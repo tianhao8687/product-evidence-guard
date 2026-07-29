@@ -1,0 +1,33 @@
+name: Product Evidence Guard tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile
+        run: python -m compileall -q product_evidence_guard
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+      - name: Run demo smoke test
+        run: |
+          python -m product_evidence_guard analyze samples/demo --output demo-output
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          summary = json.loads(Path('demo-output/run-summary.json').read_text(encoding='utf-8'))
+          assert summary['candidate_count'] == 13
+          assert summary['fact_group_count'] == 5
+          assert summary['blocking_conflict_count'] == 2
+          PY

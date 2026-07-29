@@ -1,0 +1,8 @@
+{
+  "image": "包装正面.jpg",
+  "blocks": [
+    {"text": "型号 PEG-100", "bbox": [90, 60, 410, 115], "confidence": 0.98},
+    {"text": "净重 300g", "bbox": [90, 130, 350, 180], "confidence": 0.96},
+    {"text": "套装数量 2 PCS", "bbox": [90, 200, 260, 245], "confidence": 0.93}
+  ]
+}

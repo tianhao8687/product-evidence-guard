@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=70"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "product-evidence-guard"
+version = "0.1.0"
+description = "Local multi-source product fact verification with traceable evidence and conflict classification."
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "tianhao8687"}]
+dependencies = []
+
+[project.optional-dependencies]
+documents = [
+  "python-docx>=1.1,<1.3",
+  "openpyxl>=3.1,<3.2",
+  "pypdf>=5,<7",
+]
+openvino = [
+  "openvino>=2025.4,<2027",
+  "openvino-genai>=2025.4,<2027",
+  "numpy>=1.26",
+  "pillow>=10.4",
+]
+all = [
+  "python-docx>=1.1,<1.3",
+  "openpyxl>=3.1,<3.2",
+  "pypdf>=5,<7",
+  "openvino>=2025.4,<2027",
+  "openvino-genai>=2025.4,<2027",
+  "numpy>=1.26",
+  "pillow>=10.4",
+]
+
+[project.scripts]
+product-evidence-guard = "product_evidence_guard.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["product_evidence_guard*"]
