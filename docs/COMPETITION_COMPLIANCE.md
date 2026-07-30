@@ -86,7 +86,7 @@
 | Windows 公开入口真实模型 analyze | **已验证** | 冷/热请求均成功并生成候选 |
 | 推理中 Named Pipe 并发响应 | **已验证** | 真实 4 图推理期间，`run.ps1 status` 经 Pipe 在 0.438 s 返回 `running` 和 `available_operations`，无 fallback 字段 |
 | Windows Named Pipe smoke | **已验证** | `tests/test.ps1` 的稳定 JSON、status 与 shutdown 通过 |
-| auth 不匹配、崩溃恢复、重复启动和 timeout | **已验证** | 最终 123 项本地回归覆盖 |
+| auth 不匹配、崩溃恢复、重复启动和 timeout | **已验证** | 最终 124 项本地回归覆盖 |
 | confirm/reject/export/stale 完整业务 E2E | **未完成** | 尚无最终公开入口 transcript |
 | 模型跨多次请求复用 | **已验证** | 常驻 worker 热请求 `model_reused=true`、加载 0 s |
 
@@ -152,12 +152,12 @@
 | 确认、下载、协议、PDF 与报告测试文件 | **已完成** | 对应测试文件存在 |
 | `tests/test.ps1` | **已完成** | 文件存在；结果另行验证 |
 | `tests/test-real-model.ps1` | **已完成** | opt-in 脚本存在 |
-| 最终完整 Python 测试执行 | **已验证** | 123 项通过，50.978 s |
-| Windows PowerShell smoke | **已验证** | 内部 123 项 49.864 s；中文空格、compileall、deterministic、incremental、Pipe status/shutdown JSON smoke 通过，无效路径退出码 1 |
+| 最终完整 Python 测试执行 | **已验证** | 124 项通过，53.462 s |
+| Windows PowerShell smoke | **已验证** | 内部 124 项 55.117 s；中文空格、compileall、deterministic、incremental、Pipe status/shutdown JSON smoke 通过，无效路径退出码 1 |
 | Linux CI workflow | **已完成** | Ubuntu compile、unit、demo smoke 配置存在 |
 | Windows CI workflow | **已完成** | workflow 已配置 Windows PowerShell/Python 3.11 job |
 | commit `5a4fad8` 远端 GitHub Actions | **已验证** | 临时绿色 |
-| 最终收尾提交的 GitHub Actions | **未完成** | 本地最终回归已通过；提交尚未推送，CI 待推送后记录 |
+| 最新 GitHub Actions | **未完成** | 本地最终回归已通过；最新远端 CI 状态以 PR Actions 为准，不预先声称通过 |
 | 普通 CI 不下载 8B | **已完成** | 当前 workflow 不下载模型 |
 | 独立安全测试或 fuzzing | **未完成** | 未执行 |
 
@@ -220,7 +220,7 @@
 | 分支 `codex/competition-ready-v1` | **已完成** | 当前分支已检查 |
 | Draft PR | **已验证** | [GitHub PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1) 已创建，未合并 |
 | 临时远端 CI | **已验证** | commit `5a4fad8` 绿色 |
-| 最终收尾 CI | **未完成** | 本地最终回归已通过；待提交推送后记录 |
+| 最新远端 CI | **未完成** | 本地最终回归已通过；实时状态以 PR Actions 为准 |
 | 比赛表单提交 | **待用户操作** | 用户拥有的外部动作 |
 
 ## 发布门槛
@@ -231,6 +231,6 @@
 - 确认、导出和 stale 商业闭环；
 - 防火墙阻断或抓包网络审计；
 - 登录后的 Qoder 自动/手动触发和完整业务调用；
-- 最终收尾提交的远端 CI；
+- 最新 PR Actions 状态复核；
 - 发布 ZIP、SHA-256 和干净目录检查；
 - 可追溯到提交清单的原始证据。

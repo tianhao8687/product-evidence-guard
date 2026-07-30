@@ -2,8 +2,8 @@
 
 > 发布前说明：本文是草稿。最终离线真实单图工件状态 `passed`，只验证一次功能
 > 链成功；commit `06f8360` 已完成 30 图、10 文档 synthetic CPU Benchmark，
-> 但它不等于真实业务准确率。Qoder 账号未登录，防火墙/抓包、最终收尾提交 CI 和
-> 外部发布仍未完成。
+> 但它不等于真实业务准确率。Qoder 账号未登录，防火墙/抓包和外部发布仍未完成；
+> 最新远端 CI 状态以 PR Actions 为准。
 
 ## 从“帮我总结”到“这条参数凭什么是真的”
 
@@ -169,7 +169,7 @@ worker 跨请求复用。
 
 真实 4 图推理期间，另一个 `run.ps1 status` 通过 Named Pipe 在 0.438 秒内返回
 `running` 和 `available_operations`，响应没有 fallback 字段。这证明父服务在
-模型 worker 推理时仍可并发响应状态请求。最终 123 项回归还覆盖 authkey 不匹配、
+模型 worker 推理时仍可并发响应状态请求。最终 124 项回归还覆盖 authkey 不匹配、
 崩溃恢复、重复启动和 timeout；这不是独立渗透测试。
 
 模型下载也有独立状态：先写入 `<model>.partial`，支持续传，检查官方快照中的
@@ -289,11 +289,12 @@ editable build 以 `--no-build-isolation --no-index` 执行，安装后 28 个�
 `TRANSFORMERS_OFFLINE=1`、`OPENVINO_TELEMETRY_DISABLED=1` 下完成推理；尚未做
 防火墙阻断或抓包，因此只能写“离线环境变量验证通过”，不能写“已证明零外连”。
 
-最终本地回归为 123 项通过（50.978 s）。Windows `tests/test.ps1` 内部同一 123
-项也通过（49.864 s），并完成 `unit_tests`、中文空格、compileall、确定性、增量
+最终本地回归为 124 项通过（53.462 s）。Windows `tests/test.ps1` 内部同一 124
+项也通过（55.117 s），并完成 `unit_tests`、中文空格、compileall、确定性、增量
 复用、Named Pipe status/shutdown 的 `status=passed` JSON smoke；无效路径退出码
-为 `1`。GitHub CI 在 commit `5a4fad8` 曾临时绿色；最终收尾提交尚未推送，CI
-待推送后记录。
+为 `1`。GitHub CI 在 commit `5a4fad8` 曾临时绿色；最新远端 CI 状态以
+[Draft PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1)
+的 GitHub Actions 为准，本文不预先声称其通过。
 
 ## 结果必须从原始记录中来
 
@@ -379,8 +380,8 @@ Product Evidence Guard 想回答的不是“模型能不能看懂这张包装图
 > 文件版本失效的商品事实链？
 
 已验证真实图功能、synthetic 工程 Benchmark、离线环境变量和 Qoder Skill 发现；
-本地最终 123 项回归和安装器干净重建也已通过。登录后 Qoder 调用、网络审计、
-最终收尾提交 CI、视频与发布仍待完成。
+本地最终 124 项回归和安装器干净重建也已通过。登录后 Qoder 调用、网络审计、
+视频与发布仍待完成；最新远端 CI 状态以 PR Actions 为准。
 
 ---
 

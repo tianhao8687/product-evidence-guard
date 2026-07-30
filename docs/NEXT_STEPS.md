@@ -17,7 +17,7 @@
 
 | 能力 | 状态 | 已有证据 | 仍需完成 |
 |---|---|---|---|
-| 证据记录、单位归一、冲突图、报告、增量缓存 | **已验证** | 最终本地回归 123 项通过，50.978 s | 继续扩展恶意/边界语料 |
+| 证据记录、单位归一、冲突图、报告、增量缓存 | **已验证** | 最终本地回归 124 项通过，53.462 s | 继续扩展恶意/边界语料 |
 | confirm、reject、audit、当前哈希 export、stale | **已完成** | 代码与测试存在 | 通过最终 PowerShell/Named Pipe 路径验证 |
 | 严格两步 Qwen 输出 | **已验证** | 主图片路径完成真实 CPU 冷/热公开入口运行 | 无文字层 PDF、恶劣图片和批量验证 |
 | 常驻 server 与协议 | **已验证** | 模型复用；Pipe status/shutdown、认证、崩溃、重复启动和超时回归通过 | 完整商业 E2E |
@@ -27,7 +27,7 @@
 | Qoder Skill 发现 | **已验证** | CLI 1.1.8 用户级 Skill 为 `Enabled` | 登录后自动/手动调用并保留截图/transcript |
 | 离线环境变量推理 | **已验证** | 三个离线/遥测环境变量下推理成功 | 防火墙阻断与抓包 |
 | Synthetic CPU Benchmark | **已验证** | commit `06f8360`；30 图、10 文档完成 | 真实授权数据与 Intel GPU 另行评测 |
-| Draft PR | **已验证** | [PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1) | 本地回归已通过；推送后记录最终 CI |
+| Draft PR | **已验证** | [PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1) | 本地回归已通过；最新远端 CI 以 PR Actions 为准 |
 | 发布包 | **未完成** | allowlist、lock、链接防护与 manifest 合同已验证 | 用户决定后构建/发布 ZIP、`.sha256` 并做 clean-room 检查 |
 
 ## P0：完成可执行产品链
@@ -80,7 +80,7 @@ scripts\run.ps1 shutdown
 冷/热运行记录 `model_reused=false/true` 与热加载 0 秒，继续作为复用证据。
 
 真实 4 图推理期间，公开 `run.ps1 status` 已通过 Named Pipe 在 0.438 秒返回
-`running` 和 `available_operations`，响应没有 fallback 字段。最终 123 项回归
+`running` 和 `available_operations`，响应没有 fallback 字段。最终 124 项回归
 还覆盖 authkey 不匹配、异常恢复、重复启动和 timeout；独立拒绝服务/渗透测试
 仍未执行。
 
@@ -220,12 +220,13 @@ Working Set 约 10.83 GiB、Private Bytes 约 6.96 GiB。完整样本集、Intel
 每个结果必须记录日期、revision、命令、环境、退出码和原始日志。local pass 不是
 CI pass，测试文件存在也不是 pass。
 
-状态：**已验证**。最终 Python 本地回归 123 项通过（50.978 s）；
-`tests/test.ps1` 内部同一 123 项也通过（49.864 s），并完成 `unit_tests`、中文
+状态：**已验证**。最终 Python 本地回归 124 项通过（53.462 s）；
+`tests/test.ps1` 内部同一 124 项也通过（55.117 s），并完成 `unit_tests`、中文
 空格、compileall、确定性、incremental reuse、Named Pipe status/shutdown 的
 `status=passed` JSON smoke；无效路径退出码为 `1`。Linux 与 Windows workflow
-已配置，commit `5a4fad8` 的远端 CI 曾临时绿色；最终收尾提交尚未推送，CI 待
-推送后记录。
+已配置，commit `5a4fad8` 的远端 CI 曾临时绿色；最新远端 CI 状态以
+[Draft PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1)
+的 GitHub Actions 为准，不预先声称通过。
 
 ### 9. 验证 Qoder
 
@@ -329,12 +330,12 @@ manifest 不包含对自身的自引用哈希。当前脚本的 allowlist、必�
 - 录制 3 分钟和 5 分钟演示；
 - 用真实数据替换文章占位；
 - 在现有 [Draft PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1)
-  继续提交；本地最终回归已通过，推送后记录最终 CI；
+  继续提交；本地最终回归已通过，远端状态以 PR Actions 为准；
 - 只有用户明确登录和发布时，才向 ModelScope/文章平台发布；
 - 收集最终 URL 并提交比赛表单。
 
-状态：**待用户操作**。Draft PR 已创建，commit `5a4fad8` 的 CI 临时绿色；发布、
-账号登录与比赛提交需要用户操作；最终收尾提交 CI 待推送后记录。
+状态：**待用户操作**。Draft PR 已创建，commit `5a4fad8` 的 CI 曾临时绿色；
+发布、账号登录与比赛提交需要用户操作；最新远端 CI 状态以 PR Actions 为准。
 
 ## 必须停止并报告的情况
 

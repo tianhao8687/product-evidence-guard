@@ -21,8 +21,8 @@
 - [x] 两步 reader 已接入主分析路径；
 - [x] 同一常驻 worker 的第二次请求记录 `model_reused=true`；
 - [x] 真实 4 图推理中 `status` 经 Named Pipe 在 0.438 秒内并发返回；
-- [x] 最终本地回归 123 项通过（50.978 s），Windows 内部同一 123 项通过
-      （49.864 s）且 JSON smoke 为 `status=passed`；
+- [x] 最终本地回归 124 项通过（53.462 s），Windows 内部同一 124 项通过
+      （55.117 s）且 JSON smoke 为 `status=passed`；
 - [x] Windows PowerShell 5.1 `-Force` 干净安装与二次快速跳过已验证；
 - [x] commit `06f8360` 的 30 图、10 文档 synthetic CPU Benchmark 已完成；
 - [x] Qoder CLI 1.1.8 已发现用户级 Skill 为 `Enabled`；
@@ -425,7 +425,8 @@ max_new_tokens=900 → JSON 截断 → item_not_object → 0 candidates
 > 严格测试。工具不替代授权来源、供应商确认或企业审批。它的价值是把散乱资料
 > 变成可追溯、可阻断、可确认、会随版本失效的事实链。
 
-本地最终 123 项回归可以展示，但最终收尾提交 CI 尚未推送，不能显示为已通过。
+本地最终 124 项回归可以展示；最新远端 CI 状态以 PR Actions 为准，不能在文档
+中预先显示为已通过。
 Draft PR #1 可以展示；文章、ModelScope、视频和比赛链接只有真实发布后才能展示。
 
 ## 镜头清单

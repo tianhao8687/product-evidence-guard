@@ -13,7 +13,7 @@
 这些会话并保留 transcript/截图。
 
 安装器的 allowlist、必备文件、完整性、备份/回滚，以及
-symlink/junction/reparse point/hardlink 失败关闭合同已进入 123 项最终本地回归。
+symlink/junction/reparse point/hardlink 失败关闭合同已进入 124 项最终本地回归。
 这证明安装边界，不证明 Qoder 已经触发或执行业务流程。
 
 ## 当前官方 Skill 格式
@@ -227,7 +227,7 @@ token、个人账号细节或未脱敏的客户绝对路径。
 | 官方 npm CLI 1.1.8 隔离安装 | **已验证** | 本机命令已执行 |
 | 用户级安装 | **已验证** | 当前官方用户级目录 |
 | 项目级安装 | **未完成** | 未执行；不是用户级发现证据的必要条件 |
-| 安装器技术合同 | **已验证** | 必备 lock、完整性、回滚与链接防护进入 123 项回归 |
+| 安装器技术合同 | **已验证** | 必备 lock、完整性、回滚与链接防护进入 124 项回归 |
 | Skill 发现 | **已验证** | `skills list` 显示 `Enabled` |
 | CLI 账号登录 | **待用户操作** | `status` 显示 `Account: Not logged in` |
 | 中文自动触发 | **待用户操作** | 登录后执行并保留 transcript |

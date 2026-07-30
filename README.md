@@ -252,13 +252,14 @@ Python 单元测试：
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
-最终本地回归为 **123 项通过（50.978 s）**。Windows PowerShell
-`tests\test.ps1` 内部同一 123 项也通过（49.864 s），随后输出 `status=passed`
+最终本地回归为 **124 项通过（53.462 s）**。Windows PowerShell
+`tests\test.ps1` 内部同一 124 项也通过（55.117 s），随后输出 `status=passed`
 的 JSON smoke：`unit_tests`、中文空格路径、`compileall`、确定性分析、无变化
 增量复用、Named Pipe `status` 和 `shutdown` 均通过；无效路径退出码为 `1`。
 
-这些是本地最终回归结果。GitHub CI 在 commit `5a4fad8` 曾临时绿色；最终收尾
-提交尚未推送，因此对应 CI 必须在推送后记录，本文不预先声称其通过。
+这些是本地最终回归结果。GitHub CI 在 commit `5a4fad8` 曾临时绿色；最新远端 CI
+状态以 [Draft PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1)
+的 GitHub Actions 为准，本文不预先声称其通过。
 
 真实模型与真实图片测试单独运行：
 
@@ -353,4 +354,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 analyze `
 - [完整限制](docs/LIMITATIONS.md)
 
 当前开发协作位于 [Draft PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1)；
-PR 未合并。本地最终回归已通过；最终收尾提交 CI 待推送后记录。
+PR 未合并。本地最终回归已通过；最新远端 CI 状态以 PR Actions 为准。

@@ -26,7 +26,7 @@ Product Evidence Guard 是证据辅助工具，不是权威商品信息系统。
 | 4 图推理中 Named Pipe status | **已验证** | 0.438 s 返回 `running` 与 `available_operations`，无 fallback 字段 |
 | Windows Named Pipe 完整商业工作流 | **未完成** | confirm/reject/export/stale 尚无完整公开入口记录 |
 | Named Pipe 生命周期与认证回归 | **已验证** | status/shutdown、authkey 不匹配、崩溃、重复启动和超时已覆盖 |
-| 本地自动测试 | **已验证** | 123 项通过，50.978 s；Windows 内部 123 项 49.864 s 及 JSON smoke 通过 |
+| 本地自动测试 | **已验证** | 124 项通过，53.462 s；Windows 内部 124 项 55.117 s 及 JSON smoke 通过 |
 | 真实图加载、单图耗时和 CPU 进程内存 | **已验证** | 功能 smoke，不进入准确率统计 |
 | 一次同 worker 热调用 | **已验证** | 加载 0 s，单图 30.8367 s |
 | Synthetic CPU 工程 Benchmark | **已验证** | commit `06f8360`；30 图、10 文档、质量/冲突/增量指标完成 |

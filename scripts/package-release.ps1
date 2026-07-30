@@ -543,6 +543,34 @@ function Get-GitBlobBytes {
     }
 }
 
+function Get-FileSha256Hex {
+    param([Parameter(Mandatory = $true)][string]$Path)
+
+    $Stream = $null
+    $Hasher = $null
+    try {
+        $Stream = [System.IO.File]::Open(
+            $Path,
+            [System.IO.FileMode]::Open,
+            [System.IO.FileAccess]::Read,
+            [System.IO.FileShare]::Read
+        )
+        $Hasher = [System.Security.Cryptography.SHA256]::Create()
+        $Digest = $Hasher.ComputeHash($Stream)
+        return (
+            [System.BitConverter]::ToString($Digest)
+        ).Replace('-', '').ToLowerInvariant()
+    }
+    finally {
+        if ($null -ne $Hasher) {
+            $Hasher.Dispose()
+        }
+        if ($null -ne $Stream) {
+            $Stream.Dispose()
+        }
+    }
+}
+
 function Write-UInt16LittleEndian {
     param(
         [Parameter(Mandatory = $true)][System.IO.Stream]$Stream,
@@ -1017,9 +1045,7 @@ try {
     Write-DeterministicStoredZip `
         -Entries $OrderedEntries.ToArray() `
         -Destination $PartialPath
-    $Hash = (
-        Get-FileHash -LiteralPath $PartialPath -Algorithm SHA256
-    ).Hash.ToLowerInvariant()
+    $Hash = Get-FileSha256Hex -Path $PartialPath
     [System.IO.File]::WriteAllText(
         $HashPartialPath,
         "$Hash  $ArchiveName`n",

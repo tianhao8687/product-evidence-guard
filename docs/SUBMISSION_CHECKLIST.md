@@ -97,8 +97,8 @@
 证据：
 
 ```text
-Windows smoke：tests/test.ps1 内部 123 项通过，49.864 s；JSON status=passed
-协议回归：最终 unittest discover 123 项通过，50.978 s
+Windows smoke：tests/test.ps1 内部 124 项通过，55.117 s；JSON status=passed
+协议回归：最终 unittest discover 124 项通过，53.462 s
 服务状态：Named Pipe status 与 shutdown JSON smoke 通过
 ```
 
@@ -255,7 +255,7 @@ PDF 测试矩阵：未完成；不在本次最终单图证据内
 证据：
 
 ```text
-单元测试：123 项通过，50.978 s
+单元测试：124 项通过，53.462 s
 回归源码身份：最终 ZIP 内 manifest.json.commit；不在文档中预填
 ```
 
@@ -292,10 +292,10 @@ PDF 测试矩阵：未完成；不在本次最终单图证据内
 - [x] PDF、报告、设备与 Benchmark 测试文件。
 - [x] `tests/test.ps1` 存在。
 - [x] `tests/test-real-model.ps1` 存在且为 opt-in。
-- [x] 最终完整 Python 回归 123 项通过，50.978 s。
+- [x] 最终完整 Python 回归 124 项通过，53.462 s。
 - [x] `compileall` 通过。
 - [x] 确定性 demo smoke 通过。
-- [x] Windows PowerShell 内部 123 项通过，49.864 s；JSON smoke 通过。
+- [x] Windows PowerShell 内部 124 项通过，55.117 s；JSON smoke 通过。
 - [x] 中文路径通过。
 - [x] 含空格路径通过。
 - [ ] 缺环境/模型和错误路径能正确失败。
@@ -303,23 +303,23 @@ PDF 测试矩阵：未完成；不在本次最终单图证据内
 - [x] UTF-8 JSON stdout 通过；全部 stderr 失败路径审计另列。
 - [x] commit `5a4fad8` 的 Linux GitHub Actions 临时通过。
 - [x] commit `5a4fad8` 的 Windows GitHub Actions 临时通过。
-- [ ] 最终收尾提交的 Linux/Windows checks 通过。
+- [ ] PR Actions 中最新 Linux/Windows checks 已复核。
 - [x] 当前普通 CI 不下载 8B 模型。
 - [x] 临时 CI commit 与 Draft PR 已记录。
 
 当前 `.github/workflows/tests.yml` 已配置 Linux 与 Windows job；`5a4fad8`
-临时绿色不覆盖后续本地收尾改动。本地最终回归已经通过，最终收尾提交尚未推送，
-对应 CI 待推送后记录。
+临时绿色不覆盖后续本地收尾改动。本地最终回归已经通过；最新远端 CI 状态以
+PR Actions 为准，本文不预先声称其通过。
 
 证据：
 
 ```text
-本地测试：123 项通过，50.978 s
-Windows smoke：tests/test.ps1，123 项 49.864 s + JSON smoke status=passed；
+本地测试：124 项通过，53.462 s
+Windows smoke：tests/test.ps1，124 项 55.117 s + JSON smoke status=passed；
 unit_tests/compileall/deterministic_smoke/incremental_reuse/named_pipe_status/shutdown
 均 passed，invalid_path_exit_code=1
 临时 CI commit：5a4fad8
-最终 CI：提交尚未推送；推送后记录
+最新远端 CI：以 PR Actions 为准
 ```
 
 ## 11. Qoder 验证与用户登录
@@ -436,7 +436,7 @@ dataset SHA-256：c96e95f2817b1c8f16a99952022e03f541d3a5fe89ee6db0f1d85ea01c76dc
 ```text
 SBOM/scan：未完成
 notice bundle：精确二进制发布 bundle 未完成
-安全回归：123 项通过；fuzz/XML bomb/渗透测试未完成
+安全回归：124 项通过；fuzz/XML bomb/渗透测试未完成
 ```
 
 ## 15. 文档
@@ -533,7 +533,7 @@ SHA-256：最终 ZIP 生成时写入同目录 .sha256
 - [ ] PR 列出失败、风险和用户外部操作。
 - [ ] review comments 已处理或说明。
 - [x] commit `5a4fad8` 的临时 checks 绿色。
-- [ ] 最终收尾提交的所需 checks 全部通过，或失败被明确报告。
+- [ ] PR Actions 中最新所需 checks 全部通过，或失败被明确报告。
 
 证据：
 
@@ -542,7 +542,7 @@ Branch：codex/competition-ready-v1
 临时 CI commit：5a4fad8
 最终 Commit：不在文档预填；以发布 ZIP 内 manifest.json.commit 为准
 Draft PR：https://github.com/tianhao8687/product-evidence-guard/pull/1
-最终 CI：本地最终回归已通过；提交尚未推送，推送后记录
+最新远端 CI：本地最终回归已通过；实时状态以 PR Actions 为准
 ```
 
 ## 19. ModelScope 与比赛提交 — USER
@@ -585,7 +585,7 @@ Draft PR：https://github.com/tianhao8687/product-evidence-guard/pull/1
 | 离线环境变量下推理是否完成？ | 是；防火墙阻断/抓包网络审计未完成 |
 | Qoder 是否发现并执行 Skill？ | 已发现 `Enabled`；执行待登录后确认 |
 | Benchmark 汇总是否链接原始记录？ | 是：synthetic run ID 与本地结果目录已记录 |
-| 本地与远端测试是否链接最终 commit？ | 本地 123 项与 Windows 内部 123 项/JSON smoke 已通过；最终提交尚未推送，远端 CI 待记录 |
+| 本地与远端测试是否链接最终 commit？ | 本地 124 项与 Windows 内部 124 项/JSON smoke 已通过；最新远端 CI 状态以 PR Actions 为准 |
 | 发布包是否不含模型、数据、日志、秘密和输出？ | 最终 ZIP 尚未生成验证 |
 | 是否包含精确第三方 notices？ | 项目声明已完成；最终二进制 notices 待发布盘点 |
 | 所有剩余缺口是否对外可见？ | 是；以当前清单和合规表为准 |

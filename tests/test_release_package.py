@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import stat
 import subprocess
 import tempfile
 import unittest
@@ -91,8 +92,12 @@ class ReleasePackageStaticContractTests(unittest.TestCase):
             "StringComparer]::Ordinal",
             "0x04034b50",
             "0x5021",
+            "Get-FileSha256Hex",
+            "[System.Security.Cryptography.SHA256]::Create()",
+            "[System.IO.FileShare]::Read",
         ):
             self.assertIn(required_gate, script)
+        self.assertNotIn("Get-FileHash", script)
 
     def test_repository_attributes_and_ignores_cover_release_artifacts(
         self,
@@ -212,6 +217,14 @@ class ReleasePackageIntegrationTests(unittest.TestCase):
         self.git(repository, "init", "-q")
         self.git(repository, "config", "user.email", "release-test@example.invalid")
         self.git(repository, "config", "user.name", "Release Test")
+        run_demo = repository / "scripts" / "run-demo.sh"
+        if os.name != "nt":
+            run_demo.chmod(
+                run_demo.stat().st_mode
+                | stat.S_IXUSR
+                | stat.S_IXGRP
+                | stat.S_IXOTH
+            )
         self.git(repository, "add", "--all")
         self.git(
             repository,
@@ -221,6 +234,27 @@ class ReleasePackageIntegrationTests(unittest.TestCase):
         )
         self.git(repository, "commit", "-qm", "fixture")
         return repository
+
+    def test_fixture_repository_is_clean_after_commit(self) -> None:
+        repository = self.create_repository("clean-fixture")
+        self.git(
+            repository,
+            "diff",
+            "--cached",
+            "--quiet",
+            "--exit-code",
+            "HEAD",
+            "--",
+        )
+        self.git(
+            repository,
+            "diff",
+            "--quiet",
+            "--exit-code",
+            "--",
+        )
+        status = self.git(repository, "status", "--short")
+        self.assertEqual(status.stdout, "")
 
     def package(
         self,
