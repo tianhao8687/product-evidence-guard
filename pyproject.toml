@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "product-evidence-guard"
-version = "0.1.0"
+version = "1.0.0"
 description = "Local multi-source product fact verification with traceable evidence and conflict classification."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -17,10 +17,12 @@ documents = [
   "python-docx>=1.1,<1.3",
   "openpyxl>=3.1,<3.2",
   "pypdf>=5,<7",
+  "pypdfium2>=5.12,<6",
 ]
 openvino = [
-  "openvino>=2025.4,<2027",
-  "openvino-genai>=2025.4,<2027",
+  "openvino>=2026.1,<2027",
+  "openvino-genai>=2026.1,<2027",
+  "huggingface-hub>=0.34,<1",
   "numpy>=1.26",
   "pillow>=10.4",
 ]
@@ -28,8 +30,10 @@ all = [
   "python-docx>=1.1,<1.3",
   "openpyxl>=3.1,<3.2",
   "pypdf>=5,<7",
-  "openvino>=2025.4,<2027",
-  "openvino-genai>=2025.4,<2027",
+  "pypdfium2>=5.12,<6",
+  "openvino>=2026.1,<2027",
+  "openvino-genai>=2026.1,<2027",
+  "huggingface-hub>=0.34,<1",
   "numpy>=1.26",
   "pillow>=10.4",
 ]

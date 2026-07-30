@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import sys
 
+from .confirmation import ConfirmationError, apply_decision, export_confirmed
 from .engine import analyze_directory
 
 
@@ -31,7 +32,25 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Optional local OpenVINO GenAI VLM model directory for image text reading",
     )
-    analyze.add_argument("--device", default="CPU", help="OpenVINO device, e.g. CPU, GPU or NPU")
+    analyze.add_argument(
+        "--device",
+        default="AUTO",
+        help="OpenVINO device. AUTO chooses an Intel GPU when available, otherwise CPU.",
+    )
+
+    for command, help_text in (
+        ("confirm", "Confirm one candidate after human review"),
+        ("reject", "Reject one candidate after human review"),
+    ):
+        decision = subparsers.add_parser(command, help=help_text)
+        decision.add_argument("--output-dir", required=True)
+        decision.add_argument("--session-id", required=True)
+        decision.add_argument("--candidate-id", required=True)
+        decision.add_argument("--reason", required=True)
+
+    export = subparsers.add_parser("export", help="Export currently confirmed, non-stale facts")
+    export.add_argument("--output-dir", required=True)
+    export.add_argument("--session-id", required=True)
     return parser
 
 
@@ -50,8 +69,29 @@ def main(argv: list[str] | None = None) -> int:
             )
         except Exception as exc:
             print(f"ERROR: {exc}", file=sys.stderr)
-            return 2
+            return 1
         print(json.dumps(summary, ensure_ascii=False, indent=2))
-        print(f"\n报告已生成：{output.resolve()}")
         return 0
-    return 2
+    if args.command in {"confirm", "reject"}:
+        try:
+            result = apply_decision(
+                args.output_dir,
+                session_id=args.session_id,
+                candidate_id=args.candidate_id,
+                reason=args.reason,
+                action=args.command,
+            )
+        except ConfirmationError as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            return 1
+        print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
+        return 0
+    if args.command == "export":
+        try:
+            result = export_confirmed(args.output_dir, session_id=args.session_id)
+        except ConfirmationError as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            return 1
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+    return 1

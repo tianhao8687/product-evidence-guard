@@ -11,7 +11,7 @@ from .normalization import normalize_text, values_equal
 
 
 VERSION_RE = re.compile(
-    r"(?:^|[_\-.\s])(?:v|ver|version|版本)?\s*(\d{1,4})(?:[_\-.](\d{1,2}))?(?:[_\-.](\d{1,2}))?(?:$|[_\-.\s])",
+    r"(?:^|[_\-.\s])(?:v|ver|version|版本)\s*(\d{1,4})(?:[_\-.](\d{1,2}))?(?:[_\-.](\d{1,2}))?(?:$|[_\-.\s])",
     re.IGNORECASE,
 )
 

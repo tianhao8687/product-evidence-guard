@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import csv
+from dataclasses import dataclass
 import hashlib
 import json
+from math import ceil
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -13,6 +15,24 @@ TEXT_EXTENSIONS = {".txt", ".md"}
 DOCUMENT_EXTENSIONS = {".docx", ".xlsx", ".pdf"}
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".bmp"}
 SUPPORTED_EXTENSIONS = TEXT_EXTENSIONS | {".csv", ".json"} | DOCUMENT_EXTENSIONS | IMAGE_EXTENSIONS
+MAX_PDF_PAGES = 100
+PDF_RENDER_SCALE = 2.0
+MAX_PDF_RENDER_PIXELS = 25_000_000
+
+
+@dataclass(frozen=True, slots=True)
+class PdfParseResult:
+    blocks: tuple[SourceBlock, ...]
+    scanned_page_numbers: tuple[int, ...]
+    page_count: int
+
+
+@dataclass(frozen=True, slots=True)
+class RenderedPdfPage:
+    page_number: int
+    image_path: Path
+    pixel_width: int
+    pixel_height: int
 
 
 def sha256_file(path: Path) -> str:
@@ -41,6 +61,7 @@ def _make_block(
     text: str,
     confidence: float = 1.0,
     method: str = "deterministic_parser",
+    confidence_source: str = "deterministic",
 ) -> SourceBlock:
     return SourceBlock(
         block_id=_block_id(relative_path, file_hash, locator, text),
@@ -51,6 +72,8 @@ def _make_block(
         text=text,
         recognition_confidence=max(0.0, min(1.0, confidence)),
         extraction_method=method,
+        recognition_confidence_source=confidence_source,
+        provenance={"recognition_confidence_source": confidence_source},
     )
 
 
@@ -157,6 +180,9 @@ def parse_ocr_sidecar(path: Path, relative_path: str, file_hash: str) -> list[So
                 text=str(item["text"]).strip(),
                 confidence=float(item.get("confidence", 0.75)),
                 method=str(item.get("method", "ocr_sidecar")),
+                confidence_source=str(
+                    item.get("confidence_source", "ocr_sidecar")
+                ),
             )
         )
     return blocks
@@ -237,16 +263,23 @@ def parse_xlsx(path: Path, relative_path: str, file_hash: str) -> list[SourceBlo
     return blocks
 
 
-def parse_pdf(path: Path, relative_path: str, file_hash: str) -> list[SourceBlock]:
+def parse_pdf_document(path: Path, relative_path: str, file_hash: str) -> PdfParseResult:
     try:
         from pypdf import PdfReader
     except ImportError as exc:  # pragma: no cover - optional dependency
         raise RuntimeError("读取 PDF 需要安装 pypdf：pip install -e '.[documents]'") from exc
 
     reader = PdfReader(path)
+    page_count = len(reader.pages)
+    if page_count > MAX_PDF_PAGES:
+        raise ValueError(f"PDF pages exceed safety limit: {page_count} > {MAX_PDF_PAGES}")
     blocks: list[SourceBlock] = []
+    scanned_page_numbers: list[int] = []
     for page_number, page in enumerate(reader.pages, start=1):
         text = (page.extract_text() or "").strip()
+        if not text:
+            scanned_page_numbers.append(page_number)
+            continue
         for block_index, paragraph in enumerate(part.strip() for part in text.split("\n") if part.strip()):
             blocks.append(
                 _make_block(
@@ -257,7 +290,82 @@ def parse_pdf(path: Path, relative_path: str, file_hash: str) -> list[SourceBloc
                     text=paragraph,
                 )
             )
-    return blocks
+    return PdfParseResult(
+        blocks=tuple(blocks),
+        scanned_page_numbers=tuple(scanned_page_numbers),
+        page_count=page_count,
+    )
+
+
+def parse_pdf(path: Path, relative_path: str, file_hash: str) -> list[SourceBlock]:
+    """Parse text-layer PDF pages while preserving the original public contract."""
+
+    return list(parse_pdf_document(path, relative_path, file_hash).blocks)
+
+
+def render_pdf_page(
+    path: Path,
+    page_number: int,
+    output_dir: Path,
+    *,
+    scale: float = PDF_RENDER_SCALE,
+) -> RenderedPdfPage:
+    """Render one 1-based PDF page to a temporary PNG with bounded pixels.
+
+    The caller owns ``output_dir`` and is responsible for removing it. The
+    engine uses ``TemporaryDirectory`` so rendered customer pages are removed
+    on success and on every exception path.
+    """
+
+    try:
+        import pypdfium2 as pdfium
+    except ImportError as exc:  # pragma: no cover - optional dependency
+        raise RuntimeError(
+            "渲染扫描 PDF 需要安装 pypdfium2：pip install -e '.[documents]'"
+        ) from exc
+
+    if page_number < 1:
+        raise ValueError("PDF page_number must be 1-based and positive.")
+    if not 0.25 <= scale <= 4.0:
+        raise ValueError("PDF render scale must be between 0.25 and 4.0.")
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    document = pdfium.PdfDocument(str(path))
+    try:
+        if page_number > len(document):
+            raise ValueError(f"PDF page {page_number} does not exist.")
+        page = document[page_number - 1]
+        try:
+            width_points, height_points = page.get_size()
+            expected_width = max(1, ceil(float(width_points) * scale))
+            expected_height = max(1, ceil(float(height_points) * scale))
+            if expected_width * expected_height > MAX_PDF_RENDER_PIXELS:
+                raise ValueError(
+                    "Rendered PDF page would exceed the pixel safety limit: "
+                    f"{expected_width}x{expected_height}"
+                )
+            bitmap = page.render(scale=scale)
+            try:
+                image = bitmap.to_pil()
+                try:
+                    pixel_width, pixel_height = image.size
+                    image_path = output_dir / f"page-{page_number:04d}.png"
+                    image.save(image_path, format="PNG")
+                finally:
+                    image.close()
+            finally:
+                bitmap.close()
+        finally:
+            page.close()
+    finally:
+        document.close()
+
+    return RenderedPdfPage(
+        page_number=page_number,
+        image_path=image_path,
+        pixel_width=int(pixel_width),
+        pixel_height=int(pixel_height),
+    )
 
 
 def parse_file(path: Path, root: Path) -> list[SourceBlock]:
@@ -285,13 +393,24 @@ def parse_file(path: Path, root: Path) -> list[SourceBlock]:
 
 
 def discover_files(root: Path) -> list[Path]:
-    files: list[Path] = []
-    for path in root.rglob("*"):
-        if not path.is_file():
+    canonical_root = root.expanduser().resolve(strict=True)
+    files: set[Path] = set()
+    for path in canonical_root.rglob("*"):
+        lexical_relative = path.relative_to(canonical_root)
+        if any(part.startswith(".") for part in lexical_relative.parts):
             continue
-        if any(part.startswith(".") for part in path.relative_to(root).parts):
+        try:
+            resolved = path.resolve(strict=True)
+            resolved_relative = resolved.relative_to(canonical_root)
+        except (OSError, RuntimeError, ValueError) as exc:
+            raise ValueError(
+                f"Input path escapes the selected directory or is unsafe: {lexical_relative.as_posix()}"
+            ) from exc
+        if not resolved.is_file():
             continue
-        name = path.name.casefold()
-        if name.endswith(".ocr.json") or path.suffix.casefold() in SUPPORTED_EXTENSIONS:
-            files.append(path)
+        if any(part.startswith(".") for part in resolved_relative.parts):
+            continue
+        name = resolved.name.casefold()
+        if name.endswith(".ocr.json") or resolved.suffix.casefold() in SUPPORTED_EXTENSIONS:
+            files.add(resolved)
     return sorted(files)

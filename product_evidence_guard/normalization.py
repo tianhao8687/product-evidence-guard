@@ -27,6 +27,10 @@ UNIT_FACTORS: dict[str, dict[str, Decimal]] = {
         "lb": Decimal("453.59237"),
         "lbs": Decimal("453.59237"),
         "磅": Decimal("453.59237"),
+        "oz": Decimal("28.349523125"),
+        "ounce": Decimal("28.349523125"),
+        "ounces": Decimal("28.349523125"),
+        "盎司": Decimal("28.349523125"),
     },
     "length": {
         "mm": Decimal("1"),

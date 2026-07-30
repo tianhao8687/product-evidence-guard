@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, fields
 from typing import Any
 
 
@@ -16,13 +16,16 @@ class SourceBlock:
     text: str
     recognition_confidence: float = 1.0
     extraction_method: str = "deterministic_parser"
+    recognition_confidence_source: str = "deterministic"
+    provenance: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "SourceBlock":
-        return cls(**data)
+        allowed = {item.name for item in fields(cls)}
+        return cls(**{key: value for key, value in data.items() if key in allowed})
 
 
 @dataclass(slots=True)
@@ -46,13 +49,17 @@ class FactCandidate:
     extraction_method: str
     scope: str | None = None
     notes: list[str] = field(default_factory=list)
+    mapping_confidence_source: str = "deterministic"
+    status: str = "pending"
+    provenance: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "FactCandidate":
-        return cls(**data)
+        allowed = {item.name for item in fields(cls)}
+        return cls(**{key: value for key, value in data.items() if key in allowed})
 
 
 @dataclass(slots=True)
