@@ -76,6 +76,25 @@ class DeviceSelectionTests(unittest.TestCase):
 
 
 class ResidentModelCacheTests(unittest.TestCase):
+    def test_deterministic_only_request_does_not_require_openvino(self) -> None:
+        def unexpected_device_resolution(_requested: str) -> object:
+            raise AssertionError("deterministic-only must not inspect OpenVINO")
+
+        cache = ResidentModelCache(
+            device_resolver=unexpected_device_resolution,
+        )
+        prepared = cache.prepare(
+            openvino_model=None,
+            openvino_vlm_model=None,
+            requested_device="AUTO",
+        )
+
+        self.assertIsNone(prepared["llm"])
+        self.assertIsNone(prepared["vlm"])
+        self.assertIsNone(prepared["selection"])
+        self.assertEqual(prepared["load_seconds"], 0.0)
+        self.assertFalse(prepared["reused"])
+
     def test_progress_heartbeats_reset_the_per_stage_deadline(self) -> None:
         class Process:
             exitcode = None

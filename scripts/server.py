@@ -207,6 +207,17 @@ class ResidentModelCache:
         openvino_vlm_model: str | None,
         requested_device: str,
     ) -> dict[str, Any]:
+        # A deterministic-only analysis must remain usable on a clean machine
+        # where OpenVINO is not installed.  Bypass device discovery entirely
+        # and leave any resident model cache intact for a later model request.
+        if not openvino_model and not openvino_vlm_model:
+            return {
+                "llm": None,
+                "vlm": None,
+                "selection": None,
+                "load_seconds": 0.0,
+                "reused": False,
+            }
         selection = self._device_resolver(requested_device)
         key = (
             str(Path(openvino_model).expanduser().resolve())
