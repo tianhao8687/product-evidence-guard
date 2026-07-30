@@ -1,12 +1,22 @@
+# Keep source and documentation bytes stable across Windows and Unix checkouts.
+* text=auto eol=lf
+
 # The benchmark manifest hashes exact bytes. Preserve every generated fixture
 # byte-for-byte on Linux and Windows checkouts, including ASCII-only PDFs.
 samples/generated-benchmark/** -text
 
-*.png binary
-*.jpg binary
-*.jpeg binary
-*.webp binary
-*.bmp binary
-*.pdf binary
-*.docx binary
-*.xlsx binary
+*.png -text
+*.jpg -text
+*.jpeg -text
+*.webp -text
+*.bmp -text
+*.pdf -text
+*.docx -text
+*.xlsx -text
+*.zip -text
+*.7z -text
+*.gz -text
+*.bin -text
+*.onnx -text
+*.safetensors -text
+*.gguf -text

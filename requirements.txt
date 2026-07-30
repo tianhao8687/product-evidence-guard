@@ -1,4 +1,6 @@
-# Runtime versions used for the competition-ready Windows package.
+# Direct runtime requirements used to generate requirements.lock.
+# The installer syncs the hash-locked file; do not install this input file
+# directly when reproducing the competition-ready Windows environment.
 # OpenVINO 2026.1 introduced Qwen3-VL support; 2026.2.1 is pinned so
 # installation and benchmark results remain reproducible.
 openvino==2026.2.1
@@ -11,3 +13,4 @@ python-docx==1.2.0
 openpyxl==3.1.5
 pypdf==6.0.0
 pypdfium2==5.12.1
+setuptools==80.9.0

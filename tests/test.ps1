@@ -1,4 +1,4 @@
-param(
+﻿param(
     [string]$PythonPath = '',
     [switch]$SkipUnitTests
 )

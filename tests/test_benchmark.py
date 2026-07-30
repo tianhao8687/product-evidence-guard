@@ -466,9 +466,13 @@ class BenchmarkMetricTests(unittest.TestCase):
         package_script = (SCRIPTS_DIR / "package-release.ps1").read_text(
             encoding="utf-8"
         )
-        for excluded in (".models", ".runtime", ".git", "samples\\real"):
+        for excluded in (".models", ".runtime", ".git", "samples/real"):
             self.assertIn(excluded, package_script)
         self.assertIn("SHA256", package_script)
+        self.assertIn("HEAD tracked files", package_script)
+        self.assertIn("ReparsePoint", package_script)
+        self.assertIn("hardlink list", package_script)
+        self.assertIn("StringComparer]::Ordinal", package_script)
 
         real_script = (REPO_ROOT / "tests" / "test-real-model.ps1").read_text(
             encoding="utf-8"
