@@ -1,0 +1,12 @@
+# The benchmark manifest hashes exact bytes. Preserve every generated fixture
+# byte-for-byte on Linux and Windows checkouts, including ASCII-only PDFs.
+samples/generated-benchmark/** -text
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.bmp binary
+*.pdf binary
+*.docx binary
+*.xlsx binary

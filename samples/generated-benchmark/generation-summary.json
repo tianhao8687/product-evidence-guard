@@ -1,0 +1,10 @@
+{
+  "dataset_sha256": "c96e95f2817b1c8f16a99952022e03f541d3a5fe89ee6db0f1d85ea01c76dcf3",
+  "document_count": 10,
+  "expected_manifest": "expected_manifest.json",
+  "image_count": 30,
+  "partition": "synthetic",
+  "schema_version": 1,
+  "seed": 20260730,
+  "status": "generated"
+}

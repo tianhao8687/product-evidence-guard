@@ -1,0 +1,1128 @@
+{
+  "document_count": 10,
+  "expected_conflicts": [
+    {
+      "classification": "strong_conflict",
+      "field": "net_weight"
+    },
+    {
+      "classification": "strong_conflict",
+      "field": "quantity"
+    }
+  ],
+  "font_name": "msyh.ttc",
+  "generator": "scripts/benchmark.py",
+  "image_count": 30,
+  "samples": [
+    {
+      "category": "clear",
+      "contains_prompt_injection_text": false,
+      "degradation": [],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "net_weight",
+          "raw_value": "320g"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "320"
+          ],
+          "raw_text": "净重 320g",
+          "unit_tokens": [
+            "g"
+          ]
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/clear/label-a.png",
+      "sample_id": "synthetic-clear-001",
+      "sample_type": "image",
+      "sha256": "010c18a00a6e0f3f6b3a969f8c2a45daf3782c8d6ffe893946fa4609afab661b",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "clear",
+      "contains_prompt_injection_text": false,
+      "degradation": [],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "net_weight",
+          "raw_value": "0.32kg"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "0.32"
+          ],
+          "raw_text": "净重 0.32kg",
+          "unit_tokens": [
+            "kg"
+          ]
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/clear/label-b.png",
+      "sample_id": "synthetic-clear-002",
+      "sample_type": "image",
+      "sha256": "f2c958d6c4781b8e3c3e5282d5998e20743a873025f5551519c66e9bf89d5a2a",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "clear",
+      "contains_prompt_injection_text": false,
+      "degradation": [],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "net_weight",
+          "raw_value": "300g"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "300"
+          ],
+          "raw_text": "净重 300g",
+          "unit_tokens": [
+            "g"
+          ]
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/clear/label-c.png",
+      "sample_id": "synthetic-clear-003",
+      "sample_type": "image",
+      "sha256": "85115dbfc4e725f54ce85933bc19238fc91a4567ee5e0a33f131a906475c164a",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "clear",
+      "contains_prompt_injection_text": false,
+      "degradation": [],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "quantity",
+          "raw_value": "2件"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "2"
+          ],
+          "raw_text": "包装数量 2件",
+          "unit_tokens": []
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/clear/label-d.png",
+      "sample_id": "synthetic-clear-004",
+      "sample_type": "image",
+      "sha256": "61aec2c7d2d0a8e0fcf195ba8ee2fa1279d94171f41b6c2b6abbed51422c793a",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "clear",
+      "contains_prompt_injection_text": false,
+      "degradation": [],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "quantity",
+          "raw_value": "3件"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "3"
+          ],
+          "raw_text": "包装数量 3件",
+          "unit_tokens": []
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/clear/label-e.png",
+      "sample_id": "synthetic-clear-005",
+      "sample_type": "image",
+      "sha256": "b9bc836ebba131875b55e239715725534353a46055571b1ca349ac2a2724f78d",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "clear",
+      "contains_prompt_injection_text": false,
+      "degradation": [],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "model",
+          "raw_value": "PEG-320"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "320"
+          ],
+          "raw_text": "产品型号 PEG-320",
+          "unit_tokens": []
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/clear/label-f.png",
+      "sample_id": "synthetic-clear-006",
+      "sample_type": "image",
+      "sha256": "a669cd7e86820d4ec68b54d4899b4ac7ea1a0a7369c9f79811e5b7a1ea9901b3",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "clear",
+      "contains_prompt_injection_text": false,
+      "degradation": [],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "material",
+          "raw_value": "304不锈钢"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "304"
+          ],
+          "raw_text": "主要材质 304不锈钢",
+          "unit_tokens": []
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/clear/label-g.png",
+      "sample_id": "synthetic-clear-007",
+      "sample_type": "image",
+      "sha256": "1a2194649b79119e697dc1083cab6e17bc14f050dd4f08014e97ee917edc6098",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "clear",
+      "contains_prompt_injection_text": false,
+      "degradation": [],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "color",
+          "raw_value": "深空灰"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [],
+          "raw_text": "产品颜色 深空灰",
+          "unit_tokens": []
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/clear/label-h.png",
+      "sample_id": "synthetic-clear-008",
+      "sample_type": "image",
+      "sha256": "a03c6c0c64154112f8d30f7f54b83e39822f889b43a611a5fddfe077c972e51e",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "clear",
+      "contains_prompt_injection_text": false,
+      "degradation": [],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "voltage",
+          "raw_value": "220V"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "220"
+          ],
+          "raw_text": "额定电压 220V",
+          "unit_tokens": [
+            "V"
+          ]
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/clear/label-i.png",
+      "sample_id": "synthetic-clear-009",
+      "sample_type": "image",
+      "sha256": "5e01286cfd5aebe4ea7247679b1ae94f3dcea3ed74a793b724268b13fd5db7ee",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "clear",
+      "contains_prompt_injection_text": false,
+      "degradation": [],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "power",
+          "raw_value": "800W"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "800"
+          ],
+          "raw_text": "额定功率 800W",
+          "unit_tokens": [
+            "W"
+          ]
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/clear/label-j.png",
+      "sample_id": "synthetic-clear-010",
+      "sample_type": "image",
+      "sha256": "8dd1735a7b9189066c6f1848dce9e06828f58900c84bd7d80669661fdde4d41a",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "degraded",
+      "contains_prompt_injection_text": false,
+      "degradation": [
+        "rotation",
+        "blur",
+        "glare",
+        "downsample",
+        "jpeg"
+      ],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "capacity_charge",
+          "raw_value": "5000mAh"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "5000"
+          ],
+          "raw_text": "Battery Capacity 5000mAh",
+          "unit_tokens": [
+            "mAh"
+          ]
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/degraded/label-a.jpg",
+      "sample_id": "synthetic-degraded-001",
+      "sample_type": "image",
+      "sha256": "ff07a1612bd2c585547966033b21f97d2bc54342aa275af6b5df6f71332e666c",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "degraded",
+      "contains_prompt_injection_text": false,
+      "degradation": [
+        "rotation",
+        "blur",
+        "glare",
+        "downsample",
+        "jpeg"
+      ],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "dimensions",
+          "raw_value": "120x80x30mm"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "120",
+            "80",
+            "30"
+          ],
+          "raw_text": "Dimensions 120x80x30mm",
+          "unit_tokens": [
+            "mm"
+          ]
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/degraded/label-b.jpg",
+      "sample_id": "synthetic-degraded-002",
+      "sample_type": "image",
+      "sha256": "695ab6be096b6681a623a329c4a5bf5873404d33ced2942940f0b2b772b2f41e",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "degraded",
+      "contains_prompt_injection_text": false,
+      "degradation": [
+        "rotation",
+        "blur",
+        "glare",
+        "downsample",
+        "jpeg"
+      ],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "net_weight",
+          "raw_value": "320g"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "320"
+          ],
+          "raw_text": "净重 320g",
+          "unit_tokens": [
+            "g"
+          ]
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/degraded/label-c.jpg",
+      "sample_id": "synthetic-degraded-003",
+      "sample_type": "image",
+      "sha256": "d8be590e46e520a33a1c0f31bf74b82ffc9350396da3c922c704a03399409dc7",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "degraded",
+      "contains_prompt_injection_text": false,
+      "degradation": [
+        "rotation",
+        "blur",
+        "glare",
+        "downsample",
+        "jpeg"
+      ],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "net_weight",
+          "raw_value": "0.32kg"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "0.32"
+          ],
+          "raw_text": "净重 0.32kg",
+          "unit_tokens": [
+            "kg"
+          ]
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/degraded/label-d.jpg",
+      "sample_id": "synthetic-degraded-004",
+      "sample_type": "image",
+      "sha256": "c707251e88cf36ffa2cc285e6516dada0353e8294952c0edfa3257291c9540fa",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "degraded",
+      "contains_prompt_injection_text": false,
+      "degradation": [
+        "rotation",
+        "blur",
+        "glare",
+        "downsample",
+        "jpeg"
+      ],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "net_weight",
+          "raw_value": "300g"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "300"
+          ],
+          "raw_text": "净重 300g",
+          "unit_tokens": [
+            "g"
+          ]
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/degraded/label-e.jpg",
+      "sample_id": "synthetic-degraded-005",
+      "sample_type": "image",
+      "sha256": "a57ce246944b242edbbdfcdfb5d84685126d899e1f1192319a11e48e653b3691",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "degraded",
+      "contains_prompt_injection_text": false,
+      "degradation": [
+        "rotation",
+        "blur",
+        "glare",
+        "downsample",
+        "jpeg"
+      ],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "quantity",
+          "raw_value": "2件"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "2"
+          ],
+          "raw_text": "包装数量 2件",
+          "unit_tokens": []
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/degraded/label-f.jpg",
+      "sample_id": "synthetic-degraded-006",
+      "sample_type": "image",
+      "sha256": "4e53586d0e82454447329ea5ae9e3401c6e283193c6f357bbe1fb701f975d886",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "degraded",
+      "contains_prompt_injection_text": false,
+      "degradation": [
+        "rotation",
+        "blur",
+        "glare",
+        "downsample",
+        "jpeg"
+      ],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "quantity",
+          "raw_value": "3件"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "3"
+          ],
+          "raw_text": "包装数量 3件",
+          "unit_tokens": []
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/degraded/label-g.jpg",
+      "sample_id": "synthetic-degraded-007",
+      "sample_type": "image",
+      "sha256": "f240a1dfe70adff18f9489c162885f17c46f625ba8a3c0cf256c9bd307a705ec",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "degraded",
+      "contains_prompt_injection_text": false,
+      "degradation": [
+        "rotation",
+        "blur",
+        "glare",
+        "downsample",
+        "jpeg"
+      ],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "model",
+          "raw_value": "PEG-320"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "320"
+          ],
+          "raw_text": "产品型号 PEG-320",
+          "unit_tokens": []
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/degraded/label-h.jpg",
+      "sample_id": "synthetic-degraded-008",
+      "sample_type": "image",
+      "sha256": "1a7fb4a0b78da5b29f1d5af6c381fe647672edd1ee75b73ad8f7b4dd9aaf170a",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "degraded",
+      "contains_prompt_injection_text": false,
+      "degradation": [
+        "rotation",
+        "blur",
+        "glare",
+        "downsample",
+        "jpeg"
+      ],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "material",
+          "raw_value": "304不锈钢"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "304"
+          ],
+          "raw_text": "主要材质 304不锈钢",
+          "unit_tokens": []
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/degraded/label-i.jpg",
+      "sample_id": "synthetic-degraded-009",
+      "sample_type": "image",
+      "sha256": "6bd515ebfc692b39fb09c39ee622d67caf77815b5f32dba77d132dad48093294",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "degraded",
+      "contains_prompt_injection_text": false,
+      "degradation": [
+        "rotation",
+        "blur",
+        "glare",
+        "downsample",
+        "jpeg"
+      ],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "color",
+          "raw_value": "深空灰"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [],
+          "raw_text": "产品颜色 深空灰",
+          "unit_tokens": []
+        }
+      ],
+      "language": [
+        "zh-CN"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/degraded/label-j.jpg",
+      "sample_id": "synthetic-degraded-010",
+      "sample_type": "image",
+      "sha256": "a594ec0c5b9e967dc9c5c7c02b49c99e950041816ce7d7a0a4206cacd0678383",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "mixed",
+      "contains_prompt_injection_text": false,
+      "degradation": [],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "voltage",
+          "raw_value": "220V"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "220"
+          ],
+          "raw_text": "额定电压 220V",
+          "unit_tokens": [
+            "V"
+          ]
+        }
+      ],
+      "language": [
+        "zh-CN",
+        "en"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/mixed/label-a.png",
+      "sample_id": "synthetic-mixed-001",
+      "sample_type": "image",
+      "sha256": "0ac9e4e47fe91f91d0e7d0f0417e1e7e9ec664e75d992299c65db23f390d9f6a",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "mixed",
+      "contains_prompt_injection_text": false,
+      "degradation": [],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "power",
+          "raw_value": "800W"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "800"
+          ],
+          "raw_text": "额定功率 800W",
+          "unit_tokens": [
+            "W"
+          ]
+        }
+      ],
+      "language": [
+        "zh-CN",
+        "en"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/mixed/label-b.png",
+      "sample_id": "synthetic-mixed-002",
+      "sample_type": "image",
+      "sha256": "f9426895498cc300748609d818639bab5e6eba788f616a891644f523c223bb92",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "mixed",
+      "contains_prompt_injection_text": false,
+      "degradation": [],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "capacity_charge",
+          "raw_value": "5000mAh"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "5000"
+          ],
+          "raw_text": "Battery Capacity 5000mAh",
+          "unit_tokens": [
+            "mAh"
+          ]
+        }
+      ],
+      "language": [
+        "zh-CN",
+        "en"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/mixed/label-c.png",
+      "sample_id": "synthetic-mixed-003",
+      "sample_type": "image",
+      "sha256": "4e684c8087cd7ac34df3e3630f05477c454f126860b93ba43d6b79e18665ebba",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "mixed",
+      "contains_prompt_injection_text": false,
+      "degradation": [],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "dimensions",
+          "raw_value": "120x80x30mm"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "120",
+            "80",
+            "30"
+          ],
+          "raw_text": "Dimensions 120x80x30mm",
+          "unit_tokens": [
+            "mm"
+          ]
+        }
+      ],
+      "language": [
+        "zh-CN",
+        "en"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/mixed/label-d.png",
+      "sample_id": "synthetic-mixed-004",
+      "sample_type": "image",
+      "sha256": "7a8e780d1767a7833ad48b49840c4e4c8ada9d9e8029a13bfac35ebb5b793714",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "mixed",
+      "contains_prompt_injection_text": false,
+      "degradation": [],
+      "expected_empty": false,
+      "expected_mappings": [
+        {
+          "field": "net_weight",
+          "raw_value": "320g"
+        }
+      ],
+      "expected_transcriptions": [
+        {
+          "numeric_tokens": [
+            "320"
+          ],
+          "raw_text": "净重 320g",
+          "unit_tokens": [
+            "g"
+          ]
+        }
+      ],
+      "language": [
+        "zh-CN",
+        "en"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/mixed/label-e.png",
+      "sample_id": "synthetic-mixed-005",
+      "sample_type": "image",
+      "sha256": "2e4d1dd7b43bec1e5a383b15f8bc17d72e832d802e1bdbe5f42712805ff9ea95",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "special",
+      "contains_prompt_injection_text": false,
+      "degradation": [],
+      "expected_empty": true,
+      "expected_mappings": [],
+      "expected_transcriptions": [],
+      "language": [
+        "zh-CN",
+        "en"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/special/label-a.png",
+      "sample_id": "synthetic-special-001",
+      "sample_type": "image",
+      "sha256": "efd61b299617095a3df00a82a3b1a1fd57c57bc6cbbd24dc4094e83dec0f2521",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "special",
+      "contains_prompt_injection_text": false,
+      "degradation": [],
+      "expected_empty": true,
+      "expected_mappings": [],
+      "expected_transcriptions": [],
+      "language": [
+        "zh-CN",
+        "en"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/special/label-b.png",
+      "sample_id": "synthetic-special-002",
+      "sample_type": "image",
+      "sha256": "0d013d2cca0e94dca3f0de95f28e665b8e4961a277729ed189bba260fef8cc46",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "special",
+      "contains_prompt_injection_text": true,
+      "degradation": [],
+      "expected_empty": true,
+      "expected_mappings": [],
+      "expected_transcriptions": [],
+      "language": [
+        "zh-CN",
+        "en"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/special/label-c.png",
+      "sample_id": "synthetic-special-003",
+      "sample_type": "image",
+      "sha256": "4ef4e967ca71c49bb46af8b0524c6b528d9b6ad50e39221c892a340dc6047eac",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "special",
+      "contains_prompt_injection_text": true,
+      "degradation": [],
+      "expected_empty": true,
+      "expected_mappings": [],
+      "expected_transcriptions": [],
+      "language": [
+        "zh-CN",
+        "en"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/special/label-d.png",
+      "sample_id": "synthetic-special-004",
+      "sample_type": "image",
+      "sha256": "1d7e794cdcc6ecbd3828264dbeb92544e4443492e768d6cc9bfcfba815175b8c",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "special",
+      "contains_prompt_injection_text": false,
+      "degradation": [],
+      "expected_empty": true,
+      "expected_mappings": [],
+      "expected_transcriptions": [],
+      "language": [
+        "zh-CN",
+        "en"
+      ],
+      "partition": "synthetic",
+      "relative_path": "images/special/label-e.png",
+      "sample_id": "synthetic-special-005",
+      "sample_type": "image",
+      "sha256": "a0e7d23e9c46c5c152062f035a0b4eaebc21c523bd13f6c558f77ede328b626c",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "txt",
+      "expected_mappings": [
+        {
+          "field": "net_weight",
+          "raw_value": "320g"
+        },
+        {
+          "field": "quantity",
+          "raw_value": "2件"
+        }
+      ],
+      "partition": "synthetic",
+      "relative_path": "documents/说明书.txt",
+      "sample_id": "synthetic-document-001",
+      "sample_type": "document",
+      "sha256": "8f69b9af90f9a3a121e7baff07de2ad4bd8b64c7cee05849e2a097dfaad3ef7d",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "txt",
+      "expected_mappings": [
+        {
+          "field": "material",
+          "raw_value": "不锈钢"
+        }
+      ],
+      "partition": "synthetic",
+      "relative_path": "documents/补充说明.txt",
+      "sample_id": "synthetic-document-002",
+      "sample_type": "document",
+      "sha256": "f372caa2feb598aa87c0aedb1ec1b3f2947016b2e6d5594b70693d7e7068e9c6",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "csv",
+      "expected_mappings": [
+        {
+          "field": "net_weight",
+          "raw_value": "0.32kg"
+        },
+        {
+          "field": "quantity",
+          "raw_value": "2件"
+        }
+      ],
+      "partition": "synthetic",
+      "relative_path": "documents/参数表.csv",
+      "sample_id": "synthetic-document-003",
+      "sample_type": "document",
+      "sha256": "d963a7719d56efb9bca7790d7d51830eb37e9d070eee27419a6a277e26f96b7a",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "csv",
+      "expected_mappings": [
+        {
+          "field": "net_weight",
+          "raw_value": "350g"
+        },
+        {
+          "field": "quantity",
+          "raw_value": "3件"
+        }
+      ],
+      "partition": "synthetic",
+      "relative_path": "documents/冲突表.csv",
+      "sample_id": "synthetic-document-004",
+      "sample_type": "document",
+      "sha256": "189e1631840a8c0ce5bf183fc99f0157a43fa4c779bb22b64cf0bd2374dcaae1",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "docx",
+      "expected_mappings": [
+        {
+          "field": "model",
+          "raw_value": "PEG-320"
+        },
+        {
+          "field": "power",
+          "raw_value": "800W"
+        }
+      ],
+      "partition": "synthetic",
+      "relative_path": "documents/规格书.docx",
+      "sample_id": "synthetic-document-005",
+      "sample_type": "document",
+      "sha256": "2c40efd2eb34caeabfe8d5e749e46df3133d0fce629f404771609029d66d9b2f",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "docx",
+      "expected_mappings": [
+        {
+          "field": "gross_weight",
+          "raw_value": "400g"
+        },
+        {
+          "field": "color",
+          "raw_value": "深空灰"
+        }
+      ],
+      "partition": "synthetic",
+      "relative_path": "documents/包装资料.docx",
+      "sample_id": "synthetic-document-006",
+      "sample_type": "document",
+      "sha256": "4e9a0b7f8d35d2c1f38106c166d97f7dd7bb95847085bae51c69146da1e6c3a6",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "xlsx",
+      "expected_mappings": [
+        {
+          "field": "voltage",
+          "raw_value": "220V"
+        },
+        {
+          "field": "current",
+          "raw_value": "2A"
+        }
+      ],
+      "partition": "synthetic",
+      "relative_path": "documents/电气参数.xlsx",
+      "sample_id": "synthetic-document-007",
+      "sample_type": "document",
+      "sha256": "2844b7106ff6783273b4f866992f70d3b50b5ed9efc5d8d0c8758515162d8927",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "xlsx",
+      "expected_mappings": [
+        {
+          "field": "dimensions",
+          "raw_value": "120x80x30mm"
+        }
+      ],
+      "partition": "synthetic",
+      "relative_path": "documents/尺寸参数.xlsx",
+      "sample_id": "synthetic-document-008",
+      "sample_type": "document",
+      "sha256": "0de0ee03d7a86d550110f021ebc6a59e81ae69542860c5b0e333a33269d49dd9",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "pdf",
+      "expected_mappings": [
+        {
+          "field": "voltage",
+          "raw_value": "220V"
+        },
+        {
+          "field": "quantity",
+          "raw_value": "2 pcs"
+        }
+      ],
+      "partition": "synthetic",
+      "relative_path": "documents/spec-sheet.pdf",
+      "sample_id": "synthetic-document-009",
+      "sample_type": "document",
+      "sha256": "2eb79f09305a95ae2280fa44be8d33f63c89d4bb97d1bc140426d458d27591ca",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    },
+    {
+      "category": "txt",
+      "expected_mappings": [],
+      "partition": "synthetic",
+      "relative_path": "documents/安全提示.txt",
+      "sample_id": "synthetic-document-010",
+      "sample_type": "document",
+      "sha256": "e4b753abe57488b5ace42560d3943aa8fa0aecc1af4753ae78c1c9f90b3b6339",
+      "source_license_or_authority": "synthetic-generated-for-project"
+    }
+  ],
+  "schema_version": 1,
+  "seed": 20260730
+}
