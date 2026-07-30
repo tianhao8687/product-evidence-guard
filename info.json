@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "name": "local-product-evidence-guard",
+  "version": "1.0.0",
+  "venv_name": ".venv",
+  "python_version": "3.11",
+  "mem_need_gb": 16,
+  "server_alive_timeout": 300,
+  "pipe_address": "\\\\.\\pipe\\local-product-evidence-guard",
+  "exit_codes": {
+    "0": "success",
+    "1": "general_error",
+    "2": "client_server_communication_error",
+    "3": "model_download_in_progress"
+  },
+  "models": [
+    {
+      "id": "OpenVINO/Qwen3-VL-8B-Instruct-int4-ov",
+      "source": "https://huggingface.co/OpenVINO/Qwen3-VL-8B-Instruct-int4-ov",
+      "license": "Apache-2.0",
+      "repository_size_gb": 5.46,
+      "local_dir": ".models/Qwen3-VL-8B-Instruct-int4-ov",
+      "minimum_openvino_version": "2026.1.0",
+      "required_files": [
+        "added_tokens.json",
+        "chat_template.jinja",
+        "config.json",
+        "generation_config.json",
+        "merges.txt",
+        "openvino_config.json",
+        "openvino_detokenizer.bin",
+        "openvino_detokenizer.xml",
+        "openvino_language_model.bin",
+        "openvino_language_model.xml",
+        "openvino_text_embeddings_model.bin",
+        "openvino_text_embeddings_model.xml",
+        "openvino_tokenizer.bin",
+        "openvino_tokenizer.xml",
+        "openvino_vision_embeddings_merger_model.bin",
+        "openvino_vision_embeddings_merger_model.xml",
+        "openvino_vision_embeddings_model.bin",
+        "openvino_vision_embeddings_model.xml",
+        "openvino_vision_embeddings_pos_model.bin",
+        "openvino_vision_embeddings_pos_model.xml",
+        "preprocessor_config.json",
+        "special_tokens_map.json",
+        "tokenizer.json",
+        "tokenizer_config.json",
+        "video_preprocessor_config.json",
+        "vocab.json"
+      ]
+    }
+  ]
+}
