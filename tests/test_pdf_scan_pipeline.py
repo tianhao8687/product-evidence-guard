@@ -10,6 +10,7 @@ from unittest.mock import patch
 
 from product_evidence_guard.engine import analyze_directory
 from product_evidence_guard.models import FactCandidate, SourceBlock
+from product_evidence_guard.openvino_adapter import OpenVinoDeviceSelection
 from product_evidence_guard.parsers import (
     PdfParseResult,
     RenderedPdfPage,
@@ -18,6 +19,15 @@ from product_evidence_guard.parsers import (
     sha256_file,
 )
 from product_evidence_guard.qwen_vl_reader import QwenVlReadResult
+
+
+_FAKE_CPU_SELECTION = OpenVinoDeviceSelection(
+    requested="CPU",
+    actual="CPU",
+    available_devices=("CPU",),
+    full_device_names={"CPU": "Mock CPU"},
+    policy="explicit",
+)
 
 
 class _FakePdfTextPage:
@@ -244,6 +254,7 @@ class PdfEnginePipelineTests(unittest.TestCase):
                     root,
                     output,
                     openvino_vlm_model=Path(tmp) / "fake-model",
+                    device_selection=_FAKE_CPU_SELECTION,
                 )
 
             facts = json.loads(
@@ -363,6 +374,7 @@ class PdfEnginePipelineTests(unittest.TestCase):
                     root,
                     output,
                     openvino_vlm_model=Path(tmp) / "fake-model",
+                    device_selection=_FAKE_CPU_SELECTION,
                 )
 
         self.assertEqual(summary["candidate_count"], 0)
