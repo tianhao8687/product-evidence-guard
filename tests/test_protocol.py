@@ -570,7 +570,9 @@ class ClientAndLifecycleTests(unittest.TestCase):
             )
 
     def test_powershell_entry_is_utf8_and_forwards_all_arguments(self) -> None:
-        content = (SCRIPTS_DIR / "run.ps1").read_text(encoding="utf-8")
+        # UTF-8 with BOM keeps the public entry parseable in Windows
+        # PowerShell 5.1 on non-UTF-8 runner locales.
+        content = (SCRIPTS_DIR / "run.ps1").read_text(encoding="utf-8-sig")
         self.assertTrue(content.startswith("$ErrorActionPreference = 'Stop'"))
         self.assertIn("[Console]::OutputEncoding", content)
         self.assertIn("$ClientScript @args", content)
