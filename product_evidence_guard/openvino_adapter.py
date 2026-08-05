@@ -107,6 +107,14 @@ def resolve_openvino_device(
             f"请求的 OpenVINO 设备 {requested_text} 不可用；"
             f"当前可见设备：{list(available)}"
         )
+    if (
+        match.split(".", 1)[0].upper() == "GPU"
+        and "intel" not in full_names.get(match, "").casefold()
+    ):
+        raise RuntimeError(
+            "当前 Qwen3-VL OpenVINO 管线只验证了 Intel GPU；"
+            f"检测到 {full_names.get(match) or match}，请使用 CPU 或 AUTO。"
+        )
     return OpenVinoDeviceSelection(
         requested=requested_text,
         actual=match,
@@ -261,6 +269,7 @@ class OpenVinoVlmBackend:
     """
 
     MAX_IMAGE_PIXELS = 40_000_000
+    MAX_IMAGE_EDGE = 1024
 
     def __init__(
         self,
@@ -296,6 +305,11 @@ class OpenVinoVlmBackend:
                     f"(limit {self.MAX_IMAGE_PIXELS})"
                 )
             image = self._ImageOps.exif_transpose(source).convert("RGB")
+            if max(image.size) > self.MAX_IMAGE_EDGE:
+                image.thumbnail(
+                    (self.MAX_IMAGE_EDGE, self.MAX_IMAGE_EDGE),
+                    self._Image.Resampling.LANCZOS,
+                )
             # The leading dimension is required by the official Qwen3-VL
             # OpenVINO GenAI model-card example.
             image_data = self._np.array(image, dtype=self._np.uint8)[None]

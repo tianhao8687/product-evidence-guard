@@ -172,6 +172,13 @@ $ControlledMediaExtensions = @(
 $MaximumFileBytes = 25MB
 $MaximumArchiveInputBytes = 100MB
 $MaximumFileCount = 2000
+$TextContentExtensions = @(
+    '', '.cfg', '.csv', '.ini', '.json', '.md', '.ps1', '.py', '.sh',
+    '.toml', '.txt', '.yaml', '.yml'
+)
+$TextContentLeafNames = @(
+    '.gitattributes', '.gitignore', 'LICENSE'
+)
 $PathComparison = if (
     [System.Environment]::OSVersion.Platform -eq
     [System.PlatformID]::Win32NT
@@ -263,6 +270,16 @@ function Assert-SafeGitPath {
 
 function Test-IsAllowedScope {
     param([Parameter(Mandatory = $true)][string]$RelativePath)
+
+    # Historical evidence retained in Git contains a local drive path and a
+    # cloud-host model label. The deterministic redacted crop is the only
+    # screenshot allowed into a public release.
+    if ($RelativePath.Equals(
+        'docs/assets/qoder/04-analysis-summary.png',
+        [System.StringComparison]::Ordinal
+    )) {
+        return $false
+    }
 
     foreach ($RootFile in $AllowedRootFiles) {
         if ($RelativePath.Equals(
@@ -543,6 +560,167 @@ function Get-GitBlobBytes {
     }
 }
 
+function Get-ReleaseEntryBytes {
+    param([Parameter(Mandatory = $true)][object]$Entry)
+
+    $DataProperty = $Entry.PSObject.Properties['Data']
+    if ($null -ne $DataProperty) {
+        if ($null -eq $DataProperty.Value) {
+            return ,([byte[]]@())
+        }
+        return ,([byte[]]$DataProperty.Value)
+    }
+
+    $ObjectIdProperty = $Entry.PSObject.Properties['ObjectId']
+    if (
+        $null -eq $ObjectIdProperty -or
+        [string]::IsNullOrWhiteSpace([string]$ObjectIdProperty.Value)
+    ) {
+        throw "发布条目既没有 Git 对象也没有内存数据：$($Entry.Path)"
+    }
+    return ,(Get-GitBlobBytes -ObjectId ([string]$ObjectIdProperty.Value))
+}
+
+function Assert-SafeReleaseContent {
+    param(
+        [Parameter(Mandatory = $true)][string]$RelativePath,
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [byte[]]$Data
+    )
+
+    $Leaf = [System.IO.Path]::GetFileName($RelativePath)
+    $Extension = [System.IO.Path]::GetExtension($Leaf).ToLowerInvariant()
+    if (
+        -not ($TextContentExtensions -contains $Extension) -and
+        -not ($TextContentLeafNames -contains $Leaf)
+    ) {
+        return
+    }
+
+    $Utf8 = [System.Text.UTF8Encoding]::new($false, $true)
+    try {
+        $Text = $Utf8.GetString($Data)
+    }
+    catch {
+        throw "发布文本不是严格 UTF-8：$RelativePath"
+    }
+
+    $ForbiddenPatterns = @(
+        @{ Name = 'Windows 绝对路径'; Pattern = '(?i)(?<![A-Za-z0-9])[A-Z]:[\\/]' },
+        @{ Name = '用户主目录绝对路径'; Pattern = '(?i)(?<![A-Za-z0-9])/(?:home|Users)/[^/\s]+' },
+        @{ Name = 'Bearer 凭据'; Pattern = '(?i)\bBearer\s+[A-Za-z0-9._~+/=-]{12,}' },
+        @{ Name = '常见访问令牌'; Pattern = '(?i)\b(?:hf_|gh[opusr]_)[A-Za-z0-9_-]{16,}' },
+        @{ Name = '私钥正文'; Pattern = '-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----' }
+    )
+    foreach ($Rule in $ForbiddenPatterns) {
+        if ([System.Text.RegularExpressions.Regex]::IsMatch(
+            $Text,
+            [string]$Rule.Pattern
+        )) {
+            throw "发布文本命中$($Rule.Name)规则：$RelativePath"
+        }
+    }
+}
+
+function ConvertTo-CanonicalJsonString {
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [string]$Value
+    )
+
+    $Builder = [System.Text.StringBuilder]::new()
+    $null = $Builder.Append('"')
+    foreach ($Character in $Value.ToCharArray()) {
+        $Code = [int][char]$Character
+        $EscapeSequence = $null
+        switch ($Code) {
+            8 { $EscapeSequence = '\b' }
+            9 { $EscapeSequence = '\t' }
+            10 { $EscapeSequence = '\n' }
+            12 { $EscapeSequence = '\f' }
+            13 { $EscapeSequence = '\r' }
+            34 { $EscapeSequence = '\"' }
+            92 { $EscapeSequence = '\\' }
+        }
+        if ($null -ne $EscapeSequence) {
+            $null = $Builder.Append($EscapeSequence)
+            continue
+        }
+        if ($Code -lt 0x20 -or $Code -eq 0x2028 -or $Code -eq 0x2029) {
+            $null = $Builder.Append('\u')
+            $null = $Builder.Append(
+                $Code.ToString(
+                    'x4',
+                    [System.Globalization.CultureInfo]::InvariantCulture
+                )
+            )
+        }
+        else {
+            $null = $Builder.Append($Character)
+        }
+    }
+    $null = $Builder.Append('"')
+    return $Builder.ToString()
+}
+
+function New-ReleaseManifestBytes {
+    param(
+        [Parameter(Mandatory = $true)][string]$Version,
+        [Parameter(Mandatory = $true)][string]$Commit,
+        [Parameter(Mandatory = $true)][object[]]$SourceEntries
+    )
+
+    $Invariant = [System.Globalization.CultureInfo]::InvariantCulture
+    $Builder = [System.Text.StringBuilder]::new()
+    $null = $Builder.Append('{"schema_version":1,"name":')
+    $null = $Builder.Append(
+        (ConvertTo-CanonicalJsonString -Value 'local-product-evidence-guard')
+    )
+    $null = $Builder.Append(',"version":')
+    $null = $Builder.Append((ConvertTo-CanonicalJsonString -Value $Version))
+    $null = $Builder.Append(',"commit":')
+    $null = $Builder.Append((ConvertTo-CanonicalJsonString -Value $Commit))
+    $null = $Builder.Append(',"source":')
+    $null = $Builder.Append(
+        (ConvertTo-CanonicalJsonString -Value 'clean HEAD tracked files')
+    )
+    $null = $Builder.Append(',"archive_format":')
+    $null = $Builder.Append(
+        (ConvertTo-CanonicalJsonString -Value 'deterministic ZIP/store')
+    )
+    $null = $Builder.Append(',"source_file_count":')
+    $null = $Builder.Append($SourceEntries.Count.ToString($Invariant))
+    $null = $Builder.Append(',"archive_file_count":')
+    $null = $Builder.Append(($SourceEntries.Count + 1).ToString($Invariant))
+    $null = $Builder.Append(',"files":[')
+    for ($Index = 0; $Index -lt $SourceEntries.Count; $Index++) {
+        if ($Index -gt 0) {
+            $null = $Builder.Append(',')
+        }
+        $Entry = $SourceEntries[$Index]
+        $null = $Builder.Append('{"path":')
+        $null = $Builder.Append(
+            (ConvertTo-CanonicalJsonString -Value ([string]$Entry.Path))
+        )
+        $null = $Builder.Append(',"mode":')
+        $null = $Builder.Append(
+            (ConvertTo-CanonicalJsonString -Value ([string]$Entry.Mode))
+        )
+        $null = $Builder.Append(',"size":')
+        $null = $Builder.Append(([long]$Entry.Size).ToString($Invariant))
+        $null = $Builder.Append(',"git_object":')
+        $null = $Builder.Append(
+            (ConvertTo-CanonicalJsonString -Value ([string]$Entry.ObjectId))
+        )
+        $null = $Builder.Append('}')
+    }
+    $null = $Builder.Append("]}`n")
+    $Utf8 = [System.Text.UTF8Encoding]::new($false, $true)
+    return ,($Utf8.GetBytes($Builder.ToString()))
+}
+
 function Get-FileSha256Hex {
     param([Parameter(Mandatory = $true)][string]$Path)
 
@@ -655,9 +833,9 @@ public static class ReleasePackageCrc32
             if ($NameBytes.Length -gt [uint16]::MaxValue) {
                 throw "ZIP 条目名称过长：$($Entry.Path)"
             }
-            $Data = Get-GitBlobBytes -ObjectId $Entry.ObjectId
+            $Data = Get-ReleaseEntryBytes -Entry $Entry
             if ($Data.LongLength -ne $Entry.Size) {
-                throw "Git 对象大小在打包期间发生异常：$($Entry.Path)"
+                throw "发布条目大小在打包期间发生异常：$($Entry.Path)"
             }
             if ($Data.LongLength -gt [uint32]::MaxValue) {
                 throw "文件超过非 ZIP64 格式上限：$($Entry.Path)"
@@ -947,6 +1125,11 @@ try {
             throw "发布输入超过 $MaximumArchiveInputBytes 字节总上限。"
         }
 
+        $BlobBytes = Get-GitBlobBytes -ObjectId $ObjectId
+        Assert-SafeReleaseContent `
+            -RelativePath $RelativePath `
+            -Data $BlobBytes
+
         $WorkingPath = Join-Path $RepositoryRoot (
             $RelativePath.Replace('/', [System.IO.Path]::DirectorySeparatorChar)
         )
@@ -970,6 +1153,7 @@ try {
         $Entries.Add([pscustomobject]@{
             Path = $RelativePath
             ObjectId = $ObjectId
+            Data = $BlobBytes
             Size = $Size
             Mode = $Mode
         })
@@ -982,6 +1166,9 @@ try {
         if (-not $TrackedPaths.Contains($RequiredPath)) {
             throw "HEAD 缺少必备发布文件：$RequiredPath"
         }
+    }
+    if ($TrackedPaths.Contains('manifest.json')) {
+        throw '根 manifest.json 是打包器保留的生成条目，不能由 HEAD 跟踪。'
     }
     if ($Entries.Count -eq 0) {
         throw '发布白名单中没有任何 HEAD 文件。'
@@ -1021,9 +1208,47 @@ try {
     foreach ($Entry in $Entries) {
         $EntryByPath[$Entry.Path] = $Entry
     }
-    $OrderedEntries = [System.Collections.Generic.List[object]]::new()
+    $OrderedSourceEntries = [System.Collections.Generic.List[object]]::new()
     foreach ($OrderedPath in $OrderedPaths) {
-        $OrderedEntries.Add($EntryByPath[$OrderedPath])
+        $OrderedSourceEntries.Add($EntryByPath[$OrderedPath])
+    }
+
+    $SourceFileCount = $OrderedSourceEntries.Count
+    $SourceInputBytes = $TotalBytes
+    $ManifestBytes = New-ReleaseManifestBytes `
+        -Version $Version `
+        -Commit $HeadCommit `
+        -SourceEntries $OrderedSourceEntries.ToArray()
+    $ManifestSize = [long]$ManifestBytes.LongLength
+    if ($ManifestSize -gt $MaximumFileBytes) {
+        throw "生成的 manifest.json 超过 $MaximumFileBytes 字节上限。"
+    }
+    $TotalBytes += $ManifestSize
+    if ($TotalBytes -gt $MaximumArchiveInputBytes) {
+        throw "包含 manifest.json 后的发布输入超过 $MaximumArchiveInputBytes 字节总上限。"
+    }
+    $Entries.Add([pscustomobject]@{
+        Path = 'manifest.json'
+        Data = $ManifestBytes
+        Size = $ManifestSize
+        Mode = '100644'
+    })
+    if ($Entries.Count -gt $MaximumFileCount) {
+        throw "包含 manifest.json 后的发布文件数超过 $MaximumFileCount 上限。"
+    }
+
+    $FinalOrderedPaths = [string[]]@($Entries | ForEach-Object { $_.Path })
+    [System.Array]::Sort(
+        $FinalOrderedPaths,
+        [System.StringComparer]::Ordinal
+    )
+    $FinalEntryByPath = @{}
+    foreach ($Entry in $Entries) {
+        $FinalEntryByPath[$Entry.Path] = $Entry
+    }
+    $OrderedEntries = [System.Collections.Generic.List[object]]::new()
+    foreach ($OrderedPath in $FinalOrderedPaths) {
+        $OrderedEntries.Add($FinalEntryByPath[$OrderedPath])
     }
 
     New-Item -ItemType Directory -Force -Path $ReleaseRoot | Out-Null
@@ -1069,7 +1294,10 @@ try {
         zip = $ArchivePath
         sha256 = $Hash
         sha256_file = $HashPath
-        file_count = $Entries.Count
+        manifest = 'manifest.json'
+        source_file_count = $SourceFileCount
+        source_input_bytes = $SourceInputBytes
+        file_count = $OrderedEntries.Count
         input_bytes = $TotalBytes
         archive_format = 'deterministic ZIP/store'
         exclusions = @(

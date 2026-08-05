@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "status": "completed",
+  "run_id": "resident-visual-benchmark-final-20260731",
+  "date": "2026-07-31",
+  "environment": {
+    "os": "Windows 11",
+    "cpu": "AMD Ryzen 7 7800X3D",
+    "requested_device": "AUTO",
+    "actual_device": "CPU",
+    "model": "OpenVINO/Qwen3-VL-8B-Instruct-int4-ov",
+    "model_revision": "f3d0bc7",
+    "rapidocr": "3.9.1"
+  },
+  "controlled_document_visuals": {
+    "files": [
+      "controlled-chart-and-image.xlsx",
+      "controlled-embedded-image.docx",
+      "controlled-mixed-visual.pdf"
+    ],
+    "cold_model_cold_business_cache": {
+      "wall_seconds": 11.1997,
+      "model_load_seconds": 8.5615,
+      "analysis_seconds": 2.0912,
+      "model_reused": false
+    },
+    "resident_model_cold_business_cache": {
+      "wall_seconds": 1.705,
+      "model_load_seconds": 0.0,
+      "analysis_seconds": 1.5536,
+      "model_reused": true
+    },
+    "resident_model_warm_business_cache": {
+      "wall_seconds": 0.2092,
+      "model_load_seconds": 0.0,
+      "analysis_seconds": 0.0353,
+      "model_reused": true,
+      "unchanged_files_reused": 3
+    },
+    "comparison": {
+      "cold_minus_hot_seconds": 9.4947,
+      "hot_faster_percent": 84.78,
+      "cold_over_hot_ratio": 6.57
+    },
+    "quality": {
+      "candidate_count": 21,
+      "fact_group_count": 4,
+      "blocking_conflict_count": 0,
+      "review_count": 1,
+      "pass_count": 3,
+      "image_route_counts": {
+        "ocr_fast": 3
+      },
+      "visual_content_cache": {
+        "hits": 1,
+        "misses": 2,
+        "avoided_reader_calls": 1
+      },
+      "power_group": "semantic_scope_split",
+      "power_scopes": [
+        "rating:rated",
+        "profile:eco",
+        "profile:balanced",
+        "profile:turbo"
+      ],
+      "errors": []
+    }
+  },
+  "real_mixed_pdf": {
+    "files": [
+      "raspberry-pi-5-mechanical-drawing.pdf",
+      "ti-page-08-characteristics.pdf",
+      "ti-page-24-mixed-curves.pdf"
+    ],
+    "wall_seconds": 1.3537,
+    "analysis_seconds": 1.2484,
+    "model_load_seconds": 0.0,
+    "model_reused": true,
+    "pages_detected": 3,
+    "pages_structured_from_text_layer": 2,
+    "pages_processed_as_ocr_observations": 1,
+    "qwen_calls_avoided_by_text_layer_context": 1,
+    "pages_rendered_with_roi": 1,
+    "mean_roi_area_reduction": 0.2984,
+    "ti_page_24_detail": {
+      "text_layer_line_count": 32,
+      "ocr_observation_count": 40,
+      "target_transcription_count": 7,
+      "crop_ratio": 0.701616,
+      "crop_area_reduction": 0.298384,
+      "analysis_purpose": "visual_observations",
+      "image_route": "ocr_observations",
+      "candidate_count": 0
+    },
+    "image_route_counts": {
+      "ocr_observations": 1
+    },
+    "candidate_count": 0,
+    "errors": []
+  },
+  "measurement_boundary": {
+    "cold": "new resident model cache and new analysis output",
+    "hot": "same in-process model pipeline, new analysis output",
+    "business_cache": "same resident model and same output with unchanged files",
+    "real_mixed_pdf": "same resident model after controlled phases; observations are not product facts",
+    "controlled_route_boundary": "All three controlled visual reader results used ocr_fast. The cold-versus-hot delta mainly measures resident pipeline/model construction cost; it is not a Qwen generation-speed comparison.",
+    "post_benchmark_hardening": "After timing, observation-only mode was hardened with a narrow explicit allowlist (weight, dimensions, quantity, model, material, color); electrical and capacity fields, low-confidence text, unknown units, same-OCR-line multiple values, and mixed input/output directions remain observations without Qwen or candidates. Schema-valid empty guided reviews now stop without a repeated deep call. Late-result rejection, reader-capability cache identity, stricter spatial grouping, nonzero-CropBox full-page fallback, and coordinate-space labels were also added. These changes are covered by model-free regression tests. The successful OCR routes measured above were not rerun, so these timings remain the final single-run measurements rather than performance claims for a new model process.",
+    "sample_size_warning": "These are single runs on one machine, not latency distributions or accuracy guarantees."
+  }
+}

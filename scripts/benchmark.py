@@ -242,9 +242,10 @@ def _load_fonts() -> tuple[Any, Any, str]:
         raise RuntimeError(
             "生成合成标签图需要 Pillow；请先运行 scripts\\install-env.ps1。"
         ) from exc
+    windows_root = Path(os.environ.get("WINDIR", str(Path(os.sep) / "Windows")))
     candidates = (
-        Path(r"C:\Windows\Fonts\msyh.ttc"),
-        Path(r"C:\Windows\Fonts\simhei.ttf"),
+        windows_root / "Fonts" / "msyh.ttc",
+        windows_root / "Fonts" / "simhei.ttf",
         Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"),
         Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"),
     )

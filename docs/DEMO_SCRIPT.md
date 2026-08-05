@@ -1,6 +1,6 @@
 # Product Evidence Guard 演示脚本
 
-最后复核：2026-07-30
+最后复核：2026-08-05
 
 本文提供一套确定性彩排，以及 3 分钟、5 分钟比赛录屏脚本。最终视频必须使用
 真实本地模型，并保留与画面一致的原始运行证据。仓库自带 OCR sidecar 示例只适合
@@ -21,15 +21,16 @@
 - [x] 两步 reader 已接入主分析路径；
 - [x] 同一常驻 worker 的第二次请求记录 `model_reused=true`；
 - [x] 真实 4 图推理中 `status` 经 Named Pipe 在 0.438 秒内并发返回；
-- [x] 最终本地回归 124 项通过（53.462 s），Windows 内部同一 124 项通过
-      （55.117 s）且 JSON smoke 为 `status=passed`；
+- [x] 最终 D 盘正式目录回归 229 项通过（74.951 s，0 跳过），Windows 完整 JSON smoke 为
+      `status=passed`；
 - [x] Windows PowerShell 5.1 `-Force` 干净安装与二次快速跳过已验证；
 - [x] commit `06f8360` 的 30 图、10 文档 synthetic CPU Benchmark 已完成；
 - [x] Qoder CLI 1.1.8 已发现用户级 Skill 为 `Enabled`；
-- [ ] confirm、reject、export 和 stale 已通过 `run.ps1` 完整实测；
+- [x] confirm、reject、export 和 stale 已通过 `run.ps1`/Named Pipe 使用
+      deterministic sidecar 完整实测；真实 Qwen/Qoder 录屏仍需另做；
 - [x] 三个离线/遥测环境变量下完成真实本地推理；
 - [ ] 已通过防火墙阻断或抓包证明无外连；
-- [ ] Qoder 登录后真实触发并调用 Skill；
+- [x] Qoder 登录后已完成中英文自动/手动触发、真实图片和真实图文冲突调用；
 - [ ] 画面已检查，不含客户身份、token、私有绝对路径或无关窗口。
 
 只要上述核心证据仍缺失，视频就应标为“开发预览”或在画面上明确列出未完成项，
@@ -245,11 +246,18 @@ $facts.candidates |
 > Qoder 触发本地 Skill，唯一公开入口是 run.ps1。短客户端通过 Windows
 > Named Pipe 连接本地服务，得到稳定 UTF-8 JSON。
 
-当前只验证了 Qoder CLI 1.1.8 的用户级安装与 `skills list` 显示 `Enabled`；
-`qodercli status` 为 `Account: Not logged in`。如果先录开发预览，应改为终端
-发现画面并明确说：
+Qoder CLI 1.1.8 已完成用户级安装、`skills list`、登录、自动/手动 `status`、
+匿名 sidecar 业务闭环、真实图片与真实图文冲突分析。录制时应使用脱敏终端或 IDE
+画面并明确说：
 
-> 这里展示的是 Skill 发现证据，不是 Qoder 业务调用通过。
+> Qoder 只调用本地 Skill 入口；AI 候选保持待确认，最终决定必须由用户给出。
+
+这一段不能把 Qoder 宿主等待剪成“18 秒实时完成”。现有真实会话的宿主外层耗时
+约为 82.1–273.6 秒，高于本地引擎时间。录制前可以先完成一次预热，并预先打开
+已经结束的脱敏会话；若采用时间压缩或跳切，画面必须明确标注“时间压缩”，保留
+命令发起和结束两端，并同时展示稳定 JSON 中真实的 `analysis_seconds`、
+`model_load_seconds` 和 `model_reused`。不得把时间轴中的 18 秒镜头长度说成实际
+Qoder 或本地推理耗时。
 
 模型跨请求复用与 Named Pipe 并发状态都已经验证。真实 4 图推理期间，另一个
 `run.ps1 status` 在 0.438 秒内经 Pipe 返回 `running` 和
@@ -262,15 +270,22 @@ $facts.candidates |
 - 服务的 `loading`/`running` 状态；
 - 架构图；
 - 真实 `run-summary.json`；
-- 真实单图的 `visual-transcription.json`。
+- 真实单图的 `visual-transcription.json`；
+- `document-visuals.json` 中的 Office 锚点、XLSX 原生图表和 mixed PDF 页级路由。
 
 旁白：
 
-> Word、Excel 和文字版 PDF 用确定性解析；包装图由本地 OpenVINO Qwen3-VL
-> 分两步处理：第一步只抄原文和近似位置，第二步只映射字段。模型不决定最终
-> 参数，单位换算和冲突分级由代码完成。
+> Word、Excel 和文字版 PDF 用确定性解析；包装图先走本地 OpenVINO OCR 快速
+> 路线。不确定的普通商品图只做一次本地 Qwen3-VL 紧凑视觉复核；只有复核输出
+> 非法或报错时，才进入“先抄原文和近似位置、再映射字段”的严格两步深度兜底。
+> 模型不决定最终参数，单位换算和冲突分级由代码完成。Word/Excel 内嵌图片会
+> 保留原文档位置，Excel 原生图表直接读 series 和数值点；技术图、数据图和 PDF
+> mixed page 的 `observation-only` 路线只保留文字层或 OCR observations，不调用
+> Qwen 补猜。这里的观察不是正式事实，也不代表曲线几何已经被理解。
 
-画面只显示真实值：
+画面必须先显示本轮 `image_route_counts`，明确它究竟是 OCR fast、
+`qwen_ocr_review` 还是 `qwen_deep_fallback`。下面这组数值来自较早的真实单图
+严格两步深度工件，只能按这个口径展示：
 
 ```text
 actual device: CPU
@@ -364,15 +379,19 @@ worker；客户端整请求另有 1 小时上限。展示父服务、常驻模�
 `model_reused=false`、热请求 `model_reused=true`，以及 4 图推理中 0.438 秒
 Named Pipe 状态响应。
 
-### 1:05–1:50：两步视觉安全
+### 1:05–1:50：三级视觉安全与深度两步兜底
 
-并排展示真实图片、第一步原始 JSON 和接受结果，再展示第二步 mapping。
+先展示当前图片分路：OCR fast、一次 `qwen_ocr_review`、以及只有非法/报错才进入的
+`qwen_deep_fallback`。技术图、数据图的 `observation-only` 分支只保存观察，不调用
+Qwen。随后另行展示较早真实单图深度兜底工件的第一步原始 JSON、接受结果和第二步
+mapping；不能把这份旧深度工件说成当前每张图片都会执行的路线。
 
 旁白：
 
 > 第一步只能抄录可见原文，坐标只能是近似或不可用。第二步只能从第一步原文
 > 逐字取值，并映射到字段白名单。非 JSON、缺字段、额外字段、非法坐标、超长
-> 结果和原文不存在的值都会被拒绝；最多只允许一次 JSON 语法修复。
+> 结果和原文不存在的值都会被拒绝；最多只允许一次 JSON 语法修复。这是深度
+> 兜底的安全合同，不是所有图片的固定调用次数。
 
 展示一次真实的截断失败：
 
@@ -381,6 +400,10 @@ max_new_tokens=900 → JSON 截断 → item_not_object → 0 candidates
 ```
 
 说明安全层拒绝了不完整结果，之后成功运行没有抹掉失败记录。
+
+如果本段包含 Qoder 现场调用，沿用 3 分钟版的等待规则：先预热；或明确标注时间
+压缩/跳切并保留开始、结束和错误画面；始终展示真实 elapsed 字段，不把剪辑时长
+冒充宿主、本地引擎或模型耗时。
 
 ### 1:50–2:38：证据图与确定性裁决
 
@@ -415,17 +438,25 @@ max_new_tokens=900 → JSON 截断 → item_not_object → 0 candidates
 | Synthetic 逐图分布 | 中位数 75.991379 s；p90 85.350259 s |
 | Synthetic 峰值内存 | Working Set 10.861 GiB；GPU N/A |
 | Synthetic 质量 | mapping P/R/F1=1；冲突 TP2/FP0/FN0/TN10 |
+| 文档视觉真机 | synthetic Office 图片 2/2、mixed PDF 1/1、原生 XLSX 图表 1/1；官方 Raspberry Pi/TI mixed PDF 3 页安全路由 |
+| 文档视觉速度 | 受控 3 文档外层冷/常驻重算/业务缓存为 11.1997/1.7050/0.2092 s；真实 mixed PDF 3 页为 1.3537 s |
 | 离线结果 | 三个离线/遥测环境变量下已验证；防火墙/抓包未完成 |
+
+口播必须补充：受控三文档均走 OCR fast，差值主要是 pipeline 首次构建，不是
+Qwen 生成速度；计时后新增的 `observation-only` 窄白名单、低置信度/同一 OCR
+行多值失败关闭、schema 有效空复核不重复 deep 等安全加固没有重新启动模型复测，
+只完成无模型回归。这些速度仍是原单次测量，不是新模型进程的性能结论。
 
 ### 4:35–5:00：限制与价值
 
 旁白：
 
-> 当前模型不是校准 OCR，图片坐标只是近似；扫描 PDF、资源边界和恶意文件仍需
-> 严格测试。工具不替代授权来源、供应商确认或企业审批。它的价值是把散乱资料
-> 变成可追溯、可阻断、可确认、会随版本失效的事实链。
+> 当前模型不是校准 OCR，图片坐标只是近似；纯扫描 PDF、资源边界和恶意文件仍需
+> 严格测试。PDF mixed 检测只登记页级视觉上下文，不等于图形几何理解或曲线逐点
+> 数字化。工具不替代授权来源、供应商确认或企业审批。它的价值是把散乱资料变成
+> 可追溯、可阻断、可确认、会随版本失效的事实链。
 
-本地最终 124 项回归可以展示；最新远端 CI 状态以 PR Actions 为准，不能在文档
+本地最终 229 项回归可以展示；最新远端 CI 状态以 PR Actions 为准，不能在文档
 中预先显示为已通过。
 Draft PR #1 可以展示；文章、ModelScope、视频和比赛链接只有真实发布后才能展示。
 

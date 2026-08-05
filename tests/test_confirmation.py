@@ -35,6 +35,23 @@ class ConfirmationTests(unittest.TestCase):
                     action="confirm",
                 )
 
+            state_path = output / "confirmation-state.json"
+            state_before = state_path.read_bytes()
+            audit_path = output / "confirmation-audit.jsonl"
+            audit_path.unlink()
+            audit_path.mkdir()
+            with self.assertRaises(ConfirmationError):
+                apply_decision(
+                    output,
+                    session_id=summary["session_id"],
+                    candidate_id=candidate["candidate_id"],
+                    reason="该决定不得部分写入",
+                    action="confirm",
+                )
+            self.assertEqual(state_path.read_bytes(), state_before)
+            audit_path.rmdir()
+            audit_path.write_text("", encoding="utf-8")
+
             result = apply_decision(
                 output,
                 session_id=summary["session_id"],

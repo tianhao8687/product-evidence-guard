@@ -93,22 +93,36 @@ OpenVINO 2026.1 为 `VLMPipeline` 增加了 Qwen3-VL 支持。当前锁定环境
 openvino==2026.2.1
 openvino-genai==2026.2.1.0
 openvino-tokenizers==2026.2.1.0
+rapidocr==3.9.1
 ```
 
 OpenVINO 文档说明 GenAI 依赖匹配版本的 OpenVINO Runtime 与 Tokenizers；
 混用不兼容版本可能导致 ABI 失败。
 
 Windows/Python `3.11.13` 的完整传递依赖固定在 `requirements.lock`。该正式
-发布/Qoder 必备文件列出 27 个锁定包及分发哈希；`install-env.ps1` 使用固定
-`uv 0.8.4` 与 `--require-hashes`。2026-07-30 已在 Windows PowerShell 5.1 以
-`-Force` 干净重建，editable build 使用 `--no-build-isolation --no-index`，
-环境盘点为 28 个已安装包（含本项目）且 `pip check` 兼容；二次执行命中 stamp
-并快速跳过。
+发布/Qoder 必备文件列出 35 个锁定包及分发哈希；`install-env.ps1` 使用固定
+`uv 0.8.4` 与 `--require-hashes`。2026-07-31 已同步混合视觉环境，环境盘点为
+36 个已安装 distribution（含本项目）。editable build 仍使用
+`--no-build-isolation --no-index`。
+
+RapidOCR wheel 自带 PP-OCRv6 small 的检测、方向分类和识别 ONNX 文件。运行时
+显式传入三份本地路径并复核 SHA-256：
+
+| 文件 | SHA-256 |
+|---|---|
+| `PP-OCRv6_det_small.onnx` | `090f04abcd9d9a7498bc4ebf677e4cb9bdce1fe4197ddb7e529f1ef44e1ff94f` |
+| `ch_ppocr_mobile_v2.0_cls_mobile.onnx` | `e47acedf663230f8863ff1ab0e64dd2d82b838fceb5957146dab185a89d6215c` |
+| `PP-OCRv6_rec_small.onnx` | `6f327246b50388f3c176ae304bd95767ea6dc0c9ae92153ef8cbe210b3c14884` |
+
+代码不调用 RapidOCR 的模型下载器；文件缺失、版本不符或哈希不符时禁用 OCR，
+也不会联网补齐。普通商品事实路由可以回到已经下载在本机的 Qwen；
+`observation-only` 路由则报告 OCR 不可用并失败关闭，不调用 Qwen。
 
 来源：
 
 - [安装 OpenVINO GenAI](https://docs.openvino.ai/2026/get-started/install-openvino/install-openvino-genai.html)
 - [OpenVINO GenAI 依赖兼容性](https://docs.openvino.ai/2025/get-started/install-openvino/configurations/genai-dependencies.html)
+- [RapidOCR OpenVINO 推理引擎配置](https://rapidai.github.io/RapidOCRDocs/main/install_usage/rapidocr/how_to_use_infer_engine/)
 
 模型卡还给出了 Optimum Intel 路线。Product Evidence Guard 首选 OpenVINO
 GenAI，因为模型已经导出为 OpenVINO IR；仅通过 `VLMPipeline` 调用这份预导出
@@ -184,8 +198,20 @@ python -c "from openvino import Core; print(Core().available_devices)"
 
 ## 当前代码边界
 
-- 主图片和无文字层 PDF 页面路径已按代码检查接入 `QwenVlReader` 的两步调用；
+- 主图片、DOCX/XLSX 内嵌图片、扫描 PDF 页面和需要视觉处理的 mixed PDF 页面
+  已接入 `HybridImageReader`；
+- 普通商品事实路由先走 OpenVINO OCR 安全快路径；需要复核时只调用一次 Qwen
+  紧凑复核，schema 有效空结果直接安全结束，只有 schema 非法或调用错误才进入
+  原有两步深度调用；
+- `observation-only` 路由不调用 Qwen。只有明确标签、单值、高置信度且单位安全的
+  重量（含净重/毛重）、尺寸、数量、型号、材质或颜色可以生成 `pending` 候选；
+  不同 OCR 行中相互冲突但各自安全的白名单值以 `ocr_fast_conflict` 保留双方。
+  电气/容量字段、低置信度、未知单位、同一 OCR 行多个值或 input/output 混合方向
+  只保留 observations，不生成候选；
+- XLSX 原生图表直接从工作簿结构提取 series、类别公式、数值公式和值，不调用
+  OCR；PDF 曲线页只保留文字层/OCR 观察和定位，不做完整数值点数字化；
 - `visual-transcription.json` 已在主分析路径写出；
+- `document-visuals.json` 记录 Office 视觉资产、原生图表、mixed PDF 页及状态；
 - pypdfium2 负责把无文字层页面渲染到临时目录，随后证据重定向回原 PDF 页码；
 - Named Pipe 父服务管理常驻模型 worker 子进程；worker 按模型路径和实际设备
   缓存 pipeline；
@@ -197,9 +223,44 @@ python -c "from openvino import Core; print(Core().available_devices)"
 - client 对整个文件夹请求另设 1 小时上限；
 - 真实 4 图推理期间，公开 `status` 已通过 Named Pipe 在 0.438 秒返回 `running`
   与 `available_operations`，响应没有 fallback 字段。
+- `tests/test.ps1` 已经由 `scripts/run.ps1` → Named Pipe 完成确定性 sidecar 的
+  `analyze → confirm/reject → export → 修改来源 → reanalyze → stale` 业务
+  E2E；它验证公开接口、报告、审计和状态转换，不是一次真实 Qwen/Qoder 运行。
 
-真实 CPU 冷/热和离线环境变量运行结论来自下方保留工件；扫描 PDF 和防火墙/抓包
-网络审计仍未验证。
+真实 CPU 冷/热和离线环境变量运行结论来自下方保留工件；Raspberry Pi/TI 的
+mixed PDF 已验证，纯扫描 PDF 与防火墙/抓包网络审计仍未验证。后续另完成 3 次
+安全关闭后的独立冷启动，以及一次 35 周期本地进程 TCP 状态采样。
+
+### 2026-07-31 文档内视觉记录
+
+受控 DOCX/XLSX/PDF 在 CPU 真机上完成：检测并处理 2 张 Office 内嵌图片，
+结构化 1 个 XLSX 原生图表，处理 1 个 mixed PDF 页面；所有临时资产均删除，
+21 个视觉候选仍为 `pending`，0 运行错误。同一次 `analyze` 内，同一张图片跨
+DOCX/XLSX 只调用一次 reader，但证据定位和候选身份仍各自独立。
+
+同一进程内的冷模型、常驻模型完整重算和业务缓存命中外层耗时分别为
+11.1997、1.7050、0.2092 秒；engine 分析分别为 2.0912、1.5536、0.0353 秒，
+冷模型加载 8.5615 秒。常驻完整重算减少 84.78% 耗时，冷启动耗时是热重算的
+6.57 倍。三份视觉都走 `ocr_fast`，差额主要反映 pipeline 首次构建，不是 Qwen
+生成速度；三者都是单次 CPU 工程测量，且业务缓存不能冒充模型推理。计时后新增
+`observation-only` 窄白名单、低置信度/同一 OCR 行多值失败关闭，以及 schema
+有效空复核不重复 deep 等安全加固；这些只做无模型回归，没有按约定再次重启模型，
+因此这里仍是原单次测量而不是新模型进程的性能结论。
+
+### 2026-08-05 独立冷启动分布
+
+同一张已授权公开领域标签图在每次安全关闭服务后重新运行 3 次。分析耗时为
+26.9529、27.6312、25.5298 秒，均值 **26.7046 秒**、范围
+25.5298–27.6312 秒；模型加载均值 **4.4680 秒**。三次均为 CPU、
+`qwen_ocr_review`、`model_reused=false`，各产出 2 个候选且无错误。该分布只代表
+单机、单样本；证据见
+[`evidence/performance-network-validation-20260805.md`](evidence/performance-network-validation-20260805.md)。
+
+官方 Raspberry Pi 5 机械图纸与 TI TPS65301-Q1 数据手册的 3 个选定 mixed 页面
+也已执行。2 页直接保留文字层；TI 第 24 页以 PDFium ROI 减少 29.84% 页面面积，
+保存 40 条 OCR observations，并在 `ocr_observations` 安全结束，0 个候选且没有
+调用 Qwen。这证明路由、坐标回映和安全空结果，不是图表理解准确率。机器可读摘要
+见 `docs/evidence/document-visual-acceleration-final.json`。
 
 ## 2026-07-30 本机真实单图记录
 
@@ -279,7 +340,9 @@ $env:OPENVINO_TELEMETRY_DISABLED = "1"
 ```
 
 在模型和依赖已经缓存时，本地真实图片推理成功。该方法没有防火墙阻断或抓包，
-所以不能证明进程及全部依赖“零外连”。
+所以不能证明进程及全部依赖“零外连”。另一次独立冷启动的 35 个约 100 ms TCP
+状态采样没有观察到外部 TCP 连接；采样没有捕获数据包、DNS 或 UDP，也不是
+air-gap 证明。
 
 ## 验证记录
 
@@ -297,17 +360,21 @@ $env:OPENVINO_TELEMETRY_DISABLED = "1"
 | Intel GPU 加载模型 | **未完成** | 没有保留运行证据 |
 | NPU 加载模型 | **未完成** | 不得宣传；显式请求会拒绝 |
 | 处理真实商品图片 | **已验证** | 最终工件 `status=passed`，生成 1 个 pending 候选 |
+| 文档内图片、原生 XLSX 图表与 mixed PDF | **已验证** | 受控 Office/PDF 真机与 Raspberry Pi/TI 官方 PDF 选定页已执行；不声称 PDF 曲线逐点数字化 |
 | 冷/热模型复用 | **已验证** | 冷 3.7021/52.1827 s；热 0/30.8367 s；`model_reused=true` |
+| 3 次独立冷启动分布 | **已验证** | 分析均值 26.7046 s、范围 25.5298–27.6312 s；模型加载均值 4.4680 s |
 | RAM 与 VRAM | **已验证** | CPU 进程内存见上表；本次没有 GPU VRAM |
 | Synthetic CPU Benchmark | **已验证** | commit `06f8360`；30 图成功、10 文档无错误；不等于真实业务准确率 |
 | 推理中公开状态 | **已验证** | 4 图推理期间 Named Pipe 0.438 s 返回，无 fallback 字段 |
 | 离线环境变量推理 | **已验证** | 最终工件完成本地推理；防火墙/抓包另列 |
-| 防火墙阻断与抓包 | **未完成** | 尚未证明零外连 |
-| 本地自动测试 | **已验证** | 124 项通过，53.462 s；Windows 内部 124 项 55.117 s 及 JSON smoke 通过 |
+| 本地进程 TCP 状态采样 | **已验证** | 35 个约 100 ms 周期未观察到外部 TCP |
+| 防火墙/数据包/DNS/UDP 审计 | **未完成** | 有限 TCP 状态采样不能证明零外连或 air-gapped |
+| 本地自动测试 | **已验证** | 2026-08-05 D 盘正式目录回归 229 项通过，74.951 s，0 跳过；`tests/test.ps1` 的公开入口/Named Pipe 确定性 sidecar 业务 E2E 通过 |
 
 可准确表述为“精确 8B 模型已在 CPU 完成真实图功能验证和 synthetic 工程
 Benchmark，并在离线环境变量下成功推理”。不得把 synthetic 质量值扩写成真实
-业务准确率，也不得声称 GPU/NPU 已验证或抓包证明零外连。
+业务准确率，也不得把确定性 sidecar E2E 写成真实 Qwen/Qoder 业务实录；不得
+声称 GPU/NPU 已验证或抓包证明零外连。
 
 ## 真实运行必须记录什么
 

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="660" viewBox="0 0 1200 660" role="img" aria-labelledby="title desc">
+  <title id="title">Product Evidence Guard 本地工作流</title>
+  <desc id="desc">Qoder 通过唯一入口调用本地常驻服务，文档进入确定性解析，图片进入 OpenVINO OCR 与本地 Qwen 复核，结果汇入证据图并等待人工确认。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#475569"/></marker>
+    <style>.title{font:700 30px 'Segoe UI','Microsoft YaHei',sans-serif;fill:#172554}.label{font:600 20px 'Segoe UI','Microsoft YaHei',sans-serif;fill:#172554}.small{font:400 16px 'Segoe UI','Microsoft YaHei',sans-serif;fill:#334155}.box{stroke-width:2}.arrow{stroke:#475569;stroke-width:3;fill:none;marker-end:url(#arrow)}</style>
+  </defs>
+  <rect width="1200" height="660" rx="28" fill="#f8fafc"/>
+  <text x="600" y="54" text-anchor="middle" class="title">Product Evidence Guard：本地证据核验链</text>
+  <rect x="60" y="112" width="200" height="98" rx="18" fill="#dbeafe" stroke="#2563eb" class="box"/>
+  <text x="160" y="153" text-anchor="middle" class="label">Qoder</text><text x="160" y="182" text-anchor="middle" class="small">自动或手动触发 Skill</text>
+  <rect x="330" y="112" width="220" height="98" rx="18" fill="#e0e7ff" stroke="#4f46e5" class="box"/>
+  <text x="440" y="151" text-anchor="middle" class="label">scripts/run.ps1</text><text x="440" y="182" text-anchor="middle" class="small">唯一公开入口</text>
+  <rect x="620" y="112" width="250" height="98" rx="18" fill="#ede9fe" stroke="#7c3aed" class="box"/>
+  <text x="745" y="151" text-anchor="middle" class="label">本地常驻服务</text><text x="745" y="182" text-anchor="middle" class="small">Named Pipe · 模型只加载一次</text>
+  <path d="M260 161 H330" class="arrow"/><path d="M550 161 H620" class="arrow"/>
+  <rect x="160" y="300" width="360" height="150" rx="20" fill="#dcfce7" stroke="#16a34a" class="box"/>
+  <text x="340" y="340" text-anchor="middle" class="label">确定性文档路线</text><text x="340" y="375" text-anchor="middle" class="small">TXT / CSV / JSON / DOCX / XLSX</text><text x="340" y="405" text-anchor="middle" class="small">文字层 PDF · 原生图表结构</text><text x="340" y="432" text-anchor="middle" class="small">位置、原文、文件哈希可追溯</text>
+  <rect x="680" y="300" width="360" height="150" rx="20" fill="#ffedd5" stroke="#ea580c" class="box"/>
+  <text x="860" y="340" text-anchor="middle" class="label">本地图片路线</text><text x="860" y="375" text-anchor="middle" class="small">RapidOCR / OpenVINO 快速读取</text><text x="860" y="405" text-anchor="middle" class="small">Qwen3-VL 紧凑复核 / 深度兜底</text><text x="860" y="432" text-anchor="middle" class="small">技术图 observation-only，不补猜</text>
+  <path d="M745 210 V258 H340 V300" class="arrow"/><path d="M745 210 V258 H860 V300" class="arrow"/>
+  <rect x="330" y="520" width="260" height="92" rx="18" fill="#cffafe" stroke="#0891b2" class="box"/>
+  <text x="460" y="557" text-anchor="middle" class="label">Product Evidence Graph</text><text x="460" y="584" text-anchor="middle" class="small">归一化 · 一致性 · 强冲突</text>
+  <rect x="700" y="520" width="260" height="92" rx="18" fill="#fee2e2" stroke="#dc2626" class="box"/>
+  <text x="830" y="557" text-anchor="middle" class="label">人工安全门</text><text x="830" y="584" text-anchor="middle" class="small">confirm / reject / stale / export</text>
+  <path d="M340 450 V478 H460 V520" class="arrow"/><path d="M860 450 V478 H460 V520" class="arrow"/><path d="M590 566 H700" class="arrow"/>
+</svg>

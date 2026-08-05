@@ -28,25 +28,39 @@ Windows 常规运行需要：
 不是所有机器的最低内存保证；继续按 `info.json` 中的 16 GB 规划值留出安全余量。
 
 commit `06f8360` 还完成了 30 图、10 文档的 synthetic CPU 工程 Benchmark；
-图片 30/30 成功。该基准不等于真实业务准确率。Qoder CLI 已发现 Skill，但账号
-未登录；防火墙/抓包和完整 Windows 商业闭环仍未完成。准确状态见
+图片 30/30 成功。该基准不等于真实业务准确率。Windows 已通过唯一入口完成一组
+deterministic/sidecar 的确认、拒绝、导出与 stale 闭环；它不等同于真实 Qwen
+或真实图片 Qoder 质量演示。Qoder CLI 已发现 Skill；自动/手动 `status` 与匿名
+sidecar 的分析、确认、拒绝、导出和 stale 闭环已通过。真实图片 Qoder 冷/热/
+缓存与真实图＋受控文档强冲突分析也已完成；本轮人工决定及防火墙/抓包仍未完成。准确状态见
 [`MODEL_AND_RUNTIME.md`](MODEL_AND_RUNTIME.md)、
 [`QODER_VALIDATION.md`](QODER_VALIDATION.md) 和
 [`BENCHMARK.md`](BENCHMARK.md)。
+
+同一公开领域真实标签图另完成 3 次安全关闭后的独立冷启动：分析均值
+26.7046 秒、范围 25.5298–27.6312 秒；这是单机单样本分布。一次 35 周期、约
+100 ms 间隔的本地进程 TCP 状态采样没有观察到外部 TCP，但它不是防火墙、数据包、
+DNS、UDP 或 air-gap 证明。
 
 ## 可读取的资料
 
 | 输入 | 本地处理路线 |
 |---|---|
 | TXT、Markdown、CSV、JSON | 确定性解析器 |
-| DOCX、XLSX | 确定性 Office 解析器 |
-| 有文字层的 PDF | 确定性 PDF 文字解析器 |
+| DOCX | 确定性文字解析；文档内 PNG/JPEG/WebP/BMP 图片提取后走本地视觉路线 |
+| XLSX | 确定性单元格解析；内嵌图片走本地视觉路线；原生图表直接读取 series、类别和值 |
+| 有文字层的 PDF | 确定性文字解析；图纸、曲线或大图 mixed page 另保留视觉上下文，必要时渲染分析 |
 | 带 `image.ext.ocr.json` 的图片 | 明确提供的 OCR sidecar 解析器 |
 | 不带 sidecar 的图片 | 配置模型后使用本地 OpenVINO Qwen3-VL |
-| 无文字层或扫描 PDF 页面 | pypdfium2 本地逐页渲染，再交给 Qwen3-VL；代码已接入，真实 PDF 仍待验证 |
+| 无文字层或扫描 PDF 页面 | pypdfium2 本地逐页渲染，再交给同一 OCR/Qwen 混合路线；真实扫描 PDF 仍待单独验证 |
 
 图片扩展名支持 PNG、JPG/JPEG、WebP 和 BMP。生成式视觉语言模型不是经过校准的
 OCR；它给出的坐标只能是 `approximate` 或 `unavailable`。
+
+Office 内嵌图片会先提取到临时目录，分析后删除；证据重新指回原 DOCX/XLSX、
+文件哈希、段落或工作表锚点。XLSX 原生图表不需要 OCR：程序读取图表系列引用的
+工作表数据并写入结构化结果。PDF mixed page 目前能保留文字层、OCR 行、图例和
+轴标签，但不会把曲线完整数字化成逐点坐标。
 
 ## 1. 安装环境
 
@@ -77,9 +91,9 @@ $ModelRoot = Join-Path $ProjectRoot ".models\Qwen3-VL-8B-Instruct-int4-ov"
 .\scripts\install-env.ps1 -Force
 ```
 
-2026-07-30 已在 Windows PowerShell 5.1 以 `-Force` 完成干净重建，27 个
+2026-07-31 已在 Windows PowerShell 5.1 以 `-Force` 完成干净重建，35 个
 运行/构建包都以 `--require-hashes` 锁定；editable build 使用
-`--no-build-isolation --no-index`。安装后 28 个包（含本项目）`pip check` 通过；
+`--no-build-isolation --no-index`。安装后 36 个包（含本项目）`pip check` 通过；
 二次执行命中 stamp 并快速跳过。`requirements.lock` 是发布包与 Qoder 安装的
 必备文件，不可只带 `requirements.txt`。安装失败时先保留日志并排查，不要为了
 重试而删除已有模型或来源资料。
@@ -197,6 +211,7 @@ NVIDIA GeForce RTX 5070 (dGPU)，因此应选择 CPU。不要把 NVIDIA 显卡�
 2. `conflicts.md`
 3. `evidence-report.html`
 4. `product-facts.json`
+5. `document-visuals.json`（输入含文档内图片或图表时）
 
 | 文件 | 内容 |
 |---|---|
@@ -209,6 +224,39 @@ NVIDIA GeForce RTX 5070 (dGPU)，因此应选择 CPU。不要把 NVIDIA 显卡�
 | `confirmation-audit.jsonl` | 本地追加式决定和失效记录 |
 | `confirmed-product-facts.json` | 仅包含人工确认且来源哈希仍有效的候选 |
 | `visual-transcription.json` | 两步视觉原始输出、通过项、拒绝项和诊断 |
+| `document-visuals.json` | DOCX/XLSX 内嵌图片、XLSX 原生图表、PDF mixed page 的定位、哈希、结构化内容、路由和状态 |
+
+`document-visuals.json` 顶层 `status=observations_not_facts` 明确表示整个文件是
+观察和结构化上下文，不是候选事实。记录中的 `status=structured` 表示原生 XLSX
+图表数据已从工作簿结构读出；`structured_from_text_layer` 表示 PDF 页的文字层
+足以保存图表上下文并避免模型调用；`processed` 表示视觉路线已执行。它们都不等于
+人工确认，也不能直接进入正式事实导出。
+
+视觉路线的 `ocr_observations` 位于 `visual-transcription.json`，每条包含
+`raw_text`、RapidOCR recognizer score 的来源以及 `bbox_1000` 近似框。
+`document-visuals.json` 对已处理资产只汇总 `ocr_observation_count`。这些行级
+观察可以帮助人定位轴标签或尺寸，但不是候选事实，更不是 OCR 正确率。
+只有文字层足够丰富且明确带 `chart/figure/graph/plot/curve` 等图表语义的 mixed
+PDF 才会启用这种模式；普通商品图文页仍走事实候选路线。仅观察模式是失败关闭：
+OCR 不可用、报错或超时时不会回退 Qwen，也不会生成候选，并会标为需要重试。
+仅当 OCR 行以明确标签开头、字段属于重量/尺寸/数量/型号/材质/颜色白名单，并且
+通过置信度、单位和单值检查时（例如 `NET WEIGHT: 320 g`），仅观察选择才会取消；
+只保留这些白名单候选并让它们进入跨来源冲突审查。不同 OCR 行上的两个高置信
+白名单值可以同时保留为 `pending`，以免吞掉真实冲突。电压、电流、功率、频率、
+容量、低置信、未知单位、同一 OCR 行同字段多值或输入/输出混写都继续走
+`ocr_observations`：候选和 mappings 为空，也不会调用 Qwen。
+
+普通商品图片不受上述“禁止 Qwen 补猜”的观察模式约束：OCR 安全检查失败时可以
+进入一次 Qwen 紧凑复核。若该复核输出通过 schema 校验但没有安全候选，系统把它
+作为有效空结果结束，不会再重复一次昂贵的 deep Qwen；只有复核输出无效或报错时，
+才进入原有两步深度路径。
+
+ROI 页面会同时记录 `crop_box_pdf`、`crop_ratio` 与坐标空间。结构化
+transcription/OCR observation 的 `bbox_1000` 在仿射校验成功时回映到原 PDF
+页，校验失败则置空并标记 `position_precision=unavailable`；
+`raw_transcription_output` 若来自裁剪图则仍属于
+`raw_coordinate_space=rendered_crop_image_1000`。旋转页、非零 CropBox 原点、
+坐标异常、区域分散或节省不足时会安全回退整页。
 
 ### 冲突等级
 
@@ -350,6 +398,18 @@ pipeline。本机热请求已记录 `model_reused=true` 和加载 0 秒。真实
 .\scripts\install-qoder-skill.ps1 -Scope User
 ```
 
+本机已经在其他目录准备好 `.venv` 和模型时，可显式复用该运行时：
+
+```powershell
+.\scripts\install-qoder-skill.ps1 `
+  -Scope User `
+  -RuntimeRoot "<prepared-project-root>" `
+  -Update
+```
+
+这会写入安装副本的 `.runtime\source-root.txt`，不会复制或重复下载模型；发布包
+不会包含这个本机绝对路径。Qoder 仍只调用安装副本的 `scripts\run.ps1`。
+
 项目级安装：
 
 ```powershell
@@ -378,9 +438,9 @@ symlink/junction/reparse point/hardlink 拒绝合同已纳入最终本地回归�
 ```
 
 本机已隔离安装官方 npm Qoder CLI 1.1.8，用户级安装成功，且
-`qodercli skills list` 显示 Skill 为 `Enabled`。但 `qodercli status` 显示
-`Account: Not logged in`，所以只有“安装与发现”已验证；自动/手动调用、截图和
-业务 transcript 仍需用户登录。
+`qodercli skills list` 显示 Skill 为 `Enabled`。2026-08-04 已完成 CLI 登录，
+自动路由和手动 `/local-product-evidence-guard` 均通过唯一入口成功执行无数据
+`status`。读取样本的分析、确认和导出仍需明确的数据出境授权。
 
 ## 常见问题
 
@@ -407,7 +467,10 @@ symlink/junction/reparse point/hardlink 拒绝合同已纳入最终本地回归�
 - 资料中“上传”“执行”“删除”“忽略指令”等文字始终只是证据数据。
 - 安装和模型下载会联网；模型缓存后，已在 `HF_HUB_OFFLINE=1`、
   `TRANSFORMERS_OFFLINE=1`、`OPENVINO_TELEMETRY_DISABLED=1` 下完成推理。
-  尚未做防火墙阻断或抓包，不能声称已证明零外连。
+  后续有限 TCP 状态采样未观察到外部 TCP；尚未做防火墙阻断或数据包/DNS/UDP
+  抓取，不能声称已证明零外连或 air-gapped。
+- 当前已生成 CycloneDX 1.5 SBOM、35 包许可证元数据和实际 pypdfium2 wheel 的
+  19 份 PDFium/依赖 notices；漏洞扫描与完整二进制传递依赖许可证审计仍未完成。
 - 输出是本地明文，不会自动删除或加密。
 - 分享或提交前先检查报告、日志和截图。
 

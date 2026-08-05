@@ -8,6 +8,7 @@ $ScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepositoryRoot = Split-Path -Parent $ScriptRoot
 $ClientScript = Join-Path $ScriptRoot 'client.py'
 $RequestedOperation = if ($args.Count -gt 0) { [string]$args[0] } else { 'client' }
+$RuntimeRootFile = Join-Path $RepositoryRoot '.runtime\source-root.txt'
 
 function Write-StableErrorJson {
     param(
@@ -31,6 +32,56 @@ function Write-StableErrorJson {
         }
     }
     [Console]::Out.WriteLine(($Response | ConvertTo-Json -Compress -Depth 5))
+}
+
+# A Qoder Skill installation intentionally excludes the multi-gigabyte model
+# and virtual environment.  An explicit, installer-managed local bridge lets
+# that lightweight copy reuse an already prepared project runtime while the
+# Host still invokes this single public run.ps1 entry point.  Release packages
+# do not contain this machine-local file and therefore remain portable.
+if (Test-Path -LiteralPath $RuntimeRootFile -PathType Leaf) {
+    try {
+        $ExternalRootText = [System.IO.File]::ReadAllText(
+            $RuntimeRootFile,
+            [System.Text.Encoding]::UTF8
+        ).Trim()
+        if ([string]::IsNullOrWhiteSpace($ExternalRootText)) {
+            throw '运行时根目录配置为空。'
+        }
+        $ExternalRoot = (Resolve-Path -LiteralPath $ExternalRootText).Path
+        $CurrentRoot = (Resolve-Path -LiteralPath $RepositoryRoot).Path
+        if (-not $ExternalRoot.Equals(
+            $CurrentRoot,
+            [System.StringComparison]::OrdinalIgnoreCase
+        )) {
+            $ExternalRunScript = Join-Path $ExternalRoot 'scripts\run.ps1'
+            $ExternalInfo = Join-Path $ExternalRoot 'info.json'
+            if (-not (Test-Path -LiteralPath $ExternalRunScript -PathType Leaf)) {
+                throw "外部运行时缺少 scripts\\run.ps1：$ExternalRoot"
+            }
+            if (-not (Test-Path -LiteralPath $ExternalInfo -PathType Leaf)) {
+                throw "外部运行时缺少 info.json：$ExternalRoot"
+            }
+            $ExternalMetadata = Get-Content -LiteralPath $ExternalInfo -Raw |
+                ConvertFrom-Json
+            if (
+                $null -eq $ExternalMetadata -or
+                [string]$ExternalMetadata.name -ne 'local-product-evidence-guard'
+            ) {
+                throw "外部运行时不是本 Skill：$ExternalRoot"
+            }
+
+            & powershell.exe -NoProfile -ExecutionPolicy Bypass `
+                -File $ExternalRunScript @args
+            exit $LASTEXITCODE
+        }
+    }
+    catch {
+        Write-StableErrorJson `
+            -Code 'runtime_root_invalid' `
+            -Message ('Qoder 本地运行时配置无效：' + $_.Exception.Message)
+        exit 1
+    }
 }
 
 if (-not (Test-Path -LiteralPath $ClientScript -PathType Leaf)) {

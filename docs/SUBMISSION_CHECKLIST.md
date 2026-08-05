@@ -1,6 +1,6 @@
 # 比赛提交清单
 
-最后复核：2026-07-30
+最后复核：2026-08-05
 
 本文件是最终证据索引。源码工件勾选只代表“文件存在并已检查”，不代表工作流
 已经通过。只有精确命令或会话真实执行并留下证据，验证项才可以勾选。
@@ -62,7 +62,7 @@
 ```text
 模型校验清单：<project-root>\release\model-sha256-manifest.json
 发布源码身份：ZIP 内 manifest.json.commit
-最终 ZIP 版本一致性：实际构建后复核；当前不预造结果
+最终 ZIP 版本一致性：历史 v1.0.0 候选已构建；最终新 HEAD 的标准路径 ZIP 待重建复核
 ```
 
 ## 3. 唯一入口与运行架构
@@ -75,6 +75,7 @@
 - [x] `scripts/install-qoder-skill.ps1`
 - [x] `scripts/model_download.py`
 - [x] `scripts/benchmark.py`
+- [x] `scripts/benchmark-document-visuals.py`
 - [x] `scripts/package-release.ps1`
 - [ ] `SKILL.md` 和用户文档只把 `scripts/run.ps1` 作为公开入口。
 - [x] Windows 上稳定 UTF-8 JSON stdout 已验证。
@@ -82,7 +83,8 @@
 - [ ] 退出码 `0/1/2/3` 已端到端验证。
 - [x] Named Pipe 地址、authkey 和协议版本已验证一致。
 - [x] 每个连接只处理一个请求。
-- [ ] `status`、`analyze`、`confirm`、`reject`、`export`、`shutdown` 全部实测。
+- [x] `status`、`analyze`、`confirm`、`reject`、`export`、`shutdown` 已通过
+      `scripts/run.ps1` → Named Pipe 确定性 sidecar E2E 实测。
 - [ ] `starting`、`downloading`、`loading`、`running`、`error`、`shutdown`
       状态迁移全部实测。
 - [x] 重复启动、旧 PID/lock、精确进程恢复、崩溃和 timeout 已纳入最终回归。
@@ -91,15 +93,18 @@
 - [x] 真实 4 图推理中，`run.ps1 status` 经 Named Pipe 在 0.438 秒内返回
       `running` 和 `available_operations`，响应没有 fallback 字段。
 
-当前已知缺口是 confirm/reject/export/stale 尚无最终公开入口商业 transcript；
-模型复用、推理中 Pipe 状态并发、认证失败和生命周期错误路径已经验证。
+确定性 sidecar 已覆盖完整公开入口商业闭环；该证据不等同于真实 Qwen/Qoder
+录屏。模型复用、推理中 Pipe 状态并发、认证失败和生命周期错误路径已经验证。
 
 证据：
 
 ```text
-Windows smoke：tests/test.ps1 内部 124 项通过，55.117 s；JSON status=passed
-协议回归：最终 unittest discover 124 项通过，53.462 s
-服务状态：Named Pipe status 与 shutdown JSON smoke 通过
+最终完整基线：tests/test.ps1 在 D 盘正式目录内部 unittest 229 项通过，74.951 s，
+0 跳过
+公开入口：scripts/run.ps1 → Named Pipe sidecar E2E 覆盖 analyze、confirm（含理由）、
+reject（含理由）、export、修改来源、reanalyze 和 stale
+报告/审计：JSON、Markdown、HTML 与 confirmation-audit.jsonl 均通过
+说明：上述是确定性 sidecar 证据，不是真实 Qwen/Qoder 证据
 ```
 
 ## 4. 环境与依赖安装
@@ -111,12 +116,12 @@ Windows smoke：tests/test.ps1 内部 124 项通过，55.117 s；JSON status=pas
 - [x] 已在 Windows PowerShell 5.1 以 `-Force` 干净重建。
 - [x] 重复安装命中 stamp 并安全快速跳过。
 - [x] `-Force` 精确目标与 reparse point 防护已验证。
-- [x] 28 个已安装包（含本项目）`pip check` 全部兼容。
-- [x] 27 个运行/构建包全部 hash-locked，并使用 `--require-hashes`。
+- [x] 36 个已安装包（含本项目）`pip check` 全部兼容。
+- [x] 35 个运行/构建包全部 hash-locked，并使用 `--require-hashes`。
 - [x] editable build 使用 `--no-build-isolation --no-index`，不临时解析未锁定后端。
 - [ ] 安装失败返回非零码和清晰中文提示。
 - [ ] 绝对日志路径存在，且日志不含商品正文。
-- [ ] 已盘点安装环境中的依赖许可证。
+- [x] 已盘点 35 个锁定 distribution 的许可证元数据并生成机器可读清单。
 - [x] 已生成带分发哈希的正式 `requirements.lock`。
 
 证据：
@@ -124,8 +129,9 @@ Windows smoke：tests/test.ps1 内部 124 项通过，55.117 s；JSON status=pas
 ```text
 安装结果：Windows PowerShell 5.1 -Force 成功；Python 3.11.13
 重复安装：命中 stamp，快速跳过
-依赖结果：27 个 hash-locked 包；28 个已安装包（含本项目）兼容
-SBOM/完整二进制许可证包：未完成，不能由 lock 文件替代
+依赖结果：35 个 hash-locked 包；36 个已安装包（含本项目）兼容
+SBOM：CycloneDX 1.5，35/35 锁定 distribution 已纳入
+许可证：35 包元数据已盘点；完整所有二进制传递依赖许可证审计仍未完成
 ```
 
 ## 5. 模型获取与身份
@@ -138,13 +144,13 @@ SBOM/完整二进制许可证包：未完成，不能由 lock 文件替代
 - [x] revision 固定。
 - [ ] 下载前剩余磁盘已截图或记录。
 - [x] 完整正式快照已下载。
-- [ ] 中断并恢复下载已真实演练。
+- [x] 中断并恢复下载已真实演练。
 - [x] 正式快照可由精确模型成功加载。
 - [x] 26 个必需 payload 为 `5,462,515,610` bytes。
 - [x] 含 Hugging Face 元数据的模型目录为 `5,462,526,140` bytes。
 - [x] 已生成并保留 26 文件 SHA-256 manifest；清单尚未签名。
-- [ ] 已验证不完整正式目录会报错且不会被覆盖。
-- [ ] 通过 `run.ps1` 验证退出码 `3` 和 `--continue`。
+- [x] 已验证不完整正式目录会报错且不会被覆盖。
+- [x] 通过 `run.ps1` 验证退出码 `3` 和 `--continue`。
 
 证据：
 
@@ -152,7 +158,8 @@ SBOM/完整二进制许可证包：未完成，不能由 lock 文件替代
 目标目录：<project-root>\.models\Qwen3-VL-8B-Instruct-int4-ov
 revision：f3d0bc7
 下载日志：正式快照已下载并成功加载；原始日志保留在 Git 外
-续传日志：未完成中断/恢复 E2E
+续传日志：tiny Hub partial→后台 worker；首调用 0.462 s/exit 3，第二次
+--continue exit 0，最终原子提升；详见 docs/evidence/download-resume-validation-20260805.md
 manifest/checksum：<project-root>\release\model-sha256-manifest.json
 必需 payload：5,462,515,610 bytes；含元数据目录：5,462,526,140 bytes
 ```
@@ -255,7 +262,7 @@ PDF 测试矩阵：未完成；不在本次最终单图证据内
 证据：
 
 ```text
-单元测试：124 项通过，53.462 s
+最终完整基线：D 盘正式目录 229 项通过，74.951 s，0 跳过
 回归源码身份：最终 ZIP 内 manifest.json.commit；不在文档中预填
 ```
 
@@ -268,18 +275,20 @@ PDF 测试矩阵：未完成；不在本次最终单图证据内
 - [x] `confirmation-audit.jsonl`。
 - [x] 只含当前 hash 的 `confirmed-product-facts.json`。
 - [x] 来源变化后 reconciliation 为 stale。
-- [ ] 强冲突未自动选择的真实演示。
-- [ ] 通过 `run.ps1` 真实执行 confirm/reject。
-- [ ] export 只含已确认且当前候选。
-- [ ] 公共 E2E 中修改来源使旧决定 stale。
-- [ ] HTML/Markdown/JSON 完整显示确认和 stale 信息。
+- [x] 确定性 sidecar 公共 E2E 中强冲突未自动选择。
+- [x] 通过 `run.ps1` 执行带非空理由的 confirm/reject。
+- [x] export 只含已确认且当前候选。
+- [x] 公共 E2E 中修改来源、reanalyze，并使旧决定 stale。
+- [x] HTML/Markdown/JSON 完整显示确认和 stale 信息，审计 JSONL 已验证。
 
 证据：
 
 ```text
-商业闭环 transcript：未完成
-脱敏输出目录：未生成
-修改前后 hash：未执行公开入口 stale E2E
+商业闭环：tests/test.ps1 通过 scripts/run.ps1 → Named Pipe 完成
+analyze → confirm（含理由）→ reject（含理由）→ export → 修改来源 →
+reanalyze → stale；stale candidate 重试按预期 exit 1
+报告/审计：JSON、Markdown、HTML、confirmation-audit.jsonl 均通过
+证据边界：使用 samples/demo 确定性 sidecar，不是真实 Qwen/Qoder 录屏证据
 ```
 
 ## 10. 自动测试与 CI
@@ -290,16 +299,33 @@ PDF 测试矩阵：未完成；不在本次最终单图证据内
 - [x] downloader 测试文件。
 - [x] protocol 测试文件。
 - [x] PDF、报告、设备与 Benchmark 测试文件。
+- [x] 4 份官方公开 PDF/DOCX/XLSX 完成原生解析、误报修复与增量速度测试；原文件
+      保持在 Git 和发布包之外。
+- [x] 可复现 DOCX/XLSX/PDF 样本覆盖 2 张 Office 内嵌图片、1 个原生 XLSX
+      图表和 1 个 mixed PDF 页面；真实模型处理摘要已脱敏归档。
+- [x] Raspberry Pi/TI 官方 mixed PDF 3 页完成页级检测、文字层保留与安全路由；
+      TI 曲线页 ROI 面积减少 29.84%，以 OCR observations 结束；明确不宣称
+      图形几何理解或曲线逐点数字化。
+- [x] `docs/evidence/document-visual-acceleration-final.json` 分栏保留受控文档
+      冷模型、常驻完整重算、业务缓存命中和真实 mixed PDF 摘要，并注明受控路径
+      全部为 OCR fast、计时后安全加固未重启模型复测。
+- [x] `observation-only` 只允许明确标签、单值、高置信度且单位安全的重量（含
+      净重/毛重）、尺寸、数量、型号、材质或颜色生成候选；电气/容量、低置信度、
+      未知单位、同一 OCR 行多值和 input/output 混合方向只保留 observations，
+      不调用 Qwen。schema 有效空紧凑复核不重复 deep；这些都是计时后无模型回归
+      边界，旧的单次速度没有重启模型复测。
 - [x] `tests/test.ps1` 存在。
 - [x] `tests/test-real-model.ps1` 存在且为 opt-in。
-- [x] 最终完整 Python 回归 124 项通过，53.462 s。
+- [x] 最终 D 盘正式目录 Python 回归 229 项通过，74.951 s，0 跳过。
+      脱敏机器摘要：`docs/evidence/final-local-regression-20260805.json`。
 - [x] `compileall` 通过。
 - [x] 确定性 demo smoke 通过。
-- [x] Windows PowerShell 内部 124 项通过，55.117 s；JSON smoke 通过。
+- [x] Windows PowerShell `tests/test.ps1` 最终完整基线中，内部 unittest
+      D 盘正式目录 229 项通过，74.951 s，0 跳过；完整业务 E2E JSON 通过。
 - [x] 中文路径通过。
 - [x] 含空格路径通过。
 - [ ] 缺环境/模型和错误路径能正确失败。
-- [ ] 下载 pending/continue 通过。
+- [x] 下载 pending/continue 通过。
 - [x] UTF-8 JSON stdout 通过；全部 stderr 失败路径审计另列。
 - [x] commit `5a4fad8` 的 Linux GitHub Actions 临时通过。
 - [x] commit `5a4fad8` 的 Windows GitHub Actions 临时通过。
@@ -314,10 +340,12 @@ PR Actions 为准，本文不预先声称其通过。
 证据：
 
 ```text
-本地测试：124 项通过，53.462 s
-Windows smoke：tests/test.ps1，124 项 55.117 s + JSON smoke status=passed；
-unit_tests/compileall/deterministic_smoke/incremental_reuse/named_pipe_status/shutdown
-均 passed，invalid_path_exit_code=1
+最终完整基线：D 盘正式目录 229 项通过，74.951 s，0 跳过
+Windows smoke：tests/test.ps1 status=passed；unit_tests、compileall、
+deterministic_smoke、incremental_reuse、public_business_e2e、json_reports、
+markdown_report、html_report、audit_jsonl、named_pipe_status、shutdown 均 passed；
+confirm/reject/export/reanalyze 均 exit 0，stale candidate 与 invalid path 均 exit 1
+业务证据边界：完整闭环使用确定性 sidecar，不是真实 Qwen/Qoder
 临时 CI commit：5a4fad8
 最新远端 CI：以 PR Actions 为准
 ```
@@ -329,28 +357,34 @@ unit_tests/compileall/deterministic_smoke/incremental_reuse/named_pipe_status/sh
 - [x] 安装器 allowlist、必备 `requirements.lock`、完整性、备份/回滚和链接防护
       合同已通过最终回归。
 - [x] Skill 出现在 `qodercli skills list`，状态为 `Enabled`。
-- [x] `qodercli status` 的实际结果已记录为 `Account: Not logged in`。
-- [ ] 用户已登录 Qoder。
+- [x] 2026-08-04 已完成 Qoder CLI 登录；自动/手动触发与匿名 sidecar 分析、确认、拒绝、导出、stale 已通过并保存脱敏记录。
+- [x] 用户已登录 Qoder；只记录登录状态，不保存账号或认证材料。
 - [ ] 用户级和项目级没有同名重复项的最终截图。
-- [ ] 中文自动触发已记录。
-- [ ] 英文自动触发已记录。
-- [ ] 手动 `/local-product-evidence-guard` 已记录。
-- [ ] Qoder 只调用 `scripts\run.ps1`。
-- [ ] downloading/`--continue` 行为已记录。
-- [ ] analyze/confirm/reject/export/stale 已记录。
-- [ ] 中文文件名和输出没有 mojibake。
-- [ ] 没有云模型/OCR 回退。
-- [ ] Qoder 版本、范围、解析路径、命令、退出码和 transcript 已保留。
-- [ ] 脱敏截图存于 `docs/assets/qoder/`。
-- [ ] 有证据后才把 `QODER_VALIDATION.md` 改为已验证。
+- [x] 原任务指定的 5 条中文触发句已在 5 个全新会话逐条验证，5/5 自动选择 Skill，均只调用一次 `status`。
+- [x] 原任务指定的 3 条英文触发句已在 3 个全新会话逐条验证，3/3 自动选择 Skill，均只调用一次 `status`。
+- [x] 8 条触发矩阵脱敏记录已保存；8/8 Tool 与 CLI 退出码 0、无乱码、未读取商品文件。
+- [x] 手动 `/local-product-evidence-guard` 已记录。
+- [x] 现有脱敏会话中，Qoder 业务操作只调用 `scripts\run.ps1`。
+- [x] downloading/`--continue` 行为已记录。
+- [x] 匿名 sidecar 的 analyze/confirm/reject/export/stale 已记录；真实图文新一轮决定仍未执行。
+- [x] 中文文件名、理由和输出没有 mojibake。
+- [x] 运行工件证明图片 OCR/VLM 使用本地 OpenVINO 后端且没有云 OCR/VLM 回退；独立网络抓包仍未完成。
+- [x] Qoder 版本、范围、解析路径、命令、退出码和脱敏 transcript 已保留。
+- [x] 一张脱敏截图及文字证据存于 `docs/assets/qoder/`；完整截图组仍未完成。
+- [x] `QODER_VALIDATION.md` 已按现有证据更新，并明确列出未完成边界。
 
 证据：
 
 ```text
 Qoder 版本：CLI 1.1.8
 安装范围/路径：用户级 `%USERPROFILE%\.qoder\skills\local-product-evidence-guard\`
-transcript：[待填]
-截图目录：[待填]
+transcript：docs/assets/qoder/2026-08-04-status-validation.md；
+            docs/assets/qoder/2026-08-04-business-workflow.md；
+            docs/assets/qoder/2026-08-05-english-auto-trigger.md；
+            docs/assets/qoder/2026-08-05-real-image-performance.md；
+            docs/assets/qoder/2026-08-05-real-image-controlled-documents.md
+截图：docs/assets/qoder/04-analysis-summary-redacted.png
+尚缺：用户级/项目级无重复项截图，以及 confirm/export/stale 完整 IDE 截图组
 ```
 
 ## 12. 离线验证
@@ -360,8 +394,8 @@ transcript：[待填]
       `OPENVINO_TELEMETRY_DISABLED=1`。
 - [x] 在上述环境变量下通过公开入口分析一张真实图片。
 - [x] 项目分析路径没有托管模型或云 OCR 回退。
-- [ ] 防火墙阻断或抓包观察方法已记录。
-- [ ] 已观察并记录外连尝试。
+- [x] 约 100 ms TCP 状态采样方法、目标 PID 范围和严格边界已记录。
+- [x] 35 个采样周期内未观察到外部 TCP；不等于防火墙/数据包/DNS/UDP 抓取。
 - [x] 环境变量、退出码与本地报告已保留。
 - [x] `PRIVACY.md`、模型文档和文章已区分环境变量验证与网络审计。
 
@@ -370,7 +404,8 @@ transcript：[待填]
 ```text
 离线方法：三个离线/遥测环境变量
 离线日志：见 <artifact-root> 下脱敏运行记录
-防火墙/抓包网络观察：未完成
+TCP 状态观察：35 个约 100 ms 周期未观察到外部 TCP
+边界：防火墙、数据包、DNS、UDP 与 air-gap 证明未完成
 ```
 
 ## 13. Benchmark
@@ -386,7 +421,7 @@ transcript：[待填]
 - [x] 完整 synthetic CPU 结果。
 - [ ] 适用 Intel GPU 结果。
 - [x] 30 图逐图中位数与 p90 已记录。
-- [ ] 独立重复冷启动分布；冻结运行只记录一次加载。
+- [x] 同一真实标签图安全关闭后独立冷启动 3 次；分析均值 26.7046 s，范围 25.5298–27.6312 s。
 - [x] 峰值进程 RAM 已记录；GPU 内存因 CPU 推理为 N/A。
 - [x] 数字/单位正确率与原始计数。
 - [x] 字段 mapping precision/recall/F1。
@@ -419,12 +454,12 @@ dataset SHA-256：c96e95f2817b1c8f16a99952022e03f541d3a5fe89ee6db0f1d85ea01c76dc
 - [x] 固定依赖列表中没有强 copyleft PDF renderer。
 - [x] pypdfium2/PDFium notice 义务已记录。
 - [ ] 日志已审计正文、模型 raw text、凭据和客户绝对路径。
-- [ ] 网络外连测试。
+- [x] 已完成有限本地进程 TCP 状态采样；未观察到外部 TCP，且未扩大为零外连结论。
 - [ ] 依赖漏洞扫描。
-- [ ] SBOM。
+- [x] CycloneDX 1.5 SBOM 已生成；35/35 锁定 distribution 有版本、哈希和许可证元数据。
 - [x] 依赖 hash-required lock 与模型 26 文件 SHA-256 manifest 已生成。
-- [ ] 模型 manifest 签名、完整 SBOM、漏洞扫描和二进制许可证包。
-- [ ] 已收集精确 pypdfium2 wheel 对应的 PDFium 和依赖 notices。
+- [ ] 模型 manifest 签名、漏洞扫描和所有二进制传递依赖的完整许可证审计。
+- [x] 已从实际 `pypdfium2 5.12.1` Windows x64 wheel 收集并索引 19 份 PDFium/依赖 notices。
 - [ ] 畸形/敌对文件与资源耗尽测试。
 - [x] 输入发现、发布和 Qoder 的 symlink/junction/reparse-point/hardlink 防护测试。
 - [x] Named Pipe authkey 不匹配、崩溃、重复启动和 timeout 回归测试。
@@ -434,9 +469,11 @@ dataset SHA-256：c96e95f2817b1c8f16a99952022e03f541d3a5fe89ee6db0f1d85ea01c76dc
 证据：
 
 ```text
-SBOM/scan：未完成
-notice bundle：精确二进制发布 bundle 未完成
-安全回归：124 项通过；fuzz/XML bomb/渗透测试未完成
+SBOM：CycloneDX 1.5，35/35 锁定 distribution 已覆盖
+notice bundle：实际 pypdfium2 wheel 的 19 份 PDFium/依赖 notices 已收集
+仍未完成：漏洞扫描、所有其他二进制传递依赖的完整许可证审计、模型 manifest 签名
+安全回归：最终 D 盘正式目录基线 229 项通过，74.951 s，0 跳过；
+fuzz/XML bomb/渗透测试未完成
 ```
 
 ## 15. 文档
@@ -453,9 +490,9 @@ notice bundle：精确二进制发布 bundle 未完成
 - [x] `docs/SUBMISSION_CHECKLIST.md`。
 - [x] `docs/LIMITATIONS.md`。
 - [x] `docs/NEXT_STEPS.md`。
-- [ ] 所有本地 Markdown 链接都可解析。
+- [x] 所有本地 Markdown 链接都可解析；已由只读全库扫描复核，并纳入 `test_submission_contract`。
 - [ ] 所有 Mermaid 可渲染。
-- [ ] 除明确警告/历史说明外，没有旧 `.lingma` 安装指令。
+- [x] 除明确警告/历史说明外，没有旧 `.lingma` 安装指令。
 - [ ] 没有虚构模型、Qoder、离线、Benchmark、CI 或 PR 状态。
 - [ ] 日期、版本、命令、输出文件名和状态表一致。
 
@@ -506,25 +543,24 @@ release/local-product-evidence-guard-v1.0.0.zip
 - [x] allowlist 独立于 `.gitignore`，并拒绝 reparse point/hardlink 输入。
 - [x] ZIP 内 `manifest.json.commit` 作为源码身份；manifest 不自引用哈希。
 - [x] ZIP 同目录 `.sha256` 作为整个归档的校验权威。
-- [ ] ZIP 内容清单已保留。
-- [ ] SHA-256 已生成并独立复核。
-- [ ] 干净目录解压、安装和 smoke 通过。
-- [ ] 精确第三方 license bundle 已包含。
+- [x] ZIP 内容清单已由 `manifest.json` 核验并保留。
+- [x] SHA-256 已生成并独立重算复核。
+- [ ] 最终新 HEAD 的精确发布包完成 clean-room 解压、安装、完整测试和 smoke。
+- [ ] 所有二进制传递依赖的完整第三方 license bundle 已包含；pypdfium2/PDFium 19 份 notices 已完成。
 
 证据：
 
 ```text
-ZIP：尚未由用户执行最终发布
-SHA-256：最终 ZIP 生成时写入同目录 .sha256
-内容清单：最终 ZIP 内 manifest.json
-干净目录：最终 ZIP 生成后执行；当前仅技术合同已验证
+历史 clean-room：commit 2f10f53 的包在全新临时目录解压；使用 Python 3.11.13
+按 lock 安装 36 个包，模块从解压目录导入；219 项通过（77.233 s，0 跳过）并
+完成业务 E2E。当前新 HEAD 的标准路径 ZIP、SHA-256 与精确 clean-room 仍需重建复验。
 ```
 
 ## 18. GitHub PR 与远端检查
 
 - [ ] 最终变更有意地 stage。
 - [ ] commit 历史清楚，且不含模型、客户数据或输出。
-- [x] 分支已 push 至当前 Draft PR。
+- [ ] 最终本地分支已 push 至当前 Draft PR；当前 PR head 仍落后本地最终变更。
 - [x] 对正确 base 创建 Draft PR。
 - [x] PR 未 merge。
 - [ ] PR 摘要列出功能和文件变化。
@@ -570,7 +606,7 @@ Draft PR：https://github.com/tianhao8687/product-evidence-guard/pull/1
 | 技术文章 | `待链接` |
 | 演示视频 | `待链接` |
 | Benchmark 证据 | `<artifact-root>\benchmark-final-06f8360-20260730\` |
-| Qoder 证据 | `待链接或附件` |
+| Qoder 证据 | `docs/assets/qoder/`（脱敏 transcript、真实图片性能与 1 张 IDE 截图） |
 | 比赛提交确认 | `待记录` |
 
 ## 最终签署
@@ -581,12 +617,12 @@ Draft PR：https://github.com/tianhao8687/product-evidence-guard/pull/1
 |---|---|
 | 精确 8B 是否在声明设备运行？ | 是：CPU 真实图功能验证与 synthetic Benchmark |
 | 真实公开图片是否完成两步模型调用？ | 是：一张 |
-| Windows 公共入口是否完成 analyze/confirm/export/stale？ | analyze 已验证；完整商业闭环未完成 |
+| Windows 公共入口是否完成 analyze/confirm/export/stale？ | 是：确定性 sidecar 已经由 `scripts/run.ps1` → Named Pipe 完成 analyze、confirm、reject、export、来源变更、reanalyze 与 stale；真实 Qwen/Qoder 录屏仍待完成 |
 | 离线环境变量下推理是否完成？ | 是；防火墙阻断/抓包网络审计未完成 |
-| Qoder 是否发现并执行 Skill？ | 已发现 `Enabled`；执行待登录后确认 |
+| Qoder 是否发现并执行 Skill？ | 是；CLI 已登录，中英文自动触发与手动触发成功，匿名业务闭环和真实图片调用均经安装副本固定入口完成 |
 | Benchmark 汇总是否链接原始记录？ | 是：synthetic run ID 与本地结果目录已记录 |
-| 本地与远端测试是否链接最终 commit？ | 本地 124 项与 Windows 内部 124 项/JSON smoke 已通过；最新远端 CI 状态以 PR Actions 为准 |
-| 发布包是否不含模型、数据、日志、秘密和输出？ | 最终 ZIP 尚未生成验证 |
+| 本地与远端测试是否链接最终 commit？ | D 盘正式目录基线为 229 项/74.951 s，0 跳过，JSON 业务 E2E 通过；最新远端 CI 状态以 PR Actions 为准 |
+| 发布包是否不含模型、数据、日志、秘密和输出？ | 历史候选的 allowlist、实际内容清单与 clean-room 已复核；最终新 HEAD 的精确 ZIP 仍需重建并重新扫描 |
 | 是否包含精确第三方 notices？ | 项目声明已完成；最终二进制 notices 待发布盘点 |
 | 所有剩余缺口是否对外可见？ | 是；以当前清单和合规表为准 |
 

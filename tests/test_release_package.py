@@ -95,6 +95,10 @@ class ReleasePackageStaticContractTests(unittest.TestCase):
             "Get-FileSha256Hex",
             "[System.Security.Cryptography.SHA256]::Create()",
             "[System.IO.FileShare]::Read",
+            "Assert-SafeReleaseContent",
+            "Windows 绝对路径",
+            "Bearer 凭据",
+            "docs/assets/qoder/04-analysis-summary.png",
         ):
             self.assertIn(required_gate, script)
         self.assertNotIn("Get-FileHash", script)
@@ -311,7 +315,12 @@ class ReleasePackageIntegrationTests(unittest.TestCase):
     def test_two_clean_head_packages_are_byte_identical_stored_zips(
         self,
     ) -> None:
-        repository = self.create_repository("repeatable")
+        separator_path = "docs/line\u2028separator.txt"
+        extra_files = {separator_path: b"unicode separator path\n"}
+        repository = self.create_repository(
+            "repeatable",
+            extra_files=extra_files,
+        )
         first_output = self.base / "output-one"
         second_output = self.base / "output-two"
 
@@ -343,8 +352,10 @@ class ReleasePackageIntegrationTests(unittest.TestCase):
             self.assertEqual(names, sorted(names))
             self.assertEqual(len(names), len(set(names)))
             self.assertIn(".gitattributes", names)
+            self.assertIn("manifest.json", names)
             self.assertIn("requirements.lock", names)
             self.assertIn("docs/BENCHMARK.md", names)
+            self.assertIn(separator_path, names)
             self.assertIn(
                 "samples/generated-benchmark/documents/\u4e2d\u6587 \u8bf4\u660e.txt",
                 names,
@@ -363,6 +374,75 @@ class ReleasePackageIntegrationTests(unittest.TestCase):
             self.assertEqual(
                 (by_name["README.md"].external_attr >> 16) & 0o777,
                 0o644,
+            )
+            manifest_bytes = archive.read("manifest.json")
+            self.assertFalse(manifest_bytes.startswith(b"\xef\xbb\xbf"))
+            self.assertTrue(manifest_bytes.endswith(b"\n"))
+            manifest = json.loads(manifest_bytes)
+            self.assertEqual(manifest["schema_version"], 1)
+            self.assertEqual(manifest["name"], "local-product-evidence-guard")
+            self.assertEqual(manifest["version"], "9.8.7")
+            self.assertEqual(manifest["commit"], first_payload["commit"])
+            self.assertEqual(manifest["source"], "clean HEAD tracked files")
+            self.assertEqual(
+                manifest["archive_format"],
+                "deterministic ZIP/store",
+            )
+            source_names = [name for name in names if name != "manifest.json"]
+            manifest_files = manifest["files"]
+            manifest_paths = [item["path"] for item in manifest_files]
+            self.assertEqual(manifest_paths, source_names)
+            self.assertEqual(
+                manifest["source_file_count"],
+                len(source_names),
+            )
+            self.assertEqual(manifest["archive_file_count"], len(names))
+            self.assertNotIn("manifest.json", manifest_paths)
+            self.assertNotIn("sha256", manifest)
+            tree = self.git(
+                repository,
+                "ls-tree",
+                "-r",
+                "--full-tree",
+                "HEAD",
+                "--",
+            ).stdout.split("\n")
+            git_entries: dict[str, tuple[str, str]] = {}
+            for line in tree:
+                if not line:
+                    continue
+                metadata, relative_path = line.split("\t", 1)
+                mode, object_type, object_id = metadata.split()
+                if relative_path in source_names:
+                    self.assertEqual(object_type, "blob")
+                    git_entries[relative_path] = (mode, object_id)
+            self.assertEqual(set(git_entries), set(source_names))
+            for item in manifest_files:
+                info = by_name[item["path"]]
+                mode, object_id = git_entries[item["path"]]
+                self.assertEqual(item["mode"], mode)
+                self.assertEqual(item["git_object"], object_id)
+                self.assertEqual(item["size"], info.file_size)
+            manifest_info = by_name["manifest.json"]
+            self.assertEqual(manifest_info.compress_type, zipfile.ZIP_STORED)
+            self.assertEqual(manifest_info.date_time, (2020, 1, 1, 0, 0, 0))
+            self.assertEqual(
+                (manifest_info.external_attr >> 16) & 0o777,
+                0o644,
+            )
+            self.assertEqual(first_payload["manifest"], "manifest.json")
+            self.assertEqual(
+                first_payload["source_file_count"],
+                len(source_names),
+            )
+            self.assertEqual(first_payload["file_count"], len(names))
+            self.assertEqual(
+                first_payload["source_input_bytes"],
+                sum(by_name[name].file_size for name in source_names),
+            )
+            self.assertEqual(
+                first_payload["input_bytes"],
+                sum(item.file_size for item in infos),
             )
 
     def test_rejects_dirty_tracked_file(self) -> None:
@@ -410,6 +490,17 @@ class ReleasePackageIntegrationTests(unittest.TestCase):
             "HEAD 缺少必备发布文件：docs/BENCHMARK.md",
         )
 
+    def test_rejects_tracked_root_manifest_collision(self) -> None:
+        repository = self.create_repository(
+            "tracked-manifest",
+            extra_files={"manifest.json": b'{"not":"generated"}\n'},
+        )
+        self.assert_package_failure(
+            repository,
+            self.base / "tracked-manifest-output",
+            "manifest.json 是打包器保留的生成条目",
+        )
+
     def test_rejects_tracked_denylisted_file(self) -> None:
         repository = self.create_repository(
             "denylist",
@@ -430,6 +521,30 @@ class ReleasePackageIntegrationTests(unittest.TestCase):
             repository,
             self.base / "real-output",
             "samples/real 仅允许",
+        )
+
+    def test_rejects_private_absolute_path_in_text_content(self) -> None:
+        private_path = "C" + ":\\Users\\Alice\\private\\report.json\n"
+        repository = self.create_repository(
+            "private-path-content",
+            extra_files={"docs/private-path.txt": private_path.encode("utf-8")},
+        )
+        self.assert_package_failure(
+            repository,
+            self.base / "private-path-output",
+            "Windows 绝对路径",
+        )
+
+    def test_rejects_bearer_credential_in_text_content(self) -> None:
+        credential = "Bear" + "er abcdefghijklmnopqrstuvwxyz123456\n"
+        repository = self.create_repository(
+            "bearer-content",
+            extra_files={"docs/credential.txt": credential.encode("utf-8")},
+        )
+        self.assert_package_failure(
+            repository,
+            self.base / "bearer-output",
+            "Bearer 凭据",
         )
 
     def test_rejects_output_inside_allowed_tree(self) -> None:

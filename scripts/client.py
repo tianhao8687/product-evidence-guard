@@ -46,6 +46,7 @@ from protocol import (  # noqa: E402
     send_message,
     success_response,
     terminate_exact_server,
+    utc_now,
     validate_response,
 )
 
@@ -56,7 +57,11 @@ DEFAULT_STATUS_TIMEOUT = 2.0
 # can legitimately contain several files, so the short client keeps a bounded
 # one-hour request window rather than imposing a second 330-second task limit.
 DEFAULT_REQUEST_TIMEOUT = 60.0 * 60.0
+DEFAULT_DOWNLOAD_WAIT_TIMEOUT = 8.0 * 60.0
+DEFAULT_DOWNLOAD_POLL_INTERVAL = 1.0
 PENDING_ANALYSIS_NAME = "pending-analysis.json"
+MODEL_DOWNLOAD_SCRIPT = SCRIPT_DIR / "model_download.py"
+MODEL_DOWNLOAD_LOG_NAME = "model-download.log"
 
 
 class CliUsageError(ValueError):
@@ -279,7 +284,22 @@ def status_when_disconnected(
     *,
     runtime_dir: Path = RUNTIME_DIR,
 ) -> tuple[dict[str, Any], int]:
+    download_state = read_json_object(
+        runtime_dir / model_download.DOWNLOAD_STATE_NAME
+    ) or {}
     state = read_json_object(runtime_dir / "server-state.json") or {}
+    if download_state.get("status") == "downloading":
+        response = _local_success(
+            "status",
+            status="downloading",
+            result={
+                "server": state,
+                "download": download_state,
+                "message": "模型仍在下载，请运行 scripts\\run.ps1 --continue。",
+            },
+            exit_code=EXIT_DOWNLOAD_PENDING,
+        )
+        return response, EXIT_DOWNLOAD_PENDING
     status = state.get("status")
     if status == "downloading":
         response = _local_success(
@@ -343,12 +363,20 @@ def _save_pending_analysis(
     *,
     runtime_dir: Path,
 ) -> None:
+    existing = _load_pending_analysis(runtime_dir)
+    candidate = dict(payload)
+    if existing is not None:
+        if existing == candidate:
+            return
+        raise CliUsageError(
+            "已有另一个待恢复分析请求；请先运行 scripts\\run.ps1 --continue。"
+        )
     atomic_write_json(
         _pending_analysis_path(runtime_dir),
         {
             "schema_version": 1,
             "operation": "analyze",
-            "payload": dict(payload),
+            "payload": candidate,
         },
     )
 
@@ -372,6 +400,211 @@ def _clear_pending_analysis(runtime_dir: Path) -> None:
         pass
 
 
+def _download_wait_timeout() -> float:
+    raw = os.environ.get("PRODUCT_EVIDENCE_DOWNLOAD_WAIT_TIMEOUT", "").strip()
+    if not raw:
+        return DEFAULT_DOWNLOAD_WAIT_TIMEOUT
+    try:
+        value = float(raw)
+    except ValueError as exc:
+        raise CliUsageError(
+            "PRODUCT_EVIDENCE_DOWNLOAD_WAIT_TIMEOUT 必须是秒数。"
+        ) from exc
+    return min(DEFAULT_DOWNLOAD_WAIT_TIMEOUT, max(0.0, value))
+
+
+def _download_worker_runtime_dir(runtime_dir: Path) -> Path:
+    return runtime_dir / model_download.DOWNLOAD_WORKER_DIR_NAME
+
+
+def _download_worker_is_running(runtime_dir: Path) -> bool:
+    worker_dir = _download_worker_runtime_dir(runtime_dir)
+    record = read_pid_record(worker_dir)
+    return is_server_record_current(
+        record,
+        expected_script=MODEL_DOWNLOAD_SCRIPT,
+    )
+
+
+def start_model_download_process(
+    spec: model_download.DownloadSpec,
+    *,
+    runtime_dir: Path,
+) -> int:
+    """Start one hidden helper that may outlive the host's client call."""
+
+    runtime_dir.mkdir(parents=True, exist_ok=True)
+    command = [
+        sys.executable,
+        "-B",
+        str(MODEL_DOWNLOAD_SCRIPT),
+        "--model-id",
+        spec.model_id,
+        "--target",
+        str(spec.target),
+        "--revision",
+        spec.revision,
+        "--runtime-dir",
+        str(runtime_dir),
+    ]
+    popen_options: dict[str, Any] = {
+        "cwd": str(REPO_ROOT),
+        "stdin": subprocess.DEVNULL,
+        "close_fds": True,
+    }
+    if os.name == "nt":
+        popen_options["creationflags"] = getattr(
+            subprocess,
+            "CREATE_NO_WINDOW",
+            0,
+        )
+    else:
+        popen_options["start_new_session"] = True
+    log_path = runtime_dir / MODEL_DOWNLOAD_LOG_NAME
+    with log_path.open("ab", buffering=0) as log_handle:
+        process = subprocess.Popen(
+            command,
+            stdout=log_handle,
+            stderr=log_handle,
+            **popen_options,
+        )
+    return int(process.pid)
+
+
+def coordinate_model_download(
+    spec: model_download.DownloadSpec,
+    *,
+    runtime_dir: Path,
+    wait_timeout: float | None = None,
+    poll_interval: float = DEFAULT_DOWNLOAD_POLL_INTERVAL,
+    starter: Callable[..., int] = start_model_download_process,
+    monotonic: Callable[[], float] = time.monotonic,
+    sleeper: Callable[[float], None] = time.sleep,
+) -> dict[str, Any]:
+    """Wait within the host budget while a detached helper resumes `.partial`."""
+
+    errors = model_download.verify_model_directory(
+        spec.target,
+        spec.required_files,
+    )
+    if not errors:
+        return {
+            "status": "ready",
+            "downloaded": False,
+            "model_id": spec.model_id,
+            "model_path": str(spec.target),
+            "revision": spec.revision,
+        }
+    if spec.target.exists():
+        return {
+            "status": "error",
+            "downloaded": False,
+            "model_id": spec.model_id,
+            "model_path": str(spec.target),
+            "revision": spec.revision,
+            "retryable": False,
+            "error": (
+                "正式模型目录存在但完整性检查失败："
+                + "; ".join(errors[:5])
+            ),
+        }
+
+    worker_pid: int | None = None
+    if not _download_worker_is_running(runtime_dir):
+        atomic_write_json(
+            runtime_dir / model_download.DOWNLOAD_STATE_NAME,
+            {
+                "schema_version": 1,
+                "status": "downloading",
+                "active": True,
+                "retryable": True,
+                "model_id": spec.model_id,
+                "target": str(spec.target),
+                "partial": str(
+                    spec.target.with_name(spec.target.name + ".partial")
+                ),
+                "revision": spec.revision,
+                "updated_at": utc_now(),
+                "last_error": None,
+            },
+        )
+        try:
+            worker_pid = int(starter(spec, runtime_dir=runtime_dir))
+        except Exception as exc:
+            atomic_write_json(
+                runtime_dir / model_download.DOWNLOAD_STATE_NAME,
+                {
+                    "schema_version": 1,
+                    "status": "error",
+                    "active": False,
+                    "retryable": False,
+                    "model_id": spec.model_id,
+                    "target": str(spec.target),
+                    "revision": spec.revision,
+                    "updated_at": utc_now(),
+                    "last_error": f"{type(exc).__name__}: {exc}",
+                },
+            )
+            raise
+
+    timeout = _download_wait_timeout() if wait_timeout is None else wait_timeout
+    timeout = min(DEFAULT_DOWNLOAD_WAIT_TIMEOUT, max(0.0, float(timeout)))
+    started = monotonic()
+    deadline = started + timeout
+    while True:
+        errors = model_download.verify_model_directory(
+            spec.target,
+            spec.required_files,
+        )
+        if not errors:
+            return {
+                "status": "ready",
+                "downloaded": True,
+                "model_id": spec.model_id,
+                "model_path": str(spec.target),
+                "revision": spec.revision,
+                "worker_pid": worker_pid,
+            }
+        state = read_json_object(
+            runtime_dir / model_download.DOWNLOAD_STATE_NAME
+        ) or {}
+        worker_running = _download_worker_is_running(runtime_dir)
+        if state.get("status") == "error" and not worker_running:
+            return {
+                "status": "error",
+                "downloaded": False,
+                "model_id": spec.model_id,
+                "model_path": str(spec.target),
+                "revision": spec.revision,
+                "retryable": False,
+                "error": str(state.get("last_error") or "模型下载失败。"),
+                "worker_pid": worker_pid,
+            }
+        now = monotonic()
+        if (
+            now - started >= max(1.0, poll_interval)
+            and not worker_running
+            and state.get("status") == "downloading"
+            and state.get("last_error")
+        ):
+            break
+        if now >= deadline:
+            break
+        sleeper(min(max(0.01, poll_interval), max(0.01, deadline - now)))
+    return {
+        "status": "downloading",
+        "downloaded": False,
+        "model_id": spec.model_id,
+        "model_path": str(spec.target),
+        "partial_path": str(spec.target.with_name(spec.target.name + ".partial")),
+        "revision": spec.revision,
+        "retryable": True,
+        "worker_pid": worker_pid,
+        "wait_timeout_seconds": timeout,
+        "continue_command": "scripts\\run.ps1 --continue",
+    }
+
+
 def prepare_local_model(
     payload: dict[str, Any],
     *,
@@ -392,11 +625,18 @@ def prepare_local_model(
     )
     if errors:
         _save_pending_analysis(payload, runtime_dir=runtime_dir)
-        result = dict(downloader(spec))
+        if downloader is model_download.download_model:
+            result = coordinate_model_download(
+                spec,
+                runtime_dir=runtime_dir,
+            )
+        else:
+            result = dict(downloader(spec))
+        if result.get("status") == "error":
+            raise RuntimeError(str(result.get("error") or "模型下载失败。"))
         if result.get("status") != "ready":
             raise DownloadPending(result)
     payload["openvino_vlm_model"] = str(spec.target)
-    _clear_pending_analysis(runtime_dir)
     return payload
 
 
@@ -408,7 +648,13 @@ def continue_download(
 ) -> tuple[dict[str, Any] | None, dict[str, Any], int]:
     try:
         spec = spec_loader()
-        result = dict(downloader(spec))
+        if downloader is model_download.download_model:
+            result = coordinate_model_download(
+                spec,
+                runtime_dir=runtime_dir,
+            )
+        else:
+            result = dict(downloader(spec))
     except Exception as exc:
         response = _local_error(
             "continue",
@@ -416,6 +662,15 @@ def continue_download(
             message=f"{type(exc).__name__}: {exc}",
             exit_code=EXIT_GENERAL_ERROR,
         )
+        return None, response, EXIT_GENERAL_ERROR
+    if result.get("status") == "error":
+        response = _local_error(
+            "continue",
+            code="download_failed",
+            message=str(result.get("error") or "模型下载失败。"),
+            exit_code=EXIT_GENERAL_ERROR,
+        )
+        response["result"] = result
         return None, response, EXIT_GENERAL_ERROR
     if result.get("status") != "ready":
         response = _local_error(
@@ -430,7 +685,6 @@ def continue_download(
     pending = _load_pending_analysis(runtime_dir)
     if pending is not None:
         pending["openvino_vlm_model"] = str(spec.target)
-        _clear_pending_analysis(runtime_dir)
     response = _local_success(
         "continue",
         status="running",
@@ -618,6 +872,8 @@ def main(
                     starter=starter,
                     runtime_dir=runtime_dir,
                 )
+                if exit_code == EXIT_SUCCESS:
+                    _clear_pending_analysis(runtime_dir)
             _print_json(response)
             return exit_code
         if args.command is None:
@@ -652,6 +908,8 @@ def main(
             starter=starter,
             runtime_dir=runtime_dir,
         )
+        if operation == "analyze" and exit_code == EXIT_SUCCESS:
+            _clear_pending_analysis(runtime_dir)
         _print_json(response)
         return exit_code
     except CliUsageError as exc:

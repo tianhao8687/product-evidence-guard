@@ -16,10 +16,12 @@
   "models": [
     {
       "id": "OpenVINO/Qwen3-VL-8B-Instruct-int4-ov",
+      "model_id": "OpenVINO/Qwen3-VL-8B-Instruct-int4-ov",
       "source": "https://huggingface.co/OpenVINO/Qwen3-VL-8B-Instruct-int4-ov",
       "license": "Apache-2.0",
       "repository_size_gb": 5.46,
       "local_dir": ".models/Qwen3-VL-8B-Instruct-int4-ov",
+      "dir_name": ".models/Qwen3-VL-8B-Instruct-int4-ov",
       "minimum_openvino_version": "2026.1.0",
       "required_files": [
         "added_tokens.json",
@@ -48,6 +50,29 @@
         "tokenizer_config.json",
         "video_preprocessor_config.json",
         "vocab.json"
+      ]
+    }
+  ],
+  "embedded_models": [
+    {
+      "model_id": "RapidOCR/PP-OCRv6-small-OpenVINO",
+      "delivery": "rapidocr==3.9.1 hash-locked wheel",
+      "license": "Apache-2.0",
+      "inference_runtime": "OpenVINO 2026.2.1 CPU",
+      "auto_download_allowed": false,
+      "required_files": [
+        {
+          "path": "rapidocr/models/PP-OCRv6_det_small.onnx",
+          "sha256": "090f04abcd9d9a7498bc4ebf677e4cb9bdce1fe4197ddb7e529f1ef44e1ff94f"
+        },
+        {
+          "path": "rapidocr/models/ch_ppocr_mobile_v2.0_cls_mobile.onnx",
+          "sha256": "e47acedf663230f8863ff1ab0e64dd2d82b838fceb5957146dab185a89d6215c"
+        },
+        {
+          "path": "rapidocr/models/PP-OCRv6_rec_small.onnx",
+          "sha256": "6f327246b50388f3c176ae304bd95767ea6dc0c9ae92153ef8cbe210b3c14884"
+        }
       ]
     }
   ]

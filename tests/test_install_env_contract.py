@@ -191,6 +191,7 @@ class InstallEnvironmentContractTests(unittest.TestCase):
             "$runtimeDir",
             "$logDir",
             "$pythonInstallDir",
+            "$uvCacheDir",
         ):
             initialize_position = self.script.index(
                 f"-TargetPath {managed_path}"
@@ -252,6 +253,11 @@ class InstallEnvironmentContractTests(unittest.TestCase):
             "'pip', 'install', '--python', $venvPython, '--upgrade'",
             self.script,
         )
+        self.assertIn("$env:UV_CACHE_DIR = $uvCacheDir", self.script)
+        self.assertIn(
+            "$uvCacheDir = Join-Path $runtimeDir 'uv-cache'",
+            self.script,
+        )
 
     def test_windows_lock_is_complete_pinned_and_hash_checked(self) -> None:
         lock = REQUIREMENTS_LOCK.read_text(encoding="utf-8")
@@ -267,11 +273,12 @@ class InstallEnvironmentContractTests(unittest.TestCase):
                 lock,
             )
         )
-        self.assertEqual(len(packages), 27)
+        self.assertEqual(len(packages), 35)
         for expected in (
             "openvino==2026.2.1",
             "openvino-genai==2026.2.1.0",
             "openvino-tokenizers==2026.2.1.0",
+            "rapidocr==3.9.1",
             "huggingface-hub==0.34.4",
             "numpy==2.2.6",
             "pillow==11.3.0",
@@ -402,7 +409,13 @@ class InstallEnvironmentLinkSafetyIntegrationTests(unittest.TestCase):
     def test_reparse_managed_directory_is_rejected_before_external_write(
         self,
     ) -> None:
-        for managed_path in (".tools", ".runtime", "logs", ".runtime/python"):
+        for managed_path in (
+            ".tools",
+            ".runtime",
+            "logs",
+            ".runtime/python",
+            ".runtime/uv-cache",
+        ):
             with self.subTest(managed_path=managed_path):
                 fixture_name = managed_path.replace(".", "").replace("/", "-")
                 repository = self.create_repository(

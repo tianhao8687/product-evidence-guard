@@ -2,6 +2,7 @@
     [ValidateSet('User', 'Project')]
     [string]$Scope = 'User',
     [string]$ProjectRoot = '',
+    [string]$RuntimeRoot = '',
     [switch]$Update
 )
 
@@ -37,9 +38,11 @@ $requiredRuntimeFiles = @(
     'product_evidence_guard/__main__.py',
     'product_evidence_guard/cli.py',
     'product_evidence_guard/confirmation.py',
+    'product_evidence_guard/document_visuals.py',
     'product_evidence_guard/engine.py',
     'product_evidence_guard/extractor.py',
     'product_evidence_guard/graph.py',
+    'product_evidence_guard/hybrid_image_reader.py',
     'product_evidence_guard/model_output_schema.py',
     'product_evidence_guard/models.py',
     'product_evidence_guard/normalization.py',
@@ -48,6 +51,7 @@ $requiredRuntimeFiles = @(
     'product_evidence_guard/qwen_vl_reader.py',
     'product_evidence_guard/reports.py',
     'product_evidence_guard/state.py',
+    'scripts/benchmark-document-visuals.py',
     'scripts/benchmark.py',
     'scripts/client.py',
     'scripts/install-env.ps1',
@@ -86,6 +90,7 @@ $allowedFiles = $requiredFiles + @(
     'docs/DEMO_SCRIPT.md',
     'docs/LIMITATIONS.md',
     'docs/MODEL_AND_RUNTIME.md',
+    'docs/OCR_ACCELERATION.md',
     'docs/QODER_VALIDATION.md',
     'docs/SUBMISSION_CHECKLIST.md',
     'docs/USER_GUIDE.md'
@@ -144,6 +149,35 @@ $deniedLeafPatterns = @(
 $preservedRuntimeDirectories = @('.models', '.venv', '.tools', '.runtime')
 $maximumFileBytes = 5MB
 $maximumTotalBytes = 25MB
+$resolvedRuntimeRoot = $null
+
+if (-not [string]::IsNullOrWhiteSpace($RuntimeRoot)) {
+    if (-not (Test-Path -LiteralPath $RuntimeRoot -PathType Container)) {
+        throw "指定的本地运行时目录不存在：$RuntimeRoot"
+    }
+    $resolvedRuntimeRoot = (Resolve-Path -LiteralPath $RuntimeRoot).Path
+    $runtimeEntry = Join-Path $resolvedRuntimeRoot 'scripts\run.ps1'
+    $runtimeInfo = Join-Path $resolvedRuntimeRoot 'info.json'
+    if (-not (Test-Path -LiteralPath $runtimeEntry -PathType Leaf)) {
+        throw "本地运行时缺少 scripts\\run.ps1：$resolvedRuntimeRoot"
+    }
+    if (-not (Test-Path -LiteralPath $runtimeInfo -PathType Leaf)) {
+        throw "本地运行时缺少 info.json：$resolvedRuntimeRoot"
+    }
+    try {
+        $runtimeMetadata = Get-Content -LiteralPath $runtimeInfo -Raw |
+            ConvertFrom-Json
+    }
+    catch {
+        throw "无法读取本地运行时 info.json：$($_.Exception.Message)"
+    }
+    if (
+        $null -eq $runtimeMetadata -or
+        [string]$runtimeMetadata.name -ne $skillName
+    ) {
+        throw "指定目录不是 $skillName 的运行时：$resolvedRuntimeRoot"
+    }
+}
 
 function Test-IsSameOrChildPath {
     param(
@@ -942,6 +976,23 @@ try {
         Invoke-InstalledValidation -InstallRoot $staging
     }
 
+    if ($null -ne $resolvedRuntimeRoot) {
+        $runtimeConfigDirectory = Join-Path $staging '.runtime'
+        New-SafeDirectoryChain `
+            -Boundary $staging `
+            -Directory $runtimeConfigDirectory `
+            -Context 'Qoder 本地运行时配置目录'
+        $runtimeConfigPath = Join-Path $runtimeConfigDirectory 'source-root.txt'
+        [System.IO.File]::WriteAllText(
+            $runtimeConfigPath,
+            ($resolvedRuntimeRoot + [Environment]::NewLine),
+            [System.Text.UTF8Encoding]::new($false)
+        )
+        Assert-NoReparsePoint `
+            -Path $runtimeConfigPath `
+            -Context 'Qoder 本地运行时配置'
+    }
+
     if (Test-Path -LiteralPath $destination) {
         throw "切换新版本前安装目标意外存在：$destination"
     }
@@ -1067,3 +1118,7 @@ Write-Host (
     '请重启 Qoder，或在 Qoder CLI 中运行 /skills reload，' +
     '然后输入 /local-product-evidence-guard 验证。'
 )
+if ($null -ne $resolvedRuntimeRoot) {
+    Write-Host "已复用本地运行时：$resolvedRuntimeRoot"
+    Write-Host 'Qoder 安装副本不会重复下载模型或重复创建 Python 环境。'
+}

@@ -19,9 +19,11 @@ Product Evidence Guard 是一条本地证据核验管线。它的核心合同不
 1. `scripts\run.ps1` 是唯一公开宿主入口。
 2. 用户来源文件只读；生成状态写入独立输出目录。
 3. 能提取结构的 Office 文档走确定性解析器。
-4. 图片和无文字层 PDF 页面在配置模型时使用所选本地 Qwen3-VL；未配置时明确
-   报告跳过，不使用云端推理回退。
-5. 视觉原文读取和字段映射是两次独立模型调用。
+4. 图片和无文字层 PDF 页面先走本地 OpenVINO OCR；普通商品事实路由可在需要时
+   使用所选本地 Qwen3-VL，`observation-only` 路由则失败关闭且不调用 Qwen，
+   两者都没有云端推理回退。
+5. 只有 `qwen_deep_fallback` 才把视觉原文读取和字段映射拆成两次独立模型调用；
+   紧凑复核返回 schema 有效空结果时直接安全结束，不重复进入深度调用。
 6. 原始模型输出在通过 JSON、schema、字段白名单、长度/数量和来源关联检查前
    都是不可信内容。
 7. 单位换算与冲突分级不能依赖模型意见。
@@ -104,21 +106,34 @@ stateDiagram-v2
     shutdown --> [*]
 ```
 
-状态机和并发状态请求已在 Windows 公开入口验证；最终 124 项回归覆盖 authkey
+状态机和并发状态请求已在 Windows 公开入口验证；最终 229 项回归覆盖 authkey
 不匹配、崩溃恢复、重复启动和 timeout。独立拒绝服务、进程冒充与渗透测试仍未
 完成。
 
 server 父进程管理独立的常驻模型 worker 子进程。worker 持有
-`ResidentModelCache`，按模型路径与实际设备复用 `QwenVlReader`/
-`VLMPipeline`。最终离线功能工件记录 `model_reused=false`、加载 3.6064 秒、
+`ResidentModelCache`，按模型路径与实际设备复用 `HybridImageReader`、
+RapidOCR/OpenVINO pipeline 与 Qwen `VLMPipeline`。最终离线功能工件记录
+`model_reused=false`、加载 3.6064 秒、
 内层分析 57.1824 秒、外层 `analyze` 61.895 秒。更早的同模型同设备冷/热请求
 记录 `model_reused=false/true`，热加载 0 秒、单图两步 30.8367 秒，因此模型
 跨请求复用也已经真实验证。
 
 ## 2. 确定性解析与视觉处理分流
 
-结构化来源走确定性路径。图片若明确提供 OCR sidecar 就读取 sidecar，否则在配置
-本地模型后走 VLM。PDF 中没有文字层的页面会受限渲染后进入同一视觉路径。
+结构化来源走确定性路径。图片若明确提供 OCR sidecar 就读取 sidecar，否则先走
+OpenVINO OCR。普通商品事实路由只有在字段、单位、置信度和内部一致性都满足安全
+门时才生成快速候选；其余结果进入一次 Qwen 紧凑复核。紧凑复核若返回 schema
+有效候选就生成 `pending` 候选，若返回 schema 有效空结果就安全结束且不重复进入
+深度调用，只有 schema 非法或调用错误才进入原有两步深度路径。
+
+图纸、曲线和数据图等 `observation-only` 路由不调用 Qwen。只有明确标签、单值、
+高置信度且单位安全的重量（含净重/毛重）、尺寸、数量、型号、材质或颜色可以覆盖
+观察模式并生成 `pending` 候选；不同 OCR 行出现相互冲突但各自安全的白名单值时，
+以 `ocr_fast_conflict` 保留双方候选。电气/容量字段、低置信度、未知单位、同一
+OCR 行多个值或 input/output 混合方向都只保留 observations，不生成候选。
+DOCX/XLSX 内嵌图片复用同一路线；XLSX 原生图表直接从工作簿结构读取 series、
+类别和值。PDF 无文字层页面会渲染；已有文字层但检测到图纸、曲线或大图的 mixed
+page 会先保留文字层上下文，必要时再渲染分析。
 
 ```mermaid
 flowchart TD
@@ -126,19 +141,38 @@ flowchart TD
     F --> T{"来源类型"}
 
     T -->|"TXT / MD / CSV / JSON"| DP["确定性文字与结构解析器"]
-    T -->|"DOCX / XLSX / 文字版 PDF"| OP["确定性 Office 解析器"]
+    T -->|"DOCX / XLSX"| OP["确定性 Office 文字解析器"]
+    T -->|"Office 内嵌图片"| OI["提取临时图片<br/>保留原文档锚点"]
+    T -->|"XLSX 原生图表"| XC["结构化 series / 类别 / 数值点"]
+    T -->|"文字版 PDF"| PT["文字层解析 + mixed page 检测"]
     T -->|"图片带 .ocr.json"| OS["显式 OCR sidecar 解析器"]
-    T -->|"图片无 sidecar"| V1["Qwen3-VL 第一步<br/>逐字抄录视觉原文"]
+    T -->|"图片无 sidecar"| OCR["RapidOCR + OpenVINO<br/>本地文字与检测框"]
     T -->|"无文字层 PDF 页面"| PR["pypdfium2 受限页面渲染"]
-    PR --> V1
+    PT -->|"图纸 / 曲线 / 大图且需视觉处理"| PR
+    PT -->|"文字层足够"| B
+    PR --> OCR
+    OI --> OCR
+    XC --> DV["document-visuals.json"]
 
+    OCR --> PURPOSE{"图表 / 图纸<br/>observation-only?"}
+    PURPOSE -->|"是"| OSAFE{"明确白名单属性 +<br/>置信度 / 单位 / 单值通过?"}
+    OSAFE -->|"是"| OM["确定性字段映射 / 冲突保留<br/>候选仍为 pending"]
+    OSAFE -->|"否"| OBS["只保留 OCR observations<br/>不调用 Qwen / 不生成候选"]
+    PURPOSE -->|"否"| SAFE{"字段 / 单位 / 分数 / 一致性<br/>是否满足快速路径"}
+    SAFE -->|"是"| OM
+    SAFE -->|"否"| QR["Qwen3-VL 一次紧凑视觉复核<br/>OCR 只作可能有错的提示"]
+    QR --> QSTATE{"紧凑复核结果"}
+    QSTATE -->|"schema 有效且有候选"| OM
+    QSTATE -->|"schema 有效空结果"| EMPTY["安全空结果<br/>不重复 deep"]
+    QSTATE -->|"schema 非法或调用错误"| V1["Qwen3-VL 深度第一步<br/>逐字抄录视觉原文"]
     V1 --> SV["严格 transcription schema<br/>位置只能 approximate 或 unavailable"]
-    SV --> V2["Qwen3-VL 第二步<br/>只做字段映射"]
+    SV --> V2["Qwen3-VL 深度第二步<br/>只做字段映射"]
     V2 --> MV["严格 mapping schema<br/>字段白名单与原文子串校验"]
 
     DP --> B["SourceBlock"]
     OP --> B
     OS --> B
+    OM --> B
     SV --> B
     MV --> C["FactCandidate"]
     B --> RE["确定性规则提取"]
@@ -147,19 +181,27 @@ flowchart TD
     C --> N["确定性单位与值归一"]
     N --> G["证据分组与冲突引擎"]
     G --> REP["JSON / Markdown / HTML 报告"]
+    G --> DV
     G --> H["人工决定边界"]
+    OBS --> DV
+    EMPTY --> DV
 ```
 
-严格两步实现位于 `qwen_vl_reader.py` 和 `model_output_schema.py`。它保留原文
+混合路由位于 `hybrid_image_reader.py`。普通商品事实路由的紧凑复核只调用一次
+Qwen；schema 有效且有候选时进入确定性映射，schema 有效空结果是终态，只有
+schema 非法或调用错误才进入 `qwen_deep_fallback`。严格两步深度实现位于
+`qwen_vl_reader.py` 和 `model_output_schema.py`，第一步保留原文
 transcription ID、近似位置、可读性、模型自评 confidence 来源、model ID 和
-device。畸形输出只产生诊断，不产生候选。可选重试最多一次，而且只能修复 JSON
-语法，不能把语义上非法的 schema “修”成事实。
+device，第二步只做字段映射。畸形输出只产生诊断，不产生候选。可选重试最多一次，
+而且只能修复 JSON 语法，不能把语义上非法的 schema “修”成事实。
 
-旧 `OpenVinoImageTextReader` 是更简单的一阶段适配器，不能拿来满足最终两步比赛
-工作流。主图片路径已使用 `QwenVlReader`，并完成真实模型冷/热公开入口验证。
+旧 `OpenVinoImageTextReader` 是更简单的一阶段适配器，不能拿来满足最终工作流。
+主图片路径使用 `HybridImageReader`；Qwen 原有两步路径仍是 schema 非法或调用
+错误时的最终安全兜底，没有被删除或静默替换。
 
-主 engine 会检测 PDF 中未提取出文字的页面，用 `pypdfium2` 渲染到临时目录，
-让视觉结果重新指向原始 PDF/页码，并删除临时图片。当前代码上限包括：
+主 engine 会检测 PDF 扫描页和 mixed visual page，用 `pypdfium2` 渲染需要视觉
+处理的页面；Office 内嵌图片也只写入临时目录。处理后证据重新指向原 PDF 页码或
+Office 段落/工作表锚点，并删除临时文件。当前代码上限包括：
 
 - 每任务最多 100 个文件；
 - 单文件最大 100 MiB；
@@ -248,7 +290,8 @@ candidate identity 会变化，旧决定不能静默存活。
 - engine signature 和文件哈希都相同：复用该文件候选；
 - 新文件或哈希变化：只重新解析该文件；
 - 路径删除：从新证据图移除其证据；
-- 模型路径、VLM 路径、device 或工具版本签名变化：旧缓存整体失效；
+- 模型路径/指纹、VLM 路径/指纹、device、工具 schema、实际 image reader 类别
+  或 OCR/Qwen capability identity 变化：旧缓存整体失效；
 - 来源候选改变或移除：相关决定变为 `stale`。
 
 这是证据级失效。它不能证明供应商 revision 在业务语义上更新；文件名版本提示
@@ -288,7 +331,8 @@ AUTO 公开入口记录仍应在最终证据包中保留。官方兼容边界见
 | `confirmation-state.json` | 当前确认/拒绝/stale 状态 |
 | `confirmation-audit.jsonl` | 本地 append-only 决定与失效事件 |
 | `confirmed-product-facts.json` | 仅包含已确认且来源哈希仍有效的事实 |
-| `visual-transcription.json` | 主路径写出的视觉原始、通过与拒绝记录；已保留一次 CPU 真实单图成功和一次截断拒绝工件 |
+| `visual-transcription.json` | 主路径写出的视觉原始、通过与拒绝记录；PDF ROI 会显式区分 raw crop 坐标与回映后的原页坐标 |
+| `document-visuals.json` | Office 内嵌图片、XLSX 原生图表和 PDF mixed page 的哈希、定位、结构化数据、路由、ROI 与状态 |
 
 输出可能含机密来源片段，并非匿名化。隐私和安全边界见
 [`PRIVACY.md`](../PRIVACY.md) 与 [`SECURITY.md`](../SECURITY.md)。
@@ -297,16 +341,17 @@ AUTO 公开入口记录仍应在最终证据包中保留。官方兼容边界见
 
 | 领域 | 状态 | 证据或缺口 |
 |---|---|---|
-| 确定性解析、规则、归一、graph、报告、增量缓存 | **已验证** | 最终本地回归 124 项通过，53.462 s；Windows 内部 124 项 55.117 s 及 JSON smoke 通过 |
-| 确认、拒绝、当前哈希导出、stale reconciliation | **已完成** | 代码存在；完整公开入口商业 E2E 待执行 |
+| 确定性解析、规则、归一、graph、报告、增量缓存 | **已验证** | 2026-08-05 D 盘正式目录回归 229 项通过，74.951 s，0 跳过；Windows 完整 JSON smoke 通过 |
+| 确认、拒绝、当前哈希导出、stale reconciliation | **已验证** | `tests/test.ps1` 经 `run.ps1`/Named Pipe 走通确定性 sidecar 闭环；真实 Qwen/Qoder 演示另列 |
 | 严格两步 Qwen 读取与输出 schema | **已验证** | CPU 冷/热真实图成功；扫描 PDF 和恶劣图片矩阵待测 |
-| 模型 snapshot、结构与 SHA-256 | **已验证** | revision `f3d0bc7` 已加载；26 payload 清单已生成但未签名；中断续传 E2E 待测 |
+| 模型 snapshot、结构与 SHA-256 | **已验证** | revision `f3d0bc7` 已加载；26 payload 清单已生成但未签名；tiny Hub 中断续传 E2E 已通过，正式模型前后 26/26 哈希一致 |
 | Named Pipe 父服务与常驻模型 worker | **已验证** | 模型复用；status/shutdown、认证失败、崩溃、重复启动与超时进入最终回归 |
-| `run.ps1` 与短 client | **已验证** | 真实模型与并发 status 已验证；确认/stale E2E 待测 |
+| `run.ps1` 与短 client | **已验证** | 真实模型与并发 status 已验证；确认、拒绝、导出、重新分析和 stale E2E 已通过 |
 | pypdfium2、资源上限与阶段心跳 | **已完成** | 300 秒阶段边界与精确 worker 终止已实现；恶意 PDF 待测 |
+| 文档内视觉与原生图表 | **已验证** | 受控 DOCX/XLSX/PDF OCR fast、单次请求内跨文件视觉缓存和 semantic scope 通过；Raspberry Pi/TI mixed PDF 的文字层、ROI、OCR observations 通过；PDF 曲线完整数值点数字化不在当前能力内 |
 | 输入、发布与 Qoder 链接防护 | **已验证** | symlink/junction/reparse point/hardlink 失败关闭合同进入最终回归 |
 | Qoder Skill 发现 | **已验证** | CLI 1.1.8、用户级、`Enabled` |
-| Qoder 自动/手动调用 | **待用户操作** | 账号未登录 |
+| Qoder 自动/手动调用 | **已验证（现有范围）** | 中英文自动/手动 `status`、获授权匿名 sidecar 业务闭环、真实图片及真实图＋受控文档冲突分析已通过；新一轮人工决定、完整 IDE 截图组和网络审计另列 |
 | 离线环境变量推理 | **已验证** | 三个离线/遥测变量下成功；防火墙/抓包未执行 |
 | Synthetic CPU Benchmark | **已验证** | commit `06f8360`；30 图、10 文档完成；不等于真实业务准确率 |
 

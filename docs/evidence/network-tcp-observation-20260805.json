@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-08-05",
+  "scope": "sampled TCP socket observation for the local analysis process tree during one independent cold run",
+  "method": {
+    "requested_interval_ms": 100,
+    "observation_cycles": 35,
+    "observed_states": [
+      "Established",
+      "SynSent",
+      "SynReceived"
+    ],
+    "process_scope": "public client process, server pid from server-state.json, and discovered descendants"
+  },
+  "result": {
+    "client_ok": true,
+    "client_exit_code": 0,
+    "stderr_bytes": 0,
+    "elapsed_seconds": 33.7265,
+    "analysis_seconds": 27.9003,
+    "model_load_seconds": 4.3332,
+    "device": "CPU",
+    "image_route": "qwen_ocr_review",
+    "model_reused": false,
+    "candidate_count": 2,
+    "error_count": 0,
+    "external_tcp_observation_count": 0
+  },
+  "artifacts": {
+    "input_sha256": "40c808ce56735a027cc990ee2e476a5b2538c538d1b20e0f6c2647182eabe7cf",
+    "stdout_sha256": "3365ec4f9444f9fa12018d7e49c82a926ccc06c8eb2735a49cc26a052341b199",
+    "run_summary_sha256": "c47ef9bd85700f3948f54e55e2c3cfe8777a3cec4574dd551796636589d56122"
+  },
+  "claim_boundary": "No external TCP socket was observed in these samples. This is not firewall blocking, packet capture, DNS or UDP observation, and it does not prove that Qoder or the whole dependency stack is air-gapped."
+}

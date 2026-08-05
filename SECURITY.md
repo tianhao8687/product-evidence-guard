@@ -72,7 +72,7 @@ Security Advisory，请优先使用该渠道。若不可用，可先创建只含
   symlink/junction/reparse point/hardlink，并在外部 staging 中完成校验后再切换；
 - 常见输出、模型、日志、partial 下载和真实样本被 Git 忽略。
 
-上述控制已进入 124 项本地回归；它们仍不是独立渗透测试结果，也不能消除网络文件
+上述控制已进入 229 项本地回归；它们仍不是独立渗透测试结果，也不能消除网络文件
 系统、竞态条件或管理员级攻击者的全部风险。
 
 ## 已知安全缺口
@@ -92,9 +92,10 @@ Security Advisory，请优先使用该渠道。若不可用，可先创建只含
    symlink/junction/reparse point/hardlink，并有回归测试；仍未完成专门的竞态、
    网络文件系统、权限变化或管理员对抗测试。不要把这些检查当作 OS 沙箱。
 4. **解析器漏洞。** 第三方图片、PDF、Word 和表格解码器会扩大攻击面。
-   `requirements.lock` 固定 27 个运行/构建包及分发哈希，安装使用
+   `requirements.lock` 固定 35 个运行/构建包及分发哈希，安装使用
    `--require-hashes`，本地 editable build 使用 `--no-build-isolation --no-index`；
-   这不能替代漏洞扫描、SBOM 或恶意语料测试。
+   当前已生成 CycloneDX 1.5 SBOM，但这不能替代漏洞扫描、完整二进制传递依赖
+   审计或恶意语料测试。
 5. **模型完整性。** 发布阶段已为 26 个必需 payload 生成逐文件 SHA-256 清单
    `<project-root>\release\model-sha256-manifest.json`。payload 共
    `5,462,515,610` bytes；包含 Hugging Face 元数据的目录共
@@ -104,12 +105,16 @@ Security Advisory，请优先使用该渠道。若不可用，可先创建只含
    0.438 秒内返回 `running` 和 `available_operations`，响应没有 fallback 字段。
    最终回归还覆盖 authkey 不匹配、崩溃恢复、重复启动、状态与 shutdown、超时
    边界；这不等于完成拒绝服务、权限边界或独立进程冒充渗透测试。
-7. **离线验证。** 三个离线/遥测环境变量下已经完成真实本地推理；尚未通过防火墙
-   阻断或抓包证明不存在外连流量。
+7. **离线验证。** 三个离线/遥测环境变量下已经完成真实本地推理。另一次独立冷
+   启动对客户端、服务及已发现子进程进行了 35 个约 100 ms 的 TCP 状态采样，未
+   观察到外部 TCP 连接；它不是防火墙阻断，也没有捕获数据包、DNS 或 UDP，不能
+   证明完整依赖栈零外连或 air-gapped。
 8. **输出保护。** 报告是本地明文。项目不提供静态加密、用户角色、多用户隔离或
    安全删除。
-9. **供应链证据。** 可复现的 hash-required 依赖锁已经完成；发布 SBOM、完整
-   二进制依赖许可证包、漏洞扫描，以及模型 checksum 签名仍待完成。
+9. **供应链证据。** 可复现的 hash-required 依赖锁、CycloneDX 1.5 SBOM、35 个
+   锁定包的许可证元数据，以及实际 `pypdfium2 5.12.1` wheel 的 19 份
+   PDFium/依赖 notices 已完成。依赖漏洞扫描、所有二进制传递依赖的完整许可证
+   审计和模型 checksum 签名仍待完成。
 
 ## 安全运行建议
 
@@ -129,7 +134,7 @@ Security Advisory，请优先使用该渠道。若不可用，可先创建只含
 
 | 测试 | 状态 | 证据或缺口 |
 |---|---|---|
-| schema 拒绝与字段白名单单元测试 | **已验证** | 最终本地回归 124 项通过，53.462 s |
+| schema 拒绝与字段白名单单元测试 | **已验证** | 已纳入最终 `tests/test.ps1`；精确最新数字见提交清单，避免复制旧基线 |
 | Synthetic 注入图片真实模型结果 | **已验证** | 冻结 Benchmark 2/2 样本接受事实数为 0 |
 | 扩展提示词注入对抗语料 | **未完成** | 两个 synthetic 样本不能代表完整攻击面 |
 | 畸形图片/PDF/Office 文件 fuzzing | **未完成** | 尚未执行 |
@@ -137,13 +142,16 @@ Security Advisory，请优先使用该渠道。若不可用，可先创建只含
 | 输入发现的 link 包含性 | **已验证** | symlink/junction/reparse point/hardlink 失败关闭与回归测试 |
 | 发布与 Qoder 安装 link 防护 | **已验证** | 源、目标、祖先、staging 与 hardlink 合同纳入最终回归 |
 | 推理中 Named Pipe 并发 status | **已验证** | 4 图推理中 0.438 秒经 Pipe 返回 |
-| Named Pipe 认证、崩溃、重复启动与超时 | **已验证** | 124 项回归覆盖 authkey 不匹配和生命周期边界 |
+| Named Pipe 认证、崩溃、重复启动与超时 | **已验证** | 最终回归覆盖 authkey 不匹配和生命周期边界 |
 | Named Pipe 独立渗透/拒绝服务测试 | **未完成** | 尚未执行 |
-| hash-required 依赖安装 | **已验证** | 27 包锁；Windows PowerShell 5.1 干净重建后 28 个已安装包（含本项目）`pip check` 通过 |
+| hash-required 依赖安装 | **已验证** | 35 个运行/构建包 hash-locked；干净重建后 36 个已安装包（含本项目）`pip check` 通过 |
 | 模型 26 文件 SHA-256 清单 | **已验证** | 清单已生成；尚未签名 |
-| 依赖漏洞扫描与 SBOM | **未完成** | 尚未执行 |
+| CycloneDX 1.5 SBOM | **已验证** | 35 个锁定 distribution 均有组件、版本、哈希和许可证元数据；见 `docs/evidence/sbom.json` 与 `docs/evidence/license-inventory.json` |
+| 精确 pypdfium2/PDFium notices | **已验证** | 从实际 5.12.1 Windows x64 wheel 收集 19 份 notices，并生成机器可读索引 |
+| 依赖漏洞扫描与完整二进制许可证审计 | **未完成** | 尚未执行；SBOM 和 35 包元数据不能替代该结论 |
 | 三个离线/遥测环境变量下推理 | **已验证** | 真实本地推理成功 |
-| 防火墙/抓包网络外连审计 | **未完成** | 尚未执行 |
+| 本地进程 TCP 状态采样 | **已验证** | 35 个约 100 ms 周期未观察到外部 TCP；见 `docs/evidence/performance-network-validation-20260805.md` |
+| 防火墙/数据包/DNS/UDP 网络审计 | **未完成** | TCP 状态采样不等于抓包或 air-gap 证明 |
 | 独立渗透测试 | **未完成** | 尚未执行 |
 
 OpenVINO、Qwen、Qoder、Hugging Face 或文档解析库中的安全问题还应查询对应上游

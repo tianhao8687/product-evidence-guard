@@ -1,6 +1,6 @@
 # Benchmark 方案与结果
 
-最后复核：2026-07-30
+最后复核：2026-07-31
 
 ## 当前结论
 
@@ -20,11 +20,29 @@ CPU，`model_reused=false`，模型加载 3.6064 s、内层分析 57.1824 s、�
 本次已取得 CPU 加载、首图、热图、批量、逐图分布、峰值进程内存、字段 recall、
 mapping precision/recall/F1、数字与单位正确率、参数漏检、空样本编造、提示词
 注入接受数、冲突分类和无变化增量复用结果。Intel GPU 不适用于本机；防火墙/抓包
-网络审计仍未执行。
+网络审计仍未执行。后续另完成 3 次独立冷启动分布和一次 35 周期本地进程 TCP 状态
+采样；有限采样没有观察到外部 TCP，但不是数据包、DNS、UDP 或 air-gap 证明。
 
 **所有准确率与质量指标都来自项目确定性生成的 synthetic 数据，只能证明这套固定
 工程样本在当前代码与模型下可复现通过，不等于真实客户资料或真实业务准确率。**
 一张公开真实商品标签图只证明真实图片功能链成功，不进入准确率统计。
+
+2026-07-31 又完成 1 份真实 PDF、1 份真实 DOCX 和 2 份真实 XLSX 的原生文档
+测试。4 份文件全部解析成功；旧规则产生 348 条候选，其中包含大量明显误报，并
+形成 11 个阻断冲突；修复后为 3 条 `pending` 电气候选、0 个阻断冲突。保留的
+缓存未命中/增量运行分别为 0.6907 s/0.0272 s。该轮没有人工逐字段标注，属于
+功能、精确性压力与速度测试，不进入真实准确率。完整来源、哈希、原始证据位置见
+[真实 PDF、DOCX、XLSX 文档评测](REAL_DOCUMENT_EVALUATION.md)。
+
+同日又用 Raspberry Pi 5 官方机械图纸和 TI TPS65301-Q1 官方数据手册选定页完成
+混合 PDF 视觉功能测试。完整官方 PDF SHA-256 分别为
+`5dd680d6c1f5e7aa9c7b020695e315d04aac862df82ff01d4e9041cd0668d7f2`
+和
+`21d046b6d56a969cba807b51b48a90eac09d4a3934dc25befb296faf38aff512`。
+3 个模型输入页均检测为 mixed page；2 页由文字层结构化上下文直接处理并避免模型
+调用。TI 第 24 页用 PDFium ROI 减少 29.84% 页面面积，保留 32 行文字层和
+40 条 OCR observations，并以 `ocr_observations` 结束；最终候选为 0、Qwen 调用
+为 0。这是图纸、曲线和嵌入图片的功能证据，不是曲线理解准确率。
 
 `scripts/benchmark.py` 已在冻结 commit 上真实执行，并完成：
 
@@ -70,7 +88,7 @@ mapping precision/recall/F1、数字与单位正确率、参数漏检、空样�
 | OpenVINO | `2026.2.1` |
 | OpenVINO GenAI | `2026.2.1.0` |
 | OpenVINO Tokenizers | `2026.2.1.0` |
-| pypdfium2/PDFium | pypdfium2 `5.12.1`；精确 PDFium build notice 待发布盘点 |
+| pypdfium2/PDFium | pypdfium2 `5.12.1`；实际 Windows x64 wheel 的 19 份 PDFium/依赖 notices 已收集并索引 |
 | Pillow / huggingface-hub / NumPy | `11.3.0` / `0.34.4` / `2.2.6` |
 | `Core().available_devices` | `CPU`、`GPU` |
 | `GPU` 设备全名 | NVIDIA GeForce RTX 5070 (dGPU) |
@@ -346,6 +364,76 @@ precision 和 recall 都为 0 时，F1 定义为 0，并保留原始计数。
 
 真实数据的原始输出可能包含敏感文字，应留在 Git 外，只发布脱敏汇总。
 
+## 已完成的真实文档实测
+
+| 指标 | 结果 |
+|---|---:|
+| 官方公开文件 | PDF 1、DOCX 1、XLSX 2 |
+| 解析块 / 字符 | 1,491 / 359,063 |
+| 运行错误 | 0 |
+| 旧规则候选 / 阻断冲突 | 348 / 11 |
+| 修复后候选 / 阻断冲突 | 3 / 0 |
+| 修复后候选状态 | 3 条均为 `pending` |
+| 缓存未命中 / 增量复用 | 0.6907 s / 0.0272 s |
+
+本轮使用 `--deterministic-only` 隔离原生文档路径；PDF 有文字层，不使用 OCR 或
+Qwen。两份大型 XLSX 和一份叙述性 DOCX 主要用于误报压力，不是逐行标注的字段
+recall 数据集。
+
+### 官方混合 PDF 视觉补充
+
+这组测试使用 1 页 Raspberry Pi 5 工程图、TI 数据手册第 8 页和第 24 页。它在
+受控文档冷/热阶段之后继续复用同一模型 pipeline：
+
+| 指标 | 结果 |
+|---|---:|
+| 外层 / engine 分析 | 1.3537 / 1.2484 s |
+| 模型加载 / `model_reused` | 0 s / `true` |
+| mixed 页 | 3 |
+| 文字层直接处理 / OCR observations | 2 / 1 |
+| Qwen 调用避免 | 1 |
+| ROI 页面 / 平均面积减少 | 1 / 29.84% |
+| 候选 / 错误 | 0 / 0 |
+
+同一轮受控 DOCX/XLSX/PDF 的冷模型、常驻完整重算、业务缓存命中外层耗时为
+11.1997 / 1.7050 / 0.2092 秒，严格分开了模型常驻与业务缓存。这些均为单次
+CPU 工程测量，不是延迟分布。三个视觉结果都走 `ocr_fast`，所以冷/热差额主要
+是模型/pipeline 首次构建成本，不是 Qwen 生成速度。计时后又补了
+`observation-only` 窄白名单、低置信度/同一 OCR 行多值失败关闭、schema 有效空
+复核不重复 deep，以及迟到结果拒绝、reader capability 签名、严格空间分组、
+非零 CropBox 全页回退和坐标空间标签。遵守“不再重启模型”的约定没有重跑；
+新增边界由无模型回归验证，因此这些数字仍是原单次测量，不是新模型进程的性能
+结论。
+这里的“冷”是同一 Python 进程中新建 `ResidentModelCache` 和新输出目录，
+不是重启 Windows 或清空操作系统文件缓存。
+
+29.84% 只是该页 PDF 几何裁剪面积的减少；本轮没有保存相同最终实现下的重复
+全页延迟/质量对照，因此不把它宣传为 29.84% 的速度或准确率提升。
+
+复现时使用同一个 Python 进程和同一个 `ResidentModelCache`，只在第一阶段加载
+模型：
+
+```powershell
+.\.venv\Scripts\python.exe .\scripts\benchmark-document-visuals.py `
+  --input "<受控 DOCX-XLSX-PDF 目录>" `
+  --real-input "<真实 mixed PDF 单页目录>" `
+  --model ".\.models\Qwen3-VL-8B-Instruct-int4-ov" `
+  --output ".\.runtime\document-visual-benchmark" `
+  --device AUTO
+```
+
+输出目录必须为空，避免旧 `analysis-state.json` 污染冷/热口径。
+
+`document-visuals.json` 保存页级检测原因、文字层上下文、实际视觉路由和
+`ocr_observation_count`；完整逐行 OCR observations 位于
+`visual-transcription.json`。这些观察可能包括曲线刻度、轴标题和图例，但不是
+已接受事实，也不表示已把 PDF 曲线完整数字化为数值点。所有可用事实候选仍必须
+人工确认。
+
+机器可读脱敏摘要已随源码放在
+[`docs/evidence/document-visual-acceleration-final.json`](evidence/document-visual-acceleration-final.json)；
+第三方样本本体不进入仓库或发布包。
+
 ## 已完成的单图实测
 
 成功工件位于本机：
@@ -487,8 +575,23 @@ NPU 真机证据。
 | 真实图片分析 | 已完成 |
 | 分析结果 | 成功；本地候选保持 `pending` |
 | 防火墙阻断或抓包 | 未完成；不在本次证据内 |
-| 观察到的外连尝试 | 未采集；不能声称为零 |
+| 后续 TCP 状态采样 | 35 个约 100 ms 周期没有观察到外部 TCP 连接 |
+| TCP 采样边界 | 不是防火墙/数据包/DNS/UDP 抓取，不能声称零外连或 air-gapped |
 | 原始证据路径 | `<artifact-root>\test-real-model-release-20260730\` |
+
+### 独立冷启动补充
+
+同一张已授权公开领域标签图在每次安全关闭本地服务后重新运行 3 次：
+
+| 次数 | 分析耗时 | 模型加载 | 外层耗时 |
+|---|---:|---:|---:|
+| 1 | 26.9529 s | 4.8985 s | 32.8509 s |
+| 2 | 27.6312 s | 4.2162 s | 32.8441 s |
+| 3 | 25.5298 s | 4.2892 s | 30.8354 s |
+
+分析耗时均值 **26.7046 s**，范围 **25.5298–27.6312 s**；模型加载均值
+**4.4680 s**。这些值只代表单机、单样本三次分布。逐次哈希、采样方法和边界见
+[`evidence/performance-network-validation-20260805.md`](evidence/performance-network-validation-20260805.md)。
 
 ## 报告规则
 
@@ -509,4 +612,19 @@ NPU 真机证据。
 > 功能链成功。另有 commit `06f8360` 的 30 张合成图、10 份合成文档可复现工程
 > Benchmark，图片 30/30 成功，并保留性能、质量、冲突和增量原始计数。所有质量
 > 指标只适用于固定 synthetic 数据，不等于真实业务准确率；Intel GPU 与
-> 防火墙/抓包网络审计不在本次结果中。
+> 防火墙/抓包网络审计不在本次结果中。后续 35 周期 TCP 状态采样未观察到外部
+> TCP，但不能替代数据包、DNS、UDP 或 air-gap 证明。
+
+## 2026-07-31 混合视觉加速补充
+
+新增 RapidOCR/OpenVINO 快速路径后，8 张公开真实样本已完成 OCR 路由测量。
+清晰 Atari 适配器在内部 OCR 阶段 `0.4138 s`、公开入口 engine `0.4691 s`
+内生成 4 条 pending 候选且未调用 Qwen；同 worker 热请求加载为 0 s、engine
+为 `0.4521 s`。OCR
+误读的电池图被未知单位和低分规则拦截，经本地 Qwen 紧凑复核后在
+`30.0235 s` 得到 `1000mAh` 与 `3.7V`，相对该图此前完整两步单次
+`71.681 s` 约下降 58%。
+
+完整逐样本数据、安全条件、原始复核输出和限制见
+[`OCR_ACCELERATION.md`](OCR_ACCELERATION.md)。这组 8 图结果只证明路由与单次
+延迟，不替换上方冻结 synthetic benchmark，也不构成真实业务准确率。

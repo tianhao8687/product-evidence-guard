@@ -22,6 +22,7 @@ $requirementsPath = Join-Path $repoRoot 'requirements.txt'
 $requirementsLockPath = Join-Path $repoRoot 'requirements.lock'
 $stampPath = Join-Path $runtimeDir 'install-stamp.json'
 $pythonInstallDir = Join-Path $runtimeDir 'python'
+$uvCacheDir = Join-Path $runtimeDir 'uv-cache'
 $logPath = Join-Path $logDir 'install-env.log'
 $uvDir = Join-Path $toolsDir "uv-$uvVersion"
 $uvExe = Join-Path $uvDir 'uv.exe'
@@ -377,6 +378,11 @@ Assert-NoReparsePoint -Path $repoRoot -Context 'Repository root'
     -TargetPath $pythonInstallDir `
     -ExpectedPath (Join-Path $runtimeDir 'python') `
     -BoundaryRoot $runtimeDir)
+[void](Initialize-ExactManagedDirectory `
+    -TargetPath $uvCacheDir `
+    -ExpectedPath (Join-Path $runtimeDir 'uv-cache') `
+    -BoundaryRoot $runtimeDir)
+$env:UV_CACHE_DIR = $uvCacheDir
 
 Write-Host "正在准备 Product Evidence Guard 独立 Python $pythonVersion 环境……"
 Write-InstallLog "Install started. Repository=$repoRoot"

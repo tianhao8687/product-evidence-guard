@@ -116,6 +116,25 @@ def _confirmation_counts(
     }
 
 
+def _group_recommendation(
+    group: FactGroup,
+    candidates_by_id: dict[str, FactCandidate],
+) -> str:
+    statuses = {
+        candidates_by_id[candidate_id].status
+        for candidate_id in group.candidate_ids
+        if candidate_id in candidates_by_id
+    }
+    if statuses and statuses <= {"confirmed", "rejected"}:
+        if "confirmed" in statuses:
+            return (
+                "该组已完成人工处理；已确认项可以进入正式导出。"
+                "源文件变化后确认会自动失效。"
+            )
+        return "该组候选已全部人工拒绝，不会进入正式导出。"
+    return group.recommendation
+
+
 def write_product_facts(
     path: Path,
     *,
@@ -171,8 +190,57 @@ def write_conflicts_markdown(
                 "",
             ]
         )
+    document_visual_summary = (
+        run_summary.get("document_visuals")
+        if isinstance(run_summary, dict)
+        else None
+    )
+    mixed_pdf_summary = (
+        run_summary.get("mixed_pdf")
+        if isinstance(run_summary, dict)
+        else None
+    )
+    if isinstance(document_visual_summary, dict):
+        lines.extend(
+            [
+                "# 文档视觉内容",
+                "",
+                "- 内嵌图片：发现 "
+                f"{int(document_visual_summary.get('embedded_images_detected', 0))}，"
+                "已处理 "
+                f"{int(document_visual_summary.get('embedded_images_processed', 0))}，"
+                "跳过 "
+                f"{int(document_visual_summary.get('embedded_images_skipped', 0))}",
+                "- 原生图表：发现 "
+                f"{int(document_visual_summary.get('native_charts_detected', 0))}，"
+                "已结构化 "
+                f"{int(document_visual_summary.get('native_charts_structured', 0))}",
+            ]
+        )
+        if isinstance(mixed_pdf_summary, dict):
+            lines.append(
+                "- PDF 正文与图形混合页：发现 "
+                f"{int(mixed_pdf_summary.get('pages_detected', 0))}，"
+                "文本层结构化 "
+                f"{int(mixed_pdf_summary.get('pages_structured_from_text_layer', 0))}，"
+                "本地图像 AI 处理 "
+                f"{int(mixed_pdf_summary.get('pages_processed_with_local_image_ai', 0))}，"
+                "跳过 "
+                f"{int(mixed_pdf_summary.get('pages_skipped', 0))}"
+            )
+        lines.extend(
+            [
+                "- 文档视觉问题："
+                f"{int(document_visual_summary.get('issues', 0))}",
+                "",
+                "> 图表完整数据、图片路由与位置见 `document-visuals.json`；"
+                "其中内容是观察和结构化上下文，不是 FactCandidate 或正式事实。",
+                "",
+            ]
+        )
     ordered = sorted(group_list, key=lambda item: ({"block": 0, "review": 1, "pass": 2}.get(item.severity, 3), item.field))
     for group in ordered:
+        recommendation = _group_recommendation(group, by_id)
         lines.extend(
             [
                 f"## {group.field_label} — `{group.classification}`",
@@ -180,7 +248,7 @@ def write_conflicts_markdown(
                 f"- 严重程度：**{group.severity}**",
                 f"- 判断：{group.reason}",
                 f"- 证据一致度：{group.evidence_consistency:.0%}",
-                f"- 建议：{group.recommendation}",
+                f"- 建议：{recommendation}",
                 "",
                 "证据：",
                 "",
@@ -242,6 +310,7 @@ def write_html_report(
     cards: list[str] = []
     ordered = sorted(group_list, key=lambda item: ({"block": 0, "review": 1, "pass": 2}.get(item.severity, 3), item.field))
     for group in ordered:
+        recommendation = _group_recommendation(group, by_id)
         evidence_rows: list[str] = []
         for candidate_id in group.candidate_ids:
             candidate = by_id[candidate_id]
@@ -276,7 +345,7 @@ def write_html_report(
             f"<section class='card {css_class}'>"
             f"<h2>{escape(group.field_label)} <small>{escape(group.classification)}</small></h2>"
             f"<p>{escape(group.reason)}</p>"
-            f"<p><strong>建议：</strong>{escape(group.recommendation)}</p>"
+            f"<p><strong>建议：</strong>{escape(recommendation)}</p>"
             f"<p><strong>三层可信度：</strong>识别 {group.recognition_confidence:.0%} · "
             f"字段理解 {group.mapping_confidence:.0%} · 证据一致 {group.evidence_consistency:.0%}</p>"
             "<div class='table-wrap'><table><thead><tr><th>原始值</th><th>标准值</th>"
@@ -307,6 +376,53 @@ def write_html_report(
         f"<span class='status stale'>已失效 {status_counts['stale']}</span>"
         f"{stale_notice}</section>"
     )
+    document_visual_summary = run_summary.get("document_visuals")
+    mixed_pdf_summary = run_summary.get("mixed_pdf")
+    document_visual_html = ""
+    if isinstance(document_visual_summary, dict):
+        mixed_detected = (
+            int(mixed_pdf_summary.get("pages_detected", 0))
+            if isinstance(mixed_pdf_summary, dict)
+            else 0
+        )
+        mixed_processed = (
+            int(
+                mixed_pdf_summary.get(
+                    "pages_processed_with_local_image_ai",
+                    0,
+                )
+            )
+            if isinstance(mixed_pdf_summary, dict)
+            else 0
+        )
+        mixed_structured = (
+            int(
+                mixed_pdf_summary.get(
+                    "pages_structured_from_text_layer",
+                    0,
+                )
+            )
+            if isinstance(mixed_pdf_summary, dict)
+            else 0
+        )
+        document_visual_html = (
+            "<section class='card info'><h2>文档视觉内容</h2>"
+            "<p>内嵌图片：发现 "
+            f"{int(document_visual_summary.get('embedded_images_detected', 0))}，"
+            "已处理 "
+            f"{int(document_visual_summary.get('embedded_images_processed', 0))}；"
+            "原生图表：发现 "
+            f"{int(document_visual_summary.get('native_charts_detected', 0))}，"
+            "已结构化 "
+            f"{int(document_visual_summary.get('native_charts_structured', 0))}；"
+            f"PDF 混合页：发现 {mixed_detected}，"
+            f"文本层结构化 {mixed_structured}，"
+            f"本地图像 AI 处理 {mixed_processed}。</p>"
+            "<p>完整图表数据、图片路由和位置见 "
+            "<code>document-visuals.json</code>；其中内容是观察和结构化上下文，"
+            "不是 FactCandidate 或正式事实。</p>"
+            "</section>"
+        )
     summary = escape(json.dumps(run_summary, ensure_ascii=False))
     html = f"""<!doctype html>
 <html lang="zh-CN">
@@ -331,6 +447,7 @@ small{{font-size:.58em;color:#667085}} .table-wrap{{overflow-x:auto}} table{{wid
 <p class="subtitle">本地多来源商品事实核验报告</p>
 <p class="notice"><strong>注意：</strong>报告中的内容仍是候选事实。强冲突必须人工处理，任何候选都不会自动成为正式产品参数。模型自评分数未经校准。</p>
 {confirmation_html}
+{document_visual_html}
 {''.join(cards)}
 {relation_html}
 <details><summary>本次增量分析摘要</summary><pre>{summary}</pre></details>

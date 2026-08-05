@@ -5,6 +5,10 @@
 # byte-for-byte on Linux and Windows checkouts, including ASCII-only PDFs.
 samples/generated-benchmark/** -text
 
+# These are byte-for-byte copies from the installed wheel.  Preserve upstream
+# line endings so the recorded RECORD/SHA-256 identities survive checkout.
+docs/evidence/licenses/** -text -diff
+
 *.png -text
 *.jpg -text
 *.jpeg -text

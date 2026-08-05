@@ -47,7 +47,10 @@ from protocol import (  # noqa: E402
     utc_now,
     validate_request,
 )
+import model_download  # noqa: E402
 from product_evidence_guard.confirmation import (  # noqa: E402
+    ConfirmationError,
+    ConfirmationRequestError,
     apply_decision,
     export_confirmed,
 )
@@ -55,16 +58,42 @@ from product_evidence_guard.engine import (  # noqa: E402
     MAX_SINGLE_FILE_SECONDS,
     analyze_directory,
 )
+from product_evidence_guard.hybrid_image_reader import (  # noqa: E402
+    HybridImageReader,
+)
 from product_evidence_guard.openvino_adapter import (  # noqa: E402
     OpenVinoFactExtractor,
     resolve_openvino_device,
 )
-from product_evidence_guard.qwen_vl_reader import QwenVlReader  # noqa: E402
 
 
 LOGGER = logging.getLogger("product_evidence_guard.local_server")
 MAX_PENDING_CONNECTIONS = 32
 MAX_REQUEST_WORKERS = 16
+
+
+def _select_worker_executable(
+    current_executable: str,
+    base_executable: str | None,
+    *,
+    platform: str,
+) -> str | None:
+    """Use the real Windows Python binary instead of the venv redirector.
+
+    The Windows venv executable can remain as a small parent process while the
+    actual interpreter becomes its child. ``multiprocessing.Process.terminate``
+    would then stop only the redirector and orphan the multi-gigabyte OpenVINO
+    worker. Spawning the base interpreter directly keeps the process handle
+    attached to the process that owns the model.
+    """
+
+    if platform != "win32" or not base_executable:
+        return None
+    current = Path(current_executable).resolve()
+    base = Path(base_executable).resolve()
+    if current == base or not base.is_file():
+        return None
+    return str(base)
 
 
 def configure_logging(runtime_dir: Path) -> None:
@@ -189,7 +218,7 @@ class ResidentModelCache:
         self,
         *,
         llm_factory: Callable[[str, str], Any] = OpenVinoFactExtractor,
-        vlm_factory: Callable[..., Any] = QwenVlReader.from_openvino,
+        vlm_factory: Callable[..., Any] = HybridImageReader.from_openvino,
         device_resolver: Callable[[str], Any] = resolve_openvino_device,
     ) -> None:
         self._llm_factory = llm_factory
@@ -280,6 +309,15 @@ def _resident_analysis_worker_main(connection: Any) -> None:
     or generating. The worker itself remains alive and reuses its model cache.
     """
 
+    class ParentDisconnected(Exception):
+        """Stop this exact worker quietly when its parent pipe disappears."""
+
+    def send_to_parent(message: Mapping[str, Any]) -> None:
+        try:
+            connection.send(dict(message))
+        except (BrokenPipeError, EOFError, OSError) as exc:
+            raise ParentDisconnected from exc
+
     cache = ResidentModelCache()
     while True:
         try:
@@ -295,13 +333,16 @@ def _resident_analysis_worker_main(connection: Any) -> None:
         job_id = str(message.get("job_id", ""))
         payload = message.get("payload")
         if not isinstance(payload, dict):
-            connection.send(
-                {
-                    "type": "error",
-                    "job_id": job_id,
-                    "message": "模型工作进程收到无效 payload。",
-                }
-            )
+            try:
+                send_to_parent(
+                    {
+                        "type": "error",
+                        "job_id": job_id,
+                        "message": "模型工作进程收到无效 payload。",
+                    }
+                )
+            except ParentDisconnected:
+                break
             continue
         try:
             prepared = cache.prepare(
@@ -309,7 +350,7 @@ def _resident_analysis_worker_main(connection: Any) -> None:
                 openvino_vlm_model=payload.get("openvino_vlm_model"),
                 requested_device=str(payload.get("device") or "AUTO"),
             )
-            connection.send(
+            send_to_parent(
                 {
                     "type": "model_ready",
                     "job_id": job_id,
@@ -328,7 +369,7 @@ def _resident_analysis_worker_main(connection: Any) -> None:
                 preloaded_model_load_seconds=prepared["load_seconds"],
                 preloaded_model_reused=prepared["reused"],
                 device_selection=prepared["selection"],
-                progress_callback=lambda stage, details: connection.send(
+                progress_callback=lambda stage, details: send_to_parent(
                     {
                         "type": "progress",
                         "job_id": job_id,
@@ -337,21 +378,26 @@ def _resident_analysis_worker_main(connection: Any) -> None:
                     }
                 ),
             )
-            connection.send(
+            send_to_parent(
                 {
                     "type": "result",
                     "job_id": job_id,
                     "summary": summary,
                 }
             )
+        except ParentDisconnected:
+            break
         except Exception as exc:
-            connection.send(
-                {
-                    "type": "error",
-                    "job_id": job_id,
-                    "message": f"{type(exc).__name__}: {exc}",
-                }
-            )
+            try:
+                send_to_parent(
+                    {
+                        "type": "error",
+                        "job_id": job_id,
+                        "message": f"{type(exc).__name__}: {exc}",
+                    }
+                )
+            except ParentDisconnected:
+                break
     try:
         connection.close()
     except OSError:
@@ -405,6 +451,13 @@ class ResidentAnalysisWorker:
             self._connection = None
         self._dispose(old_process, old_connection)
 
+        worker_executable = _select_worker_executable(
+            sys.executable,
+            getattr(sys, "_base_executable", None),
+            platform=sys.platform,
+        )
+        if worker_executable is not None:
+            multiprocessing.set_executable(worker_executable)
         context = multiprocessing.get_context("spawn")
         parent, child = context.Pipe(duplex=True)
         process = context.Process(
@@ -540,11 +593,16 @@ class ServerApplication:
         payload = validated["payload"]
         self.state.touch()
         if operation == "status":
+            download_state = read_json_object(
+                self.state.runtime_dir / model_download.DOWNLOAD_STATE_NAME
+            ) or {}
+            download_active = download_state.get("status") == "downloading"
             return success_response(
                 validated,
-                status=self.state.status,
+                status="downloading" if download_active else self.state.status,
                 result={
                     "server": self.state.snapshot(),
+                    "download": download_state,
                     "available_operations": [
                         "status",
                         "analyze",
@@ -554,6 +612,9 @@ class ServerApplication:
                         "shutdown",
                     ],
                 },
+                exit_code=(
+                    EXIT_DOWNLOAD_PENDING if download_active else EXIT_SUCCESS
+                ),
             )
         if operation == "shutdown":
             # A shutdown waits for the current mutating operation so analysis
@@ -576,6 +637,18 @@ class ServerApplication:
                 if operation == "export":
                     return self._dispatch_export(validated, payload)
                 raise ProtocolError(f"不支持的操作：{operation}")
+            except ConfirmationRequestError as exc:
+                # A stale/missing candidate or mismatched session is a rejected
+                # business request, not a server health failure. Keep the
+                # resident service available for the user's corrected request.
+                self.state.transition("running")
+                return error_response(
+                    validated,
+                    status="running",
+                    code="operation_failed",
+                    message=f"ConfirmationError: {exc}",
+                    exit_code=EXIT_GENERAL_ERROR,
+                )
             except ProtocolError as exc:
                 self.state.transition("error", error=str(exc))
                 return error_response(
@@ -613,6 +686,8 @@ class ServerApplication:
         for model_path in (openvino_model, openvino_vlm_model):
             if model_path and not Path(model_path).expanduser().is_dir():
                 pending = read_json_object(
+                    self.state.runtime_dir / model_download.DOWNLOAD_STATE_NAME
+                ) or read_json_object(
                     self.state.runtime_dir / "pending-request.json"
                 )
                 if pending and pending.get("status") == "downloading":

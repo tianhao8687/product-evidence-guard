@@ -52,6 +52,10 @@ class ConfirmationError(ValueError):
     """Raised when a confirmation command violates the session contract."""
 
 
+class ConfirmationRequestError(ConfirmationError):
+    """Raised for a safe, retryable user request rejection."""
+
+
 @dataclass(frozen=True, slots=True)
 class ConfirmationResult:
     session_id: str
@@ -153,7 +157,9 @@ def _load_confirmation_state(
     events: list[dict[str, Any]] = []
     if previous_session_id != session_id:
         if not recover_session_mismatch:
-            raise ConfirmationError("会话 ID 不匹配，请使用最新分析结果中的 session_id。")
+            raise ConfirmationRequestError(
+                "会话 ID 不匹配，请使用最新分析结果中的 session_id。"
+            )
         reason = "分析输入根目录或恢复会话已变化，旧确认自动失效。"
         for candidate_id, decision in data["decisions"].items():
             if not isinstance(decision, dict) or decision.get("status") not in ACTIVE_STATUSES:
@@ -172,6 +178,17 @@ def _load_confirmation_state(
     return data, events, changed
 
 
+def _assert_safe_audit_target(path: Path) -> None:
+    if path.exists() or path.is_symlink():
+        metadata = path.lstat()
+        if (
+            not stat.S_ISREG(metadata.st_mode)
+            or metadata.st_nlink != 1
+            or path.is_symlink()
+        ):
+            raise ConfirmationError("确认审计文件不是安全的普通文件。")
+
+
 def _append_audit_events(
     output_dir: Path,
     events: Iterable[dict[str, Any]],
@@ -181,15 +198,9 @@ def _append_audit_events(
         return
     path = output_dir / CONFIRMATION_AUDIT_NAME
     path.parent.mkdir(parents=True, exist_ok=True)
+    _assert_safe_audit_target(path)
     existing = ""
-    if path.exists() or path.is_symlink():
-        metadata = path.lstat()
-        if (
-            not stat.S_ISREG(metadata.st_mode)
-            or metadata.st_nlink != 1
-            or path.is_symlink()
-        ):
-            raise ConfirmationError("确认审计文件不是安全的普通文件。")
+    if path.exists():
         existing = path.read_text(encoding="utf-8")
         if existing and not existing.endswith("\n"):
             existing += "\n"
@@ -540,24 +551,28 @@ def apply_decision(
 ) -> ConfirmationResult:
     output = Path(output_dir).expanduser().resolve()
     if action not in ALLOWED_ACTIONS:
-        raise ConfirmationError(f"不支持的确认动作：{action}")
+        raise ConfirmationRequestError(f"不支持的确认动作：{action}")
     clean_reason = reason.strip()
     if not clean_reason:
-        raise ConfirmationError("确认或拒绝必须填写理由。")
+        raise ConfirmationRequestError("确认或拒绝必须填写理由。")
     if len(clean_reason) > 1000:
-        raise ConfirmationError("理由过长，最多 1000 个字符。")
+        raise ConfirmationRequestError("理由过长，最多 1000 个字符。")
 
     product_facts = _load_json_object(output / "product-facts.json")
     current_session = _session_id(product_facts)
     if current_session != session_id:
-        raise ConfirmationError("会话 ID 不匹配，请使用最新分析结果中的 session_id。")
+        raise ConfirmationRequestError(
+            "会话 ID 不匹配，请使用最新分析结果中的 session_id。"
+        )
     rows = _candidate_rows(product_facts)
     candidate = next(
         (row for row in rows if str(row.get("candidate_id", "")) == candidate_id),
         None,
     )
     if candidate is None:
-        raise ConfirmationError("候选 ID 不存在或已因源文件变化而失效。")
+        raise ConfirmationRequestError(
+            "候选 ID 不存在或已因源文件变化而失效。"
+        )
 
     snapshot = _candidate_snapshot(candidate)
     input_root, analysis_snapshots = _load_analysis_context(
@@ -565,10 +580,12 @@ def apply_decision(
         session_id=session_id,
     )
     if analysis_snapshots.get(candidate_id) != snapshot:
-        raise ConfirmationError("候选与分析状态不一致，请重新分析后再确认。")
+        raise ConfirmationRequestError(
+            "候选与分析状态不一致，请重新分析后再确认。"
+        )
     source_error = _source_validation_error(input_root, snapshot, {})
     if source_error is not None:
-        raise ConfirmationError(f"{source_error} 请重新分析后再确认。")
+        raise ConfirmationRequestError(f"{source_error} 请重新分析后再确认。")
 
     state, _, _ = _load_confirmation_state(output, session_id)
     status = "confirmed" if action == "confirm" else "rejected"
@@ -584,7 +601,7 @@ def apply_decision(
         "session_id": session_id,
         "tool_version": __version__,
     }
-    state["decisions"][candidate_id] = {
+    decision = {
         "status": status,
         "field": event["field"],
         "reason": clean_reason,
@@ -594,8 +611,11 @@ def apply_decision(
         "candidate_snapshot": snapshot,
         "candidate_snapshot_sha256": _snapshot_digest(snapshot),
     }
-    atomic_write_json(output / CONFIRMATION_STATE_NAME, state)
+    # Treat the audit as a write-ahead record: if it cannot be written safely,
+    # no exportable decision is persisted.
     _append_audit(output, event)
+    state["decisions"][candidate_id] = decision
+    atomic_write_json(output / CONFIRMATION_STATE_NAME, state)
     _synchronize_analysis_outputs(
         output,
         product_facts=product_facts,
@@ -663,7 +683,9 @@ def export_confirmed(output_dir: str | Path, *, session_id: str) -> dict[str, An
     output = Path(output_dir).expanduser().resolve()
     product_facts = _load_json_object(output / "product-facts.json")
     if _session_id(product_facts) != session_id:
-        raise ConfirmationError("会话 ID 不匹配，请使用最新分析结果中的 session_id。")
+        raise ConfirmationRequestError(
+            "会话 ID 不匹配，请使用最新分析结果中的 session_id。"
+        )
     state, _, changed = _load_confirmation_state(output, session_id)
     events: list[dict[str, Any]] = []
     try:
@@ -732,12 +754,6 @@ def initialize_confirmation_outputs(output_dir: str | Path, *, session_id: str) 
     if not audit_path.exists() and not audit_path.is_symlink():
         atomic_write_text(audit_path, "")
     else:
-        metadata = audit_path.lstat()
-        if (
-            not stat.S_ISREG(metadata.st_mode)
-            or metadata.st_nlink != 1
-            or audit_path.is_symlink()
-        ):
-            raise ConfirmationError("确认审计文件不是安全的普通文件。")
+        _assert_safe_audit_target(audit_path)
     product_facts = _load_json_object(output / "product-facts.json")
     _write_confirmed_facts(output, product_facts=product_facts, state=state)

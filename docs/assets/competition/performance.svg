@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">公开标签图的冷启动、热调用与文件缓存耗时</title>
+  <desc id="desc">三次独立冷启动分析均值 26.7046 秒，常驻模型热调用 15.141 秒，未修改文件缓存分析 0.0241 秒。</desc>
+  <defs><style>.title{font:700 30px 'Segoe UI','Microsoft YaHei',sans-serif;fill:#172554}.label{font:600 22px 'Segoe UI','Microsoft YaHei',sans-serif;fill:#172554}.value{font:700 28px 'Segoe UI','Microsoft YaHei',sans-serif;fill:#0f172a}.note{font:400 16px 'Segoe UI','Microsoft YaHei',sans-serif;fill:#475569}.axis{stroke:#94a3b8;stroke-width:2}.grid{stroke:#e2e8f0;stroke-width:1}</style></defs>
+  <rect width="1200" height="520" rx="28" fill="#f8fafc"/>
+  <text x="600" y="54" text-anchor="middle" class="title">真实公开标签图：本地分析速度</text>
+  <text x="600" y="84" text-anchor="middle" class="note">同一台机器 · CPU · Qwen 模型常驻仅用于热调用 · 文件缓存为无修改输入</text>
+  <line x1="260" y1="125" x2="1080" y2="125" class="grid"/><line x1="260" y1="205" x2="1080" y2="205" class="grid"/><line x1="260" y1="285" x2="1080" y2="285" class="grid"/><line x1="260" y1="365" x2="1080" y2="365" class="grid"/><line x1="260" y1="430" x2="1080" y2="430" class="axis"/>
+  <text x="225" y="181" text-anchor="end" class="label">冷启动均值</text><text x="225" y="211" text-anchor="end" class="note">3 次独立重启</text>
+  <rect x="260" y="155" width="748" height="62" rx="12" fill="#2563eb"/><text x="1028" y="195" class="value">26.7046 s</text>
+  <text x="225" y="276" text-anchor="end" class="label">热调用</text><text x="225" y="306" text-anchor="end" class="note">模型已常驻</text>
+  <rect x="260" y="250" width="424" height="62" rx="12" fill="#7c3aed"/><text x="704" y="290" class="value">15.1410 s</text>
+  <text x="225" y="371" text-anchor="end" class="label">文件缓存</text><text x="225" y="401" text-anchor="end" class="note">输入未修改</text>
+  <rect x="260" y="345" width="8" height="62" rx="4" fill="#16a34a"/><text x="288" y="385" class="value">0.0241 s</text>
+  <text x="260" y="468" class="note">柱长按 0–30 秒线性比例；缓存柱保留 8 px 可见下限，数值标签为真实值。</text>
+  <text x="260" y="493" class="note">冷启动范围 25.5298–27.6312 s；详细哈希和口径见 docs/evidence。</text>
+</svg>

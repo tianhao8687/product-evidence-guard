@@ -29,6 +29,7 @@ ROOT_REQUIRED = (
     "docs/NEXT_STEPS.md",
 )
 RUNTIME_SCRIPTS = (
+    "scripts/benchmark-document-visuals.py",
     "scripts/benchmark.py",
     "scripts/client.py",
     "scripts/install-env.ps1",
@@ -70,6 +71,7 @@ def _run_installer(
     *,
     installer: Path = INSTALLER,
     update: bool = False,
+    runtime_root: Path | None = None,
     cwd: Path = REPO_ROOT,
 ) -> subprocess.CompletedProcess[str]:
     assert POWERSHELL is not None
@@ -89,6 +91,8 @@ def _run_installer(
     ]
     if update:
         command.append("-Update")
+    if runtime_root is not None:
+        command.extend(["-RuntimeRoot", str(runtime_root)])
     return subprocess.run(
         command,
         cwd=cwd,
@@ -187,6 +191,16 @@ class QoderInstallerContractTests(unittest.TestCase):
             script,
         )
 
+        skill = (REPO_ROOT / "SKILL.md").read_text(encoding="utf-8")
+        for routing_rule in (
+            "必须把这些参数原样传给 `scripts\\run.ps1`",
+            "必须保留用户指定的 `--deterministic-only`",
+            "只执行用户点名的 candidate ID 和原始理由",
+            "不要再次要求处理所有剩余候选",
+            "Skill 自己不得修改来源文件",
+        ):
+            self.assertIn(routing_rule, skill)
+
     @unittest.skipUnless(POWERSHELL, "Qoder integration test requires PowerShell")
     def test_initial_install_has_complete_runtime_and_only_tracked_demo_inputs(
         self,
@@ -257,6 +271,56 @@ class QoderInstallerContractTests(unittest.TestCase):
                 (project / ".qoder" / "skills").rglob("SKILL.md")
             )
             self.assertEqual(discoverable, [installed / "SKILL.md"])
+
+    @unittest.skipUnless(POWERSHELL, "Qoder integration test requires PowerShell")
+    def test_explicit_runtime_root_creates_local_bridge_and_executes_entry(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory(prefix="qoder-runtime-bridge-") as temporary:
+            root = Path(temporary)
+            source = _copy_source_fixture(root)
+            project = root / "project"
+            project.mkdir()
+
+            result = _run_installer(
+                project,
+                installer=source / "scripts" / "install-qoder-skill.ps1",
+                runtime_root=source,
+                cwd=source,
+            )
+            _assert_success(self, result)
+            installed = _live(project)
+            runtime_config = installed / ".runtime" / "source-root.txt"
+            self.assertTrue(runtime_config.is_file())
+            self.assertEqual(
+                Path(runtime_config.read_text(encoding="utf-8").strip()).resolve(),
+                source.resolve(),
+            )
+            self.assertIn("已复用本地运行时", result.stdout)
+
+            entry_result = subprocess.run(
+                [
+                    POWERSHELL,
+                    "-NoLogo",
+                    "-NoProfile",
+                    "-NonInteractive",
+                    "-ExecutionPolicy",
+                    "Bypass",
+                    "-File",
+                    str(installed / "scripts" / "run.ps1"),
+                    "--help",
+                ],
+                cwd=installed,
+                env=_subprocess_environment(),
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=120,
+                check=False,
+            )
+            self.assertEqual(entry_result.returncode, 0, entry_result.stderr)
+            self.assertIn("--continue", entry_result.stdout)
 
     @unittest.skipUnless(
         POWERSHELL and GIT,

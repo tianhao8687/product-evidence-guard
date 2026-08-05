@@ -10,6 +10,7 @@ import tempfile
 import threading
 import time
 import unittest
+from unittest import mock
 import uuid
 
 
@@ -21,6 +22,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 import client
+import model_download
 import protocol
 import server
 
@@ -304,6 +306,57 @@ class ServerApplicationTests(unittest.TestCase):
                 "reject",
             ])
 
+            def stale_decide(*_args, **_kwargs):
+                raise server.ConfirmationRequestError("候选已经失效")
+
+            stale_app, stale_state, _ = self.make_application(
+                Path(temporary) / "stale-request",
+                decide=stale_decide,
+            )
+            stale_response = stale_app.dispatch(
+                protocol.build_request(
+                    "confirm",
+                    {
+                        "output_dir": "out",
+                        "session_id": "session",
+                        "candidate_id": "stale-candidate",
+                        "reason": "不应重新确认",
+                    },
+                )
+            )
+            self.assertFalse(stale_response["ok"])
+            self.assertEqual(stale_response["status"], "running")
+            self.assertEqual(stale_response["error"]["code"], "operation_failed")
+            self.assertEqual(stale_state.status, "running")
+            status = stale_app.dispatch(protocol.build_request("status"))
+            self.assertEqual(status["status"], "running")
+
+            def integrity_failure(*_args, **_kwargs):
+                raise server.ConfirmationError("审计目标不安全")
+
+            integrity_app, integrity_state, _ = self.make_application(
+                Path(temporary) / "integrity-failure",
+                decide=integrity_failure,
+            )
+            integrity_response = integrity_app.dispatch(
+                protocol.build_request(
+                    "confirm",
+                    {
+                        "output_dir": "out",
+                        "session_id": "session",
+                        "candidate_id": "candidate",
+                        "reason": "人工确认",
+                    },
+                )
+            )
+            self.assertFalse(integrity_response["ok"])
+            self.assertEqual(integrity_response["status"], "error")
+            self.assertEqual(
+                integrity_response["error"]["code"],
+                "operation_failed",
+            )
+            self.assertEqual(integrity_state.status, "error")
+
     def test_operation_failure_sets_error_state_without_crashing_server(self) -> None:
         def failed_engine(*_args, **_kwargs):
             raise RuntimeError("mock failure")
@@ -538,9 +591,54 @@ class ClientAndLifecycleTests(unittest.TestCase):
             self.assertEqual(exit_code, protocol.EXIT_SUCCESS)
             self.assertTrue(response["result"]["pending_analysis_resumed"])
             self.assertEqual(pending["openvino_vlm_model"], str(model_dir))
-            self.assertFalse(
+            self.assertTrue(
                 (runtime_dir / client.PENDING_ANALYSIS_NAME).exists()
             )
+
+    def test_pending_analysis_is_cleared_only_after_successful_resume(self) -> None:
+        for analysis_exit, should_exist in ((1, True), (0, False)):
+            with self.subTest(analysis_exit=analysis_exit):
+                with tempfile.TemporaryDirectory() as temporary:
+                    runtime_dir = Path(temporary) / "runtime"
+                    client._save_pending_analysis(
+                        {"input_dir": "匿名 资料", "openvino_vlm_model": None},
+                        runtime_dir=runtime_dir,
+                    )
+                    pending = {
+                        "input_dir": "匿名 资料",
+                        "openvino_vlm_model": "model",
+                    }
+                    with mock.patch.object(
+                        client,
+                        "continue_download",
+                        return_value=(pending, {"ok": True}, 0),
+                    ), mock.patch.object(
+                        client,
+                        "execute_command",
+                        return_value=({"ok": analysis_exit == 0}, analysis_exit),
+                    ):
+                        exit_code = client.main(
+                            ["--continue"],
+                            runtime_dir=runtime_dir,
+                        )
+                    self.assertEqual(exit_code, analysis_exit)
+                    self.assertEqual(
+                        (runtime_dir / client.PENDING_ANALYSIS_NAME).exists(),
+                        should_exist,
+                    )
+
+    def test_different_pending_analysis_cannot_be_overwritten(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            runtime_dir = Path(temporary) / "runtime"
+            client._save_pending_analysis(
+                {"input_dir": "first"}, runtime_dir=runtime_dir
+            )
+            with self.assertRaises(client.CliUsageError):
+                client._save_pending_analysis(
+                    {"input_dir": "second"}, runtime_dir=runtime_dir
+                )
+            pending = client._load_pending_analysis(runtime_dir)
+            self.assertEqual(pending["input_dir"], "first")
 
     def test_download_pending_is_saved_for_continue(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -569,6 +667,95 @@ class ClientAndLifecycleTests(unittest.TestCase):
                 "含 空格\\资料",
             )
 
+    def test_download_coordinator_returns_pending_at_host_timeout(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            runtime_dir = root / "runtime"
+            spec = model_download.DownloadSpec(
+                model_id="owner/model",
+                target=root / "model",
+                required_files=("config.json",),
+                revision="abc",
+                runtime_dir=runtime_dir,
+            )
+            starts: list[Path] = []
+
+            def starter(_spec, *, runtime_dir):
+                starts.append(runtime_dir)
+                return 1234
+
+            result = client.coordinate_model_download(
+                spec,
+                runtime_dir=runtime_dir,
+                wait_timeout=0,
+                starter=starter,
+            )
+            self.assertEqual(result["status"], "downloading")
+            self.assertEqual(result["wait_timeout_seconds"], 0)
+            self.assertEqual(result["worker_pid"], 1234)
+            self.assertEqual(starts, [runtime_dir])
+
+    def test_download_coordinator_observes_worker_atomic_promotion(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            runtime_dir = root / "runtime"
+            target = root / "model"
+            spec = model_download.DownloadSpec(
+                model_id="owner/model",
+                target=target,
+                required_files=("config.json",),
+                revision="abc",
+                runtime_dir=runtime_dir,
+            )
+
+            def starter(_spec, *, runtime_dir):
+                self.assertEqual(runtime_dir, spec.runtime_dir)
+                target.mkdir()
+                (target / "config.json").write_text("{}", encoding="utf-8")
+                return 5678
+
+            result = client.coordinate_model_download(
+                spec,
+                runtime_dir=runtime_dir,
+                wait_timeout=1,
+                starter=starter,
+            )
+            self.assertEqual(result["status"], "ready")
+            self.assertEqual(result["worker_pid"], 5678)
+
+    def test_download_coordinator_surfaces_permanent_worker_error(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            runtime_dir = root / "runtime"
+            spec = model_download.DownloadSpec(
+                model_id="owner/model",
+                target=root / "model",
+                required_files=("config.json",),
+                revision="abc",
+                runtime_dir=runtime_dir,
+            )
+
+            def starter(_spec, *, runtime_dir):
+                protocol.atomic_write_json(
+                    runtime_dir / "download-state.json",
+                    {
+                        "schema_version": 1,
+                        "status": "error",
+                        "last_error": "RevisionNotFoundError: bad revision",
+                    },
+                )
+                return 9012
+
+            result = client.coordinate_model_download(
+                spec,
+                runtime_dir=runtime_dir,
+                wait_timeout=1,
+                starter=starter,
+            )
+            self.assertEqual(result["status"], "error")
+            self.assertFalse(result["retryable"])
+            self.assertIn("RevisionNotFoundError", result["error"])
+
     def test_powershell_entry_is_utf8_and_forwards_all_arguments(self) -> None:
         # UTF-8 with BOM keeps the public entry parseable in Windows
         # PowerShell 5.1 on non-UTF-8 runner locales.
@@ -576,6 +763,9 @@ class ClientAndLifecycleTests(unittest.TestCase):
         self.assertTrue(content.startswith("$ErrorActionPreference = 'Stop'"))
         self.assertIn("[Console]::OutputEncoding", content)
         self.assertIn("$ClientScript @args", content)
+        self.assertIn(".runtime\\source-root.txt", content)
+        self.assertIn("-File $ExternalRunScript @args", content)
+        self.assertIn("runtime_root_invalid", content)
         self.assertNotIn("Write-Host", content)
 
     @unittest.skipUnless(os.name == "nt", "real AF_PIPE is Windows-only")

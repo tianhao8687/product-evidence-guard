@@ -25,6 +25,8 @@ from server import (  # noqa: E402
     ResidentAnalysisWorker,
     ResidentModelCache,
     _accept_connections,
+    _select_worker_executable,
+    _resident_analysis_worker_main,
 )
 
 
@@ -66,16 +68,77 @@ class DeviceSelectionTests(unittest.TestCase):
         self.assertEqual(selected.policy, "auto_cpu_fallback")
 
     def test_explicit_device_must_exist_and_npu_is_not_advertised(self) -> None:
-        core = FakeCore({"CPU": "Example CPU", "GPU": "NVIDIA RTX"})
+        intel = FakeCore({"CPU": "Example CPU", "GPU": "Intel(R) Arc"})
+        nvidia = FakeCore({"CPU": "Example CPU", "GPU": "NVIDIA RTX"})
 
-        self.assertEqual(resolve_openvino_device("GPU", core=core).actual, "GPU")
+        self.assertEqual(resolve_openvino_device("GPU", core=intel).actual, "GPU")
+        with self.assertRaisesRegex(RuntimeError, "只验证了 Intel GPU"):
+            resolve_openvino_device("GPU", core=nvidia)
         with self.assertRaisesRegex(RuntimeError, "不可用"):
-            resolve_openvino_device("GPU.9", core=core)
+            resolve_openvino_device("GPU.9", core=intel)
         with self.assertRaisesRegex(RuntimeError, "拒绝使用 NPU"):
-            resolve_openvino_device("NPU", core=core)
+            resolve_openvino_device("NPU", core=intel)
 
 
 class ResidentModelCacheTests(unittest.TestCase):
+    def test_worker_exits_quietly_when_parent_disconnects_during_send(self) -> None:
+        class DisconnectedConnection:
+            def __init__(self) -> None:
+                self.received = False
+                self.closed = False
+
+            def recv(self) -> object:
+                if not self.received:
+                    self.received = True
+                    return {
+                        "operation": "analyze",
+                        "job_id": "job",
+                        "payload": None,
+                    }
+                raise EOFError
+
+            def send(self, _message: object) -> None:
+                raise BrokenPipeError("client disconnected")
+
+            def close(self) -> None:
+                self.closed = True
+
+        connection = DisconnectedConnection()
+        _resident_analysis_worker_main(connection)
+        self.assertTrue(connection.closed)
+
+    def test_windows_worker_uses_real_python_instead_of_venv_redirector(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            redirector = root / "venv" / "Scripts" / "python.exe"
+            base = root / "runtime" / "python.exe"
+            redirector.parent.mkdir(parents=True)
+            base.parent.mkdir(parents=True)
+            redirector.write_bytes(b"launcher")
+            base.write_bytes(b"interpreter")
+
+            selected = _select_worker_executable(
+                str(redirector),
+                str(base),
+                platform="win32",
+            )
+
+        self.assertEqual(selected, str(base.resolve()))
+        self.assertIsNone(
+            _select_worker_executable(
+                sys.executable,
+                sys.executable,
+                platform="win32",
+            )
+        )
+        self.assertIsNone(
+            _select_worker_executable(
+                sys.executable,
+                str(base),
+                platform="linux",
+            )
+        )
+
     def test_deterministic_only_request_does_not_require_openvino(self) -> None:
         def unexpected_device_resolution(_requested: str) -> object:
             raise AssertionError("deterministic-only must not inspect OpenVINO")

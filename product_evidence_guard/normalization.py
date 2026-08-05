@@ -103,8 +103,42 @@ def normalize_text(value: str) -> str:
 def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
     factors = UNIT_FACTORS[family]
     aliases = sorted(factors, key=len, reverse=True)
+    unit_pattern = "|".join(re.escape(item) for item in aliases)
+    range_pattern = re.compile(
+        rf"(?P<start>{_NUMBER})\s*"
+        rf"(?P<start_unit>{unit_pattern})?\s*"
+        rf"(?:-|–|—|~|to|至|到)\s*"
+        rf"(?P<end>{_NUMBER})\s*"
+        rf"(?P<end_unit>{unit_pattern})",
+        re.IGNORECASE,
+    )
+    range_match = range_pattern.search(raw)
+    if range_match:
+        start_unit_text = range_match.group("start_unit") or range_match.group(
+            "end_unit"
+        )
+        end_unit_text = range_match.group("end_unit")
+        start_factor = factors.get(start_unit_text.casefold()) or factors.get(
+            start_unit_text
+        )
+        end_factor = factors.get(end_unit_text.casefold()) or factors.get(
+            end_unit_text
+        )
+        if start_factor is not None and end_factor is not None:
+            try:
+                start = Decimal(range_match.group("start")) * start_factor
+                end = Decimal(range_match.group("end")) * end_factor
+            except InvalidOperation:
+                pass
+            else:
+                return NormalizedValue(
+                    [_clean_decimal(start), _clean_decimal(end)],
+                    BASE_UNITS[family],
+                    ("range_preserved",),
+                )
+
     pattern = re.compile(
-        rf"(?P<number>{_NUMBER})\s*(?P<unit>{'|'.join(re.escape(item) for item in aliases)})",
+        rf"(?P<number>{_NUMBER})\s*(?P<unit>{unit_pattern})",
         re.IGNORECASE,
     )
     match = pattern.search(raw)

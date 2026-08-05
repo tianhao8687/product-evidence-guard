@@ -7,13 +7,17 @@ import time
 import unittest
 from typing import Any
 
+from product_evidence_guard.graph import build_fact_groups
 from product_evidence_guard.model_output_schema import (
     MAX_RAW_TEXT_CHARS,
     MAX_TRANSCRIPTION_ITEMS,
     parse_field_mapping_output,
     parse_visual_transcription_output,
 )
-from product_evidence_guard.qwen_vl_reader import QwenVlReader
+from product_evidence_guard.qwen_vl_reader import (
+    QwenVlReader,
+    _repair_complete_items_prefix,
+)
 
 
 def _visual_item(
@@ -92,6 +96,23 @@ class FakeBackend:
 
 
 class ModelOutputSchemaTests(unittest.TestCase):
+    def test_deterministic_truncation_repair_keeps_only_complete_items(self) -> None:
+        first = _visual_item()
+        second = _visual_item(identifier="visual-002", raw_text="电压 19V")
+        complete = _payload([first, second])
+        truncated = complete[: complete.find('"visual-002"') + 8]
+
+        repaired = _repair_complete_items_prefix(truncated)
+
+        self.assertIsNotNone(repaired)
+        parsed = parse_visual_transcription_output(repaired or "")
+        self.assertEqual([item.id for item in parsed.items], ["visual-001"])
+        self.assertIsNone(
+            _repair_complete_items_prefix(
+                '{"schema_version":999,"items":[{"id":"unsafe"}'
+            )
+        )
+
     def test_visual_output_accepts_fence_and_surrounding_explanation(self) -> None:
         raw = (
             "模型说明文字\n```json\n"
@@ -408,6 +429,404 @@ class QwenVlReaderTests(unittest.TestCase):
         self.assertEqual(candidate.normalized_unit, "g")
         self.assertEqual(candidate.source_block_id, block.block_id)
         self.assertAlmostEqual(candidate.mapping_confidence, 0.91)
+
+    def test_unit_mapping_fills_voltage_and_current_omitted_by_model(self) -> None:
+        visual = _payload(
+            [
+                _visual_item(
+                    raw_text="INPUT 100-240V~50-60Hz, 1.5A",
+                )
+            ]
+        )
+        mapping = _payload(
+            [
+                _mapping_item(
+                    field="voltage",
+                    raw_value="100-240V~50-60Hz",
+                )
+            ]
+        )
+        backend = FakeBackend([visual, mapping])
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            image = root / "adapter.jpg"
+            image.write_bytes(b"fake image bytes")
+            result = QwenVlReader(backend).analyze_image(image, root)
+
+        by_field = {candidate.field: candidate for candidate in result.fact_candidates}
+        self.assertEqual(by_field["voltage"].normalized_value, [100, 240])
+        self.assertEqual(by_field["current"].raw_value, "1.5A")
+        self.assertEqual(by_field["current"].normalized_value, 1.5)
+        self.assertEqual(by_field["voltage"].scope, "input")
+        self.assertEqual(by_field["current"].scope, "input")
+        self.assertEqual(
+            by_field["current"].extraction_method,
+            "deterministic_unit_mapping",
+        )
+        self.assertEqual(
+            by_field["current"].mapping_confidence_source,
+            "deterministic",
+        )
+
+    def test_unit_mapping_fills_voltage_on_battery_capacity_line(self) -> None:
+        visual = _payload(
+            [_visual_item(raw_text="GSP 063450 1000mAh 3.7V")]
+        )
+        mapping = _payload(
+            [
+                _mapping_item(
+                    field="capacity_charge",
+                    raw_value="1000mAh",
+                )
+            ]
+        )
+        backend = FakeBackend([visual, mapping])
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            image = root / "battery.jpg"
+            image.write_bytes(b"fake image bytes")
+            result = QwenVlReader(backend).analyze_image(image, root)
+
+        by_field = {candidate.field: candidate for candidate in result.fact_candidates}
+        self.assertEqual(by_field["capacity_charge"].normalized_value, 1000)
+        self.assertEqual(by_field["voltage"].normalized_value, 3.7)
+
+    def test_ocr_guided_review_uses_one_visual_call_and_deterministic_mapping(
+        self,
+    ) -> None:
+        backend = FakeBackend(
+            [
+                json.dumps(
+                    {
+                        "schema_version": 1,
+                        "lines": ["GSP 063450 1000mAh 3.7V"],
+                    },
+                    ensure_ascii=False,
+                )
+            ]
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            image = root / "battery.jpg"
+            image.write_bytes(b"fake image bytes")
+            result = QwenVlReader(backend).analyze_image(
+                image,
+                root,
+                ocr_hints=[{"text": "11000mAh 3.7U", "score": 0.955}],
+            )
+
+        self.assertEqual(result.image_route, "qwen_ocr_review")
+        self.assertEqual(len(backend.calls), 1)
+        self.assertIs(backend.calls[0]["image"], backend.image_token)
+        self.assertLessEqual(
+            backend.calls[0]["max_new_tokens"],
+            96,
+        )
+        self.assertIn("OCR_HINTS_BEGIN", backend.calls[0]["prompt"])
+        by_field = {item.field: item for item in result.fact_candidates}
+        self.assertEqual(by_field["capacity_charge"].normalized_value, 1000)
+        self.assertEqual(by_field["voltage"].normalized_value, 3.7)
+        self.assertTrue(
+            all(
+                item.mapping_confidence_source == "deterministic"
+                for item in result.fact_candidates
+            )
+        )
+        self.assertTrue(
+            all(
+                item.provenance["recognition_confidence_source"]
+                == "qwen_visual_review_unscored"
+                for item in result.fact_candidates
+            )
+        )
+
+    def test_ocr_guided_review_rejects_non_strict_wrapper(self) -> None:
+        backend = FakeBackend(
+            [
+                'explanation {"schema_version":1,'
+                '"lines":["GSP 063450 1000mAh 3.7V"]}'
+            ]
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            image = root / "battery.jpg"
+            image.write_bytes(b"fake image bytes")
+            result = QwenVlReader(backend).analyze_image(
+                image,
+                root,
+                ocr_hints=[{"text": "11000mAh 3.7U", "score": 0.955}],
+            )
+
+        self.assertEqual(result.fact_candidates, [])
+        self.assertIn("invalid_json", {error.code for error in result.errors})
+
+    def test_ocr_guided_review_does_not_treat_model_suffix_as_current(
+        self,
+    ) -> None:
+        backend = FakeBackend(
+            [
+                json.dumps(
+                    {"schema_version": 1, "lines": ["MOD0L/04A"]},
+                    ensure_ascii=False,
+                )
+            ]
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            image = root / "adapter.jpg"
+            image.write_bytes(b"fake image bytes")
+            result = QwenVlReader(backend).analyze_image(
+                image,
+                root,
+                ocr_hints=[{"text": "MOD0L/04A", "score": 0.99}],
+            )
+
+        self.assertEqual(result.fact_candidates, [])
+
+    def test_model_suffix_is_not_misread_as_current(self) -> None:
+        visual = _payload(
+            [_visual_item(raw_text="MODEL CPA009-004A")]
+        )
+        mapping = _payload(
+            [_mapping_item(field="model", raw_value="CPA009-004A")]
+        )
+        backend = FakeBackend([visual, mapping])
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            image = root / "adapter.jpg"
+            image.write_bytes(b"fake image bytes")
+            result = QwenVlReader(backend).analyze_image(image, root)
+
+        self.assertEqual(
+            [(candidate.field, candidate.raw_value) for candidate in result.fact_candidates],
+            [("model", "CPA009-004A")],
+        )
+
+    def test_input_and_output_values_are_reviewed_without_false_conflict(self) -> None:
+        visual = _payload(
+            [
+                _visual_item(
+                    identifier="visual-001",
+                    raw_text="INPUT 100-240V 1.5A",
+                ),
+                _visual_item(
+                    identifier="visual-002",
+                    raw_text="OUTPUT 19V 3.16A",
+                ),
+            ]
+        )
+        mapping = _payload(
+            [
+                _mapping_item(
+                    transcription_id="visual-001",
+                    field="voltage",
+                    raw_value="100-240V",
+                ),
+                _mapping_item(
+                    transcription_id="visual-002",
+                    field="voltage",
+                    raw_value="19V",
+                ),
+            ]
+        )
+        backend = FakeBackend([visual, mapping])
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            image = root / "adapter.jpg"
+            image.write_bytes(b"fake image bytes")
+            result = QwenVlReader(backend).analyze_image(image, root)
+
+        groups = {
+            group.field: group
+            for group in build_fact_groups(result.fact_candidates)
+        }
+        self.assertEqual(
+            groups["voltage"].classification,
+            "semantic_scope_split",
+        )
+        self.assertEqual(groups["voltage"].severity, "review")
+        self.assertEqual(
+            groups["current"].classification,
+            "semantic_scope_split",
+        )
+
+    def test_explicit_mode_profiles_are_not_treated_as_power_conflicts(self) -> None:
+        visual = _payload(
+            [
+                _visual_item(
+                    identifier="visual-eco",
+                    raw_text="POWER BY MODE (W) 30 W ECO",
+                ),
+                _visual_item(
+                    identifier="visual-balanced",
+                    raw_text="POWER BY MODE (W) 45 W BALANCED",
+                ),
+                _visual_item(
+                    identifier="visual-turbo",
+                    raw_text="POWER BY MODE (W) 65 W TURBO",
+                ),
+            ]
+        )
+        mapping = _payload(
+            [
+                _mapping_item(
+                    transcription_id="visual-eco",
+                    field="power",
+                    raw_value="BY MODE (W) 30 W ECO",
+                ),
+                _mapping_item(
+                    transcription_id="visual-balanced",
+                    field="power",
+                    raw_value="BY MODE (W) 45 W BALANCED",
+                ),
+                _mapping_item(
+                    transcription_id="visual-turbo",
+                    field="power",
+                    raw_value="BY MODE (W) 65 W TURBO",
+                ),
+            ]
+        )
+        backend = FakeBackend([visual, mapping])
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            image = root / "power-profiles.jpg"
+            image.write_bytes(b"fake image bytes")
+            result = QwenVlReader(backend).analyze_image(image, root)
+
+        self.assertEqual(
+            {
+                (candidate.normalized_value, candidate.scope)
+                for candidate in result.fact_candidates
+                if candidate.field == "power"
+            },
+            {
+                (30, "profile:eco"),
+                (45, "profile:balanced"),
+                (65, "profile:turbo"),
+            },
+        )
+        group = next(
+            item
+            for item in build_fact_groups(result.fact_candidates)
+            if item.field == "power"
+        )
+        self.assertEqual(group.classification, "semantic_scope_split")
+        self.assertEqual(group.severity, "review")
+
+    def test_rating_and_profile_scopes_do_not_create_false_conflicts(self) -> None:
+        visual = _payload(
+            [
+                _visual_item(
+                    identifier="visual-rated",
+                    raw_text="RATED POWER 65 W",
+                ),
+                _visual_item(
+                    identifier="visual-max",
+                    raw_text="MAX POWER 80 W",
+                ),
+                _visual_item(
+                    identifier="visual-eco",
+                    raw_text="POWER BY MODE (W) 30 W ECO",
+                ),
+            ]
+        )
+        backend = FakeBackend([visual, _payload([])])
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            image = root / "power-ratings.jpg"
+            image.write_bytes(b"fake image bytes")
+            result = QwenVlReader(backend).analyze_image(image, root)
+
+        power_candidates = [
+            candidate
+            for candidate in result.fact_candidates
+            if candidate.field == "power"
+        ]
+        self.assertEqual(
+            {
+                (candidate.normalized_value, candidate.scope)
+                for candidate in power_candidates
+            },
+            {
+                (30, "profile:eco"),
+                (65, "rating:rated"),
+                (80, "rating:max"),
+            },
+        )
+        self.assertTrue(
+            all(
+                candidate.mapping_confidence_source == "deterministic"
+                for candidate in power_candidates
+            )
+        )
+        group = next(
+            item
+            for item in build_fact_groups(power_candidates)
+            if item.field == "power"
+        )
+        self.assertEqual(group.classification, "semantic_scope_split")
+        self.assertEqual(group.severity, "review")
+
+    def test_unlabeled_power_values_remain_a_strong_conflict(self) -> None:
+        visual = _payload(
+            [
+                _visual_item(
+                    identifier="visual-low",
+                    raw_text="POWER 30 W",
+                ),
+                _visual_item(
+                    identifier="visual-high",
+                    raw_text="POWER 65 W",
+                ),
+            ]
+        )
+        mapping = _payload(
+            [
+                _mapping_item(
+                    transcription_id="visual-low",
+                    field="power",
+                    raw_value="30 W",
+                ),
+                _mapping_item(
+                    transcription_id="visual-high",
+                    field="power",
+                    raw_value="65 W",
+                ),
+            ]
+        )
+        backend = FakeBackend([visual, mapping])
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            image = root / "unlabeled-power.jpg"
+            image.write_bytes(b"fake image bytes")
+            result = QwenVlReader(backend).analyze_image(image, root)
+
+        power_candidates = [
+            candidate
+            for candidate in result.fact_candidates
+            if candidate.field == "power"
+        ]
+        self.assertEqual(
+            [candidate.scope for candidate in power_candidates],
+            [None, None],
+        )
+        group = next(
+            item
+            for item in build_fact_groups(power_candidates)
+            if item.field == "power"
+        )
+        self.assertEqual(group.classification, "strong_conflict")
+        self.assertEqual(group.severity, "block")
 
     def test_invalid_mapping_keeps_source_block_but_creates_no_candidate(self) -> None:
         backend = FakeBackend(
