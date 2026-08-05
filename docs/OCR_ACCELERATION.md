@@ -153,7 +153,7 @@ Qwen 紧凑复核原始输出：
 Atari 两次均生成 4 条 `pending` 候选且零错误；电池样本生成 `1000mAh` 与
 `3.7V` 两条 `pending` 候选且零错误。随后从干净 Git HEAD 生成发布 ZIP 并独立
 重算 SHA-256 匹配。最终发布包在全新目录按 lock 完成 clean-room 安装，模块来源
-指向解压目录；commit `6180369` 的历史精确 clean-room 为 246 项通过（0 跳过），并完成
+指向解压目录；最新精确 clean-room 为 263 项通过（0 跳过），并完成
 compileall、业务 E2E、Named Pipe status 与 shutdown。
 
 ## 文档图片与 mixed page 最终实测

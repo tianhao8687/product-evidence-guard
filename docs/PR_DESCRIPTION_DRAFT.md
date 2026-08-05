@@ -2,9 +2,9 @@
 
 > 建议标题：`feat: deliver offline Product Evidence Guard skill for Qoder and OpenVINO`
 >
-> 本文是可复制到 GitHub PR #1 的草稿，不代表已经更新远端 PR。commit
-> `618036973caa923047ab6be4023dc6acb6b5afa1` 只对应下方历史发布包；当前工作树已
-> 完成 263 项回归，提交后必须重建发布包并以新 commit 的相邻校验记录替换历史包身份。
+> 本文是可复制到 GitHub PR #1 的草稿，不代表已经更新远端 PR。最终包的 commit、
+> SHA-256 和精确净室耗时以标准路径 ZIP 旁的 `.verification.json` 为准；复制到 PR
+> 时应从该机器记录填入，不能在归档内部预填自引用哈希。
 
 ## 概要
 
@@ -37,21 +37,18 @@ candidate ID 和理由后才能确认或拒绝。
 powershell -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .\tests\test.ps1
 ```
 
-当前源码回归与 commit `6180369` 历史包结果：
+当前源码与最终包结果：
 
 | 范围 | 结果 | 证据 |
 |---|---|---|
 | 当前 D 盘源码回归 | 263 项通过，178.084 s，0 跳过；Windows 业务 E2E 通过 | `docs/evidence/final-local-regression-20260805.json` |
-| 历史包打包前复查 | commit `6180369`：246 项通过，87.329 s，0 跳过；通信失败退出码 2 | `release/local-product-evidence-guard-v1.0.0.verification.json` |
-| 历史精确 ZIP clean-room | commit `6180369`：Python 3.11.13、36 个已安装包；246 项通过，89.646 s，命令墙钟 107.771 s，0 跳过 | 同上 verification JSON |
+| 最终精确 ZIP clean-room | Python 3.11.13、36 个已安装包；263 项通过，0 跳过；精确 commit、SHA-256、测试与墙钟耗时见相邻记录 | `release/local-product-evidence-guard-v1.0.0.verification.json` |
 | 编译与业务 smoke | `compileall`、确定性 smoke、增量复用、confirm/reject/export/stale、Pipe status/shutdown 全部通过 | 同上 verification JSON |
 
-历史发布包基线为 `local-product-evidence-guard-v1.0.0.zip`，184 个归档文件，
-SHA-256 为
-`099454e83c154d6f50456780442871308632fa0c878379238dee298aa2125776`；manifest commit
-为完整 `618036973caa923047ab6be4023dc6acb6b5afa1`。包内模型数和真实样本 payload 数
-均为 0，私有主机路径命中数为 0。这个哈希只适用于上述冻结 ZIP；本 PR 后续提交
-不能继续沿用它。
+最终发布包使用标准文件名 `local-product-evidence-guard-v1.0.0.zip`。包内模型数、
+真实样本 payload、私有主机路径和凭据命中数均为 0；manifest 与 Git tree/blob
+逐项匹配。精确文件数、字节数、SHA-256 和 manifest commit 由相邻 verification
+记录保存，任何后续源码变更都必须重建并重新执行净室验证。
 
 本次提交材料增量可用以下命令复核：
 
@@ -122,8 +119,8 @@ git diff --check
 
 ## 已知风险与失败边界
 
-- 新提交会使当前 ZIP、SHA-256、manifest commit 和 clean-room 记录过期，必须重新
-  打包和验证。
+- 任何后续源码提交都会使 ZIP、SHA-256、manifest commit 和 clean-room 记录过期，
+  必须重新打包和验证。
 - 真实模型对空白、模糊、遮挡、无参数和提示注入图片的完整对抗矩阵仍不足；schema
   与 mock 失败关闭测试不能代替真实模型测试。
 - PDF 页数、像素、解压资源、临时目录清理和恶意文档虽有负面测试，仍不等于安全

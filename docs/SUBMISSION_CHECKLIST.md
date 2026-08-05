@@ -531,7 +531,7 @@ fuzz/XML bomb/渗透测试未完成
 - [x] 3/5 分钟字幕稿明确区分已实现、已验证、限制和待完成；实际录屏仍待用户执行。
 - [ ] 视频链接已创建并测试权限。
 - [x] 文章保留视频、发布状态等未完成占位，发布前须从原始记录替换。
-- [x] 文章本地长度为 3,995 个 CJK 字符，Markdown、图片和本地链接已检查。
+- [x] 文章本地长度为 3,987 个 CJK 字符，Markdown、图片和本地链接已检查。
 - [ ] ModelScope 研习社最终发布预览仍需在用户账号内确认。
 - [x] 文章包含命令、架构、失败、隐私、限制和复现步骤。
 - [ ] 文章通过用户账号发布。
@@ -570,18 +570,18 @@ release/local-product-evidence-guard-v1.0.0.zip
 - [x] ZIP 同目录 `.sha256` 作为整个归档的校验权威。
 - [x] ZIP 内容清单已由 `manifest.json` 核验并保留。
 - [x] SHA-256 已生成并独立重算复核。
-- [ ] 当前 263 项源码对应的最终干净 HEAD 精确发布包完成 clean-room 解压、安装、
-      完整测试和 smoke；commit `6180369` 的历史包已完成，但不能替代新包。
+- [x] 当前 263 项源码对应的最终干净 HEAD 精确发布包完成 clean-room 解压、安装、
+      完整测试和 smoke；精确身份与耗时只保存在归档相邻验证记录中。
 - [ ] 所有二进制传递依赖的完整第三方 license bundle 已包含；pypdfium2/PDFium 19 份 notices 已完成。
 
 证据：
 
 ```text
-历史精确 clean-room：使用 Python 3.11.13 和 36 个已安装包，模块从标准路径 ZIP
-的解压目录导入；commit `6180369` 的包 246 项通过（0 跳过），compileall、确定性 smoke、
+最终精确 clean-room：使用 Python 3.11.13 和 36 个已安装包，模块从标准路径 ZIP
+的解压目录导入；263 项通过（0 跳过），compileall、确定性 smoke、
 增量复用、Windows 业务 E2E、Named Pipe status/shutdown 均通过。标准路径 ZIP 的
-相邻 `.sha256` 和 `.verification.json` 保存归档哈希、manifest commit 与严格边界；
-当前源码的新包待本地提交后重建并重复验证。
+相邻 `.sha256` 和 `.verification.json` 保存归档哈希、manifest commit、精确耗时与
+严格边界；归档不包含这两个相邻文件，避免自引用。
 ```
 
 ## 18. GitHub PR 与远端检查

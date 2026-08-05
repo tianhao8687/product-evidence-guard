@@ -105,11 +105,9 @@ class SubmissionMaterialsContractTests(unittest.TestCase):
             self.assertIn(heading, content)
 
         for exact_evidence in (
-            "618036973caa923047ab6be4023dc6acb6b5afa1",
             "263 项通过，178.084 s，0 跳过",
-            "246 项通过，87.329 s，0 跳过",
-            "246 项通过，89.646 s",
-            "099454e83c154d6f50456780442871308632fa0c878379238dee298aa2125776",
+            "263 项通过，0 跳过",
+            "精确 commit、SHA-256、测试与墙钟耗时见相邻记录",
             "3.6064/57.1824/61.895 s",
             "26.7046 s",
             "35 个约 100 ms TCP 状态观察周期",
