@@ -106,7 +106,7 @@ class SubmissionMaterialsContractTests(unittest.TestCase):
 
         for exact_evidence in (
             "618036973caa923047ab6be4023dc6acb6b5afa1",
-            "263 项通过，84.891 s，0 跳过",
+            "263 项通过，178.084 s，0 跳过",
             "246 项通过，87.329 s，0 跳过",
             "246 项通过，89.646 s",
             "099454e83c154d6f50456780442871308632fa0c878379238dee298aa2125776",
@@ -129,7 +129,6 @@ class SubmissionMaterialsContractTests(unittest.TestCase):
 
         for evidence_path in (
             "docs/evidence/final-local-regression-20260805.json",
-            "release/local-product-evidence-guard-v1.0.0.verification.json",
             "docs/evidence/synthetic-benchmark-final-06f8360.json",
             "docs/evidence/qoder-install-integrity-20260805.json",
             "docs/evidence/mermaid-static-audit-20260805.json",
@@ -139,6 +138,18 @@ class SubmissionMaterialsContractTests(unittest.TestCase):
         ):
             self.assertIn(evidence_path, content)
             self.assertTrue((REPO_ROOT / evidence_path).is_file())
+
+        adjacent_verification = (
+            "release/local-product-evidence-guard-v1.0.0.verification.json"
+        )
+        self.assertIn(adjacent_verification, content)
+        if (REPO_ROOT / "manifest.json").is_file():
+            # The verification record describes the completed archive and must
+            # stay beside it; embedding it would create a self-reference and
+            # would also put the release output back inside the release input.
+            self.assertFalse((REPO_ROOT / "release").exists())
+        else:
+            self.assertTrue((REPO_ROOT / adjacent_verification).is_file())
 
         self.assertIn("当前本地脱敏分支更新尚未推送", content)
         self.assertIn("真实渲染待验证", content)

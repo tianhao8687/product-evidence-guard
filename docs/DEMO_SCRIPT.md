@@ -21,7 +21,7 @@
 - [x] 两步 reader 已接入主分析路径；
 - [x] 同一常驻 worker 的第二次请求记录 `model_reused=true`；
 - [x] 真实 4 图推理中 `status` 经 Named Pipe 在 0.438 秒内并发返回；
-- [x] 最终 D 盘正式目录回归 263 项通过（84.891 s，0 跳过），Windows 完整 JSON smoke 为
+- [x] 最终 D 盘正式目录回归 263 项通过（178.084 s，0 跳过），Windows 完整 JSON smoke 为
       `status=passed`；
 - [x] Windows PowerShell 5.1 `-Force` 干净安装与二次快速跳过已验证；
 - [x] commit `06f8360` 的 30 图、10 文档 synthetic CPU Benchmark 已完成；

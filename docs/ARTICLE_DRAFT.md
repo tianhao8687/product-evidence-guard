@@ -235,7 +235,7 @@ $ArtifactRoot = "<artifact-root>"
 ```
 
 模型缓存后，三个离线/遥测环境变量下推理通过。最终回归 263 项通过
-（84.891 s，0 跳过），唯一入口的 sidecar 确认、拒绝、导出、重分析与 stale E2E
+（178.084 s，0 跳过），唯一入口的 sidecar 确认、拒绝、导出、重分析与 stale E2E
 也通过；这不等于 Qwen/Qoder 证据。commit `5a4fad8` 的 CI 曾绿色；最新状态以
 [Draft PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1)
 的 GitHub Actions 为准，本文不预先声称其通过。

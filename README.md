@@ -298,7 +298,7 @@ Python 单元测试：
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
-2026-08-05 最终 D 盘正式目录回归为 **263 项通过（84.891 s，0 跳过）**。Windows PowerShell
+2026-08-05 最终 D 盘正式目录回归为 **263 项通过（178.084 s，0 跳过）**。Windows PowerShell
 `tests\test.ps1` 随后输出 `status=passed`：`unit_tests`、中文空格路径、
 `compileall`、确定性分析、无变化增量复用，以及经唯一入口完成的
 `confirm → reject → export → 修改来源 → reanalyze → stale` 均通过；JSON、

@@ -162,7 +162,7 @@
 | 确认、下载、协议、PDF 与报告测试文件 | **已完成** | 对应测试文件存在 |
 | `tests/test.ps1` | **已完成** | 文件存在；结果另行验证 |
 | `tests/test-real-model.ps1` | **已完成** | opt-in 脚本存在 |
-| 最终完整 Python 测试执行 | **已验证** | 2026-08-05 D 盘正式目录 263 项通过，84.891 s，0 跳过 |
+| 最终完整 Python 测试执行 | **已验证** | 2026-08-05 D 盘正式目录 263 项通过，178.084 s，0 跳过 |
 | Windows PowerShell smoke | **已验证** | 263 项、中文空格、compileall、deterministic、incremental、完整确认闭环、Pipe status/shutdown 通过；无效路径和旧候选退出码 1 |
 | Linux CI workflow | **已完成** | Ubuntu compile、unit、demo smoke 配置存在 |
 | Windows CI workflow | **已完成** | workflow 已配置 Windows PowerShell/Python 3.11 job |

@@ -9,7 +9,7 @@
   "unit_tests": {
     "status": "passed",
     "count": 263,
-    "elapsed_seconds": 84.891,
+    "elapsed_seconds": 178.084,
     "skipped": 0
   },
   "public_business_e2e": {

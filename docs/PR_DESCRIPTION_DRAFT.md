@@ -41,7 +41,7 @@ powershell -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .\te
 
 | 范围 | 结果 | 证据 |
 |---|---|---|
-| 当前 D 盘源码回归 | 263 项通过，84.891 s，0 跳过；Windows 业务 E2E 通过 | `docs/evidence/final-local-regression-20260805.json` |
+| 当前 D 盘源码回归 | 263 项通过，178.084 s，0 跳过；Windows 业务 E2E 通过 | `docs/evidence/final-local-regression-20260805.json` |
 | 历史包打包前复查 | commit `6180369`：246 项通过，87.329 s，0 跳过；通信失败退出码 2 | `release/local-product-evidence-guard-v1.0.0.verification.json` |
 | 历史精确 ZIP clean-room | commit `6180369`：Python 3.11.13、36 个已安装包；246 项通过，89.646 s，命令墙钟 107.771 s，0 跳过 | 同上 verification JSON |
 | 编译与业务 smoke | `compileall`、确定性 smoke、增量复用、confirm/reject/export/stale、Pipe status/shutdown 全部通过 | 同上 verification JSON |

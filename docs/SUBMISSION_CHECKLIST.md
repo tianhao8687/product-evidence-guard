@@ -100,7 +100,7 @@ verification.json 位于归档外，避免归档身份自引用
 证据：
 
 ```text
-最终完整基线：tests/test.ps1 在 D 盘正式目录内部 unittest 263 项通过，84.891 s，
+最终完整基线：tests/test.ps1 在 D 盘正式目录内部 unittest 263 项通过，178.084 s，
 0 跳过
 公开入口：scripts/run.ps1 → Named Pipe sidecar E2E 覆盖 analyze、confirm（含理由）、
 reject（含理由）、export、修改来源、reanalyze 和 stale
@@ -275,7 +275,7 @@ PDF，并覆盖文件大小/数量、渲染像素和 partial PNG 清理；真实
 证据：
 
 ```text
-最终完整基线：D 盘正式目录 263 项通过，84.891 s，0 跳过
+最终完整基线：D 盘正式目录 263 项通过，178.084 s，0 跳过
 回归源码身份：最终 ZIP 内 manifest.json.commit；不在文档中预填
 ```
 
@@ -329,12 +329,12 @@ reanalyze → stale；stale candidate 重试按预期 exit 1
       边界，旧的单次速度没有重启模型复测。
 - [x] `tests/test.ps1` 存在。
 - [x] `tests/test-real-model.ps1` 存在且为 opt-in。
-- [x] 最终 D 盘正式目录 Python 回归 263 项通过，84.891 s，0 跳过。
+- [x] 最终 D 盘正式目录 Python 回归 263 项通过，178.084 s，0 跳过。
       脱敏机器摘要：`docs/evidence/final-local-regression-20260805.json`。
 - [x] `compileall` 通过。
 - [x] 确定性 demo smoke 通过。
 - [x] Windows PowerShell `tests/test.ps1` 最终完整基线中，内部 unittest
-      D 盘正式目录 263 项通过，84.891 s，0 跳过；完整业务 E2E JSON 通过。
+      D 盘正式目录 263 项通过，178.084 s，0 跳过；完整业务 E2E JSON 通过。
 - [x] 中文路径通过。
 - [x] 含空格路径通过。
 - [x] 缺 Python 环境、缺模型下载态、非法路径、stale 候选和 Pipe 通信错误均返回
@@ -355,7 +355,7 @@ PR Actions 为准，本文不预先声称其通过。
 证据：
 
 ```text
-最终完整基线：D 盘正式目录 263 项通过，84.891 s，0 跳过
+最终完整基线：D 盘正式目录 263 项通过，178.084 s，0 跳过
 Windows smoke：tests/test.ps1 status=passed；unit_tests、compileall、
 deterministic_smoke、incremental_reuse、public_business_e2e、json_reports、
 markdown_report、html_report、audit_jsonl、named_pipe_status、shutdown 均 passed；
@@ -494,7 +494,7 @@ dataset SHA-256：c96e95f2817b1c8f16a99952022e03f541d3a5fe89ee6db0f1d85ea01c76dc
 SBOM：CycloneDX 1.5，35/35 锁定 distribution 已覆盖
 notice bundle：实际 pypdfium2 wheel 的 19 份 PDFium/依赖 notices 已收集
 仍未完成：漏洞扫描、所有其他二进制传递依赖的完整许可证审计、模型 manifest 签名
-安全回归：最终 D 盘正式目录基线 263 项通过，84.891 s，0 跳过；
+安全回归：最终 D 盘正式目录基线 263 项通过，178.084 s，0 跳过；
 fuzz/XML bomb/渗透测试未完成
 ```
 
@@ -649,7 +649,7 @@ Draft PR：https://github.com/tianhao8687/product-evidence-guard/pull/1
 | 离线环境变量下推理是否完成？ | 是；防火墙阻断/抓包网络审计未完成 |
 | Qoder 是否发现并执行 Skill？ | 是；CLI 已登录，中英文自动触发与手动触发成功，匿名业务闭环和真实图片调用均经安装副本固定入口完成 |
 | Benchmark 汇总是否链接原始记录？ | 是：synthetic run ID 与本地结果目录已记录 |
-| 本地与远端测试是否链接最终 commit？ | D 盘正式目录基线为 263 项/84.891 s，0 跳过，JSON 业务 E2E 通过；远端旧 head 的 Linux/Windows 已通过，当前本地分支推送后的 CI 仍待复核 |
+| 本地与远端测试是否链接最终 commit？ | D 盘正式目录基线为 263 项/178.084 s，0 跳过，JSON 业务 E2E 通过；远端旧 head 的 Linux/Windows 已通过，当前本地分支推送后的 CI 仍待复核 |
 | 发布包是否不含模型、数据、日志、秘密和输出？ | 是：最终标准路径 ZIP 经 allowlist、内容清单、Git blob、秘密/路径扫描与 exact clean-room 复核；相邻验证记录保存边界 |
 | 是否包含精确第三方 notices？ | pypdfium2/PDFium 的 19 份精确 notices 已包含并逐项校验；其他二进制传递依赖的完整许可证审计仍未完成 |
 | 所有剩余缺口是否对外可见？ | 是；以当前清单和合规表为准 |
