@@ -26,8 +26,15 @@
 Qoder 仍只调用安装副本的 `scripts\run.ps1`，该入口复用已准备的 `.venv`、
 模型和常驻服务状态，不复制模型，也不把绝对路径写入发布包。
 
+2026-08-05 最终只读完整性复核还确认：CLI 为 1.1.8、目标 Skill 为 `Enabled`，
+只有一个用户级安装，项目和工作区同名安装计数均为 0；运行时桥接指向当前源码根，
+`SKILL.md`、`info.json`、`meta.json`、`scripts/run.ps1`、`scripts/client.py` 和
+`scripts/server.py` 的源码/安装 SHA-256 全部一致。安装副本只执行 `status` 时
+进程与稳定 JSON 退出码均为 0，没有读取商品文件或加载模型。脱敏、机器可读记录见
+[`evidence/qoder-install-integrity-20260805.json`](evidence/qoder-install-integrity-20260805.json)。
+
 安装器的 allowlist、必备文件、完整性、备份/回滚，以及
-symlink/junction/reparse point/hardlink 失败关闭合同已进入 231 项最终本地回归。
+symlink/junction/reparse point/hardlink 失败关闭合同已进入 246 项最终本地回归。
 这同时证明安装边界；真实图片、英文触发和公共入口下载续传均已补测，已有一张
 脱敏 IDE 截图，完整确认、导出与 stale 截图组见下文的诚实缺口。
 
@@ -147,6 +154,7 @@ Qoder IDE 文档建议重启 IDE，然后输入 `/` 检查已加载 Skills。
 | Skill 路径 | `%USERPROFILE%\.qoder\skills\local-product-evidence-guard\SKILL.md` |
 | `qodercli skills list` | Skill 已发现，状态 `Enabled` |
 | `qodercli status` | 2026-08-04 已登录；不保存账号详情或认证材料 |
+| 最终安装完整性 | 6 个关键文件源码/安装 SHA-256 一致；用户级 1 个、项目/工作区 0 个同名安装；安装副本 `status` 退出码 0 |
 | 安装器合同 | allowlist、完整性、备份/回滚、链接防护已通过本地回归 |
 | 自动/手动调用 | 无数据 `status` 已分别通过；匿名 sidecar 业务闭环也已通过 |
 
@@ -275,8 +283,9 @@ token、个人账号细节或未脱敏的客户绝对路径。
 | 官方 npm CLI 1.1.8 隔离安装 | **已验证** | 本机命令已执行 |
 | 用户级安装 | **已验证** | 当前官方用户级目录 |
 | 项目级安装 | **未完成** | 未执行；不是用户级发现证据的必要条件 |
-| 安装器技术合同 | **已验证** | 必备 lock、完整性、运行时桥接、回滚与链接防护进入 231 项回归 |
-| Skill 发现 | **已验证** | `skills list` 显示 `Enabled` |
+| 最终安装完整性 | **已验证** | 脱敏 JSON 记录唯一安装、无重复项、运行时桥接、6 个关键文件哈希一致及安装副本 `status` 退出码 0 |
+| 安装器技术合同 | **已验证** | 必备 lock、完整性、运行时桥接、回滚与链接防护进入 246 项回归 |
+| Skill 发现 | **已验证** | `skills list` 显示 `Enabled`；Qoder“用户级 → 技能”页也直接显示 `local-product-evidence-guard`，脱敏截图见 `docs/assets/qoder/01-skill-discovered.png` |
 | CLI 账号登录 | **已验证** | 2026-08-04 CLI 登录成功；不保存认证材料 |
 | 中文自动触发 | **已验证** | 无数据自然语言请求自动选择 Skill 并执行 `status` |
 | 英文自动触发 | **已验证** | 全新会话中未点名 Skill；Qoder 自动选择并只执行 `status`，退出码 0 |
@@ -291,7 +300,7 @@ token、个人账号细节或未脱敏的客户绝对路径。
 | 模型常驻与增量缓存 | **已验证** | 26.7585 s 冷分析、11.9164 s 热模型重识图、0.0177 s 文件复用 |
 | 无云端 OCR/VLM 回退 | **部分验证** | 本地后端与路由证据完整；仍缺独立网络抓包/断网观察 |
 | 脱敏 transcript | **已验证** | status 与业务闭环文字证据已保存 |
-| 截图 | **部分验证** | 已保存 1 张无账号侧栏的 Qoder IDE 分析/人工确认安全门截图；完整确认、导出与 stale 截图组仍待录制 |
+| 截图 | **部分验证** | 已保存 2 张无账号、无样本正文、无绝对路径的真实 Qoder 截图：用户级 Skill 发现页和 IDE 分析/人工确认安全门；完整确认、导出与 stale 截图组仍待录制 |
 
 当前可以表述为“Qoder CLI 1.1.8 已通过中英文自动触发和手动触发本 Skill，匿名
 sidecar 业务闭环、真实图片 Qwen3-VL/OpenVINO 冷/热/缓存、真实图＋受控文档强

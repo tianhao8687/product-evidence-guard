@@ -30,14 +30,15 @@
   11.1997/1.7050/0.2092 秒，常驻完整重算减少 84.78% 耗时，冷启动耗时是
   热重算的 6.57 倍；三份视觉均走 OCR fast，该差异不代表 Qwen 生成速度。
 - 2026-07-31 阶段性基线为 197 项、0 跳过；此数字仅为历史记录。
-- 最终 D 盘正式目录回归扩展为 231 项、0 跳过，并完成 Windows 业务 E2E、
+- 最终 D 盘正式目录回归扩展为 246 项、0 跳过，并完成 Windows 业务 E2E、
   Named Pipe status/shutdown、JSON/Markdown/HTML 与审计输出验证；
 - 增加 3 次独立冷启动分布、有限 TCP 状态采样、CycloneDX 1.5 SBOM、35 个锁定包
   许可证元数据，以及 pypdfium2/PDFium 19 份精确 notices；
 - Qoder 1.1.8 的 5 条中文与 3 条英文自然语言触发全部自动选择本 Skill，只调用
   `scripts/run.ps1 status`；安装副本保持 `Enabled` 且关键运行文件与源码哈希一致；
 - 最终脱敏分支的标准路径 ZIP、相邻 SHA-256 与归档外 verification 记录已建立；
-  精确 clean-room 231 项、0 跳过，并完成业务 E2E 与 Pipe 生命周期验证。
+  最终精确 clean-room 246 项、0 跳过，并完成业务 E2E 与 Pipe 生命周期验证；
+  当前发布包重建后以相邻 verification.json 为准。
 
 ## 1.0.0 — 2026-07-30
 

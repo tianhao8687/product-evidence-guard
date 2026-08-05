@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "date": "2026-08-05",
+  "scope": "openvino-visible devices on the verified local machine",
+  "openvino": {
+    "version": "2026.2.1-21919-ede283a88e3-releases/2026/2",
+    "available_devices": [
+      "CPU",
+      "GPU"
+    ]
+  },
+  "devices": [
+    {
+      "id": "CPU",
+      "full_name": "AMD Ryzen 7 7800X3D 8-Core Processor",
+      "actual_inference_device": true,
+      "driver_version": null,
+      "driver_version_status": "not exposed for the CPU device; OpenVINO plugin build recorded instead",
+      "openvino_plugin": {
+        "description": "openvino_intel_cpu_plugin",
+        "build_number": "2026.2.1-21919-ede283a88e3-releases/2026/2"
+      }
+    },
+    {
+      "id": "GPU",
+      "full_name": "NVIDIA GeForce RTX 5070 (dGPU)",
+      "actual_inference_device": false,
+      "driver_version": "591.86",
+      "driver_version_source": "nvidia-smi",
+      "openvino_property_driver_version": null,
+      "openvino_plugin": {
+        "description": "Intel GPU plugin",
+        "build_number": "2026.2.1-21919-ede283a88e3-releases/2026/2"
+      },
+      "claim_boundary": "The NVIDIA GPU is visible but is not evidence of an Intel GPU benchmark."
+    }
+  ],
+  "npu": {
+    "available": false,
+    "driver_version": null,
+    "status": "not applicable on this machine"
+  },
+  "privacy": {
+    "device_uuid_recorded": false,
+    "device_luid_recorded": false,
+    "host_absolute_path_recorded": false,
+    "account_identifier_recorded": false
+  }
+}

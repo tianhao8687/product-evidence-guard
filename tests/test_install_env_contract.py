@@ -64,6 +64,26 @@ class InstallEnvironmentContractTests(unittest.TestCase):
         self.assertIn("uv_exe_sha256", self.script)
         self.assertIn("$currentUvExeSha256", self.script)
 
+    def test_unhandled_install_failure_has_utf8_chinese_message_and_nonzero_exit(
+        self,
+    ) -> None:
+        self.assertIn(
+            "[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)",
+            self.script,
+        )
+        self.assertIn("trap {", self.script)
+        self.assertIn(
+            '[Console]::Error.WriteLine("环境安装失败：$failureMessage")',
+            self.script,
+        )
+        self.assertIn("exit 1", self.script)
+        self.assertLess(
+            self.script.index(
+                "if (-not (Test-Path -LiteralPath $requirementsLockPath"
+            ),
+            self.script.index("Invoke-WebRequest -UseBasicParsing"),
+        )
+
     def test_uv_cache_and_extracted_executable_are_bound_to_pinned_hash(
         self,
     ) -> None:
@@ -452,6 +472,15 @@ class InstallEnvironmentLinkSafetyIntegrationTests(unittest.TestCase):
 
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(outside_log.read_bytes(), sentinel)
+
+    def test_missing_lock_fails_nonzero_with_clear_chinese_message(self) -> None:
+        repository = self.create_repository("missing-lock")
+        (repository / "requirements.lock").unlink()
+
+        result = self.run_installer(repository)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("环境安装失败：", result.stdout + result.stderr)
 
 
 if __name__ == "__main__":

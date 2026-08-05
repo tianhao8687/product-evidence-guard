@@ -32,8 +32,28 @@ observation-only mixed PDF 结果取代这三份旧基线，旧记录只保留�
 
 ## 其他发布证据
 
+- Qoder 用户级 Skill 发现截图位于
+  [`../assets/qoder/01-skill-discovered.png`](../assets/qoder/01-skill-discovered.png)：
+  它来自 2026-08-05 本机 Qoder“技能与指令”设置页，直接显示
+  `local-product-evidence-guard` 已被用户级 Skill 列表发现。截图不含账号、绝对路径、
+  商品正文或会话内容；它只证明 UI 发现状态，不替代自动触发和业务闭环 transcript。
+- [`hardware-runtime-20260805.json`](hardware-runtime-20260805.json)：记录本机
+  OpenVINO 可见的 CPU/GPU、OpenVINO plugin build 和 NVIDIA `591.86` 驱动；CPU
+  不暴露独立 `DRIVER_VERSION`，因此明确记为 N/A 并以 plugin build 代替。设备 UUID、
+  LUID、主机路径和账号均未发布；NVIDIA GPU 没有被写成 Intel GPU 实测。
+- [`synthetic-benchmark-final-06f8360.json`](synthetic-benchmark-final-06f8360.json)：
+  commit `06f8360` 的 30 张 synthetic 图片、10 份 synthetic 文档 CPU 工程
+  Benchmark 公开汇总。它逐项保留规模、性能、质量、冲突、增量和限制字段；仅删除
+  原工件中的本机模型绝对路径，并记录原工件 SHA-256。原始模型输出和逐样本资料仍
+  留在 Git 外。所有质量指标只适用于固定 synthetic 数据，不是真实业务准确率。
 - `public-exit-code-contract-20260805.json`：通过公开 `scripts/run.ps1` 验证
   退出码 `0/1/2/3`。退出码 2 使用隔离的短生命 Python 子进程提供精确 PID
   启动标记，模拟服务身份有效但 Named Pipe 不可达且状态为 error；测试后恢复
   runtime 快照，不加载模型、不使用商品正文。该记录不是拒绝服务、进程冒充或
   渗透测试。
+- `qoder-install-integrity-20260805.json`：本机只读复核 Qoder CLI 版本、Skill
+  `Enabled` 状态、唯一用户级安装、项目/工作区无同名重复项、运行时桥接、6 个
+  关键文件源码/安装 SHA-256 一致，以及安装副本 `run.ps1 status` 退出码 0。
+  发布副本只使用 `%USERPROFILE%`、`%SKILL_ROOT%` 和
+  `<prepared-project-root>` 占位符，不含主机绝对路径、账号或会话信息；该记录不
+  代表重新发送了 Qoder 云端消息，也不是商品分析或网络抓包证据。

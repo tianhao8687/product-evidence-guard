@@ -100,7 +100,7 @@ verification.json 位于归档外，避免归档身份自引用
 证据：
 
 ```text
-最终完整基线：tests/test.ps1 在 D 盘正式目录内部 unittest 231 项通过，79.634 s，
+最终完整基线：tests/test.ps1 在 D 盘正式目录内部 unittest 246 项通过，85.123 s，
 0 跳过
 公开入口：scripts/run.ps1 → Named Pipe sidecar E2E 覆盖 analyze、confirm（含理由）、
 reject（含理由）、export、修改来源、reanalyze 和 stale
@@ -121,7 +121,8 @@ reject（含理由）、export、修改来源、reanalyze 和 stale
 - [x] 36 个已安装包（含本项目）`pip check` 全部兼容。
 - [x] 35 个运行/构建包全部 hash-locked，并使用 `--require-hashes`。
 - [x] editable build 使用 `--no-build-isolation --no-index`，不临时解析未锁定后端。
-- [ ] 安装失败返回非零码和清晰中文提示。
+- [x] 安装失败返回非零码和清晰 UTF-8 中文提示；缺 `requirements.lock` 的真实
+      PowerShell 入口测试已通过。
 - [x] 绝对日志路径存在，且代表性日志与服务异常日志不含商品正文。
 - [x] 已盘点 35 个锁定 distribution 的许可证元数据并生成机器可读清单。
 - [x] 已生成带分发哈希的正式 `requirements.lock`。
@@ -171,7 +172,8 @@ manifest/checksum：<project-root>\release\model-sha256-manifest.json
 ## 6. 真实 OpenVINO 模型验证
 
 - [x] OS 已记录为 Windows 11 专业版 10.0.26200，build 26200。
-- [ ] 全部设备 driver 版本已记录。
+- [x] 本机 OpenVINO 可见设备的 driver/plugin 版本已记录：NVIDIA `591.86`；CPU
+      不暴露独立 driver，记录 OpenVINO plugin build；NPU 不存在并标为 N/A。
 - [x] CPU 为 AMD Ryzen 7 7800X3D，RAM 为 31.11 GB。
 - [x] CPU 物理/逻辑核心为 8 / 16；内存精确值为 33,409,253,376 bytes。
 - [x] 电源计划记录为高性能，GUID `8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c`。
@@ -231,14 +233,21 @@ manifest/checksum：<project-root>\release\model-sha256-manifest.json
 - [x] 模型加载、每个文件和最终化阶段分别使用 300 秒心跳边界。
 - [x] 阶段超时只终止该服务创建并精确跟踪的模型 worker。
 - [x] 客户端对整个文件夹请求使用 1 小时上限。
-- [ ] 扫描、混合、空白、损坏、加密和超限 PDF 全矩阵测试。
-- [ ] 临时页图像在所有失败路径都能安全清理且不删除来源。
+- [x] 扫描、混合、空白、损坏、加密、101 页超限和渲染像素超限 PDF 的本地
+      功能/负向子矩阵已执行；来源文件 hash 保持不变。
+- [ ] PDF 全矩阵仍缺密码解密成功、更多 xref/object-stream 畸形、真实扫描 OCR
+      质量和大规模压力；不得把当前子矩阵写成完整渗透测试。
+- [x] 代表性视觉 reader、ROI 渲染和 partial PNG 失败路径会清理临时目录且不删除
+      来源，来源 hash 已验证不变。
+- [ ] “所有失败路径”尚未由故障注入穷尽，不扩大现有清理结论。
 
 证据：
 
 ```text
 单图工件：<artifact-root>\test-real-model-release-20260730\
-PDF 测试矩阵：未完成；不在本次最终单图证据内
+PDF 安全子矩阵：新增 8 项纯本地负向测试，实际生成空白、损坏、加密、101 页
+PDF，并覆盖文件大小/数量、渲染像素和 partial PNG 清理；真实扫描 OCR 质量、
+资源炸弹与完整 fuzz/渗透矩阵仍未完成
 ```
 
 ## 8. 确定性证据与冲突引擎
@@ -259,12 +268,14 @@ PDF 测试矩阵：未完成；不在本次最终单图证据内
 - [x] 文件级增量缓存。
 - [x] 删除来源后移除证据。
 - [x] 当前最终工作树的完整回归套件通过；发布源码身份由 ZIP manifest 记录。
-- [ ] 资源边界和敌对输入已实测。
+- [x] 文件大小、文件数量、PDF 页数、渲染像素和损坏/加密 PDF 边界已用小型受控
+      fixture 实测，避免生成资源炸弹本身。
+- [ ] 压缩炸弹、持续 CPU/RAM 耗尽、并发洪泛和全部 Office/图片敌对格式未完成。
 
 证据：
 
 ```text
-最终完整基线：D 盘正式目录 231 项通过，79.634 s，0 跳过
+最终完整基线：D 盘正式目录 246 项通过，85.123 s，0 跳过
 回归源码身份：最终 ZIP 内 manifest.json.commit；不在文档中预填
 ```
 
@@ -318,15 +329,16 @@ reanalyze → stale；stale candidate 重试按预期 exit 1
       边界，旧的单次速度没有重启模型复测。
 - [x] `tests/test.ps1` 存在。
 - [x] `tests/test-real-model.ps1` 存在且为 opt-in。
-- [x] 最终 D 盘正式目录 Python 回归 231 项通过，79.634 s，0 跳过。
+- [x] 最终 D 盘正式目录 Python 回归 246 项通过，85.123 s，0 跳过。
       脱敏机器摘要：`docs/evidence/final-local-regression-20260805.json`。
 - [x] `compileall` 通过。
 - [x] 确定性 demo smoke 通过。
 - [x] Windows PowerShell `tests/test.ps1` 最终完整基线中，内部 unittest
-      D 盘正式目录 231 项通过，79.634 s，0 跳过；完整业务 E2E JSON 通过。
+      D 盘正式目录 246 项通过，85.123 s，0 跳过；完整业务 E2E JSON 通过。
 - [x] 中文路径通过。
 - [x] 含空格路径通过。
-- [ ] 缺环境/模型和错误路径能正确失败。
+- [x] 缺 Python 环境、缺模型下载态、非法路径、stale 候选和 Pipe 通信错误均返回
+      稳定 JSON 与对应非零码；安装缺 lock 另有真实 PowerShell 失败测试。
 - [x] 下载 pending/continue 通过。
 - [x] UTF-8 JSON stdout 通过；全部 stderr 失败路径审计另列。
 - [x] commit `5a4fad8` 的 Linux GitHub Actions 临时通过。
@@ -342,7 +354,7 @@ PR Actions 为准，本文不预先声称其通过。
 证据：
 
 ```text
-最终完整基线：D 盘正式目录 231 项通过，79.634 s，0 跳过
+最终完整基线：D 盘正式目录 246 项通过，85.123 s，0 跳过
 Windows smoke：tests/test.ps1 status=passed；unit_tests、compileall、
 deterministic_smoke、incremental_reuse、public_business_e2e、json_reports、
 markdown_report、html_report、audit_jsonl、named_pipe_status、shutdown 均 passed；
@@ -372,7 +384,7 @@ confirm/reject/export/reanalyze 均 exit 0，stale candidate 与 invalid path �
 - [x] 中文文件名、理由和输出没有 mojibake。
 - [x] 运行工件证明图片 OCR/VLM 使用本地 OpenVINO 后端且没有云 OCR/VLM 回退；独立网络抓包仍未完成。
 - [x] Qoder 版本、范围、解析路径、命令、退出码和脱敏 transcript 已保留。
-- [x] 一张脱敏截图及文字证据存于 `docs/assets/qoder/`；完整截图组仍未完成。
+- [x] 两张脱敏真实截图及文字证据存于 `docs/assets/qoder/`：用户级 Skill 发现页与分析/人工确认安全门；完整截图组仍未完成。
 - [x] `QODER_VALIDATION.md` 已按现有证据更新，并明确列出未完成边界。
 
 证据：
@@ -385,7 +397,8 @@ transcript：docs/assets/qoder/2026-08-04-status-validation.md；
             docs/assets/qoder/2026-08-05-english-auto-trigger.md；
             docs/assets/qoder/2026-08-05-real-image-performance.md；
             docs/assets/qoder/2026-08-05-real-image-controlled-documents.md
-截图：docs/assets/qoder/04-analysis-summary-redacted.png
+截图：docs/assets/qoder/01-skill-discovered.png；
+      docs/assets/qoder/04-analysis-summary-redacted.png
 尚缺：用户级/项目级无重复项截图，以及 confirm/export/stale 完整 IDE 截图组
 ```
 
@@ -462,7 +475,8 @@ dataset SHA-256：c96e95f2817b1c8f16a99952022e03f541d3a5fe89ee6db0f1d85ea01c76dc
 - [x] 依赖 hash-required lock 与模型 26 文件 SHA-256 manifest 已生成。
 - [ ] 模型 manifest 签名、漏洞扫描和所有二进制传递依赖的完整许可证审计。
 - [x] 已从实际 `pypdfium2 5.12.1` Windows x64 wheel 收集并索引 19 份 PDFium/依赖 notices。
-- [ ] 畸形/敌对文件与资源耗尽测试。
+- [x] 损坏/加密/超页/超像素 PDF、超文件大小和超文件数量的代表性负向测试通过。
+- [ ] XML/ZIP bomb、持续资源耗尽、并发洪泛与完整 fuzz/渗透矩阵未执行。
 - [x] 输入发现、发布和 Qoder 的 symlink/junction/reparse-point/hardlink 防护测试。
 - [x] Named Pipe authkey 不匹配、崩溃、重复启动和 timeout 回归测试。
 - [ ] Named Pipe 独立进程冒充、拒绝服务或渗透测试。
@@ -474,7 +488,7 @@ dataset SHA-256：c96e95f2817b1c8f16a99952022e03f541d3a5fe89ee6db0f1d85ea01c76dc
 SBOM：CycloneDX 1.5，35/35 锁定 distribution 已覆盖
 notice bundle：实际 pypdfium2 wheel 的 19 份 PDFium/依赖 notices 已收集
 仍未完成：漏洞扫描、所有其他二进制传递依赖的完整许可证审计、模型 manifest 签名
-安全回归：最终 D 盘正式目录基线 231 项通过，79.634 s，0 跳过；
+安全回归：最终 D 盘正式目录基线 246 项通过，85.123 s，0 跳过；
 fuzz/XML bomb/渗透测试未完成
 ```
 
@@ -509,7 +523,8 @@ fuzz/XML bomb/渗透测试未完成
 - [ ] 字幕区分已实现、已验证和待完成。
 - [ ] 视频链接已创建并测试权限。
 - [ ] 文章保留未完成占位，发布前从原始记录替换。
-- [ ] 文章长度和目标平台格式已检查。
+- [x] 文章本地长度为 3,999 个 CJK 字符，Markdown、图片和本地链接已检查。
+- [ ] ModelScope 研习社最终发布预览仍需在用户账号内确认。
 - [x] 文章包含命令、架构、失败、隐私、限制和复现步骤。
 - [ ] 文章通过用户账号发布。
 - [ ] 文章 URL 和发布日期已记录。
@@ -554,7 +569,7 @@ release/local-product-evidence-guard-v1.0.0.zip
 
 ```text
 最终精确 clean-room：使用 Python 3.11.13 和 36 个已安装包，模块从标准路径 ZIP
-的解压目录导入；231 项通过（0 跳过），compileall、确定性 smoke、
+的解压目录导入；246 项通过（0 跳过），compileall、确定性 smoke、
 增量复用、Windows 业务 E2E、Named Pipe status/shutdown 均通过。标准路径 ZIP 的
 相邻 `.sha256` 和 `.verification.json` 保存归档哈希、manifest commit 与严格边界。
 ```
@@ -609,7 +624,7 @@ Draft PR：https://github.com/tianhao8687/product-evidence-guard/pull/1
 | 技术文章 | `待链接` |
 | 演示视频 | `待链接` |
 | Benchmark 证据 | `<artifact-root>\benchmark-final-06f8360-20260730\` |
-| Qoder 证据 | `docs/assets/qoder/`（脱敏 transcript、真实图片性能与 1 张 IDE 截图） |
+| Qoder 证据 | `docs/assets/qoder/`（脱敏 transcript、真实图片性能、Skill 发现页与 IDE 安全门截图） |
 | 比赛提交确认 | `待记录` |
 
 ## 最终签署
@@ -624,7 +639,7 @@ Draft PR：https://github.com/tianhao8687/product-evidence-guard/pull/1
 | 离线环境变量下推理是否完成？ | 是；防火墙阻断/抓包网络审计未完成 |
 | Qoder 是否发现并执行 Skill？ | 是；CLI 已登录，中英文自动触发与手动触发成功，匿名业务闭环和真实图片调用均经安装副本固定入口完成 |
 | Benchmark 汇总是否链接原始记录？ | 是：synthetic run ID 与本地结果目录已记录 |
-| 本地与远端测试是否链接最终 commit？ | D 盘正式目录基线为 231 项/79.634 s，0 跳过，JSON 业务 E2E 通过；最新远端 CI 状态以 PR Actions 为准 |
+| 本地与远端测试是否链接最终 commit？ | D 盘正式目录基线为 246 项/85.123 s，0 跳过，JSON 业务 E2E 通过；最新远端 CI 状态以 PR Actions 为准 |
 | 发布包是否不含模型、数据、日志、秘密和输出？ | 是：最终标准路径 ZIP 经 allowlist、内容清单、Git blob、秘密/路径扫描与 exact clean-room 复核；相邻验证记录保存边界 |
 | 是否包含精确第三方 notices？ | pypdfium2/PDFium 的 19 份精确 notices 已包含并逐项校验；其他二进制传递依赖的完整许可证审计仍未完成 |
 | 所有剩余缺口是否对外可见？ | 是；以当前清单和合规表为准 |

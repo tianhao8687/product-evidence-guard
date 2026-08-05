@@ -4,6 +4,18 @@
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+[Console]::InputEncoding = [System.Text.UTF8Encoding]::new($false)
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+$OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+
+trap {
+    $failureMessage = $_.Exception.Message
+    if ([string]::IsNullOrWhiteSpace($failureMessage)) {
+        $failureMessage = '未知错误'
+    }
+    [Console]::Error.WriteLine("环境安装失败：$failureMessage")
+    exit 1
+}
 
 $pythonVersion = '3.11.13'
 $uvVersion = '0.8.4'
@@ -362,6 +374,16 @@ if (-not (Test-Path -LiteralPath $repoRoot -PathType Container)) {
     throw "Repository root is not a directory: $repoRoot"
 }
 Assert-NoReparsePoint -Path $repoRoot -Context 'Repository root'
+
+# Fail before creating caches or attempting any download.  A missing lock is a
+# local configuration error and must never be turned into network activity.
+if (-not (Test-Path -LiteralPath $requirementsPath -PathType Leaf)) {
+    throw '缺少 requirements.txt，无法验证锁文件输入。'
+}
+if (-not (Test-Path -LiteralPath $requirementsLockPath -PathType Leaf)) {
+    throw '缺少 requirements.lock，拒绝从未锁定的传递依赖安装。'
+}
+
 [void](Initialize-ExactManagedDirectory `
     -TargetPath $toolsDir `
     -ExpectedPath (Join-Path $repoRoot '.tools') `

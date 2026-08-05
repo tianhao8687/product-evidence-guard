@@ -92,7 +92,7 @@
 | Windows 公开入口真实模型 analyze | **已验证** | 冷/热请求均成功并生成候选 |
 | 推理中 Named Pipe 并发响应 | **已验证** | 真实 4 图推理期间，`run.ps1 status` 经 Pipe 在 0.438 s 返回 `running` 和 `available_operations`，无 fallback 字段 |
 | Windows Named Pipe smoke | **已验证** | `tests/test.ps1` 的稳定 JSON、完整业务闭环、status 与 shutdown 通过 |
-| auth 不匹配、崩溃恢复、重复启动和 timeout | **已验证** | 最终 231 项本地回归覆盖 |
+| auth 不匹配、崩溃恢复、重复启动和 timeout | **已验证** | 最终 246 项本地回归覆盖 |
 | confirm/reject/export/stale 完整业务 E2E | **已验证** | `run.ps1`/Named Pipe 使用 deterministic sidecar 完成；真实 Qwen/Qoder 录屏另列 |
 | 模型跨多次请求复用 | **已验证** | 常驻 worker 热请求 `model_reused=true`、加载 0 s |
 
@@ -125,6 +125,8 @@
 | OCR sidecar 兼容 | **已完成** | 证据保留图片、bbox 和 confidence |
 | pypdfium2 扫描页渲染 | **已完成** | 无文字页临时渲染并重定向证据 |
 | 文件、页数、像素、文字和数量上限 | **已完成** | 代码边界存在 |
+| PDF 负向子矩阵 | **已验证（有限）** | 本地实际生成空白、损坏、加密和 101 页 PDF，并覆盖文件/数量/像素边界；来源 hash 不变。未扩大为完整 fuzz、真实扫描 OCR 质量或大规模压力结论 |
+| PDF 临时页清理 | **已验证（代表性失败）** | visual reader、ROI 和 partial PNG 故障注入均清理临时目录且不删除来源；未声称穷尽所有失败路径 |
 | 分阶段硬超时与精确 worker 终止 | **已验证** | 模型加载、每个文件、最终化各有 300 s 心跳边界；超时只终止该服务创建并跟踪的 worker |
 | 客户端整请求上限 | **已完成** | 整个文件夹请求最长 1 h，不与每阶段 300 s 边界混用 |
 | 单位归一与净重/毛重隔离 | **已完成** | 确定性 normalization |
@@ -160,8 +162,8 @@
 | 确认、下载、协议、PDF 与报告测试文件 | **已完成** | 对应测试文件存在 |
 | `tests/test.ps1` | **已完成** | 文件存在；结果另行验证 |
 | `tests/test-real-model.ps1` | **已完成** | opt-in 脚本存在 |
-| 最终完整 Python 测试执行 | **已验证** | 2026-08-05 D 盘正式目录 231 项通过，79.634 s，0 跳过 |
-| Windows PowerShell smoke | **已验证** | 231 项、中文空格、compileall、deterministic、incremental、完整确认闭环、Pipe status/shutdown 通过；无效路径和旧候选退出码 1 |
+| 最终完整 Python 测试执行 | **已验证** | 2026-08-05 D 盘正式目录 246 项通过，85.123 s，0 跳过 |
+| Windows PowerShell smoke | **已验证** | 246 项、中文空格、compileall、deterministic、incremental、完整确认闭环、Pipe status/shutdown 通过；无效路径和旧候选退出码 1 |
 | Linux CI workflow | **已完成** | Ubuntu compile、unit、demo smoke 配置存在 |
 | Windows CI workflow | **已完成** | workflow 已配置 Windows PowerShell/Python 3.11 job |
 | commit `5a4fad8` 远端 GitHub Actions | **已验证** | 临时绿色 |
@@ -186,7 +188,7 @@
 | 30 图逐图分布 | **已验证** | 中位数 75.991379 s，p90 85.350259 s |
 | 重复独立冷启动 | **已验证** | 同一真实标签图安全关闭后独立运行 3 次；分析均值 26.7046 s、范围 25.5298–27.6312 s |
 | 无变化增量节省 | **已验证** | 10/10 复用，节省 0.0052551 s（8.9149%） |
-| 单文件变化增量 | **未完成** | 不在冻结结果中 |
+| 单文件变化增量 | **已验证（功能）** | 已完成只改 1 份说明书、复用另外 2 份的功能 E2E；未冻结独立性能值，不把它写成性能结论 |
 | 离线环境变量结果 | **已验证** | 三个离线/遥测环境变量下完成真实本地推理 |
 | 本地 TCP 状态观察 | **已验证** | 35 周期未观察到外部 TCP；严格边界见 `docs/evidence/performance-network-validation-20260805.md` |
 | 防火墙/数据包/DNS/UDP 审计 | **未完成** | TCP 状态采样不能证明零外连 |
@@ -211,7 +213,7 @@
 | 发布 allowlist 与链接防护合同 | **已验证** | 包含必备 lock；排除模型/数据/日志；拒绝 reparse/hardlink |
 | 版本 ZIP 与 SHA-256 | **已验证** | 最终标准路径 ZIP 已生成，相邻 `.sha256` 独立重算匹配；相邻 verification.json 保存精确归档哈希与边界 |
 | 发布身份与校验权威 | **已验证** | ZIP 内 `manifest.json.commit`、manifest 列出的全部 Git 来源文件和 Git object 逐项核验，mismatch 0；验证记录位于归档外避免自引用 |
-| 干净目录解压 smoke | **已验证** | 最终精确 ZIP 在全新目录使用 Python 3.11.13 与 36 个已安装包；231 项、0 跳过，compileall、业务 E2E、Pipe status/shutdown 均通过；精确耗时见归档相邻 verification.json |
+| 干净目录解压 smoke | **已验证** | 最终精确 ZIP 在全新目录使用 Python 3.11.13 与 36 个已安装包；246 项、0 跳过，compileall、业务 E2E、Pipe status/shutdown 均通过；精确耗时见归档相邻 verification.json |
 
 ## 11. 文档、文章、演示与外部提交
 

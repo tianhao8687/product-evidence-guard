@@ -12,8 +12,10 @@ CPU，`model_reused=false`，模型加载 3.6064 s、内层分析 57.1824 s、�
 `analyze` 61.895 s，生成 1 个保持 `pending` 的候选。它是单次功能证据，**不是
 准确率结果**，也不替代下方冻结 synthetic Benchmark。
 
-结果目录为 `<artifact-root>\benchmark-final-06f8360-20260730\`。冻结数据集包含
-30 张合成图片和 10 份合成文档；30 张图片全部成功，失败数为 0，
+原始结果目录为 `<artifact-root>\benchmark-final-06f8360-20260730\`；可公开、机器
+可读且去除本机模型绝对路径的汇总见
+[`synthetic-benchmark-final-06f8360.json`](evidence/synthetic-benchmark-final-06f8360.json)。
+冻结数据集包含 30 张合成图片和 10 份合成文档；30 张图片全部成功，失败数为 0，
 `document_errors=[]`，最终状态为 `completed`。数据集运行前后 SHA-256 均为
 `c96e95f2817b1c8f16a99952022e03f541d3a5fe89ee6db0f1d85ea01c76dcf3`。
 

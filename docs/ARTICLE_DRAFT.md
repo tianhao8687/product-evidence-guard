@@ -51,7 +51,7 @@ OCR 能读出“净重 300g”，却不能决定它是不是正式净重。`0.32
 其中 `pass` 只代表证据内部一致，`review` 要求人判断语义，`block` 则阻止自动
 写入。分组解释同时列出相关 candidate IDs，避免用一段自然语言掩盖被忽略的来源。
 
-![Product Evidence Guard 本地工作流](assets/competition/architecture.svg)
+![Product Evidence Guard 本地工作流](assets/competition/architecture.png)
 
 图中的文件版本是关键：未改文件可复用候选，只重算变化文件；确认所依赖的哈希
 变化后，决定自动变成 `stale` 并退出正式导出。可解释、增量和精准失效因此来自
@@ -135,7 +135,7 @@ Pipe 发一问一答，父服务支持 `status/analyze/confirm/reject/export/shu
 
 最终离线工件加载/内层/外层为 3.6064/57.1824/61.895 秒；较早热请求加载 0 秒、
 单图 30.8367 秒且 `model_reused=true`。真实 4 图推理中，另一个 `status` 在
-0.438 秒返回 `running`。231 项回归覆盖 authkey、崩溃、重复启动和 timeout，但不是
+0.438 秒返回 `running`。246 项回归覆盖 authkey、崩溃、重复启动和 timeout，但不是
 渗透测试。
 
 模型先下载到 `<model>.partial`，校验 26 个运行文件、空文件和 LFS 指针，完整后
@@ -234,15 +234,15 @@ $ArtifactRoot = "<artifact-root>"
   --session-id "<session>"
 ```
 
-模型缓存后，三个离线/遥测环境变量下推理通过。最终回归 231 项通过
-（79.634 s，0 跳过），唯一入口的 sidecar 确认、拒绝、导出、重分析与 stale E2E
+模型缓存后，三个离线/遥测环境变量下推理通过。最终回归 246 项通过
+（85.123 s，0 跳过），唯一入口的 sidecar 确认、拒绝、导出、重分析与 stale E2E
 也通过；这不等于 Qwen/Qoder 证据。commit `5a4fad8` 的 CI 曾绿色；最新状态以
 [Draft PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1)
 的 GitHub Actions 为准，本文不预先声称其通过。
 
 ## 结果必须从原始记录中来
 
-![公开标签图的冷启动、热调用与文件缓存耗时](assets/competition/performance.svg)
+![公开标签图的冷启动、热调用与文件缓存耗时](assets/competition/performance.png)
 
 最终离线 CPU 单图工件状态 `passed`：加载/内层/外层为
 3.6064/57.1824/61.895 秒，`model_reused=false`，生成 1 个 pending 候选。所用
@@ -331,8 +331,8 @@ Hybrid AI 的关键是分责：模型读视觉，schema 约束生成，代码处
 > 当多份资料互相矛盾时，我们能否在本机建立一条可追溯、可解释、可确认、会随
 > 文件版本失效的商品事实链？
 
-真实图、synthetic Benchmark、离线变量、Qoder 调用和当前源目录 231 项回归均已
-验证；最终精确 ZIP 的 clean-room 也是 231 项（0 跳过；精确耗时见相邻验证记录）。独立抓包、完整截图/视频和
+真实图、synthetic Benchmark、离线变量、Qoder 调用和当前源目录 246 项回归均已
+验证；最终精确 ZIP 的 clean-room 也是 246 项（0 跳过；精确耗时见相邻验证记录）。独立抓包、完整截图/视频和
 外部发布仍待完成；远端 CI 以 PR 为准。
 
 ---
@@ -342,6 +342,6 @@ Hybrid AI 的关键是分责：模型读视觉，schema 约束生成，代码处
 - Draft PR：[GitHub PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1)
 - ModelScope Skill：`【待链接】`
 - 演示视频：`【待链接】`
-- Benchmark 原始记录：`<artifact-root>\benchmark-final-06f8360-20260730\`
-- Qoder 截图：`docs/assets/qoder/04-analysis-summary-redacted.png`（已裁掉本机路径与宿主模型栏，仍需补完整截图组）
+- Benchmark 记录：[`synthetic-benchmark-final-06f8360.json`](evidence/synthetic-benchmark-final-06f8360.json)
+- Qoder 截图：[Skill 发现](assets/qoder/01-skill-discovered.png)、[分析安全门](assets/qoder/04-analysis-summary-redacted.png)；其余待补
 - 文章正式链接与发布日期：发布后回填，禁止预造

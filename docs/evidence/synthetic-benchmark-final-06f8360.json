@@ -1,0 +1,118 @@
+{
+  "artifact_kind": "public_synthetic_benchmark_summary",
+  "benchmark_commit": "06f8360",
+  "completed_at": "2026-07-30T12:53:01.292510+00:00",
+  "dataset": {
+    "document_count": 10,
+    "image_count": 30,
+    "partition": "synthetic",
+    "seed": 20260730
+  },
+  "document_errors": [],
+  "image_failure_count": 0,
+  "image_success_count": 30,
+  "limitations": [
+    "synthetic dataset metrics are not real-business accuracy",
+    "requested_device is not a claim about actual hardware execution",
+    "model self-assessed confidence is not an accuracy probability"
+  ],
+  "metrics": {
+    "batch_total_seconds": 2221.6386169999896,
+    "cold_start_total_seconds": 79.67060989998572,
+    "conflict_classification": {
+      "accuracy": 1.0,
+      "f1": 1.0,
+      "false_negative": 0,
+      "false_positive": 0,
+      "field_universe_count": 12,
+      "precision": 1.0,
+      "recall": 1.0,
+      "true_negative": 10,
+      "true_positive": 2
+    },
+    "conflict_recall": {
+      "expected": 2,
+      "matched": 2,
+      "missing": [],
+      "value": 1.0
+    },
+    "field_mapping": {
+      "expected": 25,
+      "f1": 1.0,
+      "precision": 1.0,
+      "predicted": 25,
+      "recall": 1.0,
+      "true_positive": 25
+    },
+    "field_recall": {
+      "expected": 25,
+      "matched": 25,
+      "value": 1.0
+    },
+    "hash_stabilization": {
+      "after_sha256": "c96e95f2817b1c8f16a99952022e03f541d3a5fe89ee6db0f1d85ea01c76dcf3",
+      "before_sha256": "c96e95f2817b1c8f16a99952022e03f541d3a5fe89ee6db0f1d85ea01c76dcf3",
+      "stable": true
+    },
+    "incremental_analysis": {
+      "first_pass_changed_files": 10,
+      "first_pass_seconds": 0.05894730001455173,
+      "saved_fraction": 0.08914912175729486,
+      "saved_seconds": 0.005255100026261061,
+      "scope": "10 deterministic benchmark documents; excludes model inference",
+      "second_pass_reused_files": 10,
+      "status": "completed",
+      "unchanged_second_pass_seconds": 0.05369219998829067
+    },
+    "model_load_seconds": 3.7012639999884414,
+    "model_size_bytes": 5462526140,
+    "nonexistent_content_hallucination_rate": {
+      "definition": "expected-empty images that produced accepted fact candidates",
+      "expected_empty_images": 5,
+      "hallucinated_images": 0,
+      "value": 0.0
+    },
+    "numeric_recognition_accuracy": {
+      "definition": "expected numeric tokens found in accepted transcriptions",
+      "expected": 27,
+      "matched": 27,
+      "value": 1.0
+    },
+    "parameter_miss_rate": {
+      "expected": 25,
+      "missed": 0,
+      "value": 0.0
+    },
+    "peak_gpu_memory_bytes": null,
+    "peak_memory_bytes": 11663728640,
+    "per_image_median_seconds": 75.99137945000257,
+    "per_image_p90_seconds": 85.35025920000044,
+    "prompt_injection_fact_rate": {
+      "images_with_accepted_facts": 0,
+      "injection_images": 2,
+      "value": 0.0
+    },
+    "single_image_seconds": 75.96934589999728,
+    "unit_recognition_accuracy": {
+      "definition": "expected unit tokens found with unit-boundary matching",
+      "expected": 15,
+      "matched": 15,
+      "value": 1.0
+    },
+    "warm_call_median_seconds": 76.01341300000786
+  },
+  "mode": "real_openvino",
+  "model_id": "OpenVINO/Qwen3-VL-8B-Instruct-int4-ov",
+  "publication": {
+    "privacy_review": "passed",
+    "removed_fields": [
+      "model_path"
+    ],
+    "source_artifact": "benchmark-final-06f8360-20260730/benchmark-results.json",
+    "source_sha256": "91fe74baed3863ca641d61b253fffd81dd22862143ea8036dfdee44c150f139b"
+  },
+  "requested_device": "CPU",
+  "run_id": "benchmark-final-06f8360-20260730",
+  "schema_version": 1,
+  "status": "completed"
+}

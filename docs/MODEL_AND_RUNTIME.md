@@ -287,6 +287,8 @@ smoke 与同 worker 冷/热复用证据继续保留为历史记录。真实单�
 | 电源计划 | 高性能，GUID `8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c` |
 | `Core().available_devices` | `CPU`、`GPU` |
 | GPU 设备全名 | NVIDIA GeForce RTX 5070 (dGPU)；未作为本项目 Intel GPU 路线验证 |
+| NVIDIA 驱动 | `591.86`（`nvidia-smi`）；OpenVINO `GPU` 未暴露独立 `DRIVER_VERSION` |
+| OpenVINO CPU/GPU plugin build | `2026.2.1-21919-ede283a88e3-releases/2026/2` |
 | 请求/实际推理设备 | `CPU` / `CPU` |
 | 测试图片 | 701×1097 FDA/Wikimedia 公有领域商品标签图 |
 | 图片 SHA-256 | `40C808CE56735A027CC990EE2E476A5B2538C538D1B20E0F6C2647182EABE7CF` |
@@ -369,7 +371,7 @@ air-gap 证明。
 | 离线环境变量推理 | **已验证** | 最终工件完成本地推理；防火墙/抓包另列 |
 | 本地进程 TCP 状态采样 | **已验证** | 35 个约 100 ms 周期未观察到外部 TCP |
 | 防火墙/数据包/DNS/UDP 审计 | **未完成** | 有限 TCP 状态采样不能证明零外连或 air-gapped |
-| 本地自动测试 | **已验证** | 2026-08-05 D 盘正式目录回归 231 项通过，79.634 s，0 跳过；`tests/test.ps1` 的公开入口/Named Pipe 确定性 sidecar 业务 E2E 通过 |
+| 本地自动测试 | **已验证** | 2026-08-05 D 盘正式目录回归 246 项通过，85.123 s，0 跳过；`tests/test.ps1` 的公开入口/Named Pipe 确定性 sidecar 业务 E2E 通过 |
 
 可准确表述为“精确 8B 模型已在 CPU 完成真实图功能验证和 synthetic 工程
 Benchmark，并在离线环境变量下成功推理”。不得把 synthetic 质量值扩写成真实
