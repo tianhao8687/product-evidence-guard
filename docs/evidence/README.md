@@ -29,3 +29,11 @@
 可复核历史 PDF 工件视为同等级证据。该旧实现会让 TI 曲线页进入 Qwen；最终
 `document-visual-acceleration-final.json` 已用明确分栏的冷/热/业务缓存和
 observation-only mixed PDF 结果取代这三份旧基线，旧记录只保留为演进历史。
+
+## 其他发布证据
+
+- `public-exit-code-contract-20260805.json`：通过公开 `scripts/run.ps1` 验证
+  退出码 `0/1/2/3`。退出码 2 使用隔离的短生命 Python 子进程提供精确 PID
+  启动标记，模拟服务身份有效但 Named Pipe 不可达且状态为 error；测试后恢复
+  runtime 快照，不加载模型、不使用商品正文。该记录不是拒绝服务、进程冒充或
+  渗透测试。

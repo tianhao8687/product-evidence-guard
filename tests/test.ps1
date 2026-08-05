@@ -442,6 +442,99 @@ try {
     Assert-True ($Shutdown.status -eq 'shutdown') 'shutdown 未成功。'
     $ServerMayBeRunning = $false
 
+    # Exercise the public exit-code 2 contract without touching a real model
+    # worker.  The harmless child process supplies a live, exact PID marker;
+    # an error state plus an unreachable Named Pipe must fail closed as a
+    # communication error.  Restore the ordinary shutdown snapshot afterward.
+    $RuntimeDirectory = Join-Path $RepositoryRoot '.runtime'
+    $PidPath = Join-Path $RuntimeDirectory 'server.pid'
+    $StatePath = Join-Path $RuntimeDirectory 'server-state.json'
+    $PidCleanupDeadline = [DateTime]::UtcNow.AddSeconds(5)
+    while (
+        (Test-Path -LiteralPath $PidPath) -and
+        [DateTime]::UtcNow -lt $PidCleanupDeadline
+    ) {
+        Start-Sleep -Milliseconds 100
+    }
+    Assert-True (-not (Test-Path -LiteralPath $PidPath)) `
+        'shutdown 后不应遗留 server.pid。'
+    $HadState = Test-Path -LiteralPath $StatePath -PathType Leaf
+    $OriginalStateBytes = if ($HadState) {
+        [System.IO.File]::ReadAllBytes($StatePath)
+    }
+    else {
+        $null
+    }
+    $DummyProcess = Start-Process -FilePath $Python -ArgumentList @(
+        '-c',
+        '"import time; time.sleep(60)"'
+    ) -PassThru -WindowStyle Hidden
+    try {
+        Start-Sleep -Milliseconds 200
+        Assert-True (-not $DummyProcess.HasExited) `
+            '通信错误测试的隔离子进程未保持运行。'
+        $MarkerScript = (
+            'from scripts.protocol import process_start_marker; ' +
+            'print(process_start_marker(' + [string]$DummyProcess.Id + '))'
+        )
+        $ProcessMarker = (& $Python -c $MarkerScript).Trim()
+        Assert-True ($LASTEXITCODE -eq 0 -and $ProcessMarker) `
+            '无法读取隔离子进程的精确启动标记。'
+        $Utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+        $PidRecord = [ordered]@{
+            schema_version = 1
+            app_id = 'local-product-evidence-guard'
+            pid = $DummyProcess.Id
+            process_start_marker = $ProcessMarker
+            startup_id = 'public-exit-two-e2e'
+            server_script = (Resolve-Path -LiteralPath (
+                Join-Path $RepositoryRoot 'scripts\server.py'
+            )).Path
+            executable = $Python
+            created_at = [DateTime]::UtcNow.ToString('o')
+        }
+        $ErrorState = [ordered]@{
+            schema_version = 1
+            status = 'error'
+            error = @{
+                code = 'isolated_transport_probe'
+                message = 'synthetic state; no product text'
+            }
+        }
+        [System.IO.File]::WriteAllText(
+            $PidPath,
+            ($PidRecord | ConvertTo-Json -Depth 5),
+            $Utf8NoBom
+        )
+        [System.IO.File]::WriteAllText(
+            $StatePath,
+            ($ErrorState | ConvertTo-Json -Depth 5),
+            $Utf8NoBom
+        )
+        $CommunicationFailure = Invoke-Entry -Arguments @(
+            'status'
+        ) -ExpectedExitCode 2
+        Assert-True (-not [bool]$CommunicationFailure.ok) `
+            'Named Pipe 不可达且服务状态为 error 时不应成功。'
+        Assert-True ($CommunicationFailure.error.code -eq 'server_unreachable') `
+            '通信失败没有返回稳定 server_unreachable 错误码。'
+    }
+    finally {
+        if ($null -ne $DummyProcess -and -not $DummyProcess.HasExited) {
+            $DummyProcess.Kill()
+            $DummyProcess.WaitForExit()
+        }
+        if (Test-Path -LiteralPath $PidPath) {
+            Remove-Item -LiteralPath $PidPath -Force
+        }
+        if ($HadState) {
+            [System.IO.File]::WriteAllBytes($StatePath, $OriginalStateBytes)
+        }
+        elseif (Test-Path -LiteralPath $StatePath) {
+            Remove-Item -LiteralPath $StatePath -Force
+        }
+    }
+
     $Result = [ordered]@{
         schema_version = 1
         status = 'passed'
@@ -463,6 +556,7 @@ try {
         html_report = 'passed'
         audit_jsonl = 'passed'
         invalid_path_exit_code = 1
+        communication_error_exit_code = 2
         named_pipe_status = 'passed'
         shutdown = 'passed'
     }

@@ -210,7 +210,7 @@
 | 打包脚本 | **已完成** | `scripts/package-release.ps1` 存在 |
 | 发布 allowlist 与链接防护合同 | **已验证** | 包含必备 lock；排除模型/数据/日志；拒绝 reparse/hardlink |
 | 版本 ZIP 与 SHA-256 | **已验证** | 最终标准路径 ZIP 已生成，相邻 `.sha256` 独立重算匹配；相邻 verification.json 保存精确归档哈希与边界 |
-| 发布身份与校验权威 | **已验证** | ZIP 内 `manifest.json.commit`、172 个 Git 来源文件和 Git object 逐项核验，mismatch 0；验证记录位于归档外避免自引用 |
+| 发布身份与校验权威 | **已验证** | ZIP 内 `manifest.json.commit`、manifest 列出的全部 Git 来源文件和 Git object 逐项核验，mismatch 0；验证记录位于归档外避免自引用 |
 | 干净目录解压 smoke | **已验证** | 最终精确 ZIP 在全新目录使用 Python 3.11.13 与 36 个已安装包；231 项、0 跳过，compileall、业务 E2E、Pipe status/shutdown 均通过；精确耗时见归档相邻 verification.json |
 
 ## 11. 文档、文章、演示与外部提交

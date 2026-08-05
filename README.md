@@ -306,6 +306,11 @@ Markdown、HTML、审计 JSONL、Named Pipe `status/shutdown` 也通过。无效
 重新确认旧候选的退出码均为 `1`。该闭环使用仓库 OCR sidecar 彩排数据，不等同于
 真实 Qwen 或 Qoder 调用。
 
+另一个隔离公开入口 E2E 使用精确活跃 PID 标记模拟“服务身份有效、Named Pipe
+不可达、状态为 error”，确认稳定返回 `server_unreachable` 和退出码 `2`，并在
+测试后恢复 runtime 快照；真实 tiny Hub 续传路径已验证退出码 `3`。因此统一
+`0/1/2/3` 合同均有公共入口证据。
+
 这些是本地最终回归结果。GitHub CI 在 commit `5a4fad8` 曾临时绿色；最新远端 CI
 状态以 [Draft PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1)
 的 GitHub Actions 为准，本文不预先声称其通过。

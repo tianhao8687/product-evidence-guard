@@ -81,7 +81,7 @@ verification.json 位于归档外，避免归档身份自引用
 - [x] `SKILL.md` 和用户文档只把 `scripts/run.ps1` 作为公开入口。
 - [x] Windows 上稳定 UTF-8 JSON stdout 已验证。
 - [x] 运行日志与业务 JSON 已验证分离。
-- [ ] 退出码 `0/1/2/3` 已端到端验证。
+- [x] 退出码 `0/1/2/3` 已通过公开入口端到端验证。
 - [x] Named Pipe 地址、authkey 和协议版本已验证一致。
 - [x] 每个连接只处理一个请求。
 - [x] `status`、`analyze`、`confirm`、`reject`、`export`、`shutdown` 已通过
@@ -105,6 +105,7 @@ verification.json 位于归档外，避免归档身份自引用
 公开入口：scripts/run.ps1 → Named Pipe sidecar E2E 覆盖 analyze、confirm（含理由）、
 reject（含理由）、export、修改来源、reanalyze 和 stale
 报告/审计：JSON、Markdown、HTML 与 confirmation-audit.jsonl 均通过
+退出码：0/1 来自业务 E2E，2 来自隔离 Named Pipe 不可达 E2E，3 来自真实续传路径
 说明：上述是确定性 sidecar 证据，不是真实 Qwen/Qoder 证据
 ```
 
