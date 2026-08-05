@@ -99,6 +99,8 @@ class ReleasePackageStaticContractTests(unittest.TestCase):
             "Windows 绝对路径",
             "Bearer 凭据",
             "docs/assets/qoder/04-analysis-summary.png",
+            "docs/evidence/licenses/",
+            "GetEncoding(28591)",
         ):
             self.assertIn(required_gate, script)
         self.assertNotIn("Get-FileHash", script)
@@ -110,6 +112,7 @@ class ReleasePackageStaticContractTests(unittest.TestCase):
         self.assertIn("* text=auto eol=lf", attributes)
         for binary_pattern in ("*.png -text", "*.pdf -text", "*.zip -text"):
             self.assertIn(binary_pattern, attributes)
+        self.assertIn("docs/evidence/licenses/** -text -diff", attributes)
 
         ignores = (REPO_ROOT / ".gitignore").read_text(encoding="utf-8")
         for ignored in (
@@ -544,6 +547,32 @@ class ReleasePackageIntegrationTests(unittest.TestCase):
         self.assert_package_failure(
             repository,
             self.base / "bearer-output",
+            "Bearer 凭据",
+        )
+
+    def test_preserves_non_utf8_exact_upstream_notice_bytes(self) -> None:
+        relative_path = "docs/evidence/licenses/upstream/legacy-notice.txt"
+        notice = b"legacy notice byte: \xff\n"
+        repository = self.create_repository(
+            "legacy-notice",
+            extra_files={relative_path: notice},
+        )
+        result, payload = self.package(repository, self.base / "legacy-output")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        with zipfile.ZipFile(Path(str(payload["zip"]))) as archive:
+            self.assertEqual(archive.read(relative_path), notice)
+
+    def test_rejects_credential_inside_non_utf8_upstream_notice(self) -> None:
+        credential = b"\xffBear" + b"er abcdefghijklmnopqrstuvwxyz123456\n"
+        repository = self.create_repository(
+            "legacy-notice-credential",
+            extra_files={
+                "docs/evidence/licenses/upstream/credential.txt": credential,
+            },
+        )
+        self.assert_package_failure(
+            repository,
+            self.base / "legacy-notice-credential-output",
             "Bearer 凭据",
         )
 

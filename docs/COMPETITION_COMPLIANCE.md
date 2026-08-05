@@ -92,7 +92,7 @@
 | Windows 公开入口真实模型 analyze | **已验证** | 冷/热请求均成功并生成候选 |
 | 推理中 Named Pipe 并发响应 | **已验证** | 真实 4 图推理期间，`run.ps1 status` 经 Pipe 在 0.438 s 返回 `running` 和 `available_operations`，无 fallback 字段 |
 | Windows Named Pipe smoke | **已验证** | `tests/test.ps1` 的稳定 JSON、完整业务闭环、status 与 shutdown 通过 |
-| auth 不匹配、崩溃恢复、重复启动和 timeout | **已验证** | 最终 229 项本地回归覆盖 |
+| auth 不匹配、崩溃恢复、重复启动和 timeout | **已验证** | 最终 231 项本地回归覆盖 |
 | confirm/reject/export/stale 完整业务 E2E | **已验证** | `run.ps1`/Named Pipe 使用 deterministic sidecar 完成；真实 Qwen/Qoder 录屏另列 |
 | 模型跨多次请求复用 | **已验证** | 常驻 worker 热请求 `model_reused=true`、加载 0 s |
 
@@ -160,8 +160,8 @@
 | 确认、下载、协议、PDF 与报告测试文件 | **已完成** | 对应测试文件存在 |
 | `tests/test.ps1` | **已完成** | 文件存在；结果另行验证 |
 | `tests/test-real-model.ps1` | **已完成** | opt-in 脚本存在 |
-| 最终完整 Python 测试执行 | **已验证** | 2026-08-05 D 盘正式目录 229 项通过，74.951 s，0 跳过 |
-| Windows PowerShell smoke | **已验证** | 229 项、中文空格、compileall、deterministic、incremental、完整确认闭环、Pipe status/shutdown 通过；无效路径和旧候选退出码 1 |
+| 最终完整 Python 测试执行 | **已验证** | 2026-08-05 D 盘正式目录 231 项通过，79.634 s，0 跳过 |
+| Windows PowerShell smoke | **已验证** | 231 项、中文空格、compileall、deterministic、incremental、完整确认闭环、Pipe status/shutdown 通过；无效路径和旧候选退出码 1 |
 | Linux CI workflow | **已完成** | Ubuntu compile、unit、demo smoke 配置存在 |
 | Windows CI workflow | **已完成** | workflow 已配置 Windows PowerShell/Python 3.11 job |
 | commit `5a4fad8` 远端 GitHub Actions | **已验证** | 临时绿色 |

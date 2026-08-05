@@ -99,7 +99,7 @@
 证据：
 
 ```text
-最终完整基线：tests/test.ps1 在 D 盘正式目录内部 unittest 229 项通过，74.951 s，
+最终完整基线：tests/test.ps1 在 D 盘正式目录内部 unittest 231 项通过，79.634 s，
 0 跳过
 公开入口：scripts/run.ps1 → Named Pipe sidecar E2E 覆盖 analyze、confirm（含理由）、
 reject（含理由）、export、修改来源、reanalyze 和 stale
@@ -262,7 +262,7 @@ PDF 测试矩阵：未完成；不在本次最终单图证据内
 证据：
 
 ```text
-最终完整基线：D 盘正式目录 229 项通过，74.951 s，0 跳过
+最终完整基线：D 盘正式目录 231 项通过，79.634 s，0 跳过
 回归源码身份：最终 ZIP 内 manifest.json.commit；不在文档中预填
 ```
 
@@ -316,12 +316,12 @@ reanalyze → stale；stale candidate 重试按预期 exit 1
       边界，旧的单次速度没有重启模型复测。
 - [x] `tests/test.ps1` 存在。
 - [x] `tests/test-real-model.ps1` 存在且为 opt-in。
-- [x] 最终 D 盘正式目录 Python 回归 229 项通过，74.951 s，0 跳过。
+- [x] 最终 D 盘正式目录 Python 回归 231 项通过，79.634 s，0 跳过。
       脱敏机器摘要：`docs/evidence/final-local-regression-20260805.json`。
 - [x] `compileall` 通过。
 - [x] 确定性 demo smoke 通过。
 - [x] Windows PowerShell `tests/test.ps1` 最终完整基线中，内部 unittest
-      D 盘正式目录 229 项通过，74.951 s，0 跳过；完整业务 E2E JSON 通过。
+      D 盘正式目录 231 项通过，79.634 s，0 跳过；完整业务 E2E JSON 通过。
 - [x] 中文路径通过。
 - [x] 含空格路径通过。
 - [ ] 缺环境/模型和错误路径能正确失败。
@@ -340,7 +340,7 @@ PR Actions 为准，本文不预先声称其通过。
 证据：
 
 ```text
-最终完整基线：D 盘正式目录 229 项通过，74.951 s，0 跳过
+最终完整基线：D 盘正式目录 231 项通过，79.634 s，0 跳过
 Windows smoke：tests/test.ps1 status=passed；unit_tests、compileall、
 deterministic_smoke、incremental_reuse、public_business_e2e、json_reports、
 markdown_report、html_report、audit_jsonl、named_pipe_status、shutdown 均 passed；
@@ -472,7 +472,7 @@ dataset SHA-256：c96e95f2817b1c8f16a99952022e03f541d3a5fe89ee6db0f1d85ea01c76dc
 SBOM：CycloneDX 1.5，35/35 锁定 distribution 已覆盖
 notice bundle：实际 pypdfium2 wheel 的 19 份 PDFium/依赖 notices 已收集
 仍未完成：漏洞扫描、所有其他二进制传递依赖的完整许可证审计、模型 manifest 签名
-安全回归：最终 D 盘正式目录基线 229 项通过，74.951 s，0 跳过；
+安全回归：最终 D 盘正式目录基线 231 项通过，79.634 s，0 跳过；
 fuzz/XML bomb/渗透测试未完成
 ```
 
@@ -621,7 +621,7 @@ Draft PR：https://github.com/tianhao8687/product-evidence-guard/pull/1
 | 离线环境变量下推理是否完成？ | 是；防火墙阻断/抓包网络审计未完成 |
 | Qoder 是否发现并执行 Skill？ | 是；CLI 已登录，中英文自动触发与手动触发成功，匿名业务闭环和真实图片调用均经安装副本固定入口完成 |
 | Benchmark 汇总是否链接原始记录？ | 是：synthetic run ID 与本地结果目录已记录 |
-| 本地与远端测试是否链接最终 commit？ | D 盘正式目录基线为 229 项/74.951 s，0 跳过，JSON 业务 E2E 通过；最新远端 CI 状态以 PR Actions 为准 |
+| 本地与远端测试是否链接最终 commit？ | D 盘正式目录基线为 231 项/79.634 s，0 跳过，JSON 业务 E2E 通过；最新远端 CI 状态以 PR Actions 为准 |
 | 发布包是否不含模型、数据、日志、秘密和输出？ | 历史候选的 allowlist、实际内容清单与 clean-room 已复核；最终新 HEAD 的精确 ZIP 仍需重建并重新扫描 |
 | 是否包含精确第三方 notices？ | 项目声明已完成；最终二进制 notices 待发布盘点 |
 | 所有剩余缺口是否对外可见？ | 是；以当前清单和合规表为准 |

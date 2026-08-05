@@ -603,14 +603,26 @@ function Assert-SafeReleaseContent {
         $Text = $Utf8.GetString($Data)
     }
     catch {
-        throw "发布文本不是严格 UTF-8：$RelativePath"
+        $IsExactUpstreamNotice = $RelativePath.StartsWith(
+            'docs/evidence/licenses/',
+            [System.StringComparison]::Ordinal
+        )
+        if (-not $IsExactUpstreamNotice) {
+            throw "发布文本不是严格 UTF-8：$RelativePath"
+        }
+
+        # Exact wheel notices must retain their upstream bytes, including
+        # legacy encodings. ISO-8859-1 maps every byte one-to-one, so the same
+        # ASCII security signatures below are still checked without rewriting
+        # the evidence or silently accepting arbitrary non-UTF-8 documents.
+        $Text = [System.Text.Encoding]::GetEncoding(28591).GetString($Data)
     }
 
     $ForbiddenPatterns = @(
         @{ Name = 'Windows 绝对路径'; Pattern = '(?i)(?<![A-Za-z0-9])[A-Z]:[\\/]' },
         @{ Name = '用户主目录绝对路径'; Pattern = '(?i)(?<![A-Za-z0-9])/(?:home|Users)/[^/\s]+' },
-        @{ Name = 'Bearer 凭据'; Pattern = '(?i)\bBearer\s+[A-Za-z0-9._~+/=-]{12,}' },
-        @{ Name = '常见访问令牌'; Pattern = '(?i)\b(?:hf_|gh[opusr]_)[A-Za-z0-9_-]{16,}' },
+        @{ Name = 'Bearer 凭据'; Pattern = '(?i)(?<![A-Za-z0-9])Bearer\s+[A-Za-z0-9._~+/=-]{12,}' },
+        @{ Name = '常见访问令牌'; Pattern = '(?i)(?<![A-Za-z0-9])(?:hf_|gh[opusr]_)[A-Za-z0-9_-]{16,}' },
         @{ Name = '私钥正文'; Pattern = '-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----' }
     )
     foreach ($Rule in $ForbiddenPatterns) {
