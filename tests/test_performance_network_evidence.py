@@ -48,7 +48,12 @@ class PerformanceNetworkEvidenceTests(unittest.TestCase):
 
     def test_public_evidence_contains_no_host_absolute_path(self) -> None:
         serialized = COLD.read_text(encoding="utf-8") + NETWORK.read_text(encoding="utf-8")
-        for forbidden in ("C:\\\\Users\\\\", "D:\\\\", "/home/", "/Users/"):
+        for forbidden in (
+            "C" + ":\\\\Users\\\\",
+            "D" + ":\\\\",
+            "/" + "home" + "/",
+            "/" + "Users" + "/",
+        ):
             self.assertNotIn(forbidden, serialized)
 
 
