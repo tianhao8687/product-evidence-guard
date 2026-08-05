@@ -16,11 +16,11 @@
 
 ## 1. 仓库与范围
 
-- [x] 工作分支为 `codex/competition-ready-v1`。
-- [ ] 最终分支已安全同步目标 base，且没有丢弃用户改动。
-- [ ] 已逐个复核工作区变更及其用途。
-- [ ] 已确认没有修改无关仓库。
-- [ ] 没有直接 push 或 merge 到 `main`。
+- [x] 工作分支为 `codex/competition-ready-v1-sanitized`。
+- [x] 最终分支以远端安全父提交重建，保留全部有意源码变更且不携带原始未脱敏截图历史。
+- [x] 已逐个复核工作区变更及其用途。
+- [x] 已确认没有修改无关仓库。
+- [x] 没有直接 push 或 merge 到 `main`；最终脱敏分支仍仅在本地。
 - [x] 产品名为 Product Evidence Guard。
 - [x] Skill 名为 `local-product-evidence-guard`。
 - [x] 范围保持为商品证据核验，不扩展为 PIM、SaaS、生图或自动发布。
@@ -48,21 +48,22 @@
 - [x] `THIRD_PARTY_NOTICES.md`
 - [x] `PRIVACY.md`
 - [x] `SECURITY.md`
-- [ ] 最终检查 `SKILL.md` 的 name、description 长度、中英文触发词、公开入口、
+- [x] 最终检查 `SKILL.md` 的 name、description 长度、中英文触发词、公开入口、
       `--continue`、失败、离线与注入规则。
 - [x] Qoder 安装器只提供当前 `.qoder\skills` 用户级/项目级范围，不支持旧
       `.lingma` 目标。
 - [x] `requirements.lock` 是正式发布包和 Qoder 安装必备文件。
-- [ ] `info.json`、`requirements.txt`、`requirements.lock`、包元数据、文档和
+- [x] `info.json`、`requirements.txt`、`requirements.lock`、包元数据、文档和
       代码版本在最终 ZIP 中完全一致。
-- [ ] 所有 JSON 文件均通过 UTF-8 解析。
+- [x] 所有发布 JSON 文件均通过 UTF-8 解析。
 
 证据：
 
 ```text
 模型校验清单：<project-root>\release\model-sha256-manifest.json
 发布源码身份：ZIP 内 manifest.json.commit
-最终 ZIP 版本一致性：历史 v1.0.0 候选已构建；最终新 HEAD 的标准路径 ZIP 待重建复核
+最终 ZIP 版本一致性：标准路径 ZIP、相邻 SHA-256 和相邻 verification.json 已复核；
+verification.json 位于归档外，避免归档身份自引用
 ```
 
 ## 3. 唯一入口与运行架构
@@ -77,15 +78,15 @@
 - [x] `scripts/benchmark.py`
 - [x] `scripts/benchmark-document-visuals.py`
 - [x] `scripts/package-release.ps1`
-- [ ] `SKILL.md` 和用户文档只把 `scripts/run.ps1` 作为公开入口。
+- [x] `SKILL.md` 和用户文档只把 `scripts/run.ps1` 作为公开入口。
 - [x] Windows 上稳定 UTF-8 JSON stdout 已验证。
-- [ ] 运行日志与业务 JSON 已验证分离。
+- [x] 运行日志与业务 JSON 已验证分离。
 - [ ] 退出码 `0/1/2/3` 已端到端验证。
 - [x] Named Pipe 地址、authkey 和协议版本已验证一致。
 - [x] 每个连接只处理一个请求。
 - [x] `status`、`analyze`、`confirm`、`reject`、`export`、`shutdown` 已通过
       `scripts/run.ps1` → Named Pipe 确定性 sidecar E2E 实测。
-- [ ] `starting`、`downloading`、`loading`、`running`、`error`、`shutdown`
+- [x] `starting`、`downloading`、`loading`、`running`、`error`、`shutdown`
       状态迁移全部实测。
 - [x] 重复启动、旧 PID/lock、精确进程恢复、崩溃和 timeout 已纳入最终回归。
 - [x] 常驻模型 worker 在第二次同模型请求复用 pipeline。
@@ -120,7 +121,7 @@ reject（含理由）、export、修改来源、reanalyze 和 stale
 - [x] 35 个运行/构建包全部 hash-locked，并使用 `--require-hashes`。
 - [x] editable build 使用 `--no-build-isolation --no-index`，不临时解析未锁定后端。
 - [ ] 安装失败返回非零码和清晰中文提示。
-- [ ] 绝对日志路径存在，且日志不含商品正文。
+- [x] 绝对日志路径存在，且代表性日志与服务异常日志不含商品正文。
 - [x] 已盘点 35 个锁定 distribution 的许可证元数据并生成机器可读清单。
 - [x] 已生成带分发哈希的正式 `requirements.lock`。
 
@@ -142,7 +143,7 @@ SBOM：CycloneDX 1.5，35/35 锁定 distribution 已纳入
 - [x] 26 个运行文件清单已记录。
 - [x] `.partial`、续传、结构检查和原子提升代码存在。
 - [x] revision 固定。
-- [ ] 下载前剩余磁盘已截图或记录。
+- [x] 下载前剩余磁盘已记录。
 - [x] 完整正式快照已下载。
 - [x] 中断并恢复下载已真实演练。
 - [x] 正式快照可由精确模型成功加载。
@@ -417,7 +418,7 @@ TCP 状态观察：35 个约 100 ms 周期未观察到外部 TCP
 - [x] `scripts/benchmark.py` 已覆盖冻结 synthetic 指标合同并真实执行。
 - [x] Synthetic manifest 已生成、明确标记，运行前后 hash 一致。
 - [x] 30 图、10 文档满足冻结数据集组成。
-- [ ] USER — 已提供授权匿名真实样本集。
+- [x] USER — 已提供授权匿名真实样本集；授权范围和样本 SHA 已保留。
 - [x] 完整 synthetic CPU 结果。
 - [ ] 适用 Intel GPU 结果。
 - [x] 30 图逐图中位数与 p90 已记录。
@@ -428,7 +429,7 @@ TCP 状态观察：35 个约 100 ms 周期未观察到外部 TCP
 - [x] 漏检、空样本编造和注入接受计数。
 - [x] 冲突分类 TP/FP/FN/TN。
 - [x] 无变化增量节省与 10/10 复用。
-- [ ] 单文件变化增量。
+- [x] 单文件变化增量功能 E2E：只改 1 份说明书并复用另外 2 份；未冻结独立性能值。
 - [x] Synthetic 与真实功能验证分开。
 - [x] 汇总结果指向本地原始工件。
 - [x] README、Benchmark 文档和文章表格与冻结值一致。
@@ -464,7 +465,7 @@ dataset SHA-256：c96e95f2817b1c8f16a99952022e03f541d3a5fe89ee6db0f1d85ea01c76dc
 - [x] 输入发现、发布和 Qoder 的 symlink/junction/reparse-point/hardlink 防护测试。
 - [x] Named Pipe authkey 不匹配、崩溃、重复启动和 timeout 回归测试。
 - [ ] Named Pipe 独立进程冒充、拒绝服务或渗透测试。
-- [ ] 独立安全复核，或明确标注未执行。
+- [x] 独立安全复核尚未执行，并已在限制与合规表中明确标注；此勾选不表示通过安全审计。
 
 证据：
 
@@ -478,7 +479,7 @@ fuzz/XML bomb/渗透测试未完成
 
 ## 15. 文档
 
-- [ ] `README.md` 已完成最终普通用户复核。
+- [x] `README.md` 已完成最终普通用户复核：安装、首次下载、继续、分析、报告、确认、导出、Qoder、测试与限制均有大白话说明。
 - [x] `docs/ARCHITECTURE.md`，含 5 张 Mermaid。
 - [x] `docs/USER_GUIDE.md`。
 - [x] `docs/MODEL_AND_RUNTIME.md`。
@@ -545,15 +546,16 @@ release/local-product-evidence-guard-v1.0.0.zip
 - [x] ZIP 同目录 `.sha256` 作为整个归档的校验权威。
 - [x] ZIP 内容清单已由 `manifest.json` 核验并保留。
 - [x] SHA-256 已生成并独立重算复核。
-- [ ] 最终新 HEAD 的精确发布包完成 clean-room 解压、安装、完整测试和 smoke。
+- [x] 最终干净 HEAD 的精确发布包完成 clean-room 解压、安装、完整测试和 smoke。
 - [ ] 所有二进制传递依赖的完整第三方 license bundle 已包含；pypdfium2/PDFium 19 份 notices 已完成。
 
 证据：
 
 ```text
-历史 clean-room：commit 2f10f53 的包在全新临时目录解压；使用 Python 3.11.13
-按 lock 安装 36 个包，模块从解压目录导入；219 项通过（77.233 s，0 跳过）并
-完成业务 E2E。当前新 HEAD 的标准路径 ZIP、SHA-256 与精确 clean-room 仍需重建复验。
+最终精确 clean-room：使用 Python 3.11.13 和 36 个已安装包，模块从标准路径 ZIP
+的解压目录导入；231 项通过（0 跳过），compileall、确定性 smoke、
+增量复用、Windows 业务 E2E、Named Pipe status/shutdown 均通过。标准路径 ZIP 的
+相邻 `.sha256` 和 `.verification.json` 保存归档哈希、manifest commit 与严格边界。
 ```
 
 ## 18. GitHub PR 与远端检查
@@ -574,7 +576,7 @@ release/local-product-evidence-guard-v1.0.0.zip
 证据：
 
 ```text
-Branch：codex/competition-ready-v1
+Branch：codex/competition-ready-v1-sanitized
 临时 CI commit：5a4fad8
 最终 Commit：不在文档预填；以发布 ZIP 内 manifest.json.commit 为准
 Draft PR：https://github.com/tianhao8687/product-evidence-guard/pull/1
@@ -622,8 +624,8 @@ Draft PR：https://github.com/tianhao8687/product-evidence-guard/pull/1
 | Qoder 是否发现并执行 Skill？ | 是；CLI 已登录，中英文自动触发与手动触发成功，匿名业务闭环和真实图片调用均经安装副本固定入口完成 |
 | Benchmark 汇总是否链接原始记录？ | 是：synthetic run ID 与本地结果目录已记录 |
 | 本地与远端测试是否链接最终 commit？ | D 盘正式目录基线为 231 项/79.634 s，0 跳过，JSON 业务 E2E 通过；最新远端 CI 状态以 PR Actions 为准 |
-| 发布包是否不含模型、数据、日志、秘密和输出？ | 历史候选的 allowlist、实际内容清单与 clean-room 已复核；最终新 HEAD 的精确 ZIP 仍需重建并重新扫描 |
-| 是否包含精确第三方 notices？ | 项目声明已完成；最终二进制 notices 待发布盘点 |
+| 发布包是否不含模型、数据、日志、秘密和输出？ | 是：最终标准路径 ZIP 经 allowlist、内容清单、Git blob、秘密/路径扫描与 exact clean-room 复核；相邻验证记录保存边界 |
+| 是否包含精确第三方 notices？ | pypdfium2/PDFium 的 19 份精确 notices 已包含并逐项校验；其他二进制传递依赖的完整许可证审计仍未完成 |
 | 所有剩余缺口是否对外可见？ | 是；以当前清单和合规表为准 |
 
 只有这些问题得到真实回答，并完成用户外部操作后，才能称为“比赛提交完成”。

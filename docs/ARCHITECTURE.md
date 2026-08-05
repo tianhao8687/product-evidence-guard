@@ -1,6 +1,6 @@
 # Product Evidence Guard 架构设计
 
-最后复核：2026-07-30
+最后复核：2026-08-05
 
 Product Evidence Guard 是一条本地证据核验管线。它的核心合同不是“让模型给
 答案”，而是：

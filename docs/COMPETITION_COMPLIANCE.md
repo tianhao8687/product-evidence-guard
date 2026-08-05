@@ -209,9 +209,9 @@
 | 网络外连审计 | **未完成** | 已有有限 TCP 状态观察；防火墙、数据包、DNS 与 UDP 审计尚未执行 |
 | 打包脚本 | **已完成** | `scripts/package-release.ps1` 存在 |
 | 发布 allowlist 与链接防护合同 | **已验证** | 包含必备 lock；排除模型/数据/日志；拒绝 reparse/hardlink |
-| 版本 ZIP 与 SHA-256 | **未完成** | 历史本地候选的相邻 `.sha256` 已独立重算匹配；最终新 HEAD 的标准路径 ZIP 尚未重建 |
-| 发布身份与校验权威 | **已验证** | 打包合同与历史候选证明 `manifest.json.commit`、HEAD 来源文件和 Git object 可核验；最终新 HEAD 仍需重新应用该合同 |
-| 干净目录解压 smoke | **已验证** | commit `2f10f53` 的包在全新目录按 lock 安装独立 Python 3.11.13 环境；219 项通过（77.233 s，0 跳过）并完成业务 E2E；最终新 HEAD 的精确 ZIP 仍需重建复验 |
+| 版本 ZIP 与 SHA-256 | **已验证** | 最终标准路径 ZIP 已生成，相邻 `.sha256` 独立重算匹配；相邻 verification.json 保存精确归档哈希与边界 |
+| 发布身份与校验权威 | **已验证** | ZIP 内 `manifest.json.commit`、172 个 Git 来源文件和 Git object 逐项核验，mismatch 0；验证记录位于归档外避免自引用 |
+| 干净目录解压 smoke | **已验证** | 最终精确 ZIP 在全新目录使用 Python 3.11.13 与 36 个已安装包；231 项、0 跳过，compileall、业务 E2E、Pipe status/shutdown 均通过；精确耗时见归档相邻 verification.json |
 
 ## 11. 文档、文章、演示与外部提交
 
@@ -229,7 +229,7 @@
 | 技术文章发布 | **待用户操作** | 需要平台账号和发布决定 |
 | ModelScope Skill 发布 | **待用户操作** | 需要平台账号和发布决定 |
 | 比赛标签和最终 URL | **待用户操作** | 外部发布/提交 |
-| 分支 `codex/competition-ready-v1` | **已完成** | 当前分支已检查 |
+| 分支 `codex/competition-ready-v1-sanitized` | **已完成** | 当前脱敏分支已检查；原始未脱敏截图历史不在此分支可达历史中 |
 | Draft PR | **已验证** | [GitHub PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1) 已创建，未合并 |
 | 临时远端 CI | **已验证** | commit `5a4fad8` 绿色 |
 | 最新远端 CI | **未完成** | 本地最终回归已通过；实时状态以 PR Actions 为准 |

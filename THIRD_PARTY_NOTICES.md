@@ -70,6 +70,11 @@ pypdfium2 的许可证说明要求：二进制发行时必须同时提供 PDFium
 `python scripts/generate-pdfium-notices.py --check` 在已安装的锁定环境中离线复核；
 该证据不表示其他平台或未来版本使用同一声明集合。
 
+这些文件按 wheel 中的原始字节与文件名保存，不能为了文档美观而改写。上游
+`libjpeg_turbo.md` 内部仍引用 `README.ijg`，而该 wheel 将对应文本命名为
+`libjpeg_turbo.ijg`；这是上游发行物的相对链接/命名差异，不代表缺少许可证正文，
+也不应通过修改原始 notice 来掩盖。
+
 ## 传递依赖与发布责任
 
 上表软件包可能安装额外依赖和原生组件，这里没有穷举它们的全部声明。发布二进制

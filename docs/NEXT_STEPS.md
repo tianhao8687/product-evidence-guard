@@ -1,6 +1,6 @@
 # 下一步与发布关键路径
 
-最后复核：2026-07-31
+最后复核：2026-08-05
 
 当前比赛路线固定：
 
@@ -34,7 +34,7 @@
 | 离线环境变量推理 | **已验证** | 三个离线/遥测环境变量下推理成功；35 周期 TCP 状态采样未观察到外部 TCP | 防火墙、数据包、DNS 与 UDP 审计 |
 | Synthetic CPU Benchmark | **已验证** | commit `06f8360`；30 图、10 文档完成 | 真实授权数据与 Intel GPU 另行评测 |
 | Draft PR | **已验证** | [PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1) | 本地回归已通过；最新远端 CI 以 PR Actions 为准 |
-| 发布包 | **未完成** | commit `2f10f53` 的包曾完成 219 项、0 跳过 clean-room；最终新 HEAD 尚无同一精确 ZIP 的复验 | 重建标准路径 ZIP、SHA-256、clean-room，再做外部上传 |
+| 发布包 | **已验证** | 标准路径 ZIP、相邻 SHA-256 与 verification.json 已复核；精确 clean-room 231 项通过（0 跳过），业务 E2E 与 Pipe status/shutdown 通过 | 用户决定是否外部上传 |
 
 ## P0：完成可执行产品链
 
@@ -344,13 +344,13 @@ ZIP 必须包含源码、Skill 元数据、脚本、测试、匿名 demo、文�
 manifest 不包含对自身或 ZIP 的自引用哈希。当前脚本在内存中生成确定性
 `manifest.json`，列出干净 HEAD 的路径、mode、size 和 Git object；allowlist、
 必备 `requirements.lock`、排除项与
-symlink/junction/reparse point/hardlink 拒绝合同均已通过本地回归。历史 commit
-`2f10f53` 的候选包已完成 clean-room 解压，使用 Python 3.11.13 按 lock 安装
-36 个包；219 项通过（77.233 s，0 跳过）并完成业务 E2E。之后的新 HEAD 含文档
-与供应链证据变化，不能把旧包测试扩大成最终精确 ZIP 的证明。
+symlink/junction/reparse point/hardlink 拒绝合同均已通过本地回归。最终标准路径 ZIP
+已从干净 HEAD 生成，相邻 `.sha256` 独立重算匹配；同一精确归档在 clean-room 中
+使用 Python 3.11.13 和 36 个已安装包，231 项通过（0 跳过），并完成
+compileall、确定性 smoke、增量复用、业务 E2E、Named Pipe status 与 shutdown。
+归档外的相邻 `.verification.json` 保存归档哈希和验证边界，避免归档自引用。
 
-状态：**未完成**。必须从最终干净 HEAD 重建标准路径 ZIP、重算 SHA-256 并对同一
-精确归档重新 clean-room；之后才进入用户决定的外部上传和发布。
+状态：**已验证**。外部上传和发布仍需用户决定与平台账号。
 
 ### 13. 完成外部比赛步骤
 
