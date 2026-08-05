@@ -98,8 +98,8 @@ class SupplyChainEvidenceTests(unittest.TestCase):
 
         serialized = SBOM.read_text(encoding="utf-8") + LICENSES.read_text(encoding="utf-8")
         self.assertNotIn(str(REPO_ROOT), serialized)
-        self.assertNotIn("C:\\\\Users\\", serialized)
-        self.assertNotIn("D:\\\\", serialized)
+        self.assertNotIn("C" + ":\\\\Users\\", serialized)
+        self.assertNotIn("D" + ":\\\\", serialized)
         for secret_marker in ("api_key", "access_token", "bearer ", "authorization"):
             self.assertNotIn(secret_marker, serialized.lower())
 
