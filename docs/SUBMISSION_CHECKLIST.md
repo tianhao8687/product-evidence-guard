@@ -517,8 +517,11 @@ fuzz/XML bomb/渗透测试未完成
       审计。
 - [ ] 5 个 Mermaid 块已由真实 Mermaid 引擎逐图渲染确认。
 - [x] 除明确警告/历史说明外，没有旧 `.lingma` 安装指令。
-- [ ] 没有虚构模型、Qoder、离线、Benchmark、CI 或 PR 状态。
-- [ ] 日期、版本、命令、输出文件名和状态表一致。
+- [x] 模型、Qoder、离线、Benchmark、CI 与 PR 状态已逐项链接机器证据，并明确
+      区分真实实测、synthetic、远端旧 head、限制和待用户操作，没有把历史绿色或
+      局部观察冒充当前完整证明。
+- [x] 日期、版本、命令、输出文件名和状态表已由 JSON 解析、本地链接、提交材料
+      合同及最终包相邻验证记录交叉检查；外部 URL/发布日期仍保留待填。
 
 ## 16. 视频与文章 — USER
 
@@ -586,8 +589,9 @@ release/local-product-evidence-guard-v1.0.0.zip
 
 ## 18. GitHub PR 与远端检查
 
-- [ ] 最终变更有意地 stage。
-- [ ] commit 历史清楚，且不含模型、客户数据或输出。
+- [x] 最终本地变更已按比赛交付范围有意地 stage 并提交；审计时工作树干净。
+- [x] 本轮提交历史按安全/发布合同/材料收口拆分；最终 Git tree 与 ZIP 均不含模型、
+      真实样本 payload、客户输出、凭据或运行日志。
 - [ ] 最终本地分支已 push 至当前 Draft PR；当前 PR head 仍落后本地最终变更。
 - [x] 对正确 base 创建 Draft PR。
 - [x] PR 未 merge。
@@ -595,7 +599,8 @@ release/local-product-evidence-guard-v1.0.0.zip
 - [ ] PR 列出精确本地测试命令与结果。
 - [ ] PR 分开记录真实模型、Qoder、离线、Benchmark 和 CI。
 - [ ] PR 列出失败、风险和用户外部操作。
-- [ ] review comments 已处理或说明。
+- [x] 2026-08-05 公开只读快照中 review、review comment、issue comment 均为 0；
+      当前没有可处理意见，推送新 head 后仍需再次复核。
 - [x] commit `5a4fad8` 的临时 checks 绿色。
 - [ ] PR Actions 中最新所需 checks 全部通过，或失败被明确报告。
 
