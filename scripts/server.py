@@ -34,6 +34,7 @@ from protocol import (  # noqa: E402
     RUNTIME_DIR,
     SERVER_LOG_PATH,
     AlreadyRunningError,
+    AuthenticationError,
     ProtocolError,
     RuntimeIdentityGuard,
     atomic_write_json,
@@ -70,6 +71,61 @@ from product_evidence_guard.openvino_adapter import (  # noqa: E402
 LOGGER = logging.getLogger("product_evidence_guard.local_server")
 MAX_PENDING_CONNECTIONS = 32
 MAX_REQUEST_WORKERS = 16
+_SAFE_LOG_EVENTS = {
+    "connection_failed",
+    "duplicate_server_start_refused",
+    "operation_failed",
+    "protocol_response_send_failed",
+    "server_exited",
+    "server_started",
+    "server_stopped_unexpectedly",
+}
+_SAFE_LOG_OPERATIONS = {
+    "analyze",
+    "confirm",
+    "export",
+    "reject",
+    "shutdown",
+    "status",
+}
+
+
+def _safe_log_atom(value: object) -> str:
+    text = str(value)
+    if (
+        0 < len(text) <= 128
+        and text.isascii()
+        and all(character.isalnum() or character in "._:-" for character in text)
+    ):
+        return text
+    return "<redacted>"
+
+
+def _log_event(level: int, event: str, **fields: object) -> None:
+    """Write only bounded operational metadata to the persistent server log.
+
+    Request payloads, exception messages, paths and model output are never log
+    fields. Values outside the small ASCII atom contract are replaced instead
+    of being escaped, so they cannot smuggle customer text or credentials into
+    the log.
+    """
+
+    safe_event = event if event in _SAFE_LOG_EVENTS else "redacted_event"
+    parts = [f"event={safe_event}"]
+    for name, value in sorted(fields.items()):
+        safe_name = _safe_log_atom(name)
+        if (
+            name == "operation"
+            and isinstance(value, str)
+            and value in _SAFE_LOG_OPERATIONS
+        ):
+            safe_value = str(value)
+        elif name == "error_type":
+            safe_value = _safe_log_atom(value)
+        else:
+            safe_value = "<redacted>"
+        parts.append(f"{safe_name}={safe_value}")
+    LOGGER.log(level, " ".join(parts))
 
 
 def _select_worker_executable(
@@ -661,7 +717,12 @@ class ServerApplication:
             except Exception as exc:
                 safe_error = f"{type(exc).__name__}: {exc}"
                 self.state.transition("error", error=safe_error)
-                LOGGER.error("Operation %s failed: %s", operation, type(exc).__name__)
+                _log_event(
+                    logging.ERROR,
+                    "operation_failed",
+                    operation=operation,
+                    error_type=type(exc).__name__,
+                )
                 return error_response(
                     validated,
                     status="error",
@@ -791,7 +852,11 @@ def handle_connection(connection: Any, application: ServerApplication) -> None:
             exit_code=EXIT_GENERAL_ERROR,
         )
     except Exception as exc:
-        LOGGER.error("Connection failed: %s", type(exc).__name__)
+        _log_event(
+            logging.ERROR,
+            "connection_failed",
+            error_type=type(exc).__name__,
+        )
         response = error_response(
             request,
             status="error",
@@ -802,7 +867,7 @@ def handle_connection(connection: Any, application: ServerApplication) -> None:
     try:
         send_message(connection, response)
     except (OSError, ProtocolError):
-        LOGGER.warning("Could not send a protocol response.")
+        _log_event(logging.WARNING, "protocol_response_send_failed")
     finally:
         try:
             connection.close()
@@ -818,7 +883,7 @@ def _accept_connections(
     while not stop_event.is_set():
         try:
             connection = listener.accept()
-        except (OSError, EOFError):
+        except (OSError, EOFError, AuthenticationError):
             # A client can abandon a Windows pipe while the authentication
             # handshake is pending. That connection must not permanently kill
             # the accept loop; a closed listener is paired with stop_event and
@@ -860,8 +925,8 @@ def serve_forever(
     )
     try:
         record = guard.acquire()
-    except AlreadyRunningError as exc:
-        LOGGER.warning("Duplicate server start refused: %s", exc)
+    except AlreadyRunningError:
+        _log_event(logging.WARNING, "duplicate_server_start_refused")
         return EXIT_GENERAL_ERROR
 
     stop_event = threading.Event()
@@ -895,7 +960,7 @@ def serve_forever(
     try:
         listener = listener_factory(address, AUTHKEY)
         state.transition("running")
-        LOGGER.info("Local server started.")
+        _log_event(logging.INFO, "server_started")
         connections: queue.Queue[Any] = queue.Queue(
             maxsize=MAX_PENDING_CONNECTIONS
         )
@@ -942,7 +1007,11 @@ def serve_forever(
         return EXIT_SUCCESS
     except Exception as exc:
         state.transition("error", error=f"{type(exc).__name__}: {exc}")
-        LOGGER.error("Server stopped unexpectedly: %s", type(exc).__name__)
+        _log_event(
+            logging.ERROR,
+            "server_stopped_unexpectedly",
+            error_type=type(exc).__name__,
+        )
         return EXIT_GENERAL_ERROR
     finally:
         stop_event.set()
@@ -964,7 +1033,7 @@ def serve_forever(
                 signal.signal(signum, handler)
             except (OSError, ValueError):
                 pass
-        LOGGER.info("Local server exited.")
+        _log_event(logging.INFO, "server_exited")
         for handler in list(LOGGER.handlers):
             LOGGER.removeHandler(handler)
             handler.close()

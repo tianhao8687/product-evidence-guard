@@ -106,7 +106,7 @@ stateDiagram-v2
     shutdown --> [*]
 ```
 
-状态机和并发状态请求已在 Windows 公开入口验证；最终 246 项回归覆盖 authkey
+状态机和并发状态请求已在 Windows 公开入口验证；最终 263 项回归覆盖 authkey
 不匹配、崩溃恢复、重复启动和 timeout。独立拒绝服务、进程冒充与渗透测试仍未
 完成。
 
@@ -341,7 +341,7 @@ AUTO 公开入口记录仍应在最终证据包中保留。官方兼容边界见
 
 | 领域 | 状态 | 证据或缺口 |
 |---|---|---|
-| 确定性解析、规则、归一、graph、报告、增量缓存 | **已验证** | 2026-08-05 D 盘正式目录回归 246 项通过，85.123 s，0 跳过；Windows 完整 JSON smoke 通过 |
+| 确定性解析、规则、归一、graph、报告、增量缓存 | **已验证** | 2026-08-05 D 盘正式目录回归 263 项通过，84.891 s，0 跳过；Windows 完整 JSON smoke 通过 |
 | 确认、拒绝、当前哈希导出、stale reconciliation | **已验证** | `tests/test.ps1` 经 `run.ps1`/Named Pipe 走通确定性 sidecar 闭环；真实 Qwen/Qoder 演示另列 |
 | 严格两步 Qwen 读取与输出 schema | **已验证** | CPU 冷/热真实图成功；扫描 PDF 和恶劣图片矩阵待测 |
 | 模型 snapshot、结构与 SHA-256 | **已验证** | revision `f3d0bc7` 已加载；26 payload 清单已生成但未签名；tiny Hub 中断续传 E2E 已通过，正式模型前后 26/26 哈希一致 |

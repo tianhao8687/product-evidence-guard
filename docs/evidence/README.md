@@ -51,9 +51,25 @@ observation-only mixed PDF 结果取代这三份旧基线，旧记录只保留�
   启动标记，模拟服务身份有效但 Named Pipe 不可达且状态为 error；测试后恢复
   runtime 快照，不加载模型、不使用商品正文。该记录不是拒绝服务、进程冒充或
   渗透测试。
-- `qoder-install-integrity-20260805.json`：本机只读复核 Qoder CLI 版本、Skill
+- `log-privacy-contract-20260805.json`：纯本地、无模型日志隐私合同回归。安装日志
+  不再保留完整命令、参数、第三方命令输出或仓库绝对路径；server 只写有界结构化
+  事件；client 不再把子进程 stdout/stderr 原样写入持久日志，并在下一次正式启动时
+  重置旧格式日志。当前两份旧格式本地日志也已在 reparse/hardlink 校验后原位脱敏；
+  记录包含受控正文、凭据和绝对路径哨兵的拒绝结果；不等同于独立隐私审计、渗透
+  测试或对业务报告/运行状态 JSON 的删除要求。
+- `qoder-install-integrity-20260805.json`：本机更新并复核 Qoder CLI 版本、Skill
   `Enabled` 状态、唯一用户级安装、项目/工作区无同名重复项、运行时桥接、6 个
   关键文件源码/安装 SHA-256 一致，以及安装副本 `run.ps1 status` 退出码 0。
   发布副本只使用 `%USERPROFILE%`、`%SKILL_ROOT%` 和
   `<prepared-project-root>` 占位符，不含主机绝对路径、账号或会话信息；该记录不
-  代表重新发送了 Qoder 云端消息，也不是商品分析或网络抓包证据。
+  本次更新复用既有本地运行时，没有下载、加载模型或发送 Qoder 云端消息；该记录
+  也不是商品分析或网络抓包证据。
+- `named-pipe-security-boundaries-20260805.json`：在随机独立 Windows Named Pipe 和
+  临时运行目录中执行的有限安全边界回归。错误 auth 被拒后服务可继续响应，
+  `1 MiB + 1` 的超限帧被关闭，24 路有限 `status` 并发全部成功；同时如实记录
+  同一用户可写运行状态时完整身份记录可被伪造，因此固定派生 authkey 和状态文件
+  不能抵御恶意同用户进程。该证据不等于完整 fuzz、持续 DoS 或渗透测试。
+- `remote-pr-snapshot-20260805.json`：通过公开 GitHub REST API 只读保存 Draft PR #1
+  的远端旧 head、两次成功运行中的 Linux/Windows job，以及 0 review、0 review
+  comment、0 issue comment。远端 head 与本地脱敏分支不一致，因此这份历史绿色不
+  证明当前本地提交的 CI，也不授权推送。

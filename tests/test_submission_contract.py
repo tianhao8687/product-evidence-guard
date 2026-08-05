@@ -64,6 +64,7 @@ class SubmissionContractTests(unittest.TestCase):
             "docs/COMPETITION_COMPLIANCE.md",
             "docs/DEMO_SCRIPT.md",
             "docs/ARTICLE_DRAFT.md",
+            "docs/PR_DESCRIPTION_DRAFT.md",
             "docs/SUBMISSION_CHECKLIST.md",
             "docs/LIMITATIONS.md",
             "docs/assets/qoder/01-skill-discovered.png",
@@ -84,6 +85,11 @@ class SubmissionContractTests(unittest.TestCase):
             "docs/evidence/network-tcp-observation-20260805.json",
             "docs/evidence/performance-network-validation-20260805.md",
             "docs/evidence/synthetic-benchmark-final-06f8360.json",
+            "docs/evidence/log-privacy-contract-20260805.json",
+            "docs/evidence/mermaid-static-audit-20260805.json",
+            "docs/evidence/named-pipe-security-boundaries-20260805.json",
+            "docs/evidence/qoder-install-integrity-20260805.json",
+            "docs/evidence/remote-pr-snapshot-20260805.json",
         )
         missing = [item for item in required if not (REPO_ROOT / item).is_file()]
         self.assertEqual(missing, [])

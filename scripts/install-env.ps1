@@ -42,13 +42,35 @@ $uvVerificationPath = Join-Path $uvDir 'verification.json'
 $venvPython = Join-Path $venvDir 'Scripts\python.exe'
 
 function Write-InstallLog {
-    param([string]$Message)
-    $line = "$(Get-Date -Format o) $Message"
+    param(
+        [string]$Message,
+        [switch]$Reset
+    )
+    $safeMessage = [string]$Message
+    if (-not [string]::IsNullOrWhiteSpace($repoRoot)) {
+        $safeMessage = $safeMessage.Replace($repoRoot, '<project-root>')
+    }
+    $safeMessage = [regex]::Replace(
+        $safeMessage,
+        '(?i)(token|password|secret|authorization|api[_-]?key)\s*[:=]\s*[^\s;]+',
+        '$1=<redacted>'
+    )
+    $safeMessage = [regex]::Replace(
+        $safeMessage,
+        '(?i)(?<![A-Za-z0-9])(?:[A-Z]:[\\/]|\\\\)[^\r\n]*',
+        '<local-path>'
+    )
+    $line = "$(Get-Date -Format o) $safeMessage"
     $safeLogPath = Assert-SafeManagedFile `
         -Path $logPath `
         -BoundaryRoot $repoRoot `
         -Context '安装日志'
-    Add-Content -LiteralPath $safeLogPath -Value $line -Encoding utf8
+    if ($Reset) {
+        Set-Content -LiteralPath $safeLogPath -Value $line -Encoding utf8
+    }
+    else {
+        Add-Content -LiteralPath $safeLogPath -Value $line -Encoding utf8
+    }
     [void](Assert-SafeManagedFile `
         -Path $safeLogPath `
         -BoundaryRoot $repoRoot `
@@ -60,7 +82,8 @@ function Invoke-Checked {
         [string]$FilePath,
         [string[]]$Arguments
     )
-    Write-InstallLog "RUN $FilePath $($Arguments -join ' ')"
+    $commandName = [System.IO.Path]::GetFileName($FilePath)
+    Write-InstallLog "RUN command=$commandName argument_count=$($Arguments.Count)"
     & $FilePath @Arguments
     if ($LASTEXITCODE -ne 0) {
         throw "Command failed with exit code ${LASTEXITCODE}: $FilePath"
@@ -81,11 +104,8 @@ function Invoke-QuietExitCode {
         $ErrorActionPreference = 'Continue'
         $commandOutput = & $FilePath @Arguments 2>&1
         $commandExitCode = $LASTEXITCODE
-        if ($null -ne $commandOutput) {
-            foreach ($line in @($commandOutput)) {
-                Write-InstallLog "CHECK $line"
-            }
-        }
+        $commandName = [System.IO.Path]::GetFileName($FilePath)
+        Write-InstallLog "CHECK command=$commandName exit_code=$commandExitCode"
         return $commandExitCode
     }
     finally {
@@ -407,7 +427,7 @@ if (-not (Test-Path -LiteralPath $requirementsLockPath -PathType Leaf)) {
 $env:UV_CACHE_DIR = $uvCacheDir
 
 Write-Host "正在准备 Product Evidence Guard 独立 Python $pythonVersion 环境……"
-Write-InstallLog "Install started. Repository=$repoRoot"
+Write-InstallLog "Install started. Python=$pythonVersion" -Reset
 
 $uvReady = $false
 if (Test-Path -LiteralPath $uvDir) {
@@ -455,7 +475,7 @@ if (-not $uvReady) {
     $url = "https://github.com/astral-sh/uv/releases/download/$uvVersion/$uvArchiveName"
     try {
         Write-Host "首次安装需要下载并校验 uv $uvVersion。"
-        Write-InstallLog "Downloading uv primary artifact from $url"
+        Write-InstallLog "Downloading verified uv artifact version=$uvVersion archive=$uvArchiveName"
         Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $archive
         $actualArchiveSha256 = (
             Get-FileHash -LiteralPath $archive -Algorithm SHA256
@@ -633,7 +653,7 @@ Invoke-Checked -FilePath $uvExe -Arguments @('python', 'install', $pythonVersion
 
 if ($Force -and (Test-Path -LiteralPath $venvDir)) {
     Write-Host '正在安全重建仓库内的 .venv……'
-    Write-InstallLog "Force rebuild requested for exact target $venvDir"
+    Write-InstallLog 'Force rebuild requested for managed virtual environment.'
     Remove-ExactManagedDirectory `
         -TargetPath $venvDir `
         -ExpectedPath (Join-Path $repoRoot '.venv') `

@@ -21,7 +21,7 @@
 - [x] 两步 reader 已接入主分析路径；
 - [x] 同一常驻 worker 的第二次请求记录 `model_reused=true`；
 - [x] 真实 4 图推理中 `status` 经 Named Pipe 在 0.438 秒内并发返回；
-- [x] 最终 D 盘正式目录回归 246 项通过（85.123 s，0 跳过），Windows 完整 JSON smoke 为
+- [x] 最终 D 盘正式目录回归 263 项通过（84.891 s，0 跳过），Windows 完整 JSON smoke 为
       `status=passed`；
 - [x] Windows PowerShell 5.1 `-Force` 干净安装与二次快速跳过已验证；
 - [x] commit `06f8360` 的 30 图、10 文档 synthetic CPU Benchmark 已完成；
@@ -468,7 +468,7 @@ Qwen 生成速度；计时后新增的 `observation-only` 窄白名单、低置�
 > 数字化。工具不替代授权来源、供应商确认或企业审批。它的价值是把散乱资料变成
 > 可追溯、可阻断、可确认、会随版本失效的事实链。
 
-本地最终 246 项回归可以展示；最新远端 CI 状态以 PR Actions 为准，不能在文档
+本地最终 263 项回归可以展示；最新远端 CI 状态以 PR Actions 为准，不能在文档
 中预先显示为已通过。
 Draft PR #1 可以展示；文章、ModelScope、视频和比赛链接只有真实发布后才能展示。
 

@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-08-05",
+  "repository_commit": "618036973caa923047ab6be4023dc6acb6b5afa1",
+  "scope": {
+    "markdown_files_scanned": 32,
+    "mermaid_block_count": 5,
+    "mermaid_file_count": 1
+  },
+  "blocks": [
+    {
+      "file": "docs/ARCHITECTURE.md",
+      "start_line": 41,
+      "declaration": "flowchart LR"
+    },
+    {
+      "file": "docs/ARCHITECTURE.md",
+      "start_line": 89,
+      "declaration": "stateDiagram-v2"
+    },
+    {
+      "file": "docs/ARCHITECTURE.md",
+      "start_line": 138,
+      "declaration": "flowchart TD"
+    },
+    {
+      "file": "docs/ARCHITECTURE.md",
+      "start_line": 222,
+      "declaration": "flowchart LR"
+    },
+    {
+      "file": "docs/ARCHITECTURE.md",
+      "start_line": 263,
+      "declaration": "flowchart TD"
+    }
+  ],
+  "static_checks": {
+    "fences_balanced": true,
+    "blocks_nonempty": true,
+    "supported_declarations": true,
+    "double_quotes_balanced": true,
+    "square_brackets_balanced": true,
+    "curly_braces_balanced": true,
+    "parentheses_balanced": true
+  },
+  "local_tooling": {
+    "chrome_installed": true,
+    "edge_installed": true,
+    "node_on_path": false,
+    "mermaid_cli_on_path": false,
+    "local_mermaid_javascript_found": false,
+    "renderer_used": null
+  },
+  "status": "passed_static_checks_only",
+  "claim_boundary": "All tracked Markdown Mermaid fences and basic structure were checked locally. No Mermaid parser or renderer was installed or downloaded, so this record is not proof that a Mermaid engine rendered the diagrams successfully. Chrome and Edge alone do not parse Mermaid source without the Mermaid JavaScript runtime. Render the five blocks in the GitHub PR preview or an approved preinstalled Mermaid renderer before marking visual rendering complete."
+}

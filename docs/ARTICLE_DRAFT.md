@@ -135,7 +135,7 @@ Pipe 发一问一答，父服务支持 `status/analyze/confirm/reject/export/shu
 
 最终离线工件加载/内层/外层为 3.6064/57.1824/61.895 秒；较早热请求加载 0 秒、
 单图 30.8367 秒且 `model_reused=true`。真实 4 图推理中，另一个 `status` 在
-0.438 秒返回 `running`。246 项回归覆盖 authkey、崩溃、重复启动和 timeout，但不是
+0.438 秒返回 `running`。263 项回归覆盖 authkey、崩溃、重复启动和 timeout，但不是
 渗透测试。
 
 模型先下载到 `<model>.partial`，校验 26 个运行文件、空文件和 LFS 指针，完整后
@@ -234,8 +234,8 @@ $ArtifactRoot = "<artifact-root>"
   --session-id "<session>"
 ```
 
-模型缓存后，三个离线/遥测环境变量下推理通过。最终回归 246 项通过
-（85.123 s，0 跳过），唯一入口的 sidecar 确认、拒绝、导出、重分析与 stale E2E
+模型缓存后，三个离线/遥测环境变量下推理通过。最终回归 263 项通过
+（84.891 s，0 跳过），唯一入口的 sidecar 确认、拒绝、导出、重分析与 stale E2E
 也通过；这不等于 Qwen/Qoder 证据。commit `5a4fad8` 的 CI 曾绿色；最新状态以
 [Draft PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1)
 的 GitHub Actions 为准，本文不预先声称其通过。
@@ -331,8 +331,9 @@ Hybrid AI 的关键是分责：模型读视觉，schema 约束生成，代码处
 > 当多份资料互相矛盾时，我们能否在本机建立一条可追溯、可解释、可确认、会随
 > 文件版本失效的商品事实链？
 
-真实图、synthetic Benchmark、离线变量、Qoder 调用和当前源目录 246 项回归均已
-验证；最终精确 ZIP 的 clean-room 也是 246 项（0 跳过；精确耗时见相邻验证记录）。独立抓包、完整截图/视频和
+真实图、synthetic Benchmark、离线变量、Qoder 调用和当前源目录 263 项回归均已
+验证；commit `6180369` 的历史精确 ZIP clean-room 为 246 项（0 跳过），当前源码新包
+仍须重建并以相邻验证记录为准。独立抓包、完整截图/视频和
 外部发布仍待完成；远端 CI 以 PR 为准。
 
 ---

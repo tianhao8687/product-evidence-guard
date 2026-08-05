@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "evidence_type": "named_pipe_security_boundaries",
+  "observed_on": "2026-08-05",
+  "environment": {
+    "platform": "Windows",
+    "transport": "AF_PIPE",
+    "runtime_scope": "isolated temporary directory",
+    "pipe_scope": "unique random test address",
+    "model_loaded": false,
+    "network_used": false,
+    "product_files_read": 0
+  },
+  "implementation_limits": {
+    "maximum_message_bytes": 1048576,
+    "maximum_pending_connections": 32,
+    "maximum_request_workers": 16
+  },
+  "results": {
+    "wrong_auth_independent_process": {
+      "attacker_process_count": 1,
+      "authentication_rejected": true,
+      "valid_status_succeeded_after_attempt": true,
+      "model_operation_requested": false
+    },
+    "oversized_message_independent_process": {
+      "attacker_process_count": 1,
+      "message_bytes_attempted": 1048577,
+      "message_exceeded_limit_by_bytes": 1,
+      "connection_closed_during_send": true,
+      "valid_status_succeeded_after_attempt": true,
+      "model_operation_requested": false
+    },
+    "bounded_concurrent_status_burst": {
+      "connection_count": 24,
+      "successful_status_count": 24,
+      "all_responses_valid": true,
+      "operation": "status",
+      "model_operation_requested": false
+    },
+    "same_user_live_identity_record_forgery": {
+      "harmless_independent_process_count": 1,
+      "exact_process_start_marker_used": true,
+      "expected_server_script_text_used": true,
+      "forged_record_accepted_as_current": true,
+      "process_alive_after_identity_check": true,
+      "process_terminated_during_test_cleanup": true,
+      "result": "known_limitation"
+    }
+  },
+  "coverage": {
+    "submission_checklist_479": "partial boundary evidence only; no XML or ZIP bomb, sustained resource exhaustion, full fuzzing, or denial-of-service campaign was performed",
+    "submission_checklist_482": "partial boundary evidence only; wrong auth, one oversized frame, a bounded status burst, and a harmless identity-record forgery were exercised; this is not a penetration test",
+    "security_conclusion": "The server recovered from the three bounded transport cases. The deterministic authkey and writable runtime identity files are not a security boundary against a malicious process running as the same user."
+  }
+}

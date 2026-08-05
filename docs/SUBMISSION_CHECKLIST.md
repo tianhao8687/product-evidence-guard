@@ -100,7 +100,7 @@ verification.json 位于归档外，避免归档身份自引用
 证据：
 
 ```text
-最终完整基线：tests/test.ps1 在 D 盘正式目录内部 unittest 246 项通过，85.123 s，
+最终完整基线：tests/test.ps1 在 D 盘正式目录内部 unittest 263 项通过，84.891 s，
 0 跳过
 公开入口：scripts/run.ps1 → Named Pipe sidecar E2E 覆盖 analyze、confirm（含理由）、
 reject（含理由）、export、修改来源、reanalyze 和 stale
@@ -275,7 +275,7 @@ PDF，并覆盖文件大小/数量、渲染像素和 partial PNG 清理；真实
 证据：
 
 ```text
-最终完整基线：D 盘正式目录 246 项通过，85.123 s，0 跳过
+最终完整基线：D 盘正式目录 263 项通过，84.891 s，0 跳过
 回归源码身份：最终 ZIP 内 manifest.json.commit；不在文档中预填
 ```
 
@@ -329,12 +329,12 @@ reanalyze → stale；stale candidate 重试按预期 exit 1
       边界，旧的单次速度没有重启模型复测。
 - [x] `tests/test.ps1` 存在。
 - [x] `tests/test-real-model.ps1` 存在且为 opt-in。
-- [x] 最终 D 盘正式目录 Python 回归 246 项通过，85.123 s，0 跳过。
+- [x] 最终 D 盘正式目录 Python 回归 263 项通过，84.891 s，0 跳过。
       脱敏机器摘要：`docs/evidence/final-local-regression-20260805.json`。
 - [x] `compileall` 通过。
 - [x] 确定性 demo smoke 通过。
 - [x] Windows PowerShell `tests/test.ps1` 最终完整基线中，内部 unittest
-      D 盘正式目录 246 项通过，85.123 s，0 跳过；完整业务 E2E JSON 通过。
+      D 盘正式目录 263 项通过，84.891 s，0 跳过；完整业务 E2E JSON 通过。
 - [x] 中文路径通过。
 - [x] 含空格路径通过。
 - [x] 缺 Python 环境、缺模型下载态、非法路径、stale 候选和 Pipe 通信错误均返回
@@ -343,7 +343,8 @@ reanalyze → stale；stale candidate 重试按预期 exit 1
 - [x] UTF-8 JSON stdout 通过；全部 stderr 失败路径审计另列。
 - [x] commit `5a4fad8` 的 Linux GitHub Actions 临时通过。
 - [x] commit `5a4fad8` 的 Windows GitHub Actions 临时通过。
-- [ ] PR Actions 中最新 Linux/Windows checks 已复核。
+- [x] 已只读复核远端 Draft PR #1 当前旧 head `4295ab8` 的最新 Linux/Windows
+      checks 均成功；该远端 head 不包含当前本地脱敏分支，推送后的新 CI 仍待复核。
 - [x] 当前普通 CI 不下载 8B 模型。
 - [x] 临时 CI commit 与 Draft PR 已记录。
 
@@ -354,7 +355,7 @@ PR Actions 为准，本文不预先声称其通过。
 证据：
 
 ```text
-最终完整基线：D 盘正式目录 246 项通过，85.123 s，0 跳过
+最终完整基线：D 盘正式目录 263 项通过，84.891 s，0 跳过
 Windows smoke：tests/test.ps1 status=passed；unit_tests、compileall、
 deterministic_smoke、incremental_reuse、public_business_e2e、json_reports、
 markdown_report、html_report、audit_jsonl、named_pipe_status、shutdown 均 passed；
@@ -468,7 +469,9 @@ dataset SHA-256：c96e95f2817b1c8f16a99952022e03f541d3a5fe89ee6db0f1d85ea01c76dc
 - [x] 模型和直接依赖 notices。
 - [x] 固定依赖列表中没有强 copyleft PDF renderer。
 - [x] pypdfium2/PDFium notice 义务已记录。
-- [ ] 日志已审计正文、模型 raw text、凭据和客户绝对路径。
+- [x] install/server/client 普通运行日志已审计并加固：当前旧日志脱敏后正文、模型
+      raw text、凭据和客户绝对路径均为 0 命中，未来写入由白名单事件和回归约束；
+      业务报告、确认审计和 runtime state JSON 按其独立业务合同保留。
 - [x] 已完成有限本地进程 TCP 状态采样；未观察到外部 TCP，且未扩大为零外连结论。
 - [ ] 依赖漏洞扫描。
 - [x] CycloneDX 1.5 SBOM 已生成；35/35 锁定 distribution 有版本、哈希和许可证元数据。
@@ -479,7 +482,10 @@ dataset SHA-256：c96e95f2817b1c8f16a99952022e03f541d3a5fe89ee6db0f1d85ea01c76dc
 - [ ] XML/ZIP bomb、持续资源耗尽、并发洪泛与完整 fuzz/渗透矩阵未执行。
 - [x] 输入发现、发布和 Qoder 的 symlink/junction/reparse-point/hardlink 防护测试。
 - [x] Named Pipe authkey 不匹配、崩溃、重复启动和 timeout 回归测试。
-- [ ] Named Pipe 独立进程冒充、拒绝服务或渗透测试。
+- [x] Named Pipe 已完成有限独立进程边界测试：错误 auth、`1 MiB + 1` 超限帧和
+      24 路有限状态并发后服务均可用；同时确认同用户完整身份记录可伪造并公开为
+      known limitation。
+- [ ] Named Pipe 持续拒绝服务、完整 fuzz 或渗透测试。
 - [x] 独立安全复核尚未执行，并已在限制与合规表中明确标注；此勾选不表示通过安全审计。
 
 证据：
@@ -488,7 +494,7 @@ dataset SHA-256：c96e95f2817b1c8f16a99952022e03f541d3a5fe89ee6db0f1d85ea01c76dc
 SBOM：CycloneDX 1.5，35/35 锁定 distribution 已覆盖
 notice bundle：实际 pypdfium2 wheel 的 19 份 PDFium/依赖 notices 已收集
 仍未完成：漏洞扫描、所有其他二进制传递依赖的完整许可证审计、模型 manifest 签名
-安全回归：最终 D 盘正式目录基线 246 项通过，85.123 s，0 跳过；
+安全回归：最终 D 盘正式目录基线 263 项通过，84.891 s，0 跳过；
 fuzz/XML bomb/渗透测试未完成
 ```
 
@@ -507,7 +513,9 @@ fuzz/XML bomb/渗透测试未完成
 - [x] `docs/LIMITATIONS.md`。
 - [x] `docs/NEXT_STEPS.md`。
 - [x] 所有本地 Markdown 链接都可解析；已由只读全库扫描复核，并纳入 `test_submission_contract`。
-- [ ] 所有 Mermaid 可渲染。
+- [x] 32 份发布 Markdown 中的 5 个 Mermaid 块已通过围栏、声明和括号平衡静态
+      审计。
+- [ ] 5 个 Mermaid 块已由真实 Mermaid 引擎逐图渲染确认。
 - [x] 除明确警告/历史说明外，没有旧 `.lingma` 安装指令。
 - [ ] 没有虚构模型、Qoder、离线、Benchmark、CI 或 PR 状态。
 - [ ] 日期、版本、命令、输出文件名和状态表一致。
@@ -520,10 +528,10 @@ fuzz/XML bomb/渗透测试未完成
 - [ ] Qoder 调用和本地设备证据可见。
 - [ ] 证据/冲突/确认/导出/stale 闭环可见。
 - [ ] 不含秘密、客户身份或私有绝对路径。
-- [ ] 字幕区分已实现、已验证和待完成。
+- [x] 3/5 分钟字幕稿明确区分已实现、已验证、限制和待完成；实际录屏仍待用户执行。
 - [ ] 视频链接已创建并测试权限。
-- [ ] 文章保留未完成占位，发布前从原始记录替换。
-- [x] 文章本地长度为 3,999 个 CJK 字符，Markdown、图片和本地链接已检查。
+- [x] 文章保留视频、发布状态等未完成占位，发布前须从原始记录替换。
+- [x] 文章本地长度为 3,995 个 CJK 字符，Markdown、图片和本地链接已检查。
 - [ ] ModelScope 研习社最终发布预览仍需在用户账号内确认。
 - [x] 文章包含命令、架构、失败、隐私、限制和复现步骤。
 - [ ] 文章通过用户账号发布。
@@ -562,16 +570,18 @@ release/local-product-evidence-guard-v1.0.0.zip
 - [x] ZIP 同目录 `.sha256` 作为整个归档的校验权威。
 - [x] ZIP 内容清单已由 `manifest.json` 核验并保留。
 - [x] SHA-256 已生成并独立重算复核。
-- [x] 最终干净 HEAD 的精确发布包完成 clean-room 解压、安装、完整测试和 smoke。
+- [ ] 当前 263 项源码对应的最终干净 HEAD 精确发布包完成 clean-room 解压、安装、
+      完整测试和 smoke；commit `6180369` 的历史包已完成，但不能替代新包。
 - [ ] 所有二进制传递依赖的完整第三方 license bundle 已包含；pypdfium2/PDFium 19 份 notices 已完成。
 
 证据：
 
 ```text
-最终精确 clean-room：使用 Python 3.11.13 和 36 个已安装包，模块从标准路径 ZIP
-的解压目录导入；246 项通过（0 跳过），compileall、确定性 smoke、
+历史精确 clean-room：使用 Python 3.11.13 和 36 个已安装包，模块从标准路径 ZIP
+的解压目录导入；commit `6180369` 的包 246 项通过（0 跳过），compileall、确定性 smoke、
 增量复用、Windows 业务 E2E、Named Pipe status/shutdown 均通过。标准路径 ZIP 的
-相邻 `.sha256` 和 `.verification.json` 保存归档哈希、manifest commit 与严格边界。
+相邻 `.sha256` 和 `.verification.json` 保存归档哈希、manifest commit 与严格边界；
+当前源码的新包待本地提交后重建并重复验证。
 ```
 
 ## 18. GitHub PR 与远端检查
@@ -639,7 +649,7 @@ Draft PR：https://github.com/tianhao8687/product-evidence-guard/pull/1
 | 离线环境变量下推理是否完成？ | 是；防火墙阻断/抓包网络审计未完成 |
 | Qoder 是否发现并执行 Skill？ | 是；CLI 已登录，中英文自动触发与手动触发成功，匿名业务闭环和真实图片调用均经安装副本固定入口完成 |
 | Benchmark 汇总是否链接原始记录？ | 是：synthetic run ID 与本地结果目录已记录 |
-| 本地与远端测试是否链接最终 commit？ | D 盘正式目录基线为 246 项/85.123 s，0 跳过，JSON 业务 E2E 通过；最新远端 CI 状态以 PR Actions 为准 |
+| 本地与远端测试是否链接最终 commit？ | D 盘正式目录基线为 263 项/84.891 s，0 跳过，JSON 业务 E2E 通过；远端旧 head 的 Linux/Windows 已通过，当前本地分支推送后的 CI 仍待复核 |
 | 发布包是否不含模型、数据、日志、秘密和输出？ | 是：最终标准路径 ZIP 经 allowlist、内容清单、Git blob、秘密/路径扫描与 exact clean-room 复核；相邻验证记录保存边界 |
 | 是否包含精确第三方 notices？ | pypdfium2/PDFium 的 19 份精确 notices 已包含并逐项校验；其他二进制传递依赖的完整许可证审计仍未完成 |
 | 所有剩余缺口是否对外可见？ | 是；以当前清单和合规表为准 |

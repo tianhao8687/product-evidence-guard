@@ -21,7 +21,7 @@
 
 | 能力 | 状态 | 已有证据 | 仍需完成 |
 |---|---|---|---|
-| 证据记录、单位归一、冲突图、报告、增量缓存 | **已验证** | 2026-08-05 D 盘正式目录回归 246 项通过，85.123 s，0 跳过 | 继续扩展恶意/边界语料 |
+| 证据记录、单位归一、冲突图、报告、增量缓存 | **已验证** | 2026-08-05 D 盘正式目录回归 263 项通过，84.891 s，0 跳过 | 继续扩展恶意/边界语料 |
 | confirm、reject、audit、当前哈希 export、stale | **已验证** | `run.ps1` → Named Pipe 的确定性 sidecar E2E 已覆盖；Qoder 真实图文分析已到人工安全门 | 用户亲自选择本轮真实图文 candidate ID/理由后补决定闭环 |
 | 严格两步 Qwen 输出 | **已验证** | 主图片路径完成真实 CPU 冷/热公开入口运行 | 无文字层 PDF、恶劣图片和批量验证 |
 | OCR 混合加速 | **已验证** | 8 张真实样本完成路由；清晰图 0.41 s，电池误读经 Qwen 修正 | 真实授权大样本与延迟分布 |
@@ -34,7 +34,7 @@
 | 离线环境变量推理 | **已验证** | 三个离线/遥测环境变量下推理成功；35 周期 TCP 状态采样未观察到外部 TCP | 防火墙、数据包、DNS 与 UDP 审计 |
 | Synthetic CPU Benchmark | **已验证** | commit `06f8360`；30 图、10 文档完成 | 真实授权数据与 Intel GPU 另行评测 |
 | Draft PR | **已验证** | [PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1) | 本地回归已通过；最新远端 CI 以 PR Actions 为准 |
-| 发布包 | **已验证** | 标准路径 ZIP、相邻 SHA-256 与 verification.json 已复核；精确 clean-room 246 项通过（0 跳过），业务 E2E 与 Pipe status/shutdown 通过 | 用户决定是否外部上传 |
+| 发布包 | **历史包已验证；新包待重建** | commit `6180369` 的标准路径 ZIP 与相邻验证记录已复核；当前 263 项源码的新包必须重建并执行精确 clean-room | 用户决定是否外部上传 |
 
 ## P0：完成可执行产品链
 
@@ -235,8 +235,8 @@ transcript；这两项外部实录仍需完成。
 每个结果必须记录日期、revision、命令、环境、退出码和原始日志。local pass 不是
 CI pass，测试文件存在也不是 pass。
 
-状态：**已验证**。2026-08-05 最终 D 盘正式目录 Python 回归 246 项通过
-（85.123 s，0 跳过）。
+状态：**已验证**。2026-08-05 最终 D 盘正式目录 Python 回归 263 项通过
+（84.891 s，0 跳过）。
 `tests/test.ps1` 还完成 `unit_tests`、中文空格、compileall、确定性、
 incremental reuse、Named Pipe status/shutdown，以及公开入口的
 `analyze → confirm/reject → export → 修改来源 → reanalyze → stale` 确定性
@@ -344,13 +344,14 @@ ZIP 必须包含源码、Skill 元数据、脚本、测试、匿名 demo、文�
 manifest 不包含对自身或 ZIP 的自引用哈希。当前脚本在内存中生成确定性
 `manifest.json`，列出干净 HEAD 的路径、mode、size 和 Git object；allowlist、
 必备 `requirements.lock`、排除项与
-symlink/junction/reparse point/hardlink 拒绝合同均已通过本地回归。最终标准路径 ZIP
-已从干净 HEAD 生成，相邻 `.sha256` 独立重算匹配；同一精确归档在 clean-room 中
-使用 Python 3.11.13 和 36 个已安装包，246 项通过（0 跳过），并完成
+symlink/junction/reparse point/hardlink 拒绝合同均已通过本地回归。commit `6180369`
+的历史标准路径 ZIP 已从干净 HEAD 生成，相邻 `.sha256` 独立重算匹配；同一历史
+归档在 clean-room 中使用 Python 3.11.13 和 36 个已安装包，246 项通过（0 跳过），并完成
 compileall、确定性 smoke、增量复用、业务 E2E、Named Pipe status 与 shutdown。
-归档外的相邻 `.verification.json` 保存归档哈希和验证边界，避免归档自引用。
+当前 263 项源码必须在最终提交后重建同名 ZIP 并重复 clean-room；归档外的相邻
+`.verification.json` 保存归档哈希和验证边界，避免归档自引用。
 
-状态：**已验证**。外部上传和发布仍需用户决定与平台账号。
+状态：**历史包已验证；当前源码的新包待重建**。外部上传和发布仍需用户决定与平台账号。
 
 ### 13. 完成外部比赛步骤
 

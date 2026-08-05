@@ -8,8 +8,8 @@
   },
   "unit_tests": {
     "status": "passed",
-    "count": 246,
-    "elapsed_seconds": 85.123,
+    "count": 263,
+    "elapsed_seconds": 84.891,
     "skipped": 0
   },
   "public_business_e2e": {
@@ -39,5 +39,5 @@
     "skipped": 0,
     "public_business_e2e": "passed"
   },
-  "scope_note": "The 246-test source run covers the current implementation, release packager, PDF/resource negative matrix, Qoder installation evidence, supply-chain evidence generators and public contracts. The clean-room block is historical evidence for package commit 2f10f53 and is not a claim about the next rebuilt archive."
+  "scope_note": "The 263-test source run covers the current implementation, release packager, PDF/resource negative matrix, Qoder installation evidence, log privacy, bounded Named Pipe security cases, remote PR evidence, submission materials, supply-chain evidence generators and public contracts. The clean-room block is historical evidence for package commit 2f10f53 and is not a claim about the next rebuilt archive."
 }

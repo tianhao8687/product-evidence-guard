@@ -62,6 +62,30 @@ DEFAULT_DOWNLOAD_POLL_INTERVAL = 1.0
 PENDING_ANALYSIS_NAME = "pending-analysis.json"
 MODEL_DOWNLOAD_SCRIPT = SCRIPT_DIR / "model_download.py"
 MODEL_DOWNLOAD_LOG_NAME = "model-download.log"
+_SAFE_RUNTIME_LOG_EVENTS = {
+    "model_download_worker_spawned",
+    "server_process_spawned",
+}
+
+
+def _write_safe_runtime_log_event(
+    path: Path,
+    event: str,
+    *,
+    replace: bool = False,
+) -> None:
+    """Persist one fixed event without child output, arguments or host paths."""
+
+    if event not in _SAFE_RUNTIME_LOG_EVENTS:
+        raise ValueError("Unsupported runtime log event.")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists() or path.is_symlink():
+        stat = path.lstat()
+        if path.is_symlink() or not path.is_file() or stat.st_nlink != 1:
+            raise RuntimeError("Refusing unsafe runtime log target.")
+    mode = "w" if replace else "a"
+    with path.open(mode, encoding="utf-8", newline="\n") as handle:
+        handle.write(f"{utc_now()} event={event}\n")
 
 
 class CliUsageError(ValueError):
@@ -195,13 +219,23 @@ def start_server_process(
     else:
         popen_options["start_new_session"] = True
     log_path = runtime_dir / SERVER_LOG_PATH.name
-    with log_path.open("ab", buffering=0) as log_handle:
-        process = subprocess.Popen(
-            command,
-            stdout=log_handle,
-            stderr=log_handle,
-            **popen_options,
+    # Older versions captured child stderr and may have retained host paths.
+    # Reset the bounded rotating family when starting the privacy-safe server.
+    for backup_index in (1, 2):
+        log_path.with_name(f"{log_path.name}.{backup_index}").unlink(
+            missing_ok=True
         )
+    _write_safe_runtime_log_event(
+        log_path,
+        "server_process_spawned",
+        replace=True,
+    )
+    process = subprocess.Popen(
+        command,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        **popen_options,
+    )
     return int(process.pid)
 
 
@@ -461,13 +495,20 @@ def start_model_download_process(
     else:
         popen_options["start_new_session"] = True
     log_path = runtime_dir / MODEL_DOWNLOAD_LOG_NAME
-    with log_path.open("ab", buffering=0) as log_handle:
-        process = subprocess.Popen(
-            command,
-            stdout=log_handle,
-            stderr=log_handle,
-            **popen_options,
-        )
+    # Third-party download progress and exception text may contain local paths
+    # or credentials. The structured state JSON remains the diagnostic source;
+    # the persistent log records only this fixed lifecycle event.
+    _write_safe_runtime_log_event(
+        log_path,
+        "model_download_worker_spawned",
+        replace=True,
+    )
+    process = subprocess.Popen(
+        command,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        **popen_options,
+    )
     return int(process.pid)
 
 

@@ -34,7 +34,7 @@ Qoder 仍只调用安装副本的 `scripts\run.ps1`，该入口复用已准备�
 [`evidence/qoder-install-integrity-20260805.json`](evidence/qoder-install-integrity-20260805.json)。
 
 安装器的 allowlist、必备文件、完整性、备份/回滚，以及
-symlink/junction/reparse point/hardlink 失败关闭合同已进入 246 项最终本地回归。
+symlink/junction/reparse point/hardlink 失败关闭合同已进入 263 项最终本地回归。
 这同时证明安装边界；真实图片、英文触发和公共入口下载续传均已补测，已有一张
 脱敏 IDE 截图，完整确认、导出与 stale 截图组见下文的诚实缺口。
 
@@ -284,7 +284,7 @@ token、个人账号细节或未脱敏的客户绝对路径。
 | 用户级安装 | **已验证** | 当前官方用户级目录 |
 | 项目级安装 | **未完成** | 未执行；不是用户级发现证据的必要条件 |
 | 最终安装完整性 | **已验证** | 脱敏 JSON 记录唯一安装、无重复项、运行时桥接、6 个关键文件哈希一致及安装副本 `status` 退出码 0 |
-| 安装器技术合同 | **已验证** | 必备 lock、完整性、运行时桥接、回滚与链接防护进入 246 项回归 |
+| 安装器技术合同 | **已验证** | 必备 lock、完整性、运行时桥接、回滚与链接防护进入 263 项回归 |
 | Skill 发现 | **已验证** | `skills list` 显示 `Enabled`；Qoder“用户级 → 技能”页也直接显示 `local-product-evidence-guard`，脱敏截图见 `docs/assets/qoder/01-skill-discovered.png` |
 | CLI 账号登录 | **已验证** | 2026-08-04 CLI 登录成功；不保存认证材料 |
 | 中文自动触发 | **已验证** | 无数据自然语言请求自动选择 Skill 并执行 `status` |

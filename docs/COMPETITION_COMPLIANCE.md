@@ -92,7 +92,7 @@
 | Windows 公开入口真实模型 analyze | **已验证** | 冷/热请求均成功并生成候选 |
 | 推理中 Named Pipe 并发响应 | **已验证** | 真实 4 图推理期间，`run.ps1 status` 经 Pipe 在 0.438 s 返回 `running` 和 `available_operations`，无 fallback 字段 |
 | Windows Named Pipe smoke | **已验证** | `tests/test.ps1` 的稳定 JSON、完整业务闭环、status 与 shutdown 通过 |
-| auth 不匹配、崩溃恢复、重复启动和 timeout | **已验证** | 最终 246 项本地回归覆盖 |
+| auth 不匹配、崩溃恢复、重复启动和 timeout | **已验证** | 最终 263 项本地回归覆盖 |
 | confirm/reject/export/stale 完整业务 E2E | **已验证** | `run.ps1`/Named Pipe 使用 deterministic sidecar 完成；真实 Qwen/Qoder 录屏另列 |
 | 模型跨多次请求复用 | **已验证** | 常驻 worker 热请求 `model_reused=true`、加载 0 s |
 
@@ -162,8 +162,8 @@
 | 确认、下载、协议、PDF 与报告测试文件 | **已完成** | 对应测试文件存在 |
 | `tests/test.ps1` | **已完成** | 文件存在；结果另行验证 |
 | `tests/test-real-model.ps1` | **已完成** | opt-in 脚本存在 |
-| 最终完整 Python 测试执行 | **已验证** | 2026-08-05 D 盘正式目录 246 项通过，85.123 s，0 跳过 |
-| Windows PowerShell smoke | **已验证** | 246 项、中文空格、compileall、deterministic、incremental、完整确认闭环、Pipe status/shutdown 通过；无效路径和旧候选退出码 1 |
+| 最终完整 Python 测试执行 | **已验证** | 2026-08-05 D 盘正式目录 263 项通过，84.891 s，0 跳过 |
+| Windows PowerShell smoke | **已验证** | 263 项、中文空格、compileall、deterministic、incremental、完整确认闭环、Pipe status/shutdown 通过；无效路径和旧候选退出码 1 |
 | Linux CI workflow | **已完成** | Ubuntu compile、unit、demo smoke 配置存在 |
 | Windows CI workflow | **已完成** | workflow 已配置 Windows PowerShell/Python 3.11 job |
 | commit `5a4fad8` 远端 GitHub Actions | **已验证** | 临时绿色 |
@@ -213,7 +213,7 @@
 | 发布 allowlist 与链接防护合同 | **已验证** | 包含必备 lock；排除模型/数据/日志；拒绝 reparse/hardlink |
 | 版本 ZIP 与 SHA-256 | **已验证** | 最终标准路径 ZIP 已生成，相邻 `.sha256` 独立重算匹配；相邻 verification.json 保存精确归档哈希与边界 |
 | 发布身份与校验权威 | **已验证** | ZIP 内 `manifest.json.commit`、manifest 列出的全部 Git 来源文件和 Git object 逐项核验，mismatch 0；验证记录位于归档外避免自引用 |
-| 干净目录解压 smoke | **已验证** | 最终精确 ZIP 在全新目录使用 Python 3.11.13 与 36 个已安装包；246 项、0 跳过，compileall、业务 E2E、Pipe status/shutdown 均通过；精确耗时见归档相邻 verification.json |
+| 干净目录解压 smoke | **历史包已验证；新包待重建** | commit `6180369` 的精确 ZIP 在全新目录使用 Python 3.11.13 与 36 个已安装包；246 项、0 跳过，compileall、业务 E2E、Pipe status/shutdown 均通过。当前 263 项源码的新 ZIP 必须重新执行同一验证，精确结果只写入归档相邻 verification.json |
 
 ## 11. 文档、文章、演示与外部提交
 
