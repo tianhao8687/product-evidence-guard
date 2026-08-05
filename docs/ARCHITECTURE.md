@@ -106,7 +106,7 @@ stateDiagram-v2
     shutdown --> [*]
 ```
 
-状态机和并发状态请求已在 Windows 公开入口验证；最终 263 项回归覆盖 authkey
+状态机和并发状态请求已在 Windows 公开入口验证；最终 265 项回归覆盖 authkey
 不匹配、崩溃恢复、重复启动和 timeout。独立拒绝服务、进程冒充与渗透测试仍未
 完成。
 
@@ -282,6 +282,13 @@ flowchart TD
 `confirmation-audit.jsonl` 记录决定及后续 stale。来源一旦改变，文件哈希和
 candidate identity 会变化，旧决定不能静默存活。
 
+真实图片＋受控文档结果已按这条边界完成一次本地决定闭环：用户确认真实标签重量，
+拒绝受控物流资料中的 `250g`；首次导出只有 1 条当前有效确认。源图哈希变化后，
+确认自动转为 stale，再次导出为 0 条并记录 stale 1，随后恢复源图。全过程只经过
+唯一公共入口，未调用模型、未发起需要联网的操作，也没有新的 Qoder 云端消息；
+本轮未做抓包。它验证状态机与用户决定
+落盘，不能替代完整 Qoder IDE 录屏。
+
 ## 增量分析
 
 `analysis-state.json` 保存 engine signature，以及按相对路径记录的文件哈希和
@@ -341,7 +348,7 @@ AUTO 公开入口记录仍应在最终证据包中保留。官方兼容边界见
 
 | 领域 | 状态 | 证据或缺口 |
 |---|---|---|
-| 确定性解析、规则、归一、graph、报告、增量缓存 | **已验证** | 2026-08-05 D 盘正式目录回归 263 项通过，178.084 s，0 跳过；Windows 完整 JSON smoke 通过 |
+| 确定性解析、规则、归一、graph、报告、增量缓存 | **已验证** | 2026-08-05 D 盘正式目录回归 265 项通过，90.594 s，0 跳过；Windows 完整 JSON smoke 通过 |
 | 确认、拒绝、当前哈希导出、stale reconciliation | **已验证** | `tests/test.ps1` 经 `run.ps1`/Named Pipe 走通确定性 sidecar 闭环；真实 Qwen/Qoder 演示另列 |
 | 严格两步 Qwen 读取与输出 schema | **已验证** | CPU 冷/热真实图成功；扫描 PDF 和恶劣图片矩阵待测 |
 | 模型 snapshot、结构与 SHA-256 | **已验证** | revision `f3d0bc7` 已加载；26 payload 清单已生成但未签名；tiny Hub 中断续传 E2E 已通过，正式模型前后 26/26 哈希一致 |
@@ -351,7 +358,7 @@ AUTO 公开入口记录仍应在最终证据包中保留。官方兼容边界见
 | 文档内视觉与原生图表 | **已验证** | 受控 DOCX/XLSX/PDF OCR fast、单次请求内跨文件视觉缓存和 semantic scope 通过；Raspberry Pi/TI mixed PDF 的文字层、ROI、OCR observations 通过；PDF 曲线完整数值点数字化不在当前能力内 |
 | 输入、发布与 Qoder 链接防护 | **已验证** | symlink/junction/reparse point/hardlink 失败关闭合同进入最终回归 |
 | Qoder Skill 发现 | **已验证** | CLI 1.1.8、用户级、`Enabled` |
-| Qoder 自动/手动调用 | **已验证（现有范围）** | 中英文自动/手动 `status`、获授权匿名 sidecar 业务闭环、真实图片及真实图＋受控文档冲突分析已通过；新一轮人工决定、完整 IDE 截图组和网络审计另列 |
+| Qoder 自动/手动调用 | **已验证（现有范围）** | 中英文自动/手动 `status`、获授权匿名 sidecar 业务闭环、真实图片及真实图＋受控文档冲突分析已通过；用户决定、首次有效导出和源图变化 stale 已由唯一公共入口本地完成，未调用模型、未发起需要联网的操作、无新的 Qoder 云端消息；本轮未做抓包；完整 IDE 录屏、复杂真实图片矩阵和网络审计另列 |
 | 离线环境变量推理 | **已验证** | 三个离线/遥测变量下成功；防火墙/抓包未执行 |
 | Synthetic CPU Benchmark | **已验证** | commit `06f8360`；30 图、10 文档完成；不等于真实业务准确率 |
 

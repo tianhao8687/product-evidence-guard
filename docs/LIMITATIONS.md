@@ -25,12 +25,12 @@ Product Evidence Guard 是证据辅助工具，不是权威商品信息系统。
 | 本地进程 TCP 状态采样 | **已验证** | 35 个约 100 ms 周期未观察到外部 TCP；不是数据包、DNS、UDP 或 air-gap 证明 |
 | 防火墙阻断或完整抓包审计 | **未完成** | 不能据有限采样声明零外连或 air-gapped |
 | Qoder CLI 安装与 Skill 发现 | **已验证** | CLI 1.1.8，用户级，`Enabled` |
-| Qoder 自动/手动触发与匿名业务闭环 | **已验证** | 中英文自动/手动触发、sidecar 分析/确认/拒绝/导出/stale、真实图片冷/热/缓存及真实图＋受控文档强冲突分析已通过；新一轮真实图文人工决定仍待用户操作 |
+| Qoder 自动/手动触发与匿名业务闭环 | **已验证** | 中英文自动/手动触发、sidecar 业务闭环、真实图片冷/热/缓存及真实图＋受控文档强冲突分析已通过；用户已确认真实标签重量、拒绝受控物流 `250g`，首次导出 1 条有效确认，源图哈希变化后导出 0 条且 stale 1，随后恢复源图。决定闭环只经唯一公共入口，未调用模型、未发起需要联网的操作、无新的 Qoder 云端消息；本轮未做抓包，完整 IDE 录屏仍未完成 |
 | Windows 公开模型 analyze | **已验证** | 最终工件 `status=passed`；外层 61.895 s，1 个 pending 候选 |
 | 4 图推理中 Named Pipe status | **已验证** | 0.438 s 返回 `running` 与 `available_operations`，无 fallback 字段 |
 | Windows Named Pipe 确定性商业工作流 | **已验证** | `tests/test.ps1` 经唯一入口走通 confirm/reject/export/源变更/stale；使用 sidecar，不代表真实 Qwen 或 Qoder |
 | Named Pipe 生命周期与认证回归 | **已验证** | status/shutdown、authkey 不匹配、崩溃、重复启动和超时已覆盖 |
-| 本地自动测试 | **已验证** | 2026-08-05 D 盘正式目录 263 项通过，178.084 s，0 跳过；Windows 完整业务闭环与 JSON smoke 通过 |
+| 本地自动测试 | **已验证** | 2026-08-05 D 盘正式目录 265 项通过，90.594 s，0 跳过；Windows 完整业务闭环与 JSON smoke 通过 |
 | 真实图加载、单图耗时和 CPU 进程内存 | **已验证** | 功能 smoke，不进入准确率统计 |
 | 一次同 worker 热调用 | **已验证** | 加载 0 s，单图 30.8367 s |
 | Synthetic CPU 工程 Benchmark | **已验证** | commit `06f8360`；30 图、10 文档、质量/冲突/增量指标完成 |

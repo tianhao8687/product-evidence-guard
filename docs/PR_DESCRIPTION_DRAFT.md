@@ -41,8 +41,8 @@ powershell -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .\te
 
 | 范围 | 结果 | 证据 |
 |---|---|---|
-| 当前 D 盘源码回归 | 263 项通过，178.084 s，0 跳过；Windows 业务 E2E 通过 | `docs/evidence/final-local-regression-20260805.json` |
-| 最终精确 ZIP clean-room | Python 3.11.13、36 个已安装包；263 项通过，0 跳过；精确 commit、SHA-256、测试与墙钟耗时见相邻记录 | `release/local-product-evidence-guard-v1.0.0.verification.json` |
+| 当前 D 盘源码回归 | 265 项通过，90.594 s，0 跳过；Windows 业务 E2E 通过 | `docs/evidence/final-local-regression-20260805.json` |
+| 最终精确 ZIP clean-room | Python 3.11.13、36 个已安装包；265 项通过，0 跳过；精确 commit、SHA-256、测试与墙钟耗时见相邻记录 | `release/local-product-evidence-guard-v1.0.0.verification.json` |
 | 编译与业务 smoke | `compileall`、确定性 smoke、增量复用、confirm/reject/export/stale、Pipe status/shutdown 全部通过 | 同上 verification JSON |
 
 最终发布包使用标准文件名 `local-product-evidence-guard-v1.0.0.zip`。包内模型数、
@@ -74,7 +74,11 @@ git diff --check
 |---|---|---|
 | 已验证 | Qoder CLI 1.1.8；用户级 Skill 为 `Enabled`；本地更新后的安装副本与源码 6 个关键文件 SHA-256 一致；`run.ps1 status` 退出码 0 | 更新复用现有运行时，没有下载、发送 Qoder 云端消息、读取商品文件或加载模型 |
 | 已验证 | 中英文自动触发、手动触发、匿名 sidecar 的 analyze/confirm/reject/export/stale，以及公开真实图片 Qwen 冷/热/缓存调用 | 确定性 sidecar 闭环不能冒充真实 Qwen 生成结果 |
-| 部分完成 | 已保留 Skill 发现页与 IDE 安全门两张脱敏截图 | 真实图片＋受控文档本轮 confirm/reject/export/stale 决定和完整录屏仍需用户操作 |
+| 已验证（本地决定闭环） | 用户已确认真实标签的重量候选，并拒绝受控物流资料中的 `250g` 候选；首次导出包含 1 条当前有效确认。源图哈希变化后旧确认自动转为 stale，再次导出为 0 条且记录 1 条 stale，随后已恢复源图 | 全过程只经过唯一公共入口；没有调用模型、没有发起需要联网的操作，也没有新的 Qoder 云端消息；本轮未做抓包，因此不能冒充一次新的 Qoder IDE 会话或独立断网审计 |
+| 部分完成 | 已保留 Skill 发现页与 IDE 安全门两张脱敏截图 | 上述决定闭环的完整 IDE 录屏、复杂真实图片矩阵和更完整网络审计仍未完成 |
+
+对应脱敏结构化证据：
+`docs/evidence/qoder-real-decision-closure-20260805.json`。
 
 ## 离线与网络边界
 
@@ -137,8 +141,9 @@ git diff --check
    数据。
 2. 推送最终分支后检查最新 Linux/Windows Actions；记录失败或绿色结果。
 3. 在 GitHub PR 预览中逐个检查 5 个 Mermaid 图，确认节点、中文、箭头和换行正确。
-4. 在 Qoder 中完成真实图片＋受控文档的用户决定、导出、来源变化与 stale 录屏；
-   截图前继续遮盖账号、绝对路径和样本正文。
+4. 在 Qoder 中补录已完成的真实图片＋受控文档决定、导出、来源变化与 stale 完整
+   IDE 过程；不能把本地决定重放写成新的 Qoder 云端调用，截图前继续遮盖账号、
+   绝对路径和样本正文。
 5. 录制并检查 3/5 分钟视频，确认字幕把“已验证”“限制”“待完成”分开。
 6. 用户本人登录 ModelScope，上传最终 ZIP/文章/视频链接并保存比赛提交成功页面。
 

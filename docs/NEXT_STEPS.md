@@ -21,8 +21,8 @@
 
 | 能力 | 状态 | 已有证据 | 仍需完成 |
 |---|---|---|---|
-| 证据记录、单位归一、冲突图、报告、增量缓存 | **已验证** | 2026-08-05 D 盘正式目录回归 263 项通过，178.084 s，0 跳过 | 继续扩展恶意/边界语料 |
-| confirm、reject、audit、当前哈希 export、stale | **已验证** | `run.ps1` → Named Pipe 的确定性 sidecar E2E 已覆盖；Qoder 真实图文分析已到人工安全门 | 用户亲自选择本轮真实图文 candidate ID/理由后补决定闭环 |
+| 证据记录、单位归一、冲突图、报告、增量缓存 | **已验证** | 2026-08-05 D 盘正式目录回归 265 项通过，90.594 s，0 跳过 | 继续扩展恶意/边界语料 |
+| confirm、reject、audit、当前哈希 export、stale | **已验证** | 用户已确认真实标签重量、拒绝受控物流 `250g`；首次导出 1 条有效确认，源图哈希变化后导出 0 条且 stale 1，随后恢复源图；全过程只经唯一公共入口 | 补完整 IDE 录屏；本次闭环未调用模型、未发起需要联网的操作、无新的 Qoder 云端调用，本轮未做抓包 |
 | 严格两步 Qwen 输出 | **已验证** | 主图片路径完成真实 CPU 冷/热公开入口运行 | 无文字层 PDF、恶劣图片和批量验证 |
 | OCR 混合加速 | **已验证** | 8 张真实样本完成路由；清晰图 0.41 s，电池误读经 Qwen 修正 | 真实授权大样本与延迟分布 |
 | 真实 PDF/DOCX/XLSX | **已验证** | 4 份官方公开文档全部解析；修复后 3 条 pending、0 阻断；缓存未命中/增量 0.6907/0.0272 s | 建立逐字段标注集、逐行产品 schema 与标题召回 |
@@ -30,11 +30,11 @@
 | 环境安装 | **已验证** | PS 5.1 `-Force` 干净重建；35 个 hash-locked 包、36 个已安装包兼容；CycloneDX 1.5 SBOM 与 35 包许可证元数据完成 | 漏洞扫描与完整二进制许可证审计 |
 | 模型下载器 | **已验证** | tiny Hub 真实 partial→后台→exit 3→`--continue`→原子提升；正式 8B 前后 26/26 哈希一致 | 大模型真实断网重连不重复演练 |
 | 扫描 PDF | **已完成** | 页面渲染、硬上限和 300 秒阶段心跳已接入；真实文字层 PDF 已验证 | 无文字层真实 PDF 与畸形压力测试 |
-| Qoder Skill 与匿名业务闭环 | **已验证** | CLI 1.1.8，中英文自动/手动触发、sidecar 业务闭环、真实图片冷/热/缓存、真实图文强冲突、公共入口下载续传及 1 张脱敏 IDE 截图 | 本轮人工决定、完整截图组与网络审计 |
+| Qoder Skill 与匿名业务闭环 | **已验证** | CLI 1.1.8，中英文自动/手动触发、sidecar 业务闭环、真实图片冷/热/缓存、真实图文强冲突；用户决定及哈希变化 stale 已经唯一公共入口完成 | 完整 IDE 录屏、复杂真实图片矩阵与网络审计；本次决定闭环不是新的 Qoder 云端消息 |
 | 离线环境变量推理 | **已验证** | 三个离线/遥测环境变量下推理成功；35 周期 TCP 状态采样未观察到外部 TCP | 防火墙、数据包、DNS 与 UDP 审计 |
 | Synthetic CPU Benchmark | **已验证** | commit `06f8360`；30 图、10 文档完成 | 真实授权数据与 Intel GPU 另行评测 |
 | Draft PR | **已验证** | [PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1) | 本地回归已通过；最新远端 CI 以 PR Actions 为准 |
-| 发布包 | **已验证** | 最新标准路径 ZIP、相邻 SHA-256 与 verification.json 已复核；精确 clean-room 263 项通过（0 跳过），业务 E2E 与 Pipe status/shutdown 通过 | 用户决定是否外部上传 |
+| 发布包 | **已验证** | 最新标准路径 ZIP、相邻 SHA-256 与 verification.json 已复核；精确 clean-room 265 项通过（0 跳过），业务 E2E 与 Pipe status/shutdown 通过 | 用户决定是否外部上传 |
 
 ## P0：完成可执行产品链
 
@@ -97,7 +97,11 @@ sidecar 业务 E2E。该记录验证的是公开命令与状态机，不是一�
 状态：**已验证**。真实模型、模型复用、推理中 Pipe 状态、生命周期与认证回归已
 验证；确定性 sidecar 的确认、拒绝、导出、重分析和 stale 公开路径 E2E 也已
 通过。Qoder 匿名 sidecar 业务实录、真实图片 Qwen 会话和真实图＋受控文档强冲突
-分析已完成；本轮人工决定与独立安全测试仍未完成。
+分析已完成。用户随后确认真实标签重量并拒绝受控物流 `250g`；首次导出 1 条有效
+确认，源图哈希变化后确认自动 stale、导出 0 条且 stale 1，之后恢复源图。该闭环
+只经过唯一公共入口，未调用模型、未发起需要联网的操作，也没有新的 Qoder 云端消息；
+本轮未做抓包；完整 IDE 录屏、
+复杂真实图片矩阵与独立安全测试仍未完成。
 
 ### 3. 验证并加固混合视觉与两步 Qwen 深度路径
 
@@ -213,11 +217,14 @@ Working Set 约 10.83 GiB、Private Bytes 约 6.96 GiB。完整样本集、Intel
 
 完成标准：保留命令 transcript 和脱敏输出工件。
 
-状态：**已验证（确定性 sidecar）**。`tests/test.ps1` 已经由
+状态：**已验证（确定性 sidecar 与本地用户决定）**。`tests/test.ps1` 已经由
 `scripts/run.ps1` → Named Pipe 完成 `analyze → confirm/reject → export →
 修改来源 → reanalyze → stale`，并验证报告、审计记录、当前事实导出以及旧候选
-失败。该记录不使用真实 Qwen 输出，也不能替代 Qoder 登录后的真实业务
-transcript；这两项外部实录仍需完成。
+失败。在真实图片＋受控文档结果上，用户确认真实标签重量、拒绝受控物流 `250g`；
+首次导出保留 1 条有效确认，源图哈希变化后导出 0 条且 stale 1，随后恢复源图。
+这一轮只使用唯一公共入口，未调用模型、未发起需要联网的操作，也没有新的 Qoder
+云端消息；本轮未做抓包，不能替代
+完整 Qoder IDE 录屏；复杂真实图片矩阵与更完整网络审计也仍需完成。
 
 ## P2：测试、测量与宿主验证
 
@@ -235,8 +242,8 @@ transcript；这两项外部实录仍需完成。
 每个结果必须记录日期、revision、命令、环境、退出码和原始日志。local pass 不是
 CI pass，测试文件存在也不是 pass。
 
-状态：**已验证**。2026-08-05 最终 D 盘正式目录 Python 回归 263 项通过
-（178.084 s，0 跳过）。
+状态：**已验证**。2026-08-05 最终 D 盘正式目录 Python 回归 265 项通过
+（90.594 s，0 跳过）。
 `tests/test.ps1` 还完成 `unit_tests`、中文空格、compileall、确定性、
 incremental reuse、Named Pipe status/shutdown，以及公开入口的
 `analyze → confirm/reject → export → 修改来源 → reanalyze → stale` 确定性
@@ -346,7 +353,7 @@ manifest 不包含对自身或 ZIP 的自引用哈希。当前脚本在内存中
 必备 `requirements.lock`、排除项与
 symlink/junction/reparse point/hardlink 拒绝合同均已通过本地回归。最新标准路径 ZIP
 已从干净 HEAD 生成，相邻 `.sha256` 独立重算匹配；同一精确归档在 clean-room 中
-使用 Python 3.11.13 和 36 个已安装包，263 项通过（0 跳过），并完成
+使用 Python 3.11.13 和 36 个已安装包，265 项通过（0 跳过），并完成
 compileall、确定性 smoke、增量复用、业务 E2E、Named Pipe status 与 shutdown。
 归档外的相邻 `.verification.json` 保存归档哈希和验证边界，避免归档自引用；任何
 后续源码变更都必须重建同名 ZIP 并重复 clean-room。

@@ -28,10 +28,10 @@ Qoder 自然语言请求成功触发已安装 Skill。真实图片路线为
 RapidOCR/PP-OCRv6-small-OpenVINO 与
 OpenVINO/Qwen3-VL-8B-Instruct-int4-ov，设备为 CPU。
 
-| candidate ID | 原文 | 原始值 | 归一结果 | 状态 |
-|---|---|---|---|---|
-| `41b05e135b222dc7a146` | `NET WEIGHT 8OZ` | `8OZ` | `226.796185 g` | `pending` |
-| `8bed489d503cf4eb6cb8` | `NET WT 8.0oz (0.501b)` | `8.0oz (0.501b)` | `226.796185 g` | `pending` |
+| 原文 | 原始值 | 归一结果 | 状态 |
+|---|---|---|---|
+| `NET WEIGHT 8OZ` | `8OZ` | `226.796185 g` | `pending` |
+| `NET WT 8.0oz (0.501b)` | `8.0oz (0.501b)` | `226.796185 g` | `pending` |
 
 两个候选归一后相等，分组为 `converted_match/pass`；阻断冲突为 0。系统没有把模型
 自报分数当成正确率，也没有越过人工确认门。

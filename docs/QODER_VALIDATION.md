@@ -34,7 +34,7 @@ Qoder 仍只调用安装副本的 `scripts\run.ps1`，该入口复用已准备�
 [`evidence/qoder-install-integrity-20260805.json`](evidence/qoder-install-integrity-20260805.json)。
 
 安装器的 allowlist、必备文件、完整性、备份/回滚，以及
-symlink/junction/reparse point/hardlink 失败关闭合同已进入 263 项最终本地回归。
+symlink/junction/reparse point/hardlink 失败关闭合同已进入 265 项最终本地回归。
 这同时证明安装边界；真实图片、英文触发和公共入口下载续传均已补测，已有一张
 脱敏 IDE 截图，完整确认、导出与 stale 截图组见下文的诚实缺口。
 
@@ -186,6 +186,14 @@ Qoder IDE 文档建议重启 IDE，然后输入 `/` 检查已加载 Skills。
 [`assets/qoder/2026-08-05-english-auto-trigger.md`](assets/qoder/2026-08-05-english-auto-trigger.md)。
 真实图片与受控文档强冲突证据见
 [`assets/qoder/2026-08-05-real-image-controlled-documents.md`](assets/qoder/2026-08-05-real-image-controlled-documents.md)。
+脱敏的决定、导出与来源失效结构化记录见
+[`evidence/qoder-real-decision-closure-20260805.json`](evidence/qoder-real-decision-closure-20260805.json)。
+该真实图文样本随后已由用户完成决定闭环：确认与受控规格换算一致的标签重量，拒绝
+冲突的受控物流重量；第一次导出为 confirmed 1、stale 0，源图字节变化后第二次
+导出为 confirmed 0、stale 1，测试后源图恢复原哈希。决定、导出和 stale 检查均
+只经过 `scripts/run.ps1`，没有调用模型、没有发起需要联网的操作，也没有发送新的
+Qoder 云端消息；本轮未做抓包。完整录屏仍未完成，不能把这份本地公共入口证据描述
+为新的 Qoder 云端决定会话或独立断网审计。
 首张已脱敏的 Qoder IDE 分析与人工确认安全门画面见
 [`assets/qoder/04-analysis-summary-redacted.png`](assets/qoder/04-analysis-summary-redacted.png)；截图已裁掉
 账号侧栏。该图展示的是匿名 demo sidecar 与宿主安全门，不是真实图片 Qwen3-VL
@@ -284,7 +292,7 @@ token、个人账号细节或未脱敏的客户绝对路径。
 | 用户级安装 | **已验证** | 当前官方用户级目录 |
 | 项目级安装 | **未完成** | 未执行；不是用户级发现证据的必要条件 |
 | 最终安装完整性 | **已验证** | 脱敏 JSON 记录唯一安装、无重复项、运行时桥接、6 个关键文件哈希一致及安装副本 `status` 退出码 0 |
-| 安装器技术合同 | **已验证** | 必备 lock、完整性、运行时桥接、回滚与链接防护进入 263 项回归 |
+| 安装器技术合同 | **已验证** | 必备 lock、完整性、运行时桥接、回滚与链接防护进入 265 项回归 |
 | Skill 发现 | **已验证** | `skills list` 显示 `Enabled`；Qoder“用户级 → 技能”页也直接显示 `local-product-evidence-guard`，脱敏截图见 `docs/assets/qoder/01-skill-discovered.png` |
 | CLI 账号登录 | **已验证** | 2026-08-04 CLI 登录成功；不保存认证材料 |
 | 中文自动触发 | **已验证** | 无数据自然语言请求自动选择 Skill 并执行 `status` |
@@ -296,7 +304,7 @@ token、个人账号细节或未脱敏的客户绝对路径。
 | 增量与 stale | **已验证（匿名 sidecar）** | 只重算 `说明书.txt`，复用另外两份文件；confirmed 1→0、stale 0→1 |
 | UTF-8 与中文路径 | **已验证（匿名 sidecar）** | 中文文件名、理由、报告和稳定 JSON 无乱码 |
 | Qoder 真实图片 Qwen 工作流 | **已验证** | 真实公开领域标签图；冷/热/缓存三轮退出码 0，候选保持 pending |
-| Qoder 真实图片＋受控文档冲突 | **待用户操作** | 分析已验证：4 candidates、1 个 strong/block、0 errors；用户尚未对本轮 ID 作决定 |
+| Qoder 真实图片＋受控文档冲突 | **已验证（决定阶段走本地公共入口）** | 分析为 4 candidates、1 个 strong/block、0 errors；用户确认一致标签重量、拒绝冲突物流重量，首次导出 confirmed 1/stale 0，源图哈希变化后导出 confirmed 0/stale 1；决定阶段未调用模型、未发起需要联网的操作、无新 Qoder 云端消息，本轮未做抓包 |
 | 模型常驻与增量缓存 | **已验证** | 26.7585 s 冷分析、11.9164 s 热模型重识图、0.0177 s 文件复用 |
 | 无云端 OCR/VLM 回退 | **部分验证** | 本地后端与路由证据完整；仍缺独立网络抓包/断网观察 |
 | 脱敏 transcript | **已验证** | status 与业务闭环文字证据已保存 |
@@ -304,8 +312,9 @@ token、个人账号细节或未脱敏的客户绝对路径。
 
 当前可以表述为“Qoder CLI 1.1.8 已通过中英文自动触发和手动触发本 Skill，匿名
 sidecar 业务闭环、真实图片 Qwen3-VL/OpenVINO 冷/热/缓存、真实图＋受控文档强
-冲突分析和公共入口下载续传验证通过，并已有一张脱敏 Qoder IDE 结果截图”。本轮
-真实图文决定闭环仍等待用户，不能扩大成“完整 IDE 截图组或独立断网审计已经通过”。
+冲突分析、用户决定后的本地公共入口导出/stale 闭环和公共入口下载续传验证通过，
+并已有脱敏 Qoder 截图”。决定阶段没有新 Qoder 云端消息；完整 IDE 截图组、完整
+录屏和独立断网审计仍未完成，不能扩大描述。
 
 补充复测：Qoder CLI query 必须放在 `--` 分隔符后，避免提示词内的
 `--output`/`--deterministic-only` 被 CLI 参数解析吞掉。采用该语法后，显式输出

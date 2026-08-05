@@ -21,7 +21,7 @@
 | 文件夹级多来源工作流 | **已完成** | 发现、解析、分组和报告链路存在 |
 | 证据优先，而不是通用总结 | **已完成** | 使用 `SourceBlock → FactCandidate → FactGroup` |
 | 人工决定后才形成正式事实 | **已完成** | 确认状态与当前哈希导出代码存在 |
-| 真实图片完整商业演示 | **待用户操作** | Qoder 真实图＋受控文档已形成 4 candidates、1 个 strong/block、0 errors；confirm/reject/export/stale 按安全合同等待用户亲自选择 ID 和理由 |
+| 真实图片完整商业演示 | **已验证（流程；录屏待用户）** | 真实图＋受控文档形成 4 candidates、1 个 strong/block、0 errors；用户确认一致标签重量、拒绝冲突物流重量，首次导出 confirmed 1/stale 0，源图哈希变化后导出 confirmed 0/stale 1；决定阶段未调用模型、未发起需要联网的操作、无新 Qoder 云端消息，本轮未做抓包 |
 | 真实客户数据集评测 | **待用户操作** | 需要授权且匿名的商品资料 |
 | 不承诺比赛入选或监管合规 | **已完成** | `LIMITATIONS.md` 明确排除保证 |
 
@@ -71,7 +71,7 @@
 | Qoder 只调用 `scripts\run.ps1` | **已验证** | 匿名 sidecar 范围：status/analyze/confirm/reject/export 均观察到唯一入口 |
 | Qoder 确认、拒绝、导出和 stale | **已验证** | 匿名 sidecar 范围：人工 ID/理由、安全拦截、前后两次 export 与 stale 均有脱敏证据 |
 | Qoder 真实图片 Qwen 工作流 | **已验证** | 公开领域标签图冷/热/缓存三轮退出码 0；真实 Qwen 路线，候选保持 pending |
-| Qoder 真实图片＋受控文档冲突 | **待用户操作** | 分析已验证：4 candidates、1 个 strong/block、0 errors；热模型 15.141 s、文件复查 0.0241 s；决定闭环等待用户 |
+| Qoder 真实图片＋受控文档冲突 | **已验证（决定阶段走本地公共入口）** | 分析为 4 candidates、1 个 strong/block、0 errors；用户决定、两次导出和源图哈希变化后的 stale 闭环通过，随后恢复原哈希；热模型 15.141 s、文件复查 0.0241 s；决定阶段未调用模型、未发起需要联网的操作、无新 Qoder 云端消息，本轮未做抓包 |
 | Qoder 模型常驻与缓存 | **已验证** | 冷分析 26.7585 s、常驻热模型重新识图 11.9164 s、未变化文件复查 0.0177 s |
 | Qoder 下载/续传 | **已验证** | 公共入口范围：tiny Hub 真实 partial、exit 3、后台继续与第二次 `--continue` exit 0；更新后安装副本由 Qoder 宿主 status exit 0 |
 | Qoder UTF-8 与本地视觉后端 | **已验证** | 中文路径/理由无乱码；真实图记录本地 RapidOCR/OpenVINO Qwen 后端与 CPU 设备 |
@@ -92,8 +92,8 @@
 | Windows 公开入口真实模型 analyze | **已验证** | 冷/热请求均成功并生成候选 |
 | 推理中 Named Pipe 并发响应 | **已验证** | 真实 4 图推理期间，`run.ps1 status` 经 Pipe 在 0.438 s 返回 `running` 和 `available_operations`，无 fallback 字段 |
 | Windows Named Pipe smoke | **已验证** | `tests/test.ps1` 的稳定 JSON、完整业务闭环、status 与 shutdown 通过 |
-| auth 不匹配、崩溃恢复、重复启动和 timeout | **已验证** | 最终 263 项本地回归覆盖 |
-| confirm/reject/export/stale 完整业务 E2E | **已验证** | `run.ps1`/Named Pipe 使用 deterministic sidecar 完成；真实 Qwen/Qoder 录屏另列 |
+| auth 不匹配、崩溃恢复、重复启动和 timeout | **已验证** | 最终 265 项本地回归覆盖 |
+| confirm/reject/export/stale 完整业务 E2E | **已验证** | `run.ps1`/Named Pipe 的 deterministic sidecar 闭环已通过；真实标签＋受控文档也完成用户决定、导出 1→0 与 stale 0→1 的本地公共入口闭环，完整 Qoder 录屏另列 |
 | 模型跨多次请求复用 | **已验证** | 常驻 worker 热请求 `model_reused=true`、加载 0 s |
 
 ## 5. 环境与模型获取
@@ -162,8 +162,8 @@
 | 确认、下载、协议、PDF 与报告测试文件 | **已完成** | 对应测试文件存在 |
 | `tests/test.ps1` | **已完成** | 文件存在；结果另行验证 |
 | `tests/test-real-model.ps1` | **已完成** | opt-in 脚本存在 |
-| 最终完整 Python 测试执行 | **已验证** | 2026-08-05 D 盘正式目录 263 项通过，178.084 s，0 跳过 |
-| Windows PowerShell smoke | **已验证** | 263 项、中文空格、compileall、deterministic、incremental、完整确认闭环、Pipe status/shutdown 通过；无效路径和旧候选退出码 1 |
+| 最终完整 Python 测试执行 | **已验证** | 2026-08-05 D 盘正式目录 265 项通过，90.594 s，0 跳过 |
+| Windows PowerShell smoke | **已验证** | 265 项、中文空格、compileall、deterministic、incremental、完整确认闭环、Pipe status/shutdown 通过；无效路径和旧候选退出码 1 |
 | Linux CI workflow | **已完成** | Ubuntu compile、unit、demo smoke 配置存在 |
 | Windows CI workflow | **已完成** | workflow 已配置 Windows PowerShell/Python 3.11 job |
 | commit `5a4fad8` 远端 GitHub Actions | **已验证** | 临时绿色 |
@@ -213,7 +213,7 @@
 | 发布 allowlist 与链接防护合同 | **已验证** | 包含必备 lock；排除模型/数据/日志；拒绝 reparse/hardlink |
 | 版本 ZIP 与 SHA-256 | **已验证** | 最终标准路径 ZIP 已生成，相邻 `.sha256` 独立重算匹配；相邻 verification.json 保存精确归档哈希与边界 |
 | 发布身份与校验权威 | **已验证** | ZIP 内 `manifest.json.commit`、manifest 列出的全部 Git 来源文件和 Git object 逐项核验，mismatch 0；验证记录位于归档外避免自引用 |
-| 干净目录解压 smoke | **已验证** | 最新标准路径 ZIP 在全新目录使用 Python 3.11.13 与 36 个已安装包；263 项、0 跳过，compileall、业务 E2E、Pipe status/shutdown 均通过。精确 commit、SHA-256 与耗时只写入归档相邻 verification.json，避免归档自引用 |
+| 干净目录解压 smoke | **已验证** | 最新标准路径 ZIP 在全新目录使用 Python 3.11.13 与 36 个已安装包；265 项、0 跳过，compileall、业务 E2E、Pipe status/shutdown 均通过。精确 commit、SHA-256 与耗时只写入归档相邻 verification.json，避免归档自引用 |
 
 ## 11. 文档、文章、演示与外部提交
 
@@ -227,7 +227,7 @@
 | 中文技术文章草稿 | **已完成** | `ARTICLE_DRAFT.md`；未完成项保留占位 |
 | 提交清单 | **已完成** | `SUBMISSION_CHECKLIST.md` |
 | 演示视频 | **待用户操作** | 需要录制并发布 |
-| Qoder 截图 | **未完成** | 已保存 1 张脱敏 IDE 分析/安全门画面；完整确认、导出与 stale 截图组仍待录制 |
+| Qoder 截图 | **未完成** | 已保存 Skill 发现页和脱敏 IDE 分析/安全门画面；真实图文确认、导出与 stale 完整截图组仍待录制 |
 | 技术文章发布 | **待用户操作** | 需要平台账号和发布决定 |
 | ModelScope Skill 发布 | **待用户操作** | 需要平台账号和发布决定 |
 | 比赛标签和最终 URL | **待用户操作** | 外部发布/提交 |
@@ -242,7 +242,7 @@
 下列事项没有达到 **已验证** 或合理的 **待用户操作** 前，不能称为“参赛版全部
 完成”：
 
-- 真实 Qwen/Qoder 的确认、导出和 stale 录屏闭环；
+- 真实图文决定、导出和 stale 闭环的完整 Qoder 录屏；
 - 防火墙阻断或抓包网络审计；
 - Qoder 完整 IDE 截图组；
 - 最新 PR Actions 状态复核；

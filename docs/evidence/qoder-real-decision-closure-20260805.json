@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "evidence_type": "qoder_real_image_decision_closure",
+  "observed_on": "2026-08-05",
+  "scope": {
+    "real_image_count": 1,
+    "controlled_document_count": 2,
+    "public_entrypoint": "scripts/run.ps1",
+    "prior_analysis_reused": true,
+    "decision_model_inference_requested": false,
+    "network_observation_performed": false,
+    "new_qoder_cloud_invocation": false
+  },
+  "operations": {
+    "confirm": {
+      "subject_role": "authorized_real_image_consistent_value",
+      "evidence_relation": "unit_conversion_consistent",
+      "exit_code": 0,
+      "reason_recorded": true
+    },
+    "reject": {
+      "subject_role": "controlled_synthetic_conflict_value",
+      "evidence_relation": "strong_conflict",
+      "exit_code": 0,
+      "reason_recorded": true
+    },
+    "export_before_change": {
+      "exit_code": 0,
+      "confirmed_count": 1,
+      "stale_count": 0
+    },
+    "export_after_source_change": {
+      "exit_code": 0,
+      "confirmed_count": 0,
+      "stale_count": 1
+    }
+  },
+  "source_change_test": {
+    "disposable_copy": true,
+    "confirmed_fact_became_stale": true,
+    "original_bytes_restored": true,
+    "temporary_backup_removed": true
+  },
+  "result": "passed",
+  "claim_boundary": "This proves the public-entrypoint decision, export, and source-hash invalidation workflow for one authorized real image plus controlled documents. It is not a broad real-image accuracy study, not a new model inference run, not a network-isolation proof, and not a complete Qoder IDE recording."
+}

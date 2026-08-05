@@ -89,6 +89,7 @@ class SubmissionContractTests(unittest.TestCase):
             "docs/evidence/mermaid-static-audit-20260805.json",
             "docs/evidence/named-pipe-security-boundaries-20260805.json",
             "docs/evidence/qoder-install-integrity-20260805.json",
+            "docs/evidence/qoder-real-decision-closure-20260805.json",
             "docs/evidence/remote-pr-snapshot-20260805.json",
         )
         missing = [item for item in required if not (REPO_ROOT / item).is_file()]

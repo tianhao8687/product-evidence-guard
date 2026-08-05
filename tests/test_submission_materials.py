@@ -105,8 +105,8 @@ class SubmissionMaterialsContractTests(unittest.TestCase):
             self.assertIn(heading, content)
 
         for exact_evidence in (
-            "263 项通过，178.084 s，0 跳过",
-            "263 项通过，0 跳过",
+            "265 项通过，90.594 s，0 跳过",
+            "265 项通过，0 跳过",
             "精确 commit、SHA-256、测试与墙钟耗时见相邻记录",
             "3.6064/57.1824/61.895 s",
             "26.7046 s",
@@ -129,6 +129,7 @@ class SubmissionMaterialsContractTests(unittest.TestCase):
             "docs/evidence/final-local-regression-20260805.json",
             "docs/evidence/synthetic-benchmark-final-06f8360.json",
             "docs/evidence/qoder-install-integrity-20260805.json",
+            "docs/evidence/qoder-real-decision-closure-20260805.json",
             "docs/evidence/mermaid-static-audit-20260805.json",
             "docs/evidence/log-privacy-contract-20260805.json",
             "docs/evidence/named-pipe-security-boundaries-20260805.json",
