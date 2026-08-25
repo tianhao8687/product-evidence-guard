@@ -272,7 +272,10 @@ class QoderInstallerContractTests(unittest.TestCase):
             )
             self.assertEqual(discoverable, [installed / "SKILL.md"])
 
-    @unittest.skipUnless(POWERSHELL, "Qoder integration test requires PowerShell")
+    @unittest.skipUnless(
+        sys.platform == "win32" and POWERSHELL,
+        "Qoder runtime bridge execution requires the supported Windows runtime",
+    )
     def test_explicit_runtime_root_creates_local_bridge_and_executes_entry(
         self,
     ) -> None:
