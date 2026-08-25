@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-08-05",
+  "scope": "three independent cold restarts of the local public entry point",
+  "sample": {
+    "description": "anonymous public-domain packaged-food label image",
+    "sha256": "40c808ce56735a027cc990ee2e476a5b2538c538d1b20e0f6c2647182eabe7cf"
+  },
+  "runtime": {
+    "device": "CPU",
+    "image_route": "qwen_ocr_review",
+    "model_reused": false
+  },
+  "runs": [
+    {
+      "run": 1,
+      "analysis_seconds": 26.9529,
+      "model_load_seconds": 4.8985,
+      "outer_seconds": 32.8509,
+      "candidate_count": 2,
+      "error_count": 0,
+      "run_summary_sha256": "7ca969ad38e9aaf865dbde942811ec30af600178798e15d9becaa51835ab783f"
+    },
+    {
+      "run": 2,
+      "analysis_seconds": 27.6312,
+      "model_load_seconds": 4.2162,
+      "outer_seconds": 32.8441,
+      "candidate_count": 2,
+      "error_count": 0,
+      "run_summary_sha256": "629d3ff7a872f0b8c4c025db1f2371da82a123f721df4d0029433eddbbb99799"
+    },
+    {
+      "run": 3,
+      "analysis_seconds": 25.5298,
+      "model_load_seconds": 4.2892,
+      "outer_seconds": 30.8354,
+      "candidate_count": 2,
+      "error_count": 0,
+      "run_summary_sha256": "8b97762c710a66ea403fb63f3bbbb7a3d986b889112a75236acea93d352de69b"
+    }
+  ],
+  "statistics": {
+    "analysis_seconds": {
+      "mean": 26.7046,
+      "min": 25.5298,
+      "max": 27.6312
+    },
+    "model_load_seconds": {
+      "mean": 4.468,
+      "min": 4.2162,
+      "max": 4.8985
+    }
+  },
+  "claim_boundary": "This is a three-run distribution on one machine and one public-domain image, not a population-wide latency guarantee."
+}

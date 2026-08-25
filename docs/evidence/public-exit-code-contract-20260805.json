@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "date": "2026-08-05",
+  "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\tests\\test.ps1 -SkipUnitTests",
+  "scope": "Windows public scripts/run.ps1 end-to-end contract; no model load or download",
+  "isolation": {
+    "communication_error_fixture": "harmless short-lived Python child with an exact live PID marker",
+    "server_state": "error",
+    "named_pipe_reachable": false,
+    "runtime_snapshot_restored": true,
+    "product_text_used": false
+  },
+  "result": {
+    "status": "passed",
+    "stable_json": true,
+    "exit_codes": {
+      "0": "analyze, confirm, reject, export, reanalyze, status and shutdown succeeded",
+      "1": "invalid input and stale-candidate operations failed closed",
+      "2": "verified live identity plus unreachable Named Pipe and error state returned server_unreachable",
+      "3": "separate public model-download resume validation returned model_download_in_progress"
+    },
+    "communication_error_exit_code": 2,
+    "communication_error_code": "server_unreachable",
+    "unit_tests": "skipped_by_flag"
+  },
+  "related_evidence": [
+    "docs/evidence/final-local-regression-20260805.json",
+    "docs/evidence/download-resume-validation-20260805.md"
+  ],
+  "boundary": "This record proves the public exit-code contract. It is not a denial-of-service, process-impersonation or penetration test."
+}

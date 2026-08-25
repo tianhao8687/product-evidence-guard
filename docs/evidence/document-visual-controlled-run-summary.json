@@ -1,0 +1,106 @@
+{
+  "session_id": "1245847faaed47fc8cb2e6fcd1d8cd95",
+  "input_name": "input",
+  "files_discovered": 3,
+  "changed_or_new_files": [
+    "controlled-chart-and-image.xlsx",
+    "controlled-embedded-image.docx",
+    "controlled-mixed-visual.pdf"
+  ],
+  "unchanged_files_reused": [],
+  "removed_files_invalidated": [],
+  "skipped_files": [],
+  "errors": [],
+  "candidate_count": 18,
+  "fact_group_count": 4,
+  "blocking_conflict_count": 1,
+  "review_count": 0,
+  "pass_count": 3,
+  "engine_signature_changed": true,
+  "analysis_seconds": 75.9358,
+  "model_load_seconds": 4.8247,
+  "file_timings": [
+    {
+      "file": "controlled-chart-and-image.xlsx",
+      "seconds": 33.694,
+      "cache": "analyzed",
+      "timeout_limit_exceeded": false
+    },
+    {
+      "file": "controlled-embedded-image.docx",
+      "seconds": 14.9382,
+      "cache": "analyzed",
+      "timeout_limit_exceeded": false
+    },
+    {
+      "file": "controlled-mixed-visual.pdf",
+      "seconds": 27.2971,
+      "cache": "analyzed",
+      "timeout_limit_exceeded": false
+    }
+  ],
+  "confirmation_status_counts": {
+    "pending": 18,
+    "confirmed": 0,
+    "rejected": 0,
+    "stale": 0
+  },
+  "scanned_pdf": {
+    "pages_detected": 0,
+    "pages_processed_with_qwen_vl": 0,
+    "pages_processed_with_openvino_ocr": 0,
+    "pages_processed_with_local_image_ai": 0,
+    "pages_skipped": 0,
+    "render_method": "pypdfium2",
+    "temporary_pages_retained": false
+  },
+  "mixed_pdf": {
+    "pages_detected": 1,
+    "pages_processed_with_qwen_vl": 1,
+    "pages_processed_with_openvino_ocr": 0,
+    "pages_processed_with_local_image_ai": 1,
+    "pages_skipped": 0,
+    "render_method": "pypdfium2",
+    "temporary_pages_retained": false
+  },
+  "document_visuals": {
+    "embedded_images_detected": 2,
+    "embedded_images_processed": 2,
+    "embedded_images_processed_with_openvino_ocr": 0,
+    "embedded_images_processed_with_qwen_vl": 2,
+    "embedded_images_skipped": 0,
+    "native_charts_detected": 1,
+    "native_charts_structured": 1,
+    "issues": 0,
+    "temporary_assets_retained": false
+  },
+  "limits": {
+    "max_files": 100,
+    "max_file_bytes": 104857600,
+    "max_total_text_chars": 2000000,
+    "max_single_file_seconds": 300.0,
+    "max_pdf_pages": 100
+  },
+  "local_ai": {
+    "fact_extractor": false,
+    "image_reader": true,
+    "device": "CPU",
+    "requested_device": "AUTO",
+    "device_selection_policy": "auto_cpu_fallback",
+    "available_devices": [
+      "CPU",
+      "GPU"
+    ],
+    "full_device_names": {
+      "CPU": "AMD Ryzen 7 7800X3D 8-Core Processor           ",
+      "GPU": "NVIDIA GeForce RTX 5070 (dGPU)"
+    },
+    "model_reused": false,
+    "model_id": "OpenVINO/Qwen3-VL-8B-Instruct-int4-ov",
+    "model_fingerprint": "8e9321ea899d229a2d3902344e4b3d150e46798ce85912e902703d4c3aba5ef0",
+    "image_strategy": "openvino_ocr_with_qwen_visual_fallback",
+    "image_route_counts": {
+      "qwen_ocr_review": 3
+    }
+  }
+}

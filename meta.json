@@ -1,0 +1,15 @@
+{
+  "name": "local-product-evidence-guard",
+  "display_name": "本地商品事实核验",
+  "display_description": "在本机核对说明书、参数表与包装图中的商品参数，保留证据位置并发现冲突。",
+  "detail_describe": "使用确定性文档解析与 OpenVINO Qwen3-VL 本地视觉理解建立商品事实证据图；AI 只产生候选，人工确认后才导出正式事实。",
+  "author": "tianhao8687",
+  "version": "1.0.0",
+  "use_cases": [
+    "检查商品说明书、参数表与包装图是否冲突",
+    "生图前整理可靠商品参数",
+    "找出某条参数来自哪个文件和位置",
+    "将公斤、克、厘米、毫米等单位归一",
+    "人工确认后导出正式商品事实"
+  ]
+}

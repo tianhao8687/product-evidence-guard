@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "observed_at_utc": "2026-08-05T12:03:57Z",
+  "source": "public GitHub REST API without authentication",
+  "repository": "tianhao8687/product-evidence-guard",
+  "pull_request": {
+    "number": 1,
+    "url": "https://github.com/tianhao8687/product-evidence-guard/pull/1",
+    "title": "feat: ship competition-ready local product evidence guard",
+    "state": "open",
+    "draft": true,
+    "base_ref": "main",
+    "head_ref": "codex/competition-ready-v1",
+    "head_sha": "4295ab837bf561dc57d2b1799d11ed537c1292eb",
+    "updated_at_utc": "2026-07-30T14:06:38Z"
+  },
+  "local_comparison": {
+    "local_head_at_observation": "618036973caa923047ab6be4023dc6acb6b5afa1",
+    "matches_remote_pr_head": false,
+    "interpretation": "The current local sanitized branch is newer and is not represented by these remote checks."
+  },
+  "runs": [
+    {
+      "run_id": 30549541403,
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "4295ab837bf561dc57d2b1799d11ed537c1292eb",
+      "updated_at_utc": "2026-07-30T14:01:36Z",
+      "url": "https://github.com/tianhao8687/product-evidence-guard/actions/runs/30549541403",
+      "jobs": [
+        {
+          "name": "Linux / Python 3.11",
+          "runner": "ubuntu-latest",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Windows / PowerShell / Python 3.11",
+          "runner": "windows-latest",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "run_id": 30549538512,
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "4295ab837bf561dc57d2b1799d11ed537c1292eb",
+      "updated_at_utc": "2026-07-30T14:01:39Z",
+      "url": "https://github.com/tianhao8687/product-evidence-guard/actions/runs/30549538512",
+      "jobs": [
+        {
+          "name": "Linux / Python 3.11",
+          "runner": "ubuntu-latest",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Windows / PowerShell / Python 3.11",
+          "runner": "windows-latest",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "review_summary": {
+    "review_count": 0,
+    "review_comment_count": 0,
+    "issue_comment_count": 0
+  },
+  "claim_boundary": "This snapshot proves that the remote PR head had successful Linux and Windows jobs and no reviews or comments at observation time. It does not prove CI for the newer local sanitized branch or authorize a push."
+}

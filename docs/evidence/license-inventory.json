@@ -1,0 +1,262 @@
+{
+  "schema_version": 1,
+  "generator": "scripts/generate-sbom.py",
+  "inputs": {
+    "requirements_lock": "requirements.lock",
+    "requirements_lock_sha256": "36bbddb98ccc06afab8fabf4578b1f480d3eac1bab340fc25355cd31323d7360",
+    "installed_metadata": "importlib.metadata (local environment; offline)"
+  },
+  "summary": {
+    "locked_package_count": 35,
+    "installed_version_match_count": 35,
+    "unresolved_license_count": 0,
+    "unresolved_packages": []
+  },
+  "packages": [
+    {
+      "name": "antlr4-python3-runtime",
+      "version": "4.9.3",
+      "license": "BSD",
+      "license_source": "License",
+      "purl": "pkg:pypi/antlr4-python3-runtime@4.9.3"
+    },
+    {
+      "name": "certifi",
+      "version": "2026.7.22",
+      "license": "MPL-2.0",
+      "license_source": "License",
+      "purl": "pkg:pypi/certifi@2026.7.22"
+    },
+    {
+      "name": "charset-normalizer",
+      "version": "3.4.9",
+      "license": "MIT",
+      "license_source": "License",
+      "purl": "pkg:pypi/charset-normalizer@3.4.9"
+    },
+    {
+      "name": "colorama",
+      "version": "0.4.6",
+      "license": "BSD-3-Clause",
+      "license_source": "Classifier",
+      "purl": "pkg:pypi/colorama@0.4.6"
+    },
+    {
+      "name": "colorlog",
+      "version": "6.12.0",
+      "license": "MIT License",
+      "license_source": "License",
+      "purl": "pkg:pypi/colorlog@6.12.0"
+    },
+    {
+      "name": "et-xmlfile",
+      "version": "2.0.0",
+      "license": "MIT",
+      "license_source": "License",
+      "purl": "pkg:pypi/et-xmlfile@2.0.0"
+    },
+    {
+      "name": "filelock",
+      "version": "3.32.2",
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "purl": "pkg:pypi/filelock@3.32.2"
+    },
+    {
+      "name": "fsspec",
+      "version": "2026.7.0",
+      "license": "BSD-3-Clause",
+      "license_source": "License-Expression",
+      "purl": "pkg:pypi/fsspec@2026.7.0"
+    },
+    {
+      "name": "hf-xet",
+      "version": "1.5.2",
+      "license": "Apache-2.0",
+      "license_source": "License-Expression",
+      "purl": "pkg:pypi/hf-xet@1.5.2"
+    },
+    {
+      "name": "huggingface-hub",
+      "version": "0.34.4",
+      "license": "Apache",
+      "license_source": "License",
+      "purl": "pkg:pypi/huggingface-hub@0.34.4"
+    },
+    {
+      "name": "idna",
+      "version": "3.18",
+      "license": "BSD-3-Clause",
+      "license_source": "License-Expression",
+      "purl": "pkg:pypi/idna@3.18"
+    },
+    {
+      "name": "lxml",
+      "version": "6.1.1",
+      "license": "BSD-3-Clause",
+      "license_source": "License",
+      "purl": "pkg:pypi/lxml@6.1.1"
+    },
+    {
+      "name": "numpy",
+      "version": "2.2.6",
+      "license": "BSD-3-Clause",
+      "license_source": "Classifier",
+      "purl": "pkg:pypi/numpy@2.2.6"
+    },
+    {
+      "name": "omegaconf",
+      "version": "2.3.1",
+      "license": "BSD-3-Clause",
+      "license_source": "Classifier",
+      "purl": "pkg:pypi/omegaconf@2.3.1"
+    },
+    {
+      "name": "opencv-python",
+      "version": "5.0.0.93",
+      "license": "Apache 2.0",
+      "license_source": "License",
+      "purl": "pkg:pypi/opencv-python@5.0.0.93"
+    },
+    {
+      "name": "openpyxl",
+      "version": "3.1.5",
+      "license": "MIT",
+      "license_source": "License",
+      "purl": "pkg:pypi/openpyxl@3.1.5"
+    },
+    {
+      "name": "openvino",
+      "version": "2026.2.1",
+      "license": "Apache-2.0",
+      "license_source": "License-Expression",
+      "purl": "pkg:pypi/openvino@2026.2.1"
+    },
+    {
+      "name": "openvino-genai",
+      "version": "2026.2.1.0",
+      "license": "Apache-2.0",
+      "license_source": "Classifier",
+      "purl": "pkg:pypi/openvino-genai@2026.2.1.0"
+    },
+    {
+      "name": "openvino-telemetry",
+      "version": "2025.2.0",
+      "license": "OSI Approved :: Apache Software License",
+      "license_source": "License",
+      "purl": "pkg:pypi/openvino-telemetry@2025.2.0"
+    },
+    {
+      "name": "openvino-tokenizers",
+      "version": "2026.2.1.0",
+      "license": "Apache-2.0",
+      "license_source": "License",
+      "purl": "pkg:pypi/openvino-tokenizers@2026.2.1.0"
+    },
+    {
+      "name": "packaging",
+      "version": "26.2",
+      "license": "Apache-2.0 OR BSD-2-Clause",
+      "license_source": "License-Expression",
+      "purl": "pkg:pypi/packaging@26.2"
+    },
+    {
+      "name": "pillow",
+      "version": "11.3.0",
+      "license": "MIT-CMU",
+      "license_source": "License-Expression",
+      "purl": "pkg:pypi/pillow@11.3.0"
+    },
+    {
+      "name": "pyclipper",
+      "version": "1.4.0",
+      "license": "MIT",
+      "license_source": "License",
+      "purl": "pkg:pypi/pyclipper@1.4.0"
+    },
+    {
+      "name": "pypdf",
+      "version": "6.0.0",
+      "license": "BSD-3-Clause",
+      "license_source": "License-Expression",
+      "purl": "pkg:pypi/pypdf@6.0.0"
+    },
+    {
+      "name": "pypdfium2",
+      "version": "5.12.1",
+      "license": "BSD-3-Clause, Apache-2.0, dependency licenses",
+      "license_source": "License",
+      "purl": "pkg:pypi/pypdfium2@5.12.1"
+    },
+    {
+      "name": "python-docx",
+      "version": "1.2.0",
+      "license": "MIT",
+      "license_source": "License",
+      "purl": "pkg:pypi/python-docx@1.2.0"
+    },
+    {
+      "name": "pyyaml",
+      "version": "6.0.3",
+      "license": "MIT",
+      "license_source": "License",
+      "purl": "pkg:pypi/pyyaml@6.0.3"
+    },
+    {
+      "name": "rapidocr",
+      "version": "3.9.1",
+      "license": "Apache-2.0",
+      "license_source": "License-Expression",
+      "purl": "pkg:pypi/rapidocr@3.9.1"
+    },
+    {
+      "name": "requests",
+      "version": "2.34.2",
+      "license": "Apache-2.0",
+      "license_source": "License",
+      "purl": "pkg:pypi/requests@2.34.2"
+    },
+    {
+      "name": "setuptools",
+      "version": "80.9.0",
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "purl": "pkg:pypi/setuptools@80.9.0"
+    },
+    {
+      "name": "shapely",
+      "version": "2.1.2",
+      "license": "BSD 3-Clause",
+      "license_source": "License",
+      "purl": "pkg:pypi/shapely@2.1.2"
+    },
+    {
+      "name": "six",
+      "version": "1.17.0",
+      "license": "MIT",
+      "license_source": "License",
+      "purl": "pkg:pypi/six@1.17.0"
+    },
+    {
+      "name": "tqdm",
+      "version": "4.70.0",
+      "license": "MPL-2.0 AND MIT",
+      "license_source": "License",
+      "purl": "pkg:pypi/tqdm@4.70.0"
+    },
+    {
+      "name": "typing-extensions",
+      "version": "4.16.0",
+      "license": "PSF-2.0",
+      "license_source": "License-Expression",
+      "purl": "pkg:pypi/typing-extensions@4.16.0"
+    },
+    {
+      "name": "urllib3",
+      "version": "2.7.0",
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "purl": "pkg:pypi/urllib3@2.7.0"
+    }
+  ]
+}

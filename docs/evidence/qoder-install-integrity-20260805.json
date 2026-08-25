@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "evidence_type": "qoder_install_integrity",
+  "observed_on": "2026-08-25",
+  "claim_boundary": "Local installation update and integrity audit. The existing prepared project runtime was reused; no Qoder conversation, product file access, model load, download, or network audit was requested.",
+  "qoder_cli": {
+    "version": "1.1.8",
+    "skills_list_command": "qodercli skills list",
+    "skills_list_exit_code": 0
+  },
+  "skill": {
+    "name": "local-product-evidence-guard",
+    "discovery_status": "Enabled",
+    "install_scope": "user",
+    "entry_path": "%USERPROFILE%/.qoder/skills/local-product-evidence-guard/SKILL.md",
+    "matching_install_counts": {
+      "user": 1,
+      "project": 0,
+      "workspace": 0
+    },
+    "duplicate_install_count": 0
+  },
+  "runtime_bridge": {
+    "bridge_file": "%SKILL_ROOT%/.runtime/source-root.txt",
+    "configured_target": "<prepared-project-root>",
+    "configured_target_exists": true,
+    "configured_target_matches_source_root": true,
+    "source_identity": "product-evidence-guard"
+  },
+  "critical_files": [
+    {
+      "path": "SKILL.md",
+      "source_sha256": "b66d0504bbede2afea679b1949c8bdc7d680aba1183d17de673a0aa69ee8e5ec",
+      "installed_sha256": "b66d0504bbede2afea679b1949c8bdc7d680aba1183d17de673a0aa69ee8e5ec",
+      "matches": true
+    },
+    {
+      "path": "info.json",
+      "source_sha256": "0ff42dcc223c3580a83a0fb9be8da416d26406069b92d4d72e09fdfc5f924298",
+      "installed_sha256": "0ff42dcc223c3580a83a0fb9be8da416d26406069b92d4d72e09fdfc5f924298",
+      "matches": true
+    },
+    {
+      "path": "meta.json",
+      "source_sha256": "0dc08710288ab66e6a94619cbf5f20e923776caf5e1d2d6da1a562e8af3fd602",
+      "installed_sha256": "0dc08710288ab66e6a94619cbf5f20e923776caf5e1d2d6da1a562e8af3fd602",
+      "matches": true
+    },
+    {
+      "path": "scripts/run.ps1",
+      "source_sha256": "a6c08c637e3df24ca0ae4c1454dc26a572e3aa70467f33afe73a92049bd8e9a1",
+      "installed_sha256": "a6c08c637e3df24ca0ae4c1454dc26a572e3aa70467f33afe73a92049bd8e9a1",
+      "matches": true
+    },
+    {
+      "path": "scripts/client.py",
+      "source_sha256": "c33a0474d86976c9f6a35dcf5ff97b12a4932692fa10182f8b1b9b1ef11d5dd2",
+      "installed_sha256": "c33a0474d86976c9f6a35dcf5ff97b12a4932692fa10182f8b1b9b1ef11d5dd2",
+      "matches": true
+    },
+    {
+      "path": "scripts/server.py",
+      "source_sha256": "347e75e91bd749ce6f1ff8767663468c135ff4a8e792b9fd1206cddc77e2a28a",
+      "installed_sha256": "347e75e91bd749ce6f1ff8767663468c135ff4a8e792b9fd1206cddc77e2a28a",
+      "matches": true
+    }
+  ],
+  "status_probe": {
+    "entry": "%SKILL_ROOT%/scripts/run.ps1 status",
+    "process_exit_code": 0,
+    "stable_response": {
+      "protocol_version": 1,
+      "ok": true,
+      "operation": "status",
+      "exit_code": 0,
+      "status": "stopped",
+      "error": null
+    },
+    "product_files_read": 0,
+    "model_load_requested": false,
+    "qoder_cloud_message_sent": false
+  }
+}

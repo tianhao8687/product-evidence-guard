@@ -1,0 +1,105 @@
+{
+  "session_id": "01bd549cd17e483a9f4696afb5e6c83c",
+  "input_name": "model-input",
+  "files_discovered": 3,
+  "changed_or_new_files": [],
+  "unchanged_files_reused": [
+    "raspberry-pi-5-mechanical-drawing.pdf",
+    "ti-page-08-characteristics.pdf",
+    "ti-page-24-mixed-curves.pdf"
+  ],
+  "removed_files_invalidated": [],
+  "skipped_files": [],
+  "errors": [],
+  "candidate_count": 0,
+  "fact_group_count": 0,
+  "blocking_conflict_count": 0,
+  "review_count": 0,
+  "pass_count": 0,
+  "engine_signature_changed": false,
+  "analysis_seconds": 0.0202,
+  "model_load_seconds": 0.0,
+  "file_timings": [
+    {
+      "file": "raspberry-pi-5-mechanical-drawing.pdf",
+      "seconds": 0.0006,
+      "cache": "reused"
+    },
+    {
+      "file": "ti-page-08-characteristics.pdf",
+      "seconds": 0.0005,
+      "cache": "reused"
+    },
+    {
+      "file": "ti-page-24-mixed-curves.pdf",
+      "seconds": 0.0004,
+      "cache": "reused"
+    }
+  ],
+  "confirmation_status_counts": {
+    "pending": 0,
+    "confirmed": 0,
+    "rejected": 0,
+    "stale": 0
+  },
+  "scanned_pdf": {
+    "pages_detected": 0,
+    "pages_processed_with_qwen_vl": 0,
+    "pages_processed_with_openvino_ocr": 0,
+    "pages_processed_with_local_image_ai": 0,
+    "pages_skipped": 0,
+    "render_method": "pypdfium2",
+    "temporary_pages_retained": false
+  },
+  "mixed_pdf": {
+    "pages_detected": 3,
+    "pages_processed_with_qwen_vl": 1,
+    "pages_processed_with_openvino_ocr": 0,
+    "pages_processed_with_local_image_ai": 1,
+    "pages_structured_from_text_layer": 2,
+    "pages_handled_total": 3,
+    "pages_skipped": 0,
+    "render_method": "pypdfium2",
+    "temporary_pages_retained": false
+  },
+  "document_visuals": {
+    "embedded_images_detected": 0,
+    "embedded_images_processed": 0,
+    "embedded_images_processed_with_openvino_ocr": 0,
+    "embedded_images_processed_with_qwen_vl": 0,
+    "embedded_images_skipped": 0,
+    "native_charts_detected": 0,
+    "native_charts_structured": 0,
+    "issues": 0,
+    "temporary_assets_retained": false
+  },
+  "limits": {
+    "max_files": 100,
+    "max_file_bytes": 104857600,
+    "max_total_text_chars": 2000000,
+    "max_single_file_seconds": 300.0,
+    "max_pdf_pages": 100
+  },
+  "local_ai": {
+    "fact_extractor": false,
+    "image_reader": true,
+    "device": "CPU",
+    "requested_device": "AUTO",
+    "device_selection_policy": "auto_cpu_fallback",
+    "available_devices": [
+      "CPU",
+      "GPU"
+    ],
+    "full_device_names": {
+      "CPU": "AMD Ryzen 7 7800X3D 8-Core Processor           ",
+      "GPU": "NVIDIA GeForce RTX 5070 (dGPU)"
+    },
+    "model_reused": true,
+    "model_id": "OpenVINO/Qwen3-VL-8B-Instruct-int4-ov",
+    "model_fingerprint": "8e9321ea899d229a2d3902344e4b3d150e46798ce85912e902703d4c3aba5ef0",
+    "image_strategy": "openvino_ocr_with_qwen_visual_fallback",
+    "image_route_counts": {
+      "qwen_deep_fallback": 1
+    }
+  }
+}

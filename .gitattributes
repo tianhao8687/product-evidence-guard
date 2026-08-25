@@ -1,0 +1,26 @@
+# Keep source and documentation bytes stable across Windows and Unix checkouts.
+* text=auto eol=lf
+
+# The benchmark manifest hashes exact bytes. Preserve every generated fixture
+# byte-for-byte on Linux and Windows checkouts, including ASCII-only PDFs.
+samples/generated-benchmark/** -text
+
+# These are byte-for-byte copies from the installed wheel.  Preserve upstream
+# line endings so the recorded RECORD/SHA-256 identities survive checkout.
+docs/evidence/licenses/** -text -diff
+
+*.png -text
+*.jpg -text
+*.jpeg -text
+*.webp -text
+*.bmp -text
+*.pdf -text
+*.docx -text
+*.xlsx -text
+*.zip -text
+*.7z -text
+*.gz -text
+*.bin -text
+*.onnx -text
+*.safetensors -text
+*.gguf -text

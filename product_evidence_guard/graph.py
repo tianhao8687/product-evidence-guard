@@ -11,7 +11,7 @@ from .normalization import normalize_text, values_equal
 
 
 VERSION_RE = re.compile(
-    r"(?:^|[_\-.\s])(?:v|ver|version|版本)?\s*(\d{1,4})(?:[_\-.](\d{1,2}))?(?:[_\-.](\d{1,2}))?(?:$|[_\-.\s])",
+    r"(?:^|[_\-.\s])(?:v|ver|version|版本)\s*(\d{1,4})(?:[_\-.](\d{1,2}))?(?:[_\-.](\d{1,2}))?(?:$|[_\-.\s])",
     re.IGNORECASE,
 )
 
@@ -41,6 +41,18 @@ def _all_equal(candidates: list[FactCandidate]) -> bool:
         first.normalized_unit == candidate.normalized_unit
         and values_equal(first.normalized_value, candidate.normalized_value)
         for candidate in candidates[1:]
+    )
+
+
+def _only_cross_scope_difference(candidates: list[FactCandidate]) -> bool:
+    by_scope: dict[str, list[FactCandidate]] = defaultdict(list)
+    for candidate in candidates:
+        if not candidate.scope:
+            return False
+        by_scope[candidate.scope].append(candidate)
+    return len(by_scope) > 1 and all(
+        len(items) == 1 or _all_equal(items)
+        for items in by_scope.values()
     )
 
 
@@ -95,6 +107,17 @@ def build_fact_groups(candidates: Iterable[FactCandidate]) -> list[FactGroup]:
                 reason = "原始单位或写法不同，但换算后的标准值一致。"
             severity = "pass"
             recommendation = "可作为高可信候选，但仍由用户最终确认。"
+        elif _only_cross_scope_difference(items):
+            classification = "semantic_scope_split"
+            severity = "review"
+            reason = (
+                "候选分别属于输入/输出、额定/典型/上下限、运行模式"
+                "或产品变体等不同语义口径，数值不同不应互相判为冲突。"
+            )
+            recommendation = (
+                "按各自输入输出、额定/上下限或模式口径分别展示并人工确认，"
+                "不要合并成一个值。"
+            )
         elif field in {"material", "color"} and _compatible_text_values(items):
             classification = "compatible_expression"
             severity = "review"

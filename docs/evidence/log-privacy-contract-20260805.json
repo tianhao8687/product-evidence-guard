@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "date": "2026-08-05",
+  "source_head_before_changes": "6180369",
+  "test_command": ".\\.venv\\Scripts\\python.exe -m unittest -v tests.test_log_privacy tests.test_install_env_contract tests.test_protocol",
+  "result": {
+    "status": "passed",
+    "tests": 45,
+    "elapsed_seconds": 4.376
+  },
+  "privacy_contract": {
+    "install_log": {
+      "records_full_command_arguments": false,
+      "records_native_command_output": false,
+      "records_repository_absolute_path": false,
+      "resets_legacy_format_on_next_install": true,
+      "redacts_path_and_credential_shapes": true
+    },
+    "server_log": {
+      "structured_bounded_events_only": true,
+      "records_request_payload": false,
+      "records_exception_message": false,
+      "records_model_raw_text": false,
+      "invalid_event_fields_are_redacted": true
+    },
+    "child_process_logs": {
+      "captures_child_stdout_or_stderr": false,
+      "rejects_hardlinked_log_target": true,
+      "server_legacy_log_family_reset_on_spawn": true,
+      "model_download_legacy_log_reset_on_spawn": true
+    }
+  },
+  "controlled_sentinels": {
+    "product_body": "rejected",
+    "credential": "rejected",
+    "windows_absolute_path": "rejected",
+    "model_download_target": "not_logged"
+  },
+  "pre_remediation_local_audit_counts": {
+    "install_log_windows_absolute_path_matches": 25,
+    "server_log_windows_absolute_path_matches": 10,
+    "credential_marker_matches": 0,
+    "controlled_product_marker_matches": 0
+  },
+  "post_remediation_local_audit": {
+    "legacy_logs_sanitized": 2,
+    "logs_scanned": 2,
+    "windows_absolute_path_matches": 0,
+    "credential_marker_matches": 0,
+    "controlled_product_marker_matches": 0
+  },
+  "scope_boundary": "Purely local fixture and contract validation. No network, model load, customer data, raw model output, penetration test, or independent privacy audit was performed. Runtime state JSON and user-requested business reports are not operational logs and remain outside this log-retention claim."
+}

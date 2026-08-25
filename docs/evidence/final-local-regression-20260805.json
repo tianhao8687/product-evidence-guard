@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "date": "2026-08-25",
+  "command": "powershell -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .\\tests\\test.ps1",
+  "environment": {
+    "os": "Windows",
+    "python": "<project-root>/.venv/Scripts/python.exe"
+  },
+  "unit_tests": {
+    "status": "passed",
+    "count": 265,
+    "elapsed_seconds": 84.114,
+    "skipped": 0
+  },
+  "public_business_e2e": {
+    "status": "passed",
+    "utf8_space_path": "passed",
+    "compileall": "passed",
+    "deterministic_smoke": "passed",
+    "incremental_reuse": "passed",
+    "confirm_exit_code": 0,
+    "reject_exit_code": 0,
+    "export_before_change_exit_code": 0,
+    "reanalyze_exit_code": 0,
+    "export_after_change_exit_code": 0,
+    "stale_candidate_exit_code": 1,
+    "invalid_path_exit_code": 1,
+    "communication_error_exit_code": 2,
+    "named_pipe_status": "passed",
+    "shutdown": "passed"
+  },
+  "clean_room": {
+    "package_manifest_commit": "2f10f531f6a44a1938a75771ddc1cd63c3780e6a",
+    "install_mode": "fresh extract with verified local uv, Python and wheel caches; no model copied",
+    "installed_package_count": 36,
+    "unit_test_status": "passed",
+    "unit_test_count": 219,
+    "elapsed_seconds": 77.233,
+    "skipped": 0,
+    "public_business_e2e": "passed"
+  },
+  "scope_note": "The 265-test source run covers the current implementation, release packager, PDF/resource negative matrix, Qoder installation evidence, log privacy, bounded Named Pipe security cases, remote PR evidence, submission materials, the sanitized real-image decision-closure evidence contract, supply-chain evidence generators and public contracts. The clean-room block is historical evidence for package commit 2f10f53 and is not a claim about the next rebuilt archive."
+}
