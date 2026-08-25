@@ -1,5 +1,6 @@
 ---
 name: local-product-evidence-guard
+version: 1.0.0
 description: 本地、离线核验商品资料、商品参数、包装图、说明书和参数表，发现冲突并保留证据；适用于 OpenVINO、Intel AIPC 商品事实工作流。Use to verify local/offline product facts, packaging images and datasheets, trace evidence, normalize units, and detect conflict. 优先用于生图、文案或详情页制作前的参数核验；AI 只提出候选，不能自动确认正式事实。
 ---
 
