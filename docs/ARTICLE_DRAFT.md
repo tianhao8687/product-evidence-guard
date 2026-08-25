@@ -235,9 +235,9 @@ $ArtifactRoot = "<artifact-root>"
 ```
 
 模型缓存后，三个离线/遥测环境变量下推理通过。最终回归 265 项通过
-（90.594 s，0 跳过），唯一入口的 sidecar 确认、拒绝、导出、重分析与 stale E2E
+（84.114 s，0 跳过），唯一入口的 sidecar 确认、拒绝、导出、重分析与 stale E2E
 也通过；这不等于 Qwen/Qoder 证据。commit `5a4fad8` 的 CI 曾绿色；最新状态以
-[Draft PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1)
+[Draft PR #2](https://github.com/tianhao8687/product-evidence-guard/pull/2)
 的 GitHub Actions 为准，本文不预先声称其通过。
 
 ## 结果必须从原始记录中来
@@ -340,7 +340,7 @@ Hybrid AI 的关键是分责：模型读视觉，schema 约束生成，代码处
 
 发布前替换：
 
-- Draft PR：[GitHub PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1)
+- Draft PR：[GitHub PR #2](https://github.com/tianhao8687/product-evidence-guard/pull/2)
 - ModelScope Skill：`【待链接】`
 - 演示视频：`【待链接】`
 - Benchmark 记录：[`synthetic-benchmark-final-06f8360.json`](evidence/synthetic-benchmark-final-06f8360.json)

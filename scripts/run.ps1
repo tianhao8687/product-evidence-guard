@@ -71,7 +71,8 @@ if (Test-Path -LiteralPath $RuntimeRootFile -PathType Leaf) {
                 throw "外部运行时不是本 Skill：$ExternalRoot"
             }
 
-            & powershell.exe -NoProfile -ExecutionPolicy Bypass `
+            $PowerShellExecutable = (Get-Process -Id $PID).Path
+            & $PowerShellExecutable -NoProfile -ExecutionPolicy Bypass `
                 -File $ExternalRunScript @args
             exit $LASTEXITCODE
         }

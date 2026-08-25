@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "date": "2026-08-05",
+  "date": "2026-08-25",
   "command": "powershell -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .\\tests\\test.ps1",
   "environment": {
     "os": "Windows",
@@ -9,7 +9,7 @@
   "unit_tests": {
     "status": "passed",
     "count": 265,
-    "elapsed_seconds": 90.594,
+    "elapsed_seconds": 84.114,
     "skipped": 0
   },
   "public_business_e2e": {

@@ -171,7 +171,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 analyze `
 - 对 `Input:` / `Output:` 电气规格保留语义范围，并保留多个 USB PD 档位。
 
 这些规则另有 4 项专门回归测试，当时完整本地测试总数由 145 增至 149；加入本轮
-最新 2026-08-05 D 盘最终基线为 265 项通过（90.594 s，0 跳过）。
+最新 2026-08-25 D 盘最终基线为 265 项通过（84.114 s，0 跳过）。
 
 ## 最终候选
 

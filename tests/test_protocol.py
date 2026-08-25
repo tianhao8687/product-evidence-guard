@@ -765,6 +765,7 @@ class ClientAndLifecycleTests(unittest.TestCase):
         self.assertIn("$ClientScript @args", content)
         self.assertIn(".runtime\\source-root.txt", content)
         self.assertIn("-File $ExternalRunScript @args", content)
+        self.assertNotIn("& powershell.exe", content)
         self.assertIn("runtime_root_invalid", content)
         self.assertNotIn("Write-Host", content)
 

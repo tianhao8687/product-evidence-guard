@@ -105,7 +105,7 @@ class SubmissionMaterialsContractTests(unittest.TestCase):
             self.assertIn(heading, content)
 
         for exact_evidence in (
-            "265 项通过，90.594 s，0 跳过",
+            "265 项通过，84.114 s，0 跳过",
             "265 项通过，0 跳过",
             "精确 commit、SHA-256、测试与墙钟耗时见相邻记录",
             "3.6064/57.1824/61.895 s",
@@ -148,9 +148,23 @@ class SubmissionMaterialsContractTests(unittest.TestCase):
             # would also put the release output back inside the release input.
             self.assertFalse((REPO_ROOT / "release").exists())
         else:
-            self.assertTrue((REPO_ROOT / adjacent_verification).is_file())
+            # The verification sidecar is intentionally ignored and uploaded
+            # beside the ZIP.  A clean source checkout must validate that
+            # boundary instead of requiring a local ignored build artifact.
+            gitignore_lines = {
+                line.strip()
+                for line in (REPO_ROOT / ".gitignore").read_text(
+                    encoding="utf-8"
+                ).splitlines()
+            }
+            packager = (REPO_ROOT / "scripts" / "package-release.ps1").read_text(
+                encoding="utf-8"
+            )
+            self.assertIn("release/", gitignore_lines)
+            self.assertIn("    'release',", packager)
 
-        self.assertIn("当前本地脱敏分支更新尚未推送", content)
+        self.assertIn("当前脱敏分支已推送至 Draft PR #2", content)
+        self.assertIn("最新 CI 结果必须以该 PR head 的 Actions 为准", content)
         self.assertIn("真实渲染待验证", content)
         self.assertIn("用户本人登录 ModelScope", content)
         self.assertNotIn("当前提交的最新远端 Actions 已通过", content)

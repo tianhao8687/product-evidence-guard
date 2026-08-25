@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "evidence_type": "qoder_install_integrity",
-  "observed_on": "2026-08-05",
+  "observed_on": "2026-08-25",
   "claim_boundary": "Local installation update and integrity audit. The existing prepared project runtime was reused; no Qoder conversation, product file access, model load, download, or network audit was requested.",
   "qoder_cli": {
     "version": "1.1.8",
@@ -48,8 +48,8 @@
     },
     {
       "path": "scripts/run.ps1",
-      "source_sha256": "490c1cec0c9e2c78940413d62f0ab889a245050102f1d889c69b2d721c35edf9",
-      "installed_sha256": "490c1cec0c9e2c78940413d62f0ab889a245050102f1d889c69b2d721c35edf9",
+      "source_sha256": "a6c08c637e3df24ca0ae4c1454dc26a572e3aa70467f33afe73a92049bd8e9a1",
+      "installed_sha256": "a6c08c637e3df24ca0ae4c1454dc26a572e3aa70467f33afe73a92049bd8e9a1",
       "matches": true
     },
     {

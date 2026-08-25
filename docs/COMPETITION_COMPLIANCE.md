@@ -162,7 +162,7 @@
 | 确认、下载、协议、PDF 与报告测试文件 | **已完成** | 对应测试文件存在 |
 | `tests/test.ps1` | **已完成** | 文件存在；结果另行验证 |
 | `tests/test-real-model.ps1` | **已完成** | opt-in 脚本存在 |
-| 最终完整 Python 测试执行 | **已验证** | 2026-08-05 D 盘正式目录 265 项通过，90.594 s，0 跳过 |
+| 最终完整 Python 测试执行 | **已验证** | 2026-08-25 D 盘正式目录 265 项通过，84.114 s，0 跳过 |
 | Windows PowerShell smoke | **已验证** | 265 项、中文空格、compileall、deterministic、incremental、完整确认闭环、Pipe status/shutdown 通过；无效路径和旧候选退出码 1 |
 | Linux CI workflow | **已完成** | Ubuntu compile、unit、demo smoke 配置存在 |
 | Windows CI workflow | **已完成** | workflow 已配置 Windows PowerShell/Python 3.11 job |
@@ -232,7 +232,7 @@
 | ModelScope Skill 发布 | **待用户操作** | 需要平台账号和发布决定 |
 | 比赛标签和最终 URL | **待用户操作** | 外部发布/提交 |
 | 分支 `codex/competition-ready-v1-sanitized` | **已完成** | 当前脱敏分支已检查；原始未脱敏截图历史不在此分支可达历史中 |
-| Draft PR | **已验证** | [GitHub PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1) 已创建，未合并 |
+| Draft PR | **已验证** | [GitHub PR #2](https://github.com/tianhao8687/product-evidence-guard/pull/2) 已从最终脱敏分支创建，未合并 |
 | 临时远端 CI | **已验证** | commit `5a4fad8` 绿色 |
 | 最新远端 CI | **未完成** | 本地最终回归已通过；实时状态以 PR Actions 为准 |
 | 比赛表单提交 | **待用户操作** | 用户拥有的外部动作 |

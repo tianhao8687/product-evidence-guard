@@ -43,6 +43,10 @@ class SupplyChainEvidenceTests(unittest.TestCase):
         self.assertEqual([item.name for item in locked], ["another", "Demo_Package"])
         self.assertEqual(locked[1].sha256, (first, second))
 
+    @unittest.skipUnless(
+        sys.platform == "win32",
+        "the checked supply-chain evidence describes the pinned Windows environment",
+    )
     def test_checked_evidence_is_current_and_deterministic(self) -> None:
         first = subprocess.run(
             [sys.executable, str(SCRIPT), "--check"],

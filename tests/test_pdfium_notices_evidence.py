@@ -25,6 +25,10 @@ def _bundle_snapshot(root: Path) -> dict[str, bytes]:
 
 
 class PdfiumNoticeEvidenceTests(unittest.TestCase):
+    @unittest.skipUnless(
+        sys.platform == "win32",
+        "the checked evidence pins the Windows pypdfium2 wheel",
+    )
     def test_generator_check_and_fresh_generation_are_deterministic(self) -> None:
         check = subprocess.run(
             [sys.executable, str(SCRIPT), "--check"],

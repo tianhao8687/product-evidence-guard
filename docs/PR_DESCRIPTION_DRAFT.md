@@ -2,7 +2,7 @@
 
 > 建议标题：`feat: deliver offline Product Evidence Guard skill for Qoder and OpenVINO`
 >
-> 本文是可复制到 GitHub PR #1 的草稿，不代表已经更新远端 PR。最终包的 commit、
+> 本文对应 GitHub Draft PR #2；远端正文已创建，后续最终 commit、
 > SHA-256 和精确净室耗时以标准路径 ZIP 旁的 `.verification.json` 为准；复制到 PR
 > 时应从该机器记录填入，不能在归档内部预填自引用哈希。
 
@@ -41,7 +41,7 @@ powershell -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .\te
 
 | 范围 | 结果 | 证据 |
 |---|---|---|
-| 当前 D 盘源码回归 | 265 项通过，90.594 s，0 跳过；Windows 业务 E2E 通过 | `docs/evidence/final-local-regression-20260805.json` |
+| 当前 D 盘源码回归 | 265 项通过，84.114 s，0 跳过；Windows 业务 E2E 通过 | `docs/evidence/final-local-regression-20260805.json` |
 | 最终精确 ZIP clean-room | Python 3.11.13、36 个已安装包；265 项通过，0 跳过；精确 commit、SHA-256、测试与墙钟耗时见相邻记录 | `release/local-product-evidence-guard-v1.0.0.verification.json` |
 | 编译与业务 smoke | `compileall`、确定性 smoke、增量复用、confirm/reject/export/stale、Pipe status/shutdown 全部通过 | 同上 verification JSON |
 
@@ -105,7 +105,7 @@ git diff --check
 |---|---|
 | 已配置 | GitHub Actions 包含 Ubuntu/Python 3.11 的 compile、unit、demo smoke，以及 Windows/Python 3.11 的 `tests/test.ps1` |
 | 远端只读快照 | Draft PR #1 的旧 head `4295ab8`：pull_request 与 push 两次运行的 Linux/Windows jobs 均成功；review/comment 均为 0 |
-| 未覆盖 | 当前本地脱敏分支更新尚未推送，因此上述历史绿色不证明当前提交的 CI |
+| 当前候选 | 当前脱敏分支已推送至 Draft PR #2；最新 CI 结果必须以该 PR head 的 Actions 为准，历史绿色不证明当前提交 |
 
 合并前必须在 PR Actions 页面确认最新 Linux 与 Windows required checks；若失败，
 保留失败状态和日志结论，不能用历史绿色覆盖当前失败。
@@ -132,13 +132,12 @@ git diff --check
 - 35 周期 TCP 观察没有发现外连，但未执行防火墙阻断、packet capture、DNS 或 UDP
   审计。
 - 完整二进制传递依赖许可证审计、模型 manifest 签名与独立漏洞扫描尚未全部完成。
-- 当前本地提交的 GitHub Actions、Mermaid 真实渲染、完整 Qoder 截图/视频和外部发布均需要
+- 当前修复提交的 GitHub Actions、Mermaid 真实渲染、完整 Qoder 截图/视频和外部发布均需要
   外部状态或用户操作。
 
 ## 合并/投稿前的用户操作
 
-1. 将本草稿复制到 Draft PR #1，并替换为最终 commit、ZIP SHA-256 和 clean-room
-   数据。
+1. 在 Draft PR #2 中替换最终 commit、ZIP SHA-256 和 clean-room 数据。
 2. 推送最终分支后检查最新 Linux/Windows Actions；记录失败或绿色结果。
 3. 在 GitHub PR 预览中逐个检查 5 个 Mermaid 图，确认节点、中文、箭头和换行正确。
 4. 在 Qoder 中补录已完成的真实图片＋受控文档决定、导出、来源变化与 stale 完整
