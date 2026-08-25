@@ -30,8 +30,8 @@
   "critical_files": [
     {
       "path": "SKILL.md",
-      "source_sha256": "bfe115a4433b1e99a3139fe82e8400a2fdb43361468eda184b7f81f45a25a9ed",
-      "installed_sha256": "bfe115a4433b1e99a3139fe82e8400a2fdb43361468eda184b7f81f45a25a9ed",
+      "source_sha256": "b66d0504bbede2afea679b1949c8bdc7d680aba1183d17de673a0aa69ee8e5ec",
+      "installed_sha256": "b66d0504bbede2afea679b1949c8bdc7d680aba1183d17de673a0aa69ee8e5ec",
       "matches": true
     },
     {
