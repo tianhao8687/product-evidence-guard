@@ -297,6 +297,9 @@ class OpenVinoVlmBackend:
         self._pipe = ov_genai.VLMPipeline(str(model_path), device)
 
     def load_image(self, image_path: Path) -> Any:
+        return self.load_image_region(image_path, None)
+
+    def load_image_region(self, image_path: Path, region: tuple[int, int, int, int] | None) -> Any:
         with self._Image.open(image_path) as source:
             width, height = source.size
             if width <= 0 or height <= 0 or width * height > self.MAX_IMAGE_PIXELS:
@@ -305,6 +308,13 @@ class OpenVinoVlmBackend:
                     f"(limit {self.MAX_IMAGE_PIXELS})"
                 )
             image = self._ImageOps.exif_transpose(source).convert("RGB")
+            if region is not None:
+                left, top, right, bottom = region
+                if not 0 <= left < right <= 1000 or not 0 <= top < bottom <= 1000:
+                    raise ValueError("Invalid normalized review crop")
+                width, height = image.size
+                image = image.crop((int(left * width / 1000), int(top * height / 1000),
+                                    math.ceil(right * width / 1000), math.ceil(bottom * height / 1000)))
             if max(image.size) > self.MAX_IMAGE_EDGE:
                 image.thumbnail(
                     (self.MAX_IMAGE_EDGE, self.MAX_IMAGE_EDGE),

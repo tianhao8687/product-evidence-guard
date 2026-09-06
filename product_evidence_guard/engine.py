@@ -121,6 +121,7 @@ def _image_reader_identity(
         identity.update(
             {
                 "strategy": "openvino_ocr_with_qwen_visual_fallback",
+                "optimization_revision": getattr(image_reader, "optimization_revision", "legacy"),
                 "ocr": _component_identity(
                     getattr(image_reader, "_ocr_backend", None)
                 ),
@@ -958,7 +959,7 @@ def analyze_directory(
         if progress_callback is not None:
             progress_callback(
                 "file_started",
-                {"file": relative, "index": file_index},
+                {"file": relative, "index": file_index, "total": len(discovered)},
             )
 
         # An OCR sidecar already represents the image evidence. Avoid double counting it.
@@ -2134,6 +2135,10 @@ def analyze_directory(
         "engine_signature_changed": not cache_usable,
         "analysis_seconds": round(time.perf_counter() - started_at, 4),
         "model_load_seconds": model_load_seconds,
+        "resident_recognition_cache": (
+            image_reader._recognition_cache.stats()
+            if getattr(image_reader, "_recognition_cache", None) is not None else None
+        ),
         "file_timings": file_timings,
         "confirmation_status_counts": confirmation_counts,
         "scanned_pdf": {

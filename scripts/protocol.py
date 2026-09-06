@@ -22,7 +22,10 @@ AUTHKEY = hashlib.sha256(
 ).digest()
 
 VALID_OPERATIONS = frozenset(
-    {"status", "analyze", "confirm", "reject", "export", "shutdown"}
+    {"status", "analyze", "confirm", "reject", "export", "shutdown",
+     "warmup", "residency", "review", "task", "job", "resume", "authorize",
+     "handoff", "revoke", "check-content", "deliverables", "export-table", "export-local", "export-review"}
+    | {"allow-review", "review-summary", "decide", "revoke-review"}
 )
 VALID_STATES = frozenset(
     {"starting", "downloading", "loading", "running", "error", "shutdown"}

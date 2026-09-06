@@ -26,6 +26,7 @@ ROOT_REQUIRED = (
     "LICENSE",
     "CHANGELOG.md",
     "docs/ARCHITECTURE.md",
+    "docs/CONTENT_WORKFLOW.md",
     "docs/NEXT_STEPS.md",
 )
 RUNTIME_SCRIPTS = (
@@ -41,13 +42,15 @@ RUNTIME_SCRIPTS = (
     "scripts/run-demo.ps1",
     "scripts/run-demo.sh",
     "scripts/server.py",
+    "scripts/workflow_cli.py",
+    "scripts/workflow_service.py",
 )
 DEMO_FILES = (
     "samples/demo/说明书.txt",
     "samples/demo/参数表.csv",
     "samples/demo/包装正面.jpg.ocr.json",
 )
-PACKAGE_FILES = tuple(
+PACKAGE_FILES = ("product_evidence_guard/ocr_review_prompt.txt",) + tuple(
     path.relative_to(REPO_ROOT).as_posix()
     for path in sorted((REPO_ROOT / "product_evidence_guard").glob("*.py"))
 )

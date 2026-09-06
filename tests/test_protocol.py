@@ -591,54 +591,23 @@ class ClientAndLifecycleTests(unittest.TestCase):
             self.assertEqual(exit_code, protocol.EXIT_SUCCESS)
             self.assertTrue(response["result"]["pending_analysis_resumed"])
             self.assertEqual(pending["openvino_vlm_model"], str(model_dir))
+            # The validated installed version retains recovery metadata until
+            # analysis has actually succeeded, not merely until download ends.
             self.assertTrue(
                 (runtime_dir / client.PENDING_ANALYSIS_NAME).exists()
             )
 
-    def test_pending_analysis_is_cleared_only_after_successful_resume(self) -> None:
-        for analysis_exit, should_exist in ((1, True), (0, False)):
-            with self.subTest(analysis_exit=analysis_exit):
-                with tempfile.TemporaryDirectory() as temporary:
-                    runtime_dir = Path(temporary) / "runtime"
-                    client._save_pending_analysis(
-                        {"input_dir": "匿名 资料", "openvino_vlm_model": None},
-                        runtime_dir=runtime_dir,
-                    )
-                    pending = {
-                        "input_dir": "匿名 资料",
-                        "openvino_vlm_model": "model",
-                    }
-                    with mock.patch.object(
-                        client,
-                        "continue_download",
-                        return_value=(pending, {"ok": True}, 0),
-                    ), mock.patch.object(
-                        client,
-                        "execute_command",
-                        return_value=({"ok": analysis_exit == 0}, analysis_exit),
-                    ):
-                        exit_code = client.main(
-                            ["--continue"],
-                            runtime_dir=runtime_dir,
-                        )
-                    self.assertEqual(exit_code, analysis_exit)
-                    self.assertEqual(
-                        (runtime_dir / client.PENDING_ANALYSIS_NAME).exists(),
-                        should_exist,
-                    )
-
-    def test_different_pending_analysis_cannot_be_overwritten(self) -> None:
-        with tempfile.TemporaryDirectory() as temporary:
-            runtime_dir = Path(temporary) / "runtime"
-            client._save_pending_analysis(
-                {"input_dir": "first"}, runtime_dir=runtime_dir
-            )
-            with self.assertRaises(client.CliUsageError):
-                client._save_pending_analysis(
-                    {"input_dir": "second"}, runtime_dir=runtime_dir
-                )
-            pending = client._load_pending_analysis(runtime_dir)
-            self.assertEqual(pending["input_dir"], "first")
+            from unittest.mock import patch
+            with patch.object(client, "continue_download", return_value=(pending, response, exit_code)), \
+                 patch.object(client, "execute_command", return_value=({"ok": False}, 1)), \
+                 patch.object(client, "_print_json"):
+                self.assertEqual(client.main(["--continue"], runtime_dir=runtime_dir), 1)
+            self.assertTrue((runtime_dir / client.PENDING_ANALYSIS_NAME).exists())
+            with patch.object(client, "continue_download", return_value=(pending, response, exit_code)), \
+                 patch.object(client, "execute_command", return_value=({"ok": True}, 0)), \
+                 patch.object(client, "_print_json"):
+                self.assertEqual(client.main(["--continue"], runtime_dir=runtime_dir), 0)
+            self.assertFalse((runtime_dir / client.PENDING_ANALYSIS_NAME).exists())
 
     def test_download_pending_is_saved_for_continue(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

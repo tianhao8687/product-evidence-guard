@@ -1,0 +1,242 @@
+{
+  "date": "2026-09-04",
+  "model_id": "OpenVINO/Qwen3-VL-8B-Instruct-int4-ov",
+  "hardware": {
+    "cpu": "AMD Ryzen 7 7800X3D",
+    "installed_ram_gb": 32,
+    "test_device": "CPU"
+  },
+  "sample_sha256": "40c808ce56735a027cc990ee2e476a5b2538c538d1b20e0f6c2647182eabe7cf",
+  "warmup": {
+    "wall_seconds": 13.2934,
+    "resident": {
+      "device": "CPU",
+      "keep_alive": true,
+      "load_seconds": 4.4172,
+      "model_loaded": true,
+      "model_ready": true,
+      "model_reused": false,
+      "warmup_seconds": 12.4744
+    },
+    "memory": {
+      "min_available_physical": 5480898560,
+      "min_commit_available": 10920476672,
+      "large_python_pids": [
+        35256
+      ],
+      "max_large_processes_at_once": 1,
+      "peak_largest_python_working_set": 9503285248,
+      "peak_largest_python_private_bytes": 6470914048
+    }
+  },
+  "experiments": [
+    {
+      "name": "single",
+      "status": "passed",
+      "submitted_jobs": 1,
+      "total_seconds": 24.18,
+      "jobs": [
+        {
+          "index": 0,
+          "job_id": "c5a8fd1779b44ea587045950cf91c18b",
+          "submission_seconds": 0.6418,
+          "first_execution_observed_seconds": 0.647,
+          "completed": true,
+          "phase": "completed",
+          "wall_seconds": 23.926,
+          "analysis": {
+            "seconds": 23.142,
+            "model_load_seconds": 0.0,
+            "model_reused": true,
+            "routes": {
+              "qwen_ocr_review": 1
+            },
+            "files_reused": 0,
+            "candidates": 2,
+            "errors": 0
+          }
+        }
+      ],
+      "events": [
+        {
+          "job": 1,
+          "phase": "running",
+          "stage": "loading",
+          "seconds_since_submit": 0.647
+        },
+        {
+          "job": 1,
+          "phase": "running",
+          "stage": "file_started",
+          "seconds_since_submit": 1.644
+        },
+        {
+          "job": 1,
+          "phase": "completed",
+          "stage": "finalizing",
+          "seconds_since_submit": 23.926
+        }
+      ],
+      "status_latency_seconds": {
+        "count": 4,
+        "median": 0.9358,
+        "max": 1.0576
+      },
+      "memory": {
+        "min_available_physical": 3370881024,
+        "min_commit_available": 8577413120,
+        "large_python_pids": [
+          35256
+        ],
+        "max_large_processes_at_once": 1,
+        "peak_largest_python_working_set": 12017483776,
+        "peak_largest_python_private_bytes": 8234590208
+      }
+    },
+    {
+      "name": "two_requests",
+      "status": "passed",
+      "submitted_jobs": 2,
+      "total_seconds": 28.507,
+      "jobs": [
+        {
+          "index": 0,
+          "job_id": "6225f541ca224fc192fb938f8a572c54",
+          "submission_seconds": 0.6508,
+          "first_execution_observed_seconds": 14.748,
+          "completed": true,
+          "phase": "completed",
+          "wall_seconds": 28.248,
+          "analysis": {
+            "seconds": 13.3614,
+            "model_load_seconds": 0.0,
+            "model_reused": true,
+            "routes": {
+              "qwen_ocr_review": 1
+            },
+            "files_reused": 0,
+            "candidates": 2,
+            "errors": 0
+          }
+        },
+        {
+          "index": 1,
+          "job_id": "ef238e1448b5407b94709a15852009f1",
+          "submission_seconds": 0.6452,
+          "first_execution_observed_seconds": 0.661,
+          "completed": true,
+          "phase": "completed",
+          "wall_seconds": 14.757,
+          "analysis": {
+            "seconds": 13.9365,
+            "model_load_seconds": 0.0,
+            "model_reused": true,
+            "routes": {
+              "qwen_ocr_review": 1
+            },
+            "files_reused": 0,
+            "candidates": 2,
+            "errors": 0
+          }
+        }
+      ],
+      "events": [
+        {
+          "job": 1,
+          "phase": "running",
+          "stage": "queued",
+          "seconds_since_submit": 0.657
+        },
+        {
+          "job": 2,
+          "phase": "running",
+          "stage": "loading",
+          "seconds_since_submit": 0.661
+        },
+        {
+          "job": 2,
+          "phase": "running",
+          "stage": "file_started",
+          "seconds_since_submit": 1.772
+        },
+        {
+          "job": 1,
+          "phase": "running",
+          "stage": "file_started",
+          "seconds_since_submit": 14.748
+        },
+        {
+          "job": 2,
+          "phase": "completed",
+          "stage": "finalizing",
+          "seconds_since_submit": 14.757
+        },
+        {
+          "job": 1,
+          "phase": "completed",
+          "stage": "finalizing",
+          "seconds_since_submit": 28.248
+        }
+      ],
+      "status_latency_seconds": {
+        "count": 5,
+        "median": 1.0127,
+        "max": 1.0429
+      },
+      "memory": {
+        "min_available_physical": 4150145024,
+        "min_commit_available": 8728272896,
+        "large_python_pids": [
+          35256
+        ],
+        "max_large_processes_at_once": 1,
+        "peak_largest_python_working_set": 12021231616,
+        "peak_largest_python_private_bytes": 8240762880
+      }
+    }
+  ],
+  "single_after": {
+    "wall_seconds": 14.936,
+    "analysis_seconds": 14.188,
+    "model_load_seconds": 0.0,
+    "model_reused": true,
+    "routes": {
+      "qwen_ocr_review": 1
+    },
+    "cached_files": 0,
+    "errors": 0
+  },
+  "overall_memory": {
+    "min_available_physical": 3370881024,
+    "min_commit_available": 8577413120,
+    "large_python_pids": [
+      35256
+    ],
+    "max_large_processes_at_once": 1,
+    "peak_largest_python_working_set": 12021231616,
+    "peak_largest_python_private_bytes": 8240762880
+  },
+  "queue_contract": {
+    "active_background_limit": 8,
+    "ninth_distinct_output_rejected": true,
+    "repeated_active_output_reuses_job": true,
+    "evidence": "test_concurrency_contract.py; simulated executor, no model"
+  },
+  "findings": [
+    "One large model worker observed throughout; both concurrent requests reused the same model.",
+    "The operation lock serialized inference. Job 1 began only after job 2 completed its inference.",
+    "Concurrent requests did not double the model memory footprint.",
+    "A pending job may show phase=running while progress.stage=queued; this is a current status-display limitation.",
+    "Independent output directories are required for distinct concurrent tasks; active-job deduplication currently keys on output directory."
+  ],
+  "limitations": [
+    "One public image repeated into fresh output directories; no business-cache hits.",
+    "First business request was slower. No statistical throughput or broad accuracy claim.",
+    "Only two live concurrent requests were tested. The 8-job cap was checked with a simulated executor.",
+    "Windows memory readings sampled every 0.5s; working set and private bytes are different measures.",
+    "Two independent loaded model instances were not tested. Memory pressure and slowdown are inferred risks, not measured outcomes.",
+    "No process was forcibly stopped by the benchmark; model remains resident."
+  ],
+  "artifacts": ".runtime/concurrency-edfd0fb94b",
+  "reference": "https://docs.openvino.ai/2026/openvino-workflow/running-inference/optimize-inference/optimizing-throughput.html"
+}

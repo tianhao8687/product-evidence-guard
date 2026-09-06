@@ -66,6 +66,7 @@ from product_evidence_guard.openvino_adapter import (  # noqa: E402
     OpenVinoFactExtractor,
     resolve_openvino_device,
 )
+from workflow_service import WorkflowService, OPERATIONS as WORKFLOW_OPERATIONS
 
 
 LOGGER = logging.getLogger("product_evidence_guard.local_server")
@@ -406,14 +407,26 @@ def _resident_analysis_worker_main(connection: Any) -> None:
                 openvino_vlm_model=payload.get("openvino_vlm_model"),
                 requested_device=str(payload.get("device") or "AUTO"),
             )
+            if payload.get("warmup_only"):
+                if getattr(cache, "_warmed_key", None) != cache._key and prepared["vlm"] is not None:
+                    prepared["vlm"].warmup()
+                    cache._warmed_key = cache._key
+                send_to_parent({"type": "model_ready", "job_id": job_id,
+                                 "load_seconds": prepared["load_seconds"], "reused": prepared["reused"], "has_model": True})
+                send_to_parent({"type": "result", "job_id": job_id,
+                                 "summary": {"model_reused": prepared["reused"], "load_seconds": prepared["load_seconds"]}})
+                continue
             send_to_parent(
                 {
                     "type": "model_ready",
                     "job_id": job_id,
                     "load_seconds": prepared["load_seconds"],
                     "reused": prepared["reused"],
+                    "has_model": prepared["vlm"] is not None,
                 }
             )
+            if isinstance(prepared["vlm"], HybridImageReader):
+                prepared["vlm"].use_recognition_cache = not bool(payload.get("no_visual_cache", False))
             summary = analyze_directory(
                 payload["input_dir"],
                 payload["output_dir"],
@@ -548,6 +561,7 @@ class ResidentAnalysisWorker:
         payload: Mapping[str, Any],
         *,
         on_model_ready: Callable[[], None],
+        on_progress: Callable[[str, dict], None] | None = None,
         timeout_seconds: float = MAX_SINGLE_FILE_SECONDS,
     ) -> Mapping[str, Any]:
         if timeout_seconds <= 0:
@@ -590,6 +604,8 @@ class ResidentAnalysisWorker:
                 response_type = response.get("type")
                 if response_type == "model_ready":
                     on_model_ready()
+                    if on_progress:
+                        on_progress("model_ready", {"load_seconds": response.get("load_seconds"), "reused": response.get("reused"), "has_model": response.get("has_model", True)})
                     deadline = time.monotonic() + timeout_seconds
                     continue
                 if response_type == "progress":
@@ -597,6 +613,8 @@ class ResidentAnalysisWorker:
                     # Resetting here enforces 300 seconds per file/stage instead
                     # of incorrectly limiting the whole multi-file folder.
                     deadline = time.monotonic() + timeout_seconds
+                    if on_progress:
+                        on_progress(str(response.get("stage", "running")), dict(response.get("details") or {}))
                     continue
                 if response_type == "result":
                     summary = response.get("summary")
@@ -642,12 +660,23 @@ class ServerApplication:
         self._supports_resident_models = analyze is analyze_directory
         self._analysis_worker = analysis_worker or ResidentAnalysisWorker()
         self._operation_lock = threading.Lock()
+        self._progress_callback = None
+        self.workflow = WorkflowService(self)
 
     def dispatch(self, request: Mapping[str, Any]) -> dict[str, Any]:
         validated = validate_request(request)
         operation = validated["operation"]
         payload = validated["payload"]
         self.state.touch()
+        if operation in WORKFLOW_OPERATIONS or (operation == "analyze" and payload.get("background")):
+            try:
+                result = self.workflow.handle(operation, payload)
+                return success_response(validated, status=self.state.status, result=result)
+            except Exception as exc:
+                if operation == "warmup":
+                    self.workflow.resident["model_ready"] = False
+                    self.state.transition("running")
+                return error_response(validated, status=self.state.status, code="workflow_rejected", message=str(exc))
         if operation == "status":
             download_state = read_json_object(
                 self.state.runtime_dir / model_download.DOWNLOAD_STATE_NAME
@@ -658,6 +687,7 @@ class ServerApplication:
                 status="downloading" if download_active else self.state.status,
                 result={
                     "server": self.state.snapshot(),
+                    "resident": self.workflow.resident_snapshot(),
                     "download": download_state,
                     "available_operations": [
                         "status",
@@ -666,7 +696,7 @@ class ServerApplication:
                         "reject",
                         "export",
                         "shutdown",
-                    ],
+                    ] + sorted(WORKFLOW_OPERATIONS),
                 },
                 exit_code=(
                     EXIT_DOWNLOAD_PENDING if download_active else EXIT_SUCCESS
@@ -677,6 +707,7 @@ class ServerApplication:
             # output cannot be cut off halfway through an atomic workflow.
             with self._operation_lock:
                 self._analysis_worker.close()
+                self.workflow.resident.update(model_ready=False, keep_alive=False)
                 self.state.transition("shutdown", shutdown_reason="requested")
                 self.stop_event.set()
                 return success_response(
@@ -743,6 +774,7 @@ class ServerApplication:
         openvino_model = _optional_text(payload, "openvino_model")
         openvino_vlm_model = _optional_text(payload, "openvino_vlm_model")
         device = _optional_text(payload, "device") or "AUTO"
+        self.workflow.remember({**payload, "output_dir": output_dir})
 
         for model_path in (openvino_model, openvino_vlm_model):
             if model_path and not Path(model_path).expanduser().is_dir():
@@ -778,8 +810,10 @@ class ServerApplication:
                     "input_dir": input_dir,
                     "output_dir": output_dir,
                     **analyze_options,
+                    "no_visual_cache": bool(payload.get("no_visual_cache", False)),
                 },
                 on_model_ready=lambda: self.state.transition("running"),
+                on_progress=self.workflow.worker_progress,
             )
         else:
             self.state.transition("running")
@@ -980,7 +1014,7 @@ def serve_forever(
 
         while not stop_event.is_set():
             workers = [worker for worker in workers if worker.is_alive()]
-            if workers:
+            if workers or application.workflow.jobs.busy or application.workflow.resident["keep_alive"]:
                 remaining = idle_timeout
             else:
                 remaining = idle_timeout - state.idle_seconds()
@@ -1024,6 +1058,7 @@ def serve_forever(
         for worker in workers:
             if worker is not current_thread and worker.is_alive():
                 worker.join(timeout=5.0)
+        application.workflow.close()
         application._analysis_worker.close()
         if state.status not in {"shutdown", "error"}:
             state.transition("shutdown", shutdown_reason="server_exit")

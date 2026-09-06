@@ -45,7 +45,6 @@ from protocol import (  # noqa: E402
     remove_stale_runtime_identity,
     send_message,
     success_response,
-    terminate_exact_server,
     utc_now,
     validate_response,
 )
@@ -259,12 +258,13 @@ def ensure_server(
                 return _probe(connector=connector)
             except CommunicationError:
                 time.sleep(0.1)
-        disk_state = read_json_object(runtime_dir / "server-state.json") or {}
-        if disk_state.get("status") in {"downloading", "loading"}:
-            raise CommunicationError("本地服务正忙，尚不能接受该请求。")
-        if not terminate_exact_server(existing):
-            raise CommunicationError("旧服务无响应，且无法通过精确身份安全恢复。")
-        remove_stale_runtime_identity(runtime_dir)
+        # A missed health probe is not evidence that a live model process is
+        # disposable. Never kill it or start another model during recovery.
+        raise CommunicationError(
+            "本地服务进程仍存在，但暂时无法通过 Named Pipe 确认响应。"
+            "已保留现有进程，未自动终止或重启。请稍后重试；"
+            "需要关闭时请由用户明确执行本项目的 shutdown。"
+        )
     else:
         lock_path = runtime_dir / "server.lock"
         if lock_path.exists():
@@ -659,6 +659,12 @@ def prepare_local_model(
         return payload
     if payload.get("openvino_vlm_model"):
         return payload
+    preferred = read_json_object(runtime_dir / "model-preference.json")
+    if preferred and isinstance(preferred.get("model_path"), str):
+        if not Path(preferred["model_path"]).is_dir():
+            raise CliUsageError("先前预热的模型目录已不可用，请用 warmup --model 重新指定。")
+        payload["openvino_vlm_model"] = preferred["model_path"]
+        return payload
     spec = spec_loader()
     errors = model_download.verify_model_directory(
         spec.target,
@@ -737,6 +743,8 @@ def continue_download(
 def _command_payload(args: argparse.Namespace) -> dict[str, Any]:
     if args.command == "analyze":
         return {
+            **({"background": True} if args.background else {}),
+            **({"no_visual_cache": True} if args.no_visual_cache else {}),
             "input_dir": str(Path(args.input_dir).expanduser().resolve()),
             "output_dir": (
                 str(Path(args.output_dir).expanduser().resolve())
@@ -768,6 +776,9 @@ def _command_payload(args: argparse.Namespace) -> dict[str, Any]:
             "output_dir": str(Path(args.output_dir).expanduser().resolve()),
             "session_id": args.session_id,
         }
+    if args.command not in {"status", "shutdown"}:
+        from workflow_cli import payload
+        return payload(args)
     return {}
 
 
@@ -851,11 +862,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     commands = parser.add_subparsers(dest="command")
 
-    commands.add_parser("status", help="查看本地服务状态")
+    status_parser = commands.add_parser("status", help="查看本地服务状态")
+    status_parser.add_argument("--brief", action="store_true", help="仅返回模型状态，不返回本地诊断信息")
     commands.add_parser("shutdown", help="安全关闭本地服务")
 
     analyze = commands.add_parser("analyze", help="分析一个商品资料目录")
     analyze.add_argument("input_dir")
+    analyze.add_argument("--background", action="store_true", help="返回任务编号，后台运行并保留进度")
+    analyze.add_argument("--brief", action="store_true", help="仅返回可交给宿主的简短统计")
+    analyze.add_argument("--no-visual-cache", action="store_true", help="仅供基准测试跳过常驻图片缓存；模型仍复用")
     analyze.add_argument("--output", "--output-dir", dest="output_dir", default=None)
     analyze.add_argument("--openvino-model", default=None)
     analyze.add_argument(
@@ -885,6 +900,8 @@ def build_parser() -> argparse.ArgumentParser:
     export = commands.add_parser("export")
     export.add_argument("--output-dir", required=True)
     export.add_argument("--session-id", required=True)
+    from workflow_cli import add_commands
+    add_commands(commands)
     return parser
 
 
@@ -921,6 +938,12 @@ def main(
             raise CliUsageError("必须指定操作或使用 --continue。")
         operation = args.command
         payload = _command_payload(args)
+        if operation == "warmup" and not payload.get("openvino_vlm_model"):
+            preferred = read_json_object(runtime_dir / "model-preference.json") or {}
+            model_path = preferred.get("model_path") or str(model_download.load_download_spec().target)
+            if not Path(model_path).is_dir():
+                raise CliUsageError("首次预热请用 --model 指定已下载的千问目录；预热不会自动下载或替换模型。")
+            payload["openvino_vlm_model"] = model_path
         if operation == "analyze":
             if not Path(str(payload["input_dir"])).is_dir():
                 raise CliUsageError(
@@ -949,6 +972,12 @@ def main(
             starter=starter,
             runtime_dir=runtime_dir,
         )
+        if operation == "warmup" and response.get("ok"):
+            atomic_write_json(runtime_dir / "model-preference.json",
+                              {"model_path": payload["openvino_vlm_model"]})
+        if getattr(args, "brief", False):
+            from workflow_cli import brief_response
+            response = brief_response(response)
         if operation == "analyze" and exit_code == EXIT_SUCCESS:
             _clear_pending_analysis(runtime_dir)
         _print_json(response)
