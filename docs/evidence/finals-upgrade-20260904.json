@@ -1,0 +1,59 @@
+{
+  "date": "2026-09-04",
+  "full_regression": {
+    "tests": 216,
+    "seconds": 88.35,
+    "result": "passed"
+  },
+  "subsequent_targeted_regression": {
+    "content_workflow": 15,
+    "protocol": 22,
+    "result": "passed"
+  },
+  "browser": {
+    "tested_widths": [
+      320,
+      768,
+      1024,
+      1440
+    ],
+    "horizontal_overflow": false,
+    "console_errors": 0,
+    "flows": [
+      "evidence_preview",
+      "explicit_confirmation",
+      "field_authorization",
+      "conflict_350g",
+      "equivalent_0.32kg",
+      "source_stale_line_2",
+      "reanalyze"
+    ]
+  },
+  "cpu": {
+    "model_id": "OpenVINO/Qwen3-VL-8B-Instruct-int4-ov",
+    "device": "CPU",
+    "model_reused": true,
+    "model_load_seconds": 0.0,
+    "analysis_seconds": 25.609,
+    "routes": {
+      "qwen_ocr_review": 1
+    },
+    "errors": 0
+  },
+  "warmup": {
+    "first_handler_seconds": 18.8973,
+    "first_load_seconds": 6.937,
+    "repeat_handler_seconds": [
+      0.149,
+      0.1053
+    ],
+    "keep_alive": true,
+    "boundary": "service handler; not complete CLI time or image inference latency"
+  },
+  "qoder_cloud": {
+    "result": "not_verified",
+    "observed_response_key": "pricingUrl",
+    "test_data": "authorized synthetic field packet",
+    "reason": "provider returned a pricing link instead of generated content; account cause not established"
+  }
+}

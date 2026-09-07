@@ -1,0 +1,32 @@
+{
+  "date": "2026-09-06",
+  "status": "passed",
+  "changes": [
+    "Excel review workbook",
+    "scope-separated and issue-prioritized conversation",
+    "review export refresh tracking",
+    "reject inconsistent confirmed CSV exports"
+  ],
+  "targeted_tests": 26,
+  "new_test_cases": 3,
+  "installed_workflow": {
+    "operations": 15,
+    "seconds": 11.304,
+    "model_called": false,
+    "case": ".runtime/conversation-entry-d4fa879dcc"
+  },
+  "preview": {
+    "status": "passed",
+    "case": ".runtime/product-polish-f950b9cb",
+    "workbook": ".runtime/product-polish-f950b9cb/output/product-review.xlsx",
+    "fixture": "synthetic text-only product; no model inference",
+    "commands": 6,
+    "groups": 7,
+    "candidates": 18,
+    "confirmed_rows": 1
+  },
+  "visual_review": "three sheets rendered; overview and confirmed sheets checked after date/unit/scope fixes",
+  "installed_files_matched": 7,
+  "runtime_root": "<project-root>",
+  "article_updated": false
+}

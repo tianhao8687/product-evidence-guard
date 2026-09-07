@@ -53,6 +53,7 @@ $RequiredPaths = @(
     'docs/ARTICLE_DRAFT.md',
     'docs/BENCHMARK.md',
     'docs/COMPETITION_COMPLIANCE.md',
+    'docs/CONTENT_WORKFLOW.md',
     'docs/DEMO_SCRIPT.md',
     'docs/LIMITATIONS.md',
     'docs/MODEL_AND_RUNTIME.md',
@@ -131,6 +132,11 @@ $DeniedLeafPatterns = @(
     'id_ed25519',
     'pending-request.json',
     'server-state.json',
+    'content-workflow.json',
+    'model-preference.json',
+    'analysis-requests.json',
+    'confirmed-parameters.csv',
+    'local-product-brief.md',
     'server.pid',
     'server.lock'
 )

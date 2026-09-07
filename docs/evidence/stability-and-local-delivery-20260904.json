@@ -1,0 +1,47 @@
+{
+  "date": "2026-09-04",
+  "default_interface": "Qoder conversation; original-evidence page is optional",
+  "regression": {
+    "tests": 226,
+    "seconds": 77.323,
+    "status": "passed",
+    "log": ".runtime/final-local-delivery-regression.log"
+  },
+  "installed_public_entry": {
+    "status": "passed",
+    "commands": 14,
+    "seconds": 9.042,
+    "browser_commands": 0,
+    "local_vlm_loaded": false,
+    "data": "synthetic fixtures",
+    "case_directory": ".runtime/conversation-entry-d264d3273b"
+  },
+  "process_recovery": {
+    "automatic_termination_of_unresponsive_live_server": false,
+    "automatic_second_model_spawn_after_probe_failure": false,
+    "regression": "test_unresponsive_live_server_is_not_killed_replaced_or_unregistered passed",
+    "desktop_crash_causality": "Not established. This fix does not claim to diagnose the desktop crashes."
+  },
+  "qoder_cloud": {
+    "requested_model": "Qwen3.8-Flash",
+    "result": "credit_usage_limit",
+    "observed_message": "You've reached your credit usage limit.",
+    "cloud_generation_verified": false,
+    "attempt_directory": ".runtime/qoder-roundtrip-ff291ec2de"
+  },
+  "local_fallback": {
+    "status": "passed",
+    "reason": "quota_exceeded",
+    "outputs": ["confirmed-parameters.csv", "local-product-brief.md"],
+    "uses_only_current_confirmed_facts": true,
+    "tracks_source_changes": true,
+    "network_sent": false,
+    "model_called": false
+  },
+  "qoder_install": {
+    "target_skill": "local-product-evidence-guard",
+    "discovery": "Enabled",
+    "updated_runtime_files_match_source": true,
+    "schema_note": "Qoder version frontmatter retained. The Codex-only quick_validate.py rejects that field; Qoder discovery and installer validation passed."
+  }
+}

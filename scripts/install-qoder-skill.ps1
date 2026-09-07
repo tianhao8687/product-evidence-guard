@@ -38,6 +38,8 @@ $requiredRuntimeFiles = @(
     'product_evidence_guard/__main__.py',
     'product_evidence_guard/cli.py',
     'product_evidence_guard/confirmation.py',
+    'product_evidence_guard/conversation.py',
+    'product_evidence_guard/content_check.py',
     'product_evidence_guard/document_visuals.py',
     'product_evidence_guard/engine.py',
     'product_evidence_guard/extractor.py',
@@ -50,7 +52,15 @@ $requiredRuntimeFiles = @(
     'product_evidence_guard/parsers.py',
     'product_evidence_guard/qwen_vl_reader.py',
     'product_evidence_guard/reports.py',
+    'product_evidence_guard/recognition_cache.py',
+    'product_evidence_guard/review_focus.py',
+    'product_evidence_guard/review_workbook.py',
+    'product_evidence_guard/ocr_review_prompt.txt',
+    'product_evidence_guard/review_assets.py',
+    'product_evidence_guard/review_server.py',
     'product_evidence_guard/state.py',
+    'product_evidence_guard/task_jobs.py',
+    'product_evidence_guard/workflow.py',
     'scripts/benchmark-document-visuals.py',
     'scripts/benchmark.py',
     'scripts/client.py',
@@ -62,7 +72,9 @@ $requiredRuntimeFiles = @(
     'scripts/run.ps1',
     'scripts/run-demo.ps1',
     'scripts/run-demo.sh',
-    'scripts/server.py'
+    'scripts/server.py',
+    'scripts/workflow_cli.py',
+    'scripts/workflow_service.py'
 )
 $requiredFiles = @(
     'SKILL.md',
@@ -75,6 +87,7 @@ $requiredFiles = @(
     'LICENSE',
     'CHANGELOG.md',
     'docs/ARCHITECTURE.md',
+    'docs/CONTENT_WORKFLOW.md',
     'docs/NEXT_STEPS.md'
 ) + $requiredRuntimeFiles + $demoSampleFiles
 
@@ -91,6 +104,7 @@ $allowedFiles = $requiredFiles + @(
     'docs/LIMITATIONS.md',
     'docs/MODEL_AND_RUNTIME.md',
     'docs/OCR_ACCELERATION.md',
+    'docs/SPEED_OPTIMIZATION.md',
     'docs/QODER_VALIDATION.md',
     'docs/SUBMISSION_CHECKLIST.md',
     'docs/USER_GUIDE.md'
@@ -368,8 +382,8 @@ function Assert-SafeRelativePath {
         if (-not $leaf.EndsWith(
             '.py',
             [System.StringComparison]::OrdinalIgnoreCase
-        )) {
-            throw "产品源码白名单仅允许 .py：$RelativePath"
+        ) -and $RelativePath -cne 'product_evidence_guard/ocr_review_prompt.txt') {
+            throw "产品源码白名单仅允许 .py 和明确列出的复核提示资源：$RelativePath"
         }
     }
     elseif ($RelativePath.StartsWith(

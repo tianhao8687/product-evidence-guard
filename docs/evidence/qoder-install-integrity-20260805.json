@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "evidence_type": "qoder_install_integrity",
-  "observed_on": "2026-08-25",
+  "observed_on": "2026-09-07",
   "claim_boundary": "Local installation update and integrity audit. The existing prepared project runtime was reused; no Qoder conversation, product file access, model load, download, or network audit was requested.",
   "qoder_cli": {
     "version": "1.1.8",
@@ -30,8 +30,8 @@
   "critical_files": [
     {
       "path": "SKILL.md",
-      "source_sha256": "b66d0504bbede2afea679b1949c8bdc7d680aba1183d17de673a0aa69ee8e5ec",
-      "installed_sha256": "b66d0504bbede2afea679b1949c8bdc7d680aba1183d17de673a0aa69ee8e5ec",
+      "source_sha256": "e4e5a6c7f3014d005ebf7e3e2ce22b95be02b0fb074802cafc9a667ddd8d147e",
+      "installed_sha256": "e4e5a6c7f3014d005ebf7e3e2ce22b95be02b0fb074802cafc9a667ddd8d147e",
       "matches": true
     },
     {
@@ -54,14 +54,14 @@
     },
     {
       "path": "scripts/client.py",
-      "source_sha256": "c33a0474d86976c9f6a35dcf5ff97b12a4932692fa10182f8b1b9b1ef11d5dd2",
-      "installed_sha256": "c33a0474d86976c9f6a35dcf5ff97b12a4932692fa10182f8b1b9b1ef11d5dd2",
+      "source_sha256": "1d66def064099af101828ca2ba940f0e06c3cd5dc151a5ea74cfc07af38c99a8",
+      "installed_sha256": "1d66def064099af101828ca2ba940f0e06c3cd5dc151a5ea74cfc07af38c99a8",
       "matches": true
     },
     {
       "path": "scripts/server.py",
-      "source_sha256": "347e75e91bd749ce6f1ff8767663468c135ff4a8e792b9fd1206cddc77e2a28a",
-      "installed_sha256": "347e75e91bd749ce6f1ff8767663468c135ff4a8e792b9fd1206cddc77e2a28a",
+      "source_sha256": "ab82fe76b804c58dbb463d0a85cba17bed86e4a111f31b79e461acd8bd4ec496",
+      "installed_sha256": "ab82fe76b804c58dbb463d0a85cba17bed86e4a111f31b79e461acd8bd4ec496",
       "matches": true
     }
   ],

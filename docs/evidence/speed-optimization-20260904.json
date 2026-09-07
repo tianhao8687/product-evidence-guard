@@ -1,0 +1,311 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-04",
+  "status": "performance_and_evidence_passed",
+  "environment": {
+    "device": "CPU",
+    "model_id": "OpenVINO/Qwen3-VL-8B-Instruct-int4-ov",
+    "model_path": "<local-model-root>/Qwen3-VL-8B-Instruct-int4-ov",
+    "intel_hardware_tested": false,
+    "cloud_called": false
+  },
+  "image_sha256": "40c808ce56735a027cc990ee2e476a5b2538c538d1b20e0f6c2647182eabe7cf",
+  "prompt_resource_sha256": "1bfe5932b2491bb12f2bce4016b99ddb3062bd8e59db651a920d95e233d7e13b",
+  "entry": "Qoder installed Skill scripts/run.ps1 via existing local runtime bridge",
+  "raw_case": ".runtime/speed-4d56699fda",
+  "baseline_case": ".runtime/concurrency-edfd0fb94b",
+  "baseline": {
+    "first_business_wall_seconds": 23.926,
+    "warmed_wall_seconds": 14.936,
+    "warmed_analysis_seconds": 14.188,
+    "warmed_visual_seconds": 13.8944,
+    "parameter_candidates": 2,
+    "output_lines": 7
+  },
+  "runs": [
+    {
+      "name": "fresh_first",
+      "wall_seconds": 18.5729,
+      "analysis_seconds": 17.86,
+      "model_load_seconds": 0.0,
+      "route": "qwen_ocr_review",
+      "stage_timings": {
+        "image_load_seconds": 0.0206,
+        "visual_seconds": 17.4374,
+        "ocr_seconds": 0.3817,
+        "review_total_seconds": 17.4591,
+        "hybrid_total_seconds": 17.8455
+      },
+      "review_region": {},
+      "recognition_cache": {
+        "hit": false,
+        "scope": "resident_model",
+        "enabled": false
+      },
+      "transcription": "{\"schema_version\":1,\"lines\":[\"NET WEIGHT 8OZ\",\"NET WT 8.0oz (0.501b)\"]}",
+      "errors": [],
+      "baseline_facts_retained": true,
+      "candidate_count": 2,
+      "candidate_facts": [
+        {
+          "field": "net_weight",
+          "raw_value": "8OZ",
+          "normalized_value": 226.796185,
+          "normalized_unit": "g",
+          "scope": "net",
+          "source_file": "wegmans-octopus-salad-label.jpg",
+          "status": "pending"
+        },
+        {
+          "field": "net_weight",
+          "raw_value": "8.0oz (0.501b)",
+          "normalized_value": 226.796185,
+          "normalized_unit": "g",
+          "scope": "net",
+          "source_file": "wegmans-octopus-salad-label.jpg",
+          "status": "pending"
+        }
+      ],
+      "model_reused": true
+    },
+    {
+      "name": "fresh_warmed",
+      "wall_seconds": 8.3066,
+      "analysis_seconds": 7.6037,
+      "model_load_seconds": 0.0,
+      "route": "qwen_ocr_review",
+      "stage_timings": {
+        "image_load_seconds": 0.0201,
+        "visual_seconds": 7.3486,
+        "ocr_seconds": 0.2231,
+        "review_total_seconds": 7.3698,
+        "hybrid_total_seconds": 7.594
+      },
+      "review_region": {},
+      "recognition_cache": {
+        "hit": false,
+        "scope": "resident_model",
+        "enabled": false
+      },
+      "transcription": "{\"schema_version\":1,\"lines\":[\"NET WEIGHT 8OZ\",\"NET WT 8.0oz (0.501b)\"]}",
+      "errors": [],
+      "baseline_facts_retained": true,
+      "candidate_count": 2,
+      "candidate_facts": [
+        {
+          "field": "net_weight",
+          "raw_value": "8OZ",
+          "normalized_value": 226.796185,
+          "normalized_unit": "g",
+          "scope": "net",
+          "source_file": "wegmans-octopus-salad-label.jpg",
+          "status": "pending"
+        },
+        {
+          "field": "net_weight",
+          "raw_value": "8.0oz (0.501b)",
+          "normalized_value": 226.796185,
+          "normalized_unit": "g",
+          "scope": "net",
+          "source_file": "wegmans-octopus-salad-label.jpg",
+          "status": "pending"
+        }
+      ],
+      "model_reused": true
+    },
+    {
+      "name": "cache_fill",
+      "wall_seconds": 8.3979,
+      "analysis_seconds": 7.6778,
+      "model_load_seconds": 0.0,
+      "route": "qwen_ocr_review",
+      "stage_timings": {
+        "image_load_seconds": 0.0222,
+        "visual_seconds": 7.4006,
+        "ocr_seconds": 0.2438,
+        "review_total_seconds": 7.4237,
+        "hybrid_total_seconds": 7.6685
+      },
+      "review_region": {},
+      "recognition_cache": {
+        "hit": false,
+        "scope": "resident_model",
+        "enabled": true
+      },
+      "transcription": "{\"schema_version\":1,\"lines\":[\"NET WEIGHT 8OZ\",\"NET WT 8.0oz (0.501b)\"]}",
+      "errors": [],
+      "baseline_facts_retained": true,
+      "candidate_count": 2,
+      "candidate_facts": [
+        {
+          "field": "net_weight",
+          "raw_value": "8OZ",
+          "normalized_value": 226.796185,
+          "normalized_unit": "g",
+          "scope": "net",
+          "source_file": "wegmans-octopus-salad-label.jpg",
+          "status": "pending"
+        },
+        {
+          "field": "net_weight",
+          "raw_value": "8.0oz (0.501b)",
+          "normalized_value": 226.796185,
+          "normalized_unit": "g",
+          "scope": "net",
+          "source_file": "wegmans-octopus-salad-label.jpg",
+          "status": "pending"
+        }
+      ],
+      "model_reused": true
+    },
+    {
+      "name": "cache_hit_renamed",
+      "wall_seconds": 0.7194,
+      "analysis_seconds": 0.0146,
+      "model_load_seconds": 0.0,
+      "route": "qwen_ocr_review",
+      "stage_timings": {
+        "cache_lookup_seconds": 0.0019,
+        "ocr_seconds": 0.0,
+        "visual_seconds": 0.0
+      },
+      "review_region": {},
+      "recognition_cache": {
+        "hit": true,
+        "scope": "resident_model",
+        "original_route": "qwen_ocr_review"
+      },
+      "transcription": "{\"schema_version\":1,\"lines\":[\"NET WEIGHT 8OZ\",\"NET WT 8.0oz (0.501b)\"]}",
+      "errors": [],
+      "baseline_facts_retained": true,
+      "candidate_count": 2,
+      "candidate_facts": [
+        {
+          "field": "net_weight",
+          "raw_value": "8OZ",
+          "normalized_value": 226.796185,
+          "normalized_unit": "g",
+          "scope": "net",
+          "source_file": "renamed.jpg",
+          "status": "pending"
+        },
+        {
+          "field": "net_weight",
+          "raw_value": "8.0oz (0.501b)",
+          "normalized_value": 226.796185,
+          "normalized_unit": "g",
+          "scope": "net",
+          "source_file": "renamed.jpg",
+          "status": "pending"
+        }
+      ],
+      "model_reused": true
+    }
+  ],
+  "comparison": {
+    "warmed_mean_wall_seconds": 8.3522,
+    "warmed_wall_time_reduction_percent": 44.08,
+    "final_output_lines": 2,
+    "region_used_in_accepted_image_test": false,
+    "cache_hits_are_not_inference": true
+  },
+  "residency": {
+    "model_pid": 37068,
+    "keep_alive": true,
+    "max_large_python_processes": 1,
+    "min_free_physical_bytes": 3494146048,
+    "peak_model_working_set_bytes": 12037480448
+  },
+  "quality": {
+    "two_distinct_raw_evidence_lines_retained": true,
+    "normalized_values_match_baseline": true,
+    "renamed_source_rebound": true,
+    "confirmations_not_reused": true,
+    "schema_errors": 0
+  },
+  "limitations": [
+    "One real image on this CPU; not a general benchmark distribution.",
+    "First business inference still has additional overhead after blank-image warmup.",
+    "Concurrent distinct images remain serialized on one resident model.",
+    "Region behavior has unit coverage; this accepted real image used full-frame review."
+  ],
+  "rejected_trials": [
+    {
+      "case": ".runtime/speed-792618473e",
+      "reason": "Set comparison masked evidence deduplication; superseded by multiset check."
+    },
+    {
+      "case": ".runtime/speed-fc6f675d73",
+      "reason": "One of two evidence lines missing; rejected by multiset check."
+    }
+  ],
+  "validation": {
+    "status": "passed_after_targeted_packaging_fix",
+    "full_suite_tests": 246,
+    "full_suite_log": ".runtime/speed-release-regression.log",
+    "full_suite_packaging_failures": 7,
+    "packaging_fix": "Allow the exact required ocr_review_prompt.txt resource; other source allowlist rules retained.",
+    "installer_retest": {
+      "tests": 7,
+      "seconds": 29.075,
+      "status": "passed",
+      "log": ".runtime/speed-installer-regression.log"
+    },
+    "new_speed_tests": 18,
+    "new_speed_tests_status": "passed",
+    "all_failures_resolved": true,
+    "installed_entry": {
+      "status": "passed",
+      "installed_files_checked": [
+        "SKILL.md",
+        "pyproject.toml",
+        "product_evidence_guard/hybrid_image_reader.py",
+        "product_evidence_guard/qwen_vl_reader.py",
+        "product_evidence_guard/ocr_review_prompt.txt",
+        "product_evidence_guard/recognition_cache.py",
+        "product_evidence_guard/review_focus.py",
+        "scripts/server.py",
+        "scripts/client.py"
+      ],
+      "wall_seconds": 0.6903,
+      "source_rebound": true,
+      "candidate_count": 2,
+      "cache_hit": true,
+      "model_reused": true,
+      "model_load_seconds": 0
+    }
+  },
+  "finalization_20260905": {
+    "status": "completed",
+    "changes": [
+      "Default full-image review; unvalidated crop optimization is opt-in for developers.",
+      "Queued jobs remain queued until execution starts.",
+      "Reanalysis waits instead of suggesting actions on old results.",
+      "Brief results expose local timings and reuse facts without source data.",
+      "Skill entry shortened from 7169 to 4073 characters with linked operating details."
+    ],
+    "validation": {
+      "existing_targeted_tests": 40,
+      "test_modules": [
+        "test_workflow_service",
+        "test_recognition_speed",
+        "test_content_workflow"
+      ],
+      "status": "passed",
+      "new_test_files": 0,
+      "installed_public_entry": {
+        "status": "passed",
+        "commands": 14,
+        "seconds": 11.088,
+        "browser_commands": 0,
+        "model_called": false,
+        "case": ".runtime/conversation-entry-a4506ebbc8"
+      },
+      "installed_source_files_matched": 8,
+      "skill_reference_links_checked": 4
+    },
+    "installed_skill": "<user-home>/.qoder/skills/local-product-evidence-guard",
+    "performance_note": "No new real-model speed benchmark. The 2026-09-04 measurement remains the latest performance evidence.",
+    "model_residency_note": "The model service was stopped at turn start. Available memory was about 8.3 GiB, below the prior approximately 11.2 GiB model working-set peak; only the lightweight deterministic workflow was launched."
+  }
+}

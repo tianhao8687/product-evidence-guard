@@ -1,0 +1,43 @@
+{
+  "date": "2026-09-04",
+  "default_interface": "Qoder conversation",
+  "review_page": "optional, only when the user requests original evidence",
+  "unit_and_integration_regression": {
+    "tests": 223,
+    "seconds": 85.273,
+    "status": "passed",
+    "log": ".runtime/skill-first-final-tests.log"
+  },
+  "installed_entry_smoke": {
+    "entry": "Qoder user-level skill scripts/run.ps1",
+    "commands": 12,
+    "browser_commands": 0,
+    "seconds": 8.377,
+    "status": "passed",
+    "case_directory": ".runtime/conversation-entry-479c2f3dc6",
+    "coverage": [
+      "background analysis",
+      "field-scoped conversation review permission",
+      "minimal parameter summary without original filenames or text",
+      "A1/A2 choice confirmation",
+      "authorization using confirmed choices",
+      "field handoff",
+      "350g conflict detection",
+      "0.32kg equivalence to 320g",
+      "parameter table export",
+      "source changes invalidate deliverables and identify affected lines"
+    ],
+    "generation": "synthetic fixture; not a cloud model run"
+  },
+  "runtime": {
+    "device": "CPU",
+    "keep_alive": true,
+    "model_ready": true,
+    "warmup_handler_seconds": 15.8107,
+    "model_load_seconds": 6.1764
+  },
+  "cloud_generation": {
+    "status": "not_verified",
+    "reason": "The earlier Qoder CLI generation attempt returned pricingUrl; no new cloud run is claimed."
+  }
+}

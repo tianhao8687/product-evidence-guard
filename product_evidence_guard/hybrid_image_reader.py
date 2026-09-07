@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter
 from dataclasses import dataclass
 import hashlib
 import json
@@ -22,7 +23,11 @@ from .qwen_vl_reader import (
     QwenVlReadResult,
     QwenVlReader,
     deterministic_field_mappings,
+    OCR_REVIEW_PROMPT_REVISION,
+    ocr_review_template,
 )
+from .recognition_cache import RecognitionCache, bind_image_result
+from .review_focus import choose_review_region
 
 
 RAPIDOCR_VERSION = "3.9.1"
@@ -1289,10 +1294,32 @@ class HybridImageReader:
         *,
         ocr_backend: OcrBackend | None,
         ocr_unavailable_reason: str | None = None,
+        enable_recognition_cache: bool = False,
+        enable_review_region: bool = False,
     ) -> None:
         self._qwen_reader = qwen_reader
         self._ocr_backend = ocr_backend
         self._ocr_unavailable_reason = ocr_unavailable_reason
+        self._cache_capable = enable_recognition_cache
+        self.use_recognition_cache = enable_recognition_cache
+        self.enable_review_region = enable_review_region
+        self._recognition_cache = RecognitionCache()
+
+    @property
+    def optimization_revision(self):
+        prompt_hash = hashlib.sha256(ocr_review_template().encode("utf-8")).hexdigest()[:16]
+        region_mode = "context-band-v2" if self.enable_review_region else "full-image"
+        return f"{OCR_REVIEW_PROMPT_REVISION}:{prompt_hash}:{region_mode}:resident-cache-v1"
+
+    def warmup(self) -> None:
+        """Compile the vision and generation path using a generated blank fixture."""
+        from tempfile import TemporaryDirectory
+        from PIL import Image
+        with TemporaryDirectory(prefix="peg-warmup-") as temporary:
+            path = Path(temporary) / "warmup.png"
+            Image.new("RGB", (224, 224), "white").save(path)
+            backend = self._qwen_reader._backend
+            backend.generate("Describe this image in one word.", image=backend.load_image(path), max_new_tokens=4)
 
     @classmethod
     def from_openvino(
@@ -1317,6 +1344,7 @@ class HybridImageReader:
             qwen_reader,
             ocr_backend=ocr_backend,
             ocr_unavailable_reason=unavailable_reason,
+            enable_recognition_cache=True,
         )
 
     def analyze_image(
@@ -1326,6 +1354,51 @@ class HybridImageReader:
         *,
         deadline: float | None = None,
         observation_only: bool = False,
+    ) -> QwenVlReadResult:
+        started = time.perf_counter()
+        path = Path(image_path).expanduser().resolve()
+        root_path = Path(root).expanduser().resolve() if root is not None else path.parent
+        if deadline is not None and started >= deadline:
+            return QwenVlReadResult(image_file=path.name, file_hash="", errors=[
+                ModelOutputIssue(stage="image_read", code="deadline_exceeded", message="图片核验已超过截止时间。")
+            ])
+        cache_ready = self._cache_capable and path.is_file() and path.is_relative_to(root_path)
+        content_hash = sha256_file(path) if cache_ready else None
+        backend = getattr(self._qwen_reader, "_backend", None)
+        revision = self.optimization_revision
+        key = (content_hash, observation_only, revision, self.enable_review_region,
+               id(self._ocr_backend), id(backend), getattr(self._qwen_reader, "_visual_max_new_tokens", None),
+               getattr(self._qwen_reader, "_mapping_max_new_tokens", None))
+        cached = self._recognition_cache.get(key) if cache_ready and self.use_recognition_cache else None
+        if cached is not None and (deadline is None or time.perf_counter() < deadline):
+            result = bind_image_result(cached, path, root_path, content_hash)
+            result.recognition_cache = {"hit": True, "scope": "resident_model", "original_route": cached.image_route}
+            # Keep the recognizer identity for PDF/embedded-image provenance.
+            # Cache reuse is execution metadata, not a different evidence source.
+            result.stage_timings = {"cache_lookup_seconds": round(time.perf_counter() - started, 4),
+                                    "ocr_seconds": 0.0, "visual_seconds": 0.0}
+            unchanged = sha256_file(path) == content_hash
+            if unchanged and (deadline is None or time.perf_counter() < deadline):
+                return result
+            if unchanged:
+                return QwenVlReadResult(image_file=result.image_file, file_hash=content_hash, errors=[
+                    ModelOutputIssue(stage="recognition_cache", code="deadline_exceeded", message="图片核验已超过截止时间。")
+                ])
+            return QwenVlReadResult(image_file=path.relative_to(root_path).as_posix(), file_hash="",
+                errors=[ModelOutputIssue(stage="recognition_cache", code="source_changed", message="图片在缓存读取期间发生变化，请重试。")])
+        result = self._analyze_uncached(path, root_path, deadline=deadline, observation_only=observation_only)
+        if cache_ready and result.ok and result.file_hash == content_hash and (
+            deadline is None or time.perf_counter() < deadline
+        ) and sha256_file(path) == content_hash and self.optimization_revision == revision:
+            result = bind_image_result(result, path, root_path, content_hash)
+            result.recognition_cache = {"hit": False, "scope": "resident_model", "enabled": self.use_recognition_cache}
+            if self.use_recognition_cache:
+                self._recognition_cache.put(key, result)
+        return result
+
+    def _analyze_uncached(
+        self, image_path: str | Path, root: str | Path | None = None, *,
+        deadline: float | None = None, observation_only: bool = False,
     ) -> QwenVlReadResult:
         started = time.perf_counter()
         path = Path(image_path).expanduser().resolve()
@@ -1517,12 +1590,39 @@ class HybridImageReader:
             for line in hint_lines[:24]
         ]
         review_started = time.perf_counter()
+        region = (choose_review_region(path, all_lines, target_lines)
+                  if self.enable_review_region and getattr(self._qwen_reader, "supports_review_region", False)
+                  and "unknown_unit_like_token" not in reasons
+                  and not any(_has_ambiguous_same_field_measurements(line.text)
+                              or _has_multiple_io_directions(line.text) for line in target_lines)
+                  else None)
+        region_options = {"review_region": region} if region is not None else {}
         reviewed = self._qwen_reader.analyze_image(
             path,
             root_path,
             deadline=deadline,
             ocr_hints=hints,
+            **region_options,
         )
+        if region is not None:
+            text_by_id = {line.id: line.raw_text for line in transcriptions}
+            expected_fields = Counter(
+                (mapping.field, infer_semantic_scope(mapping.field, text_by_id[mapping.transcription_id])
+                 or _FIELD_SPECS_BY_NAME[mapping.field].scope)
+                for mapping in mappings)
+            actual_fields = Counter((candidate.field, candidate.scope) for candidate in reviewed.fact_candidates)
+            expected_conflict = _has_distinct_line_mapping_conflict(transcriptions, mappings)
+            actual_conflict = _has_distinct_line_mapping_conflict(reviewed.transcriptions, reviewed.mappings)
+            if (not reviewed.ok or bool(expected_fields - actual_fields)
+                    or len(reviewed.transcriptions) < len(target_lines)
+                    or (expected_conflict and not actual_conflict)):
+                # A crop must not silently remove a known field or conflict.
+                region_seconds = time.perf_counter() - review_started
+                reviewed = self._qwen_reader.analyze_image(path, root_path, deadline=deadline, ocr_hints=hints)
+                reviewed.stage_timings["region_attempt_seconds"] = round(region_seconds, 4)
+                reviewed.fallback_reasons.append("review_region_coverage_full_image_retry")
+            else:
+                reviewed.review_region["area_ratio"] = round((region[3] - region[1]) / 1000, 4)
         review_seconds = time.perf_counter() - review_started
         reviewed.image_route = "qwen_ocr_review"
         reviewed.ocr_line_count = len(all_lines)

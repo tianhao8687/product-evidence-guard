@@ -8,6 +8,11 @@ __pycache__/
 .nox/
 .venv/
 .runtime/
+content-workflow.json
+model-preference.json
+analysis-requests.json
+confirmed-parameters.csv
+local-product-brief.md
 .tools/
 .models/
 models/
