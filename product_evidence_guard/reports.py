@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from .models import CrossFieldRelation, FactCandidate, FactGroup
+from .field_registry import registry_fingerprint
+from .identity import IDENTITY_VERSION, product_entities_from_candidates
 from .state import atomic_write_json, atomic_write_text
 
 
@@ -143,14 +145,24 @@ def write_product_facts(
     relations: Iterable[CrossFieldRelation],
     run_summary: dict[str, Any],
 ) -> None:
+    candidate_list = list(candidates)
     atomic_write_json(
         path,
         {
-            "schema_version": 1,
+            "schema_version": 2,
+            "identity_version": IDENTITY_VERSION,
+            "field_registry_sha256": registry_fingerprint(),
             "status": "pending_human_confirmation",
             "warning": "这些是候选事实和核验结果，不是已经确认的正式产品参数。",
             "run_summary": run_summary,
-            "candidates": [candidate.to_dict() for candidate in candidates],
+            "products": [
+                product.to_dict()
+                for product in product_entities_from_candidates(
+                    candidate_list,
+                    dataset_name=str(run_summary.get("input_name") or "Dataset"),
+                )
+            ],
+            "candidates": [candidate.to_dict() for candidate in candidate_list],
             "fact_groups": [group.to_dict() for group in groups],
             "cross_field_relations": [relation.to_dict() for relation in relations],
         },
@@ -246,6 +258,8 @@ def write_conflicts_markdown(
                 f"## {group.field_label} — `{group.classification}`",
                 "",
                 f"- 严重程度：**{group.severity}**",
+                f"- 商品：`{group.product_label or group.product_id or 'unresolved'}`",
+                f"- 口径：`{group.scope or 'unspecified'}`",
                 f"- 判断：{group.reason}",
                 f"- 证据一致度：{group.evidence_consistency:.0%}",
                 f"- 建议：{recommendation}",
@@ -344,6 +358,7 @@ def write_html_report(
         cards.append(
             f"<section class='card {css_class}'>"
             f"<h2>{escape(group.field_label)} <small>{escape(group.classification)}</small></h2>"
+            f"<p><strong>商品 / 口径：</strong>{escape(group.product_label or group.product_id or 'unresolved')} / {escape(group.scope or 'unspecified')}</p>"
             f"<p>{escape(group.reason)}</p>"
             f"<p><strong>建议：</strong>{escape(recommendation)}</p>"
             f"<p><strong>三层可信度：</strong>识别 {group.recognition_confidence:.0%} · "

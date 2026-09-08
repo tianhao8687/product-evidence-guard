@@ -1,6 +1,6 @@
 # Product Evidence Guard 架构设计
 
-最后复核：2026-08-05
+最后复核：2026-09-08
 
 Product Evidence Guard 是一条本地证据核验管线。它的核心合同不是“让模型给
 答案”，而是：
@@ -222,8 +222,8 @@ Office 段落/工作表锚点，并删除临时文件。当前代码上限包括
 ```mermaid
 flowchart LR
     FV["FileVersion<br/>相对路径 + SHA-256"] -->|"包含 1..n"| SB["SourceBlock<br/>原文 + 定位 + 识别元数据"]
-    SB -->|"支持 0..n"| FC["FactCandidate<br/>字段 + 原始值 + 标准值"]
-    FC -->|"按字段分组"| FG["FactGroup<br/>一致 / 复核 / 冲突"]
+    SB -->|"支持 0..n"| FC["FactCandidate<br/>Product + Field + Scope + 标准值"]
+    FC -->|"按 Product / Field / Scope 分组"| FG["FactGroup<br/>一致 / 复核 / 冲突"]
     FC -->|"跨字段语义"| CR["CrossFieldRelation<br/>例如净重与毛重"]
     FG --> R["报告建议<br/>pass / review / block"]
     CR --> R
@@ -238,8 +238,8 @@ flowchart LR
 | 记录 | 关键字段 | 产生方 |
 |---|---|---|
 | `SourceBlock` | block ID、相对文件、文件哈希、类型、定位、原文、识别 confidence 及来源、提取方式、provenance | 解析器或通过校验的视觉读取器 |
-| `FactCandidate` | candidate ID、白名单字段、原值与标准值、单位、source block ID、文件哈希、定位、mapping confidence 及来源、状态 | 规则提取或通过校验的 mapping |
-| `FactGroup` | 字段、分类、严重度、candidate IDs、标准值、三类 confidence、解释与建议 | 确定性 graph engine |
+| `FactCandidate` | candidate ID、Product、白名单字段、Scope、原值与标准值、单位、source block ID、文件哈希、定位、mapping confidence 及来源、状态 | 规则提取或通过校验的 mapping |
+| `FactGroup` | Product、字段、Scope、稳定 group ID、分类、严重度、candidate IDs、标准值、三类 confidence、解释与建议 | 确定性 graph engine |
 | `CrossFieldRelation` | 相关字段、严重度、解释、candidate IDs | 确定性语义口径规则 |
 | `HumanDecision` | session、candidate、动作、理由、来源文件/哈希、时间、工具版本 | 显式用户命令 |
 
@@ -250,7 +250,7 @@ flowchart LR
 - `compatible_expression`
 - `insufficient_evidence`
 - `likely_version_update`
-- `strong_conflict`
+- `strong_conflict` / `semantic_scope_split`
 
 `pass` 只表示证据内部一致，不代表已经正式批准；`review` 需要人工判断；`block`
 阻止自动选择真值。
@@ -278,6 +278,11 @@ flowchart TD
     S --> N
 ```
 
+v2 的统一证据身份是 `SourceBlock + Product + Field + Scope + Unit + Value`；去重、
+候选 ID、图分组、缓存和确认快照都使用同一身份组成，避免任一环节遗失商品或语义
+口径。`ProductEntity` 首选结构化行中的显式 SKU；没有 SKU 时使用型号与变体组合。
+多商品资料中不能可靠归属的证据保留为歧义 Product，不猜测绑定关系。
+
 决定与导出必须提供同一个 `session_id`。确认和拒绝要求非空理由。
 `confirmation-audit.jsonl` 记录决定及后续 stale。来源一旦改变，文件哈希和
 candidate identity 会变化，旧决定不能静默存活。
@@ -297,12 +302,33 @@ candidate identity 会变化，旧决定不能静默存活。
 - engine signature 和文件哈希都相同：复用该文件候选；
 - 新文件或哈希变化：只重新解析该文件；
 - 路径删除：从新证据图移除其证据；
-- 模型路径/指纹、VLM 路径/指纹、device、工具 schema、实际 image reader 类别
-  或 OCR/Qwen capability identity 变化：旧缓存整体失效；
+- 模型路径/指纹、VLM 路径/指纹、device、工具 schema、Field Registry 指纹、身份
+  版本、实际 image reader 类别或 OCR/Qwen capability identity 变化：旧缓存整体失效；
 - 来源候选改变或移除：相关决定变为 `stale`。
 
 这是证据级失效。它不能证明供应商 revision 在业务语义上更新；文件名版本提示
 仍只是 `review` 信号。
+
+### 数据驱动字段与声明核验
+
+`field_registry.json` 是字段、别名、值类型、单位族、默认/允许 Scope 与安全提取
+约束的唯一注册表。加载器只接受声明式 JSON 并逐项校验；不执行注册表代码，也不
+使用 `eval`/`exec`。单位换算只使用有限的 scale/offset 数值规则。
+
+生成内容不直接与任意数值字符串比对。确定性检查器先建立 `ClaimCandidate`，状态为
+`supported`、`conflict`、`unsupported` 或 `needs_review`。只有同 Product、Field、
+Scope、标准值与单位全部一致的当前授权事实能够支持声明；容量到续航、防护等级到
+户外适用性等跨字段推导一律不自动成立。
+
+### 并行与决定事务
+
+文件哈希及 TXT/CSV/JSON/DOCX/XLSX/PDF 的确定性解析可以在线程池中并行，结果按
+稳定输入顺序聚合，所以业务输出不依赖任务完成顺序。OCR/Qwen 仍遵守现有常驻模型
+和资源边界，不因本次优化并发复制大模型。
+
+批量确认/拒绝会先验证完整候选集合、session、候选快照和当前源文件哈希，再一次性
+替换确认状态。每个候选写独立审计事件并共享事务 ID；冲突组只有在用户明确选择
+“同时拒绝同组其他值”时才拒绝其他候选。
 
 ## 模型获取与设备边界
 

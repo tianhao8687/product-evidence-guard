@@ -8,7 +8,7 @@ import tempfile
 from typing import Any
 
 
-STATE_SCHEMA_VERSION = 3
+STATE_SCHEMA_VERSION = 4
 
 
 def _empty_state() -> dict[str, Any]:
@@ -35,7 +35,7 @@ def load_state(path: Path) -> dict[str, Any]:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return _empty_state()
-    if data.get("schema_version") not in {1, 2, STATE_SCHEMA_VERSION} or not isinstance(data.get("files"), dict):
+    if data.get("schema_version") not in {1, 2, 3, STATE_SCHEMA_VERSION} or not isinstance(data.get("files"), dict):
         return _empty_state()
     data["schema_version"] = STATE_SCHEMA_VERSION
     data.setdefault("session_id", "")

@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import sys
 
-from .confirmation import ConfirmationError, apply_decision, export_confirmed
+from .confirmation import ConfirmationError, apply_batch_decisions, apply_decision, export_confirmed
 from .engine import analyze_directory
 
 
@@ -37,6 +37,12 @@ def build_parser() -> argparse.ArgumentParser:
         default="AUTO",
         help="OpenVINO device. AUTO chooses an Intel GPU when available, otherwise CPU.",
     )
+    analyze.add_argument(
+        "--preprocessing-workers",
+        type=int,
+        default=None,
+        help="Deterministic parser workers (1 keeps the serial reference path)",
+    )
 
     for command, help_text in (
         ("confirm", "Confirm one candidate after human review"),
@@ -51,6 +57,16 @@ def build_parser() -> argparse.ArgumentParser:
     export = subparsers.add_parser("export", help="Export currently confirmed, non-stale facts")
     export.add_argument("--output-dir", required=True)
     export.add_argument("--session-id", required=True)
+    for command, help_text, action in (
+        ("batch-confirm", "Confirm explicitly selected candidates", "confirm"),
+        ("batch-reject", "Reject explicitly selected candidates", "reject"),
+    ):
+        batch = subparsers.add_parser(command, help=help_text)
+        batch.add_argument("--output-dir", required=True)
+        batch.add_argument("--session-id", required=True)
+        batch.add_argument("--candidate-id", action="append", required=True)
+        batch.add_argument("--reason", required=True)
+        batch.set_defaults(batch_action=action)
     return parser
 
 
@@ -66,6 +82,7 @@ def main(argv: list[str] | None = None) -> int:
                 openvino_model=args.openvino_model,
                 openvino_vlm_model=args.openvino_vlm_model,
                 device=args.device,
+                preprocessing_workers=args.preprocessing_workers,
             )
         except Exception as exc:
             print(f"ERROR: {exc}", file=sys.stderr)
@@ -93,5 +110,18 @@ def main(argv: list[str] | None = None) -> int:
             print(f"ERROR: {exc}", file=sys.stderr)
             return 1
         print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+    if args.command in {"batch-confirm", "batch-reject"}:
+        try:
+            result = apply_batch_decisions(
+                args.output_dir,
+                session_id=args.session_id,
+                decisions=[{"candidate_id": candidate_id, "action": args.batch_action, "reason": args.reason}
+                           for candidate_id in args.candidate_id],
+            )
+        except ConfirmationError as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            return 1
+        print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
         return 0
     return 1

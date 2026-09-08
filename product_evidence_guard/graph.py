@@ -7,6 +7,7 @@ from statistics import mean
 from typing import Iterable
 
 from .models import CrossFieldRelation, FactCandidate, FactGroup
+from .identity import conflict_group_id, evidence_identity, graph_identity
 from .normalization import normalize_text, values_equal
 
 
@@ -17,14 +18,9 @@ VERSION_RE = re.compile(
 
 
 def _deduplicate(candidates: Iterable[FactCandidate]) -> list[FactCandidate]:
-    by_key: dict[tuple[str, str, str, str], FactCandidate] = {}
+    by_key: dict[tuple[str, str, str, str, str, str], FactCandidate] = {}
     for candidate in candidates:
-        key = (
-            candidate.source_block_id,
-            candidate.field,
-            normalize_text(candidate.raw_value),
-            str(candidate.normalized_value),
-        )
+        key = evidence_identity(candidate)
         existing = by_key.get(key)
         if existing is None or candidate.mapping_confidence > existing.mapping_confidence:
             by_key[key] = candidate
@@ -79,12 +75,28 @@ def _likely_version_update(candidates: list[FactCandidate]) -> bool:
 
 
 def build_fact_groups(candidates: Iterable[FactCandidate]) -> list[FactGroup]:
-    grouped: dict[str, list[FactCandidate]] = defaultdict(list)
-    for candidate in _deduplicate(candidates):
-        grouped[candidate.field].append(candidate)
+    deduplicated = _deduplicate(candidates)
+    by_product_field: dict[tuple[str, str], list[FactCandidate]] = defaultdict(list)
+    for candidate in deduplicated:
+        product_id, field, _scope = graph_identity(candidate)
+        by_product_field[(product_id, field)].append(candidate)
+    grouped: dict[tuple[str, str, str], list[FactCandidate]] = defaultdict(list)
+    split_scope_keys: set[tuple[str, str]] = set()
+    for (product_id, field), field_items in by_product_field.items():
+        explicit_scopes = {item.scope for item in field_items if item.scope}
+        if len(explicit_scopes) > 1:
+            split_scope_keys.add((product_id, field))
+        # Missing scope is uncertainty, not a separate trustworthy semantic
+        # scope. With one possible explicit scope, compare conservatively;
+        # with several, keep it isolated for review instead of guessing.
+        merge_unscoped = len(explicit_scopes) == 1
+        only_scope = next(iter(explicit_scopes)) if merge_unscoped else None
+        for candidate in field_items:
+            scope_key = candidate.scope or (only_scope if merge_unscoped else "")
+            grouped[(product_id, field, scope_key or "")].append(candidate)
 
     result: list[FactGroup] = []
-    for field, items in sorted(grouped.items()):
+    for (product_id, field, scope_key), items in sorted(grouped.items()):
         items.sort(key=lambda item: (item.source_file, str(item.locator), item.candidate_id))
         recognition = mean(item.recognition_confidence for item in items)
         mapping = mean(item.mapping_confidence for item in items)
@@ -92,7 +104,17 @@ def build_fact_groups(candidates: Iterable[FactCandidate]) -> list[FactGroup]:
         consistency = max(value_counts.values()) / len(items)
         label = items[0].field_label
 
-        if len(items) == 1:
+        if len(items) == 1 and (product_id, field) in split_scope_keys:
+            classification = "semantic_scope_split"
+            severity = "review"
+            reason = (
+                "该字段在同一商品下存在多个输入/输出、额定/典型/上下限、运行模式"
+                "或产品变体语义口径；各口径独立成组，数值不同不互判为冲突。"
+            )
+            recommendation = (
+                "按当前语义口径单独展示并人工确认，不要跨口径合并成一个值。"
+            )
+        elif len(items) == 1:
             classification = "insufficient_evidence"
             severity = "review"
             reason = "只找到一条证据，暂时无法用其他资料交叉验证。"
@@ -149,21 +171,28 @@ def build_fact_groups(candidates: Iterable[FactCandidate]) -> list[FactGroup]:
                 mapping_confidence=round(mapping, 4),
                 evidence_consistency=round(consistency, 4),
                 recommendation=recommendation,
+                product_id=product_id,
+                product_label=(items[0].product_sku or items[0].product_model or product_id),
+                scope=scope_key or None,
+                group_id=conflict_group_id(product_id, field, scope_key or None),
             )
         )
     return result
 
 
 def build_cross_field_relations(candidates: Iterable[FactCandidate]) -> list[CrossFieldRelation]:
-    by_field: dict[str, list[FactCandidate]] = defaultdict(list)
+    by_product_field: dict[tuple[str, str], list[FactCandidate]] = defaultdict(list)
     deduped = _deduplicate(candidates)
     for candidate in deduped:
-        by_field[candidate.field].append(candidate)
+        by_product_field[(graph_identity(candidate)[0], candidate.field)].append(candidate)
 
     relations: list[CrossFieldRelation] = []
-    weight_fields = [field for field in ("net_weight", "gross_weight", "weight") if by_field.get(field)]
-    if len(weight_fields) >= 2:
-        all_candidates = [candidate for field in weight_fields for candidate in by_field[field]]
+    product_ids = sorted({product for product, _ in by_product_field})
+    for product_id in product_ids:
+        weight_fields = [field for field in ("net_weight", "gross_weight", "weight") if by_product_field.get((product_id, field))]
+        if len(weight_fields) < 2:
+            continue
+        all_candidates = [candidate for field in weight_fields for candidate in by_product_field[(product_id, field)]]
         values = {
             (candidate.normalized_value, candidate.normalized_unit)
             for candidate in all_candidates
@@ -180,6 +209,7 @@ def build_cross_field_relations(candidates: Iterable[FactCandidate]) -> list[Cro
                         "但未说明口径的“重量”需要人工确认它指什么。"
                     ),
                     candidate_ids=[candidate.candidate_id for candidate in all_candidates],
+                    product_id=product_id,
                 )
             )
     return relations

@@ -67,8 +67,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 task --out
 
 用户主动查看原始证据时，`review --output-dir "<输出目录>"` 返回仅绑定 127.0.0.1 的临时地址。关闭服务后该地址失效。
 链接供用户直接打开，Qoder 不应通过模型浏览器、DOM 读取或截图将审核页中的原始证据带入云端上下文。
-页面支持证据预览、明确确认/拒绝和理由、授权字段、粘贴文案回检、导出 CSV、交付件影响检查。
-图片/PDF 显示对应原始图或页面；文字与表格显示提取的证据原文及行/单元格位置。
+页面支持按 Product/来源筛选、明确勾选后的批量确认/拒绝、冲突组显式处理、证据预览、
+授权字段、粘贴文案回检、导出 CSV 和交付件影响检查。普通“采用此值”不会自动拒绝
+同组其他候选；只有用户选择“采用并明确拒绝同组其余值”才执行该批量决定。
+图片/PDF 显示对应原始图或页面；定位包含有效 bbox 时叠加证据框，只有近似坐标时
+提示结合整页核对，坐标缺失或非法时显示整页/整图而不伪造位置。文字与表格显示
+提取的证据原文及行/单元格位置。
 
 ## 3. 严格区分本地证据与云端字段
 
@@ -105,7 +109,9 @@ Qoder 使用自身当前配置的模型，按用户要求生成内容。这里�
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 check-content --output-dir "<输出目录>" --session-id "<session_id>" --bundle-id "<bundle_id>" --recipient Qoder --content-file "<生成的文案或参数表>"
 ```
 
-结果包括覆盖字段、具体行号、观察值、授权依据和问题分类：
+结果包括 ClaimCandidate、具体行号、观察值、授权依据和问题分类。声明级状态为
+`supported`、`conflict`、`unsupported` 或 `needs_review`；只有 Product、Field、
+Scope、标准值和单位全部匹配才是 `supported`：
 
 | 状态 | 含义与后续 |
 | --- | --- |

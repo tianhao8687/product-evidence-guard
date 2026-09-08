@@ -88,10 +88,11 @@ def _manifest(output: Path, session: str) -> dict:
 
 
 def _public_fact(fact: dict, session: str) -> dict:
-    identity = {k: fact.get(k) for k in ("candidate_id", "file_hash", "normalized_value", "normalized_unit", "scope")}
+    identity = {k: fact.get(k) for k in ("candidate_id", "file_hash", "normalized_value", "normalized_unit", "scope", "product_id")}
     return {"fact_id": digest([session, identity])[:24], "field": fact["field"],
             "field_label": fact["field_label"], "value": fact["normalized_value"],
-            "unit": fact["normalized_unit"], "scope": fact.get("scope")}
+            "unit": fact["normalized_unit"], "scope": fact.get("scope"),
+            "product_id": fact.get("product_id")}
 
 
 def _current_refs(confirmed: list[dict], session: str) -> dict[str, dict]:
@@ -113,7 +114,7 @@ def create_handoff(output_dir: str | Path, *, candidate_ids: list[str], recipien
     selected = [by_id[i] for i in dict.fromkeys(candidate_ids)]
     seen: dict[tuple, tuple] = {}
     for fact in selected:
-        key = (fact["field"], fact.get("scope"))
+        key = (fact.get("product_id"), fact["field"], fact.get("scope"))
         value = value_key(fact["normalized_value"], fact["normalized_unit"])
         if key in seen and seen[key] != value:
             raise ConfirmationRequestError("同一字段仍有相互矛盾的已确认值，请先处理后再授权。")
@@ -311,14 +312,16 @@ def export_table(output_dir: str | Path, *, session_id: str | None = None) -> di
         raise ConfirmationRequestError("尚无当前有效的已确认参数。")
     values = {}
     for fact in confirmed:
-        key = (fact["field"], fact.get("scope"))
+        key = (fact.get("product_id"), fact["field"], fact.get("scope"))
         value = value_key(fact["normalized_value"], fact.get("normalized_unit"))
         if key in values and values[key] != value:
             raise ConfirmationRequestError("同一口径存在互相矛盾的已确认值，请先明确采用哪一条；可导出核验表查看差异。")
         values[key] = value
-    rows = [["参数", "值", "单位", "口径"]]
+    rows = [["商品 ID", "SKU", "型号", "变体", "参数", "值", "单位", "口径"]]
     for f in confirmed:
-        rows.append([f["field_label"], str(f["normalized_value"]), f.get("normalized_unit") or "", f.get("scope") or ""])
+        rows.append([f.get("product_id") or "", f.get("product_sku") or "", f.get("product_model") or "",
+                     f.get("product_variant") or "", f["field_label"], str(f["normalized_value"]),
+                     f.get("normalized_unit") or "", f.get("scope") or ""])
     buffer = io.StringIO(newline="")
     writer = csv.writer(buffer)
     for row in rows:
@@ -350,7 +353,7 @@ def export_local(output_dir: str | Path, *, reason: str = "local_only", session_
         raise ConfirmationRequestError("尚无有效的已确认参数，请先在对话中完成参数确认。")
     values = {}
     for fact in confirmed:
-        key = (fact["field"], fact.get("scope"))
+        key = (fact.get("product_id"), fact["field"], fact.get("scope"))
         value = value_key(fact["normalized_value"], fact.get("normalized_unit"))
         if key in values and values[key] != value:
             raise ConfirmationRequestError("同一口径仍存在多个矛盾的已确认值，请先明确采用哪个值。")

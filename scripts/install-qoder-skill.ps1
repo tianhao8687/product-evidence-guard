@@ -43,13 +43,17 @@ $requiredRuntimeFiles = @(
     'product_evidence_guard/document_visuals.py',
     'product_evidence_guard/engine.py',
     'product_evidence_guard/extractor.py',
+    'product_evidence_guard/field_registry.py',
+    'product_evidence_guard/field_registry.json',
     'product_evidence_guard/graph.py',
     'product_evidence_guard/hybrid_image_reader.py',
+    'product_evidence_guard/identity.py',
     'product_evidence_guard/model_output_schema.py',
     'product_evidence_guard/models.py',
     'product_evidence_guard/normalization.py',
     'product_evidence_guard/openvino_adapter.py',
     'product_evidence_guard/parsers.py',
+    'product_evidence_guard/preprocessing.py',
     'product_evidence_guard/qwen_vl_reader.py',
     'product_evidence_guard/reports.py',
     'product_evidence_guard/recognition_cache.py',
@@ -59,9 +63,11 @@ $requiredRuntimeFiles = @(
     'product_evidence_guard/review_assets.py',
     'product_evidence_guard/review_server.py',
     'product_evidence_guard/state.py',
+    'product_evidence_guard/structured_rows.py',
     'product_evidence_guard/task_jobs.py',
     'product_evidence_guard/workflow.py',
     'scripts/benchmark-document-visuals.py',
+    'scripts/benchmark-preprocessing.py',
     'scripts/benchmark.py',
     'scripts/client.py',
     'scripts/install-env.ps1',
@@ -382,8 +388,9 @@ function Assert-SafeRelativePath {
         if (-not $leaf.EndsWith(
             '.py',
             [System.StringComparison]::OrdinalIgnoreCase
-        ) -and $RelativePath -cne 'product_evidence_guard/ocr_review_prompt.txt') {
-            throw "产品源码白名单仅允许 .py 和明确列出的复核提示资源：$RelativePath"
+        ) -and $RelativePath -cne 'product_evidence_guard/ocr_review_prompt.txt' `
+          -and $RelativePath -cne 'product_evidence_guard/field_registry.json') {
+            throw "产品源码白名单仅允许 .py 和明确列出的静态配置/提示资源：$RelativePath"
         }
     }
     elseif ($RelativePath.StartsWith(

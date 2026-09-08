@@ -38,9 +38,9 @@ def group_candidates(rows, hashes):
     """Group by semantic scope and prioritize unresolved issues without choosing a value."""
     buckets = defaultdict(list)
     for candidate in rows:
-        buckets[(candidate["field"], candidate.get("scope"))].append(candidate)
+        buckets[(candidate.get("product_id"), candidate["field"], candidate.get("scope"))].append(candidate)
     groups = []
-    for (field, scope), items in buckets.items():
+    for (product_id, field, scope), items in buckets.items():
         current = [c for c in items if hashes.get(c["source_file"]) == c["file_hash"]]
         active = [c for c in current if c["status"] not in {"rejected", "stale"}]
         pending = any(c["status"] == "pending" for c in active)
@@ -56,11 +56,12 @@ def group_candidates(rows, hashes):
                 kind, severity, reason = "decided", "pass", "已按用户决定保留参数，其他候选不自动采用。"
             elif source_count < 2 and severity != "block":
                 kind, severity, reason = "insufficient_evidence", "review", "仅来自一份资料；同文件的多处文字不等于多来源验证。"
-        groups.append({"field": field, "label": items[0]["field_label"], "scope": scope,
+        groups.append({"product_id": product_id, "product_label": items[0].get("product_sku") or items[0].get("product_model") or product_id,
+            "field": field, "label": items[0]["field_label"], "scope": scope,
             "scope_label": scope_label(scope), "classification": kind, "severity": severity,
             "reason": reason, "source_count": source_count, "candidate_ids": [c["candidate_id"] for c in items]})
     return sorted(groups, key=lambda g: ({"block": 0, "review": 1, "pass": 2}.get(g["severity"], 1),
-                                       g["field"], g["scope"] or ""))
+                                       g.get("product_id") or "", g["field"], g["scope"] or ""))
 
 
 def snapshot(output, product):
@@ -169,33 +170,36 @@ def export_review(output_dir, *, session_id=None):
             advice = "在 Qoder 中核对候选，选择采用值并说明理由。"
         else:
             advice = "已有人工确认；其余未决定候选继续保留，不自动确认。"
-        overview.append([group["label"], group["scope_label"], issue, len(items), group["source_count"],
+        overview.append([group.get("product_label") or group.get("product_id") or "未归属商品",
+                         group["label"], group["scope_label"], issue, len(items), group["source_count"],
                          len(adopted), advice])
         for c in items:
             current = hashes.get(c["source_file"]) == c["file_hash"]
             status = c["status"] if current else "source_changed"
             position = _position(c.get("locator", {}))
-            details.append([c["field_label"], scope_label(c.get("scope")), STATUSES.get(status, status),
+            details.append([c.get("product_sku") or c.get("product_model") or c.get("product_id") or "未归属商品",
+                c["field_label"], scope_label(c.get("scope")), STATUSES.get(status, status),
                 _value(c["normalized_value"]), _unit(c.get("normalized_unit")), c["raw_value"],
                 c["source_file"], position, c["raw_text"], "" if current else "旧值仅供追溯，不可继续采用。", ""])
             if c["candidate_id"] in confirmed_ids and not conflicting_decisions and current:
-                selected.append([c["field_label"], scope_label(c.get("scope")), _value(c["normalized_value"]),
+                selected.append([c.get("product_sku") or c.get("product_model") or c.get("product_id") or "未归属商品",
+                                 c["field_label"], scope_label(c.get("scope")), _value(c["normalized_value"]),
                                  _unit(c.get("normalized_unit")), c["source_file"], position])
     overview_sheet = sheet("核验总览", "按口径分别核验，先处理冲突。证据一致不等于已经人工确认。",
-          ["参数", "口径", "核验情况", "候选数", "来源文件数", "已确认数", "下一步"], overview, [16, 20, 25, 12, 14, 12, 65])
+          ["商品", "参数", "口径", "核验情况", "候选数", "来源文件数", "已确认数", "下一步"], overview, [24, 16, 20, 25, 12, 14, 12, 65])
     for row in overview_sheet.iter_rows(min_row=5):
-        if "冲突" in row[2].value or row[2].value == "先更新资料":
-            row[2].fill = PatternFill("solid", fgColor="FBE4DE")
-            row[2].font = Font(name="微软雅黑", size=10, bold=True, color="9E3429")
+        if "冲突" in row[3].value or row[3].value == "先更新资料":
+            row[3].fill = PatternFill("solid", fgColor="FBE4DE")
+            row[3].font = Font(name="微软雅黑", size=10, bold=True, color="9E3429")
     detail_sheet = sheet("候选与证据", "包含待确认、拒绝或失效记录，仅供本地核对。修改 Excel 不会改变 Skill 的确认状态；最后一列可填写备注。",
-          ["参数", "口径", "状态", "标准值", "单位", "原始值", "来源文件", "位置", "证据原文", "提示", "人工备注"],
-          details, [16, 18, 18, 20, 10, 26, 32, 30, 58, 34, 32])
+          ["商品", "参数", "口径", "状态", "标准值", "单位", "原始值", "来源文件", "位置", "证据原文", "提示", "人工备注"],
+          details, [24, 16, 18, 18, 20, 10, 26, 32, 30, 58, 34, 32])
     for row in detail_sheet.iter_rows(min_row=5):
-        color = "FBE4DE" if row[2].value in {"来源已变化", "确认已失效"} else "FFF3D6" if row[2].value == "待确认" else "E5F1EA"
-        row[2].fill = PatternFill("solid", fgColor=color)
-        row[10].fill = PatternFill("solid", fgColor="F4F7FA")
+        color = "FBE4DE" if row[3].value in {"来源已变化", "确认已失效"} else "FFF3D6" if row[3].value == "待确认" else "E5F1EA"
+        row[3].fill = PatternFill("solid", fgColor=color)
+        row[11].fill = PatternFill("solid", fgColor="F4F7FA")
     sheet("已确认参数", "只列出当前有效的已确认记录；同一口径存在矛盾的已确认值时暂不列入。资料或决定变化后需重新导出。",
-          ["参数", "口径", "采用值", "单位", "来源文件", "位置"], selected, [18, 22, 24, 12, 40, 48])
+          ["商品", "参数", "口径", "采用值", "单位", "来源文件", "位置"], selected, [24, 18, 22, 24, 12, 40, 48])
 
     path = output / "product-review.xlsx"
     if path.exists():

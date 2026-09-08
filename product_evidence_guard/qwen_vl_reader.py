@@ -173,8 +173,8 @@ def _visual_prompt() -> str:
 7. 最多返回 8 项。不要输出品牌、品名、配料、日期、价格或营销文字，除非该文字本身明确表达字段白名单中的商品参数。
 8. 合并同一标签行；某个值已经出现在带字段标签的原文中时，不要再把该值单独重复输出。
 
-字段白名单：
-model, material, color, net_weight, gross_weight, weight, dimensions, length, width, height, quantity, voltage, current, power, capacity_charge, capacity_volume, capacity
+字段白名单（以 JSON 数组为准）：
+__FIELD_NAMES__
 
 只返回以下严格 JSON，不要 Markdown 代码块或解释：
 {
@@ -190,7 +190,7 @@ model, material, color, net_weight, gross_weight, weight, dimensions, length, wi
       "confidence_source": "model_self_assessment"
     }
   ]
-}"""
+}""".replace("__FIELD_NAMES__", _FIELD_NAMES_JSON)
 
 
 def ocr_review_template() -> str:

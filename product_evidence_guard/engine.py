@@ -16,7 +16,9 @@ from . import __version__
 from .confirmation import initialize_confirmation_outputs, reconcile_confirmations
 from .document_visuals import EmbeddedVisualAsset
 from .extractor import extract_rule_candidates
+from .field_registry import registry_fingerprint
 from .graph import build_graph
+from .identity import IDENTITY_VERSION, resolve_product_identities
 from .hybrid_image_reader import (
     OBSERVATION_FACT_OVERRIDE_REASON,
     HybridImageReader,
@@ -41,13 +43,14 @@ from .parsers import (
     sha256_file,
 )
 from .qwen_vl_reader import QwenVlReadResult, QwenVlReader
+from .preprocessing import preprocess_files
 from .reports import write_conflicts_markdown, write_html_report, write_product_facts
 from .state import STATE_SCHEMA_VERSION, atomic_write_json, load_state
 
 
 QWEN_MODEL_ID = "OpenVINO/Qwen3-VL-8B-Instruct-int4-ov"
 ENGINE_SCHEMA_REVISION = (
-    "competition-v1-openvino-ocr-qwen-hybrid-8-safe-observations-deadlines-roi"
+    "v2-product-evidence-identity-claims-registry-batch-bbox-parallel"
 )
 MAX_FILES_PER_TASK = 100
 MAX_FILE_BYTES = 100 * 1024 * 1024
@@ -156,6 +159,8 @@ def _engine_signature(
         "openvino_vlm_model_fingerprint": _model_fingerprint(openvino_vlm_model),
         "device": device,
         "image_reader_identity": dict(image_reader_identity or {}),
+        "identity_version": IDENTITY_VERSION,
+        "field_registry_sha256": registry_fingerprint(),
     }
     return hashlib.sha256(json.dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
 
@@ -835,6 +840,7 @@ def analyze_directory(
     preloaded_model_reused: bool | None = None,
     device_selection: OpenVinoDeviceSelection | None = None,
     progress_callback: Callable[[str, Mapping[str, Any]], None] | None = None,
+    preprocessing_workers: int | None = None,
 ) -> dict[str, Any]:
     started_at = time.perf_counter()
     root = Path(input_dir).expanduser().resolve()
@@ -950,6 +956,19 @@ def analyze_directory(
         raise ValueError(
             f"Too many input files: {len(discovered)} (limit: {MAX_FILES_PER_TASK})"
         )
+    preprocessed, preprocessing_summary = preprocess_files(
+        discovered,
+        root,
+        previous_files=previous_files,
+        max_file_bytes=MAX_FILE_BYTES,
+        workers=preprocessing_workers,
+        parser_callbacks={
+            "pdf": parse_pdf_document,
+            "docx": parse_docx_document,
+            "xlsx": parse_xlsx_document,
+            "generic": parse_file,
+        },
+    )
     for file_index, path in enumerate(discovered, start=1):
         if output_is_inside_input and (output == path or output in path.parents):
             continue
@@ -967,7 +986,8 @@ def analyze_directory(
             skipped_files.append({"file": relative, "reason": "ocr_sidecar_present"})
             continue
 
-        file_size = path.stat().st_size
+        prepared = preprocessed[path]
+        file_size = prepared.size
         if file_size > MAX_FILE_BYTES:
             skipped_files.append(
                 {
@@ -977,7 +997,7 @@ def analyze_directory(
             )
             continue
 
-        file_hash = sha256_file(path)
+        file_hash = prepared.file_hash
         cached = previous_files.get(relative)
         if (
             cached
@@ -1119,8 +1139,12 @@ def analyze_directory(
                 embedded_visual_assets: tuple[EmbeddedVisualAsset, ...] = ()
                 structured_document_visuals: tuple[Any, ...] = ()
                 document_visual_issues: tuple[dict[str, Any], ...] = ()
+                if prepared.error is not None:
+                    raise prepared.error
                 if suffix == ".pdf":
-                    pdf_result = parse_pdf_document(path, relative, file_hash)
+                    pdf_result = prepared.parsed
+                    if not hasattr(pdf_result, "blocks"):
+                        raise RuntimeError("deterministic PDF preprocessing result is missing")
                     blocks = list(pdf_result.blocks)
                     scanned_pdf_pages = pdf_result.scanned_page_numbers
                     mixed_pdf_pages = pdf_result.mixed_visual_page_numbers
@@ -1134,11 +1158,9 @@ def analyze_directory(
                         blocks
                     )
                 elif suffix == ".docx":
-                    document_result = parse_docx_document(
-                        path,
-                        relative,
-                        file_hash,
-                    )
+                    document_result = prepared.parsed
+                    if not hasattr(document_result, "blocks"):
+                        raise RuntimeError("deterministic DOCX preprocessing result is missing")
                     blocks = list(document_result.blocks)
                     embedded_visual_assets = document_result.visual_assets
                     structured_document_visuals = (
@@ -1146,11 +1168,9 @@ def analyze_directory(
                     )
                     document_visual_issues = document_result.visual_issues
                 elif suffix == ".xlsx":
-                    document_result = parse_xlsx_document(
-                        path,
-                        relative,
-                        file_hash,
-                    )
+                    document_result = prepared.parsed
+                    if not hasattr(document_result, "blocks"):
+                        raise RuntimeError("deterministic XLSX preprocessing result is missing")
                     blocks = list(document_result.blocks)
                     embedded_visual_assets = document_result.visual_assets
                     structured_document_visuals = (
@@ -1158,7 +1178,9 @@ def analyze_directory(
                     )
                     document_visual_issues = document_result.visual_issues
                 else:
-                    blocks = parse_file(path, root)
+                    if not isinstance(prepared.parsed, list):
+                        raise RuntimeError("deterministic preprocessing result is missing")
+                    blocks = prepared.parsed
 
             block_char_count = sum(len(block.text) for block in blocks)
             if total_text_chars + block_char_count > MAX_TOTAL_TEXT_CHARS:
@@ -1969,6 +1991,36 @@ def analyze_directory(
         )
     removed_files = sorted(set(previous_files) - current_paths) if cache_usable else []
 
+    candidates_by_old_id = {
+        (candidate.source_file, candidate.candidate_id): candidate
+        for candidate in all_candidates
+    }
+    products = resolve_product_identities(all_candidates, dataset_root=root)
+    for visual in visual_results:
+        serialized_candidates = visual.get("fact_candidates")
+        if not isinstance(serialized_candidates, list):
+            continue
+        refreshed: list[dict[str, Any]] = []
+        for row in serialized_candidates:
+            if not isinstance(row, dict):
+                continue
+            candidate = candidates_by_old_id.get(
+                (str(row.get("source_file", "")), str(row.get("candidate_id", "")))
+            )
+            refreshed.append(candidate.to_dict() if candidate is not None else row)
+        visual["fact_candidates"] = refreshed
+    candidates_by_source: dict[str, list[FactCandidate]] = {}
+    for candidate in all_candidates:
+        candidates_by_source.setdefault(candidate.source_file, []).append(candidate)
+    # State and cache snapshots use the same finalized candidate identity as
+    # the graph and confirmation layer.
+    for relative, entry in new_state_files.items():
+        if isinstance(entry, dict) and "candidates" in entry:
+            entry["candidates"] = _serialize_candidates(
+                candidates_by_source.get(relative, [])
+            )
+            entry["candidate_count"] = len(candidates_by_source.get(relative, []))
+
     candidates, groups, relations = build_graph(all_candidates)
     confirmation_statuses = reconcile_confirmations(
         output,
@@ -2128,6 +2180,12 @@ def analyze_directory(
         "skipped_files": skipped_files,
         "errors": errors,
         "candidate_count": len(candidates),
+        "product_count": len(products),
+        "ambiguous_product_count": sum(
+            1 for product in products if product.identity_status == "ambiguous"
+        ),
+        "identity_version": IDENTITY_VERSION,
+        "field_registry_sha256": registry_fingerprint(),
         "fact_group_count": len(groups),
         "blocking_conflict_count": sum(1 for group in groups if group.severity == "block"),
         "review_count": sum(1 for group in groups if group.severity == "review"),
@@ -2234,6 +2292,7 @@ def analyze_directory(
             "temporary_assets_retained": False,
         },
         "visual_content_cache": dict(visual_content_cache_stats),
+        "deterministic_preprocessing": preprocessing_summary,
         "limits": {
             "max_files": MAX_FILES_PER_TASK,
             "max_file_bytes": MAX_FILE_BYTES,

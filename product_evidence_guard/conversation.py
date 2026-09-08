@@ -69,7 +69,7 @@ def _snapshot(output, product, fields):
         except (OSError, ValueError):
             source_hashes[name] = None
     fingerprint = workflow.digest([
-        {**{k: c.get(k) for k in ("candidate_id", "field", "normalized_value", "normalized_unit", "scope", "file_hash")},
+        {**{k: c.get(k) for k in ("candidate_id", "product_id", "field", "normalized_value", "normalized_unit", "scope", "file_hash")},
          "current_source_hash": source_hashes[c["source_file"]]} for c in rows
     ])
     return rows, source_hashes, fingerprint
@@ -109,10 +109,14 @@ def review_summary(output_dir, *, review_id: str, recipient: str, session_id: st
                 "source_type": _source_type(c["source_kind"]),
                 "status": c["status"] if current else "source_changed"}
         if current:
-            item.update(value=c["normalized_value"], unit=c["normalized_unit"], scope=c.get("scope"))
+            item.update(value=c["normalized_value"], unit=c["normalized_unit"], scope=c.get("scope"),
+                        product_id=c.get("product_id"))
         mapping[choice] = c["candidate_id"]
         choices_by_id[c["candidate_id"]] = item
     for group in groups:
+        # Product labels can contain an unapproved SKU/model. The opaque
+        # product_id is enough to keep groups separate in the host summary.
+        group.pop("product_label", None)
         group["choices"] = [choices_by_id[cid] for cid in group.pop("candidate_ids")]
     summaries = manifest.setdefault("review_summaries", {})
     summaries[summary_id] = {"review_id": review_id, "session_id": session, "fingerprint": fingerprint,

@@ -18,6 +18,7 @@ from .document_visuals import (
     extract_xlsx_visuals,
 )
 from .models import SourceBlock
+from .structured_rows import bind_structured_rows
 
 
 TEXT_EXTENSIONS = {".txt", ".md"}
@@ -195,32 +196,57 @@ def parse_csv(path: Path, relative_path: str, file_hash: str) -> list[SourceBloc
     blocks: list[SourceBlock] = []
     with path.open("r", encoding="utf-8-sig", newline="") as handle:
         reader = csv.reader(handle)
-        for row_number, row in enumerate(reader, start=1):
-            nonempty = [(index + 1, cell.strip()) for index, cell in enumerate(row) if cell.strip()]
-            if not nonempty:
-                continue
-            if len(nonempty) >= 2:
-                combined = " | ".join(cell for _, cell in nonempty)
-                blocks.append(
-                    _make_block(
-                        relative_path=relative_path,
-                        source_kind="csv_row",
-                        file_hash=file_hash,
-                        locator={"row": row_number, "columns": [index for index, _ in nonempty]},
-                        text=combined,
-                    )
+        source_rows = [
+            (row_number, [(index + 1, cell) for index, cell in enumerate(row)])
+            for row_number, row in enumerate(reader, start=1)
+        ]
+    structured = bind_structured_rows(source_rows, table_id=f"{relative_path}:csv")
+    if structured is not None:
+        for cell in structured:
+            blocks.append(_make_block(
+                relative_path=relative_path,
+                source_kind="csv_cell",
+                file_hash=file_hash,
+                locator={"row": cell.row_number, "column": cell.location},
+                text=f"{cell.header}: {cell.value}",
+                method="deterministic_structured_row",
+            ))
+            blocks[-1].provenance["structured_row"] = {
+                "row_id": cell.row_id,
+                "identity": dict(cell.identity),
+                "field": cell.field,
+            }
+        return blocks
+    for row_number, row in source_rows:
+        nonempty = [
+            (index + 1, str(cell).strip())
+            for index, (_location, cell) in enumerate(row)
+            if str(cell).strip()
+        ]
+        if not nonempty:
+            continue
+        if len(nonempty) >= 2:
+            combined = " | ".join(cell for _, cell in nonempty)
+            blocks.append(
+                _make_block(
+                    relative_path=relative_path,
+                    source_kind="csv_row",
+                    file_hash=file_hash,
+                    locator={"row": row_number, "columns": [index for index, _ in nonempty]},
+                    text=combined,
                 )
-            else:
-                column, value = nonempty[0]
-                blocks.append(
-                    _make_block(
-                        relative_path=relative_path,
-                        source_kind="csv_cell",
-                        file_hash=file_hash,
-                        locator={"row": row_number, "column": column},
-                        text=value,
-                    )
+            )
+        else:
+            column, value = nonempty[0]
+            blocks.append(
+                _make_block(
+                    relative_path=relative_path,
+                    source_kind="csv_cell",
+                    file_hash=file_hash,
+                    locator={"row": row_number, "column": column},
+                    text=value,
                 )
+            )
     return blocks
 
 
@@ -318,6 +344,28 @@ def parse_docx_document(
             paragraph_index += 1
         elif isinstance(child, CT_Tbl):
             table = Table(child, document)
+            source_rows = [
+                (row_index, [(column, cell.text) for column, cell in enumerate(row.cells)])
+                for row_index, row in enumerate(table.rows)
+            ]
+            structured = bind_structured_rows(source_rows, table_id=f"{relative_path}:docx:{table_index}")
+            if structured is not None:
+                for cell in structured:
+                    blocks.append(_make_block(
+                        relative_path=relative_path,
+                        source_kind="docx_table_cell",
+                        file_hash=file_hash,
+                        locator={"table": table_index, "row": cell.row_number, "column": cell.location},
+                        text=f"{cell.header}: {cell.value}",
+                        method="deterministic_structured_row",
+                    ))
+                    blocks[-1].provenance["structured_row"] = {
+                        "row_id": cell.row_id,
+                        "identity": dict(cell.identity),
+                        "field": cell.field,
+                    }
+                table_index += 1
+                continue
             for row_index, row in enumerate(table.rows):
                 values = [cell.text.strip() for cell in row.cells if cell.text.strip()]
                 if values:
@@ -373,8 +421,29 @@ def parse_xlsx_document(
     blocks: list[SourceBlock] = []
     try:
         for sheet in workbook.worksheets:
-            for row in sheet.iter_rows():
-                cells = [(cell.coordinate, cell.value) for cell in row if cell.value not in (None, "")]
+            source_rows = [
+                (row_number, [(cell.coordinate, cell.value) for cell in row])
+                for row_number, row in enumerate(sheet.iter_rows(), start=1)
+            ]
+            structured = bind_structured_rows(source_rows, table_id=f"{relative_path}:xlsx:{sheet.title}")
+            if structured is not None:
+                for cell in structured:
+                    blocks.append(_make_block(
+                        relative_path=relative_path,
+                        source_kind="xlsx_cell",
+                        file_hash=file_hash,
+                        locator={"sheet": sheet.title, "row": cell.row_number, "cells": [cell.location]},
+                        text=f"{cell.header}: {cell.value}",
+                        method="deterministic_structured_row",
+                    ))
+                    blocks[-1].provenance["structured_row"] = {
+                        "row_id": cell.row_id,
+                        "identity": dict(cell.identity),
+                        "field": cell.field,
+                    }
+                continue
+            for row_number, row in source_rows:
+                cells = [(coordinate, value) for coordinate, value in row if value not in (None, "")]
                 if not cells:
                     continue
                 text = " | ".join(str(value) for _, value in cells)

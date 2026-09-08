@@ -14,6 +14,43 @@ from .confirmation import _load_json_object, ConfirmationRequestError
 from . import review_assets, workflow
 
 
+def _highlight_bbox(image, locator: dict, *, source_size: tuple[int, int] | None = None) -> str:
+    """Draw only validated evidence coordinates; otherwise leave the page whole."""
+    from PIL import ImageDraw
+
+    width, height = image.size
+    bbox = locator.get("bbox_1000")
+    precision = str(locator.get("position_precision") or "exact")
+    coordinates = None
+    if isinstance(bbox, (list, tuple)) and len(bbox) == 4:
+        try:
+            values = [float(value) for value in bbox]
+        except (TypeError, ValueError):
+            values = []
+        if len(values) == 4 and 0 <= values[0] < values[2] <= 1000 and 0 <= values[1] < values[3] <= 1000:
+            coordinates = [values[0] * width / 1000, values[1] * height / 1000,
+                           values[2] * width / 1000, values[3] * height / 1000]
+    raw_bbox = locator.get("bbox")
+    if coordinates is None and source_size and isinstance(raw_bbox, (list, tuple)) and len(raw_bbox) == 4:
+        try:
+            values = [float(value) for value in raw_bbox]
+        except (TypeError, ValueError):
+            values = []
+        source_width, source_height = source_size
+        if len(values) == 4 and source_width > 0 and source_height > 0 and (
+            0 <= values[0] < values[2] <= source_width and 0 <= values[1] < values[3] <= source_height
+        ):
+            coordinates = [values[0] * width / source_width, values[1] * height / source_height,
+                           values[2] * width / source_width, values[3] * height / source_height]
+            precision = "approximate"
+    if coordinates is None:
+        return "unavailable"
+    draw = ImageDraw.Draw(image, "RGBA")
+    line_width = max(3, round(min(width, height) / 250))
+    draw.rectangle(coordinates, fill=(255, 196, 0, 48), outline=(210, 45, 45, 255), width=line_width)
+    return "approximate" if precision == "approximate" else "exact"
+
+
 class ReviewServer:
     def __init__(self, extension) -> None:
         self.extension = extension
@@ -25,7 +62,7 @@ class ReviewServer:
             def log_message(self, *_args) -> None:
                 pass  # Tokens, filenames and evidence must not enter access logs.
 
-            def _send(self, status, data, mime="application/json; charset=utf-8"):
+            def _send(self, status, data, mime="application/json; charset=utf-8", extra_headers=None):
                 body = json.dumps(data, ensure_ascii=False).encode("utf-8") if isinstance(data, (dict, list)) else data
                 self.send_response(status)
                 self.send_header("Content-Type", mime)
@@ -34,6 +71,8 @@ class ReviewServer:
                 self.send_header("X-Content-Type-Options", "nosniff")
                 self.send_header("Referrer-Policy", "no-referrer")
                 self.send_header("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'")
+                for name, value in (extra_headers or {}).items():
+                    self.send_header(name, value)
                 self.end_headers()
                 self.wfile.write(body)
 
@@ -70,8 +109,8 @@ class ReviewServer:
                         data = owner.extension.snapshot(output, detailed=True)
                     elif url.path == "/api/preview":
                         with owner.extension.app._operation_lock:
-                            data, mime = owner.preview(output, query.get("candidate", [""])[0])
-                        return self._send(200, data, mime)
+                            data, mime, precision = owner.preview(output, query.get("candidate", [""])[0])
+                        return self._send(200, data, mime, {"X-PEG-Evidence-Position": precision})
                     elif url.path == "/api/artifact":
                         with owner.extension.app._operation_lock:
                             _, product, _ = workflow.context(output)
@@ -153,11 +192,13 @@ class ReviewServer:
             image = Image.open(io.BytesIO(raw))
             if image.width * image.height > 40_000_000:
                 raise ValueError("图片超过预览像素上限。")
+            source_size = image.size
             image.thumbnail((1800, 1800))
+            precision = _highlight_bbox(image, candidate["locator"], source_size=source_size)
             buffer = io.BytesIO()
             image.convert("RGB").save(buffer, format="JPEG", quality=88)
             image.close()
-            return buffer.getvalue(), "image/jpeg"
+            return buffer.getvalue(), "image/jpeg", precision
         if suffix == ".pdf":
             import pypdfium2 as pdfium
             document = pdfium.PdfDocument(raw)
@@ -172,10 +213,11 @@ class ReviewServer:
                     bitmap = page.render(scale=scale)
                     try:
                         image = bitmap.to_pil()
+                        precision = _highlight_bbox(image, candidate["locator"])
                         buffer = io.BytesIO()
                         image.convert("RGB").save(buffer, format="JPEG", quality=88)
                         image.close()
-                        return buffer.getvalue(), "image/jpeg"
+                        return buffer.getvalue(), "image/jpeg", precision
                     finally:
                         bitmap.close()
                 finally:
@@ -183,4 +225,4 @@ class ReviewServer:
             finally:
                 document.close()
         return {"text": candidate["raw_text"], "locator": candidate["locator"],
-                "source": candidate["source_file"]}, "application/json; charset=utf-8"
+                "source": candidate["source_file"]}, "application/json; charset=utf-8", "text"

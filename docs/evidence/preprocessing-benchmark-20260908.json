@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "measured_at_local_date": "2026-09-08",
+  "command": "python scripts/benchmark-preprocessing.py samples/generated-benchmark/documents --copies 10 --runs 5 --workers 8",
+  "python": "3.12.14",
+  "input": {
+    "path": "samples/generated-benchmark/documents",
+    "unique_files": 10,
+    "temporary_unique_operations_per_run": 100,
+    "runs": 5
+  },
+  "serial": {
+    "workers": 1,
+    "median_seconds": 0.147526,
+    "operations_per_second": 677.85,
+    "all_runs_stable": true
+  },
+  "parallel": {
+    "workers": 8,
+    "median_seconds": 0.120855,
+    "operations_per_second": 827.44,
+    "all_runs_stable": true
+  },
+  "speedup": 1.221,
+  "improvement_percent": 22.1,
+  "business_output_identical": true,
+  "output_digest": "c1618bb1c85795a56e93036b4d3e415279400aed14e4ea4e5c70ee5466e8f99f",
+  "validation_repeat": {
+    "serial_median_seconds": 0.150998,
+    "parallel_median_seconds": 0.125742,
+    "improvement_percent": 20.1,
+    "business_output_identical": true
+  },
+  "scope": "Deterministic hashing and document parsing only. OCR and Qwen were deliberately excluded.",
+  "limits": [
+    "The ten-file fixture was copied to isolated temporary paths to create 100 unique files per run.",
+    "A second complete invocation measured a 20.1% improvement with the same business digest.",
+    "Tiny or cache-hot workloads can be dominated by thread scheduling and may not improve.",
+    "This is a local throughput comparison, not an OCR/model benchmark.",
+    "CPU inventory access was denied in the managed environment."
+  ]
+}

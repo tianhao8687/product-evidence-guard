@@ -5,6 +5,8 @@ from decimal import Decimal, InvalidOperation
 import re
 from typing import Any
 
+from .field_registry import REGISTRY, field_definition
+
 
 @dataclass(frozen=True, slots=True)
 class NormalizedValue:
@@ -16,74 +18,18 @@ class NormalizedValue:
 _NUMBER = r"[-+]?\d+(?:\.\d+)?"
 
 
-UNIT_FACTORS: dict[str, dict[str, Decimal]] = {
-    "mass": {
-        "mg": Decimal("0.001"),
-        "g": Decimal("1"),
-        "克": Decimal("1"),
-        "kg": Decimal("1000"),
-        "千克": Decimal("1000"),
-        "公斤": Decimal("1000"),
-        "lb": Decimal("453.59237"),
-        "lbs": Decimal("453.59237"),
-        "磅": Decimal("453.59237"),
-        "oz": Decimal("28.349523125"),
-        "ounce": Decimal("28.349523125"),
-        "ounces": Decimal("28.349523125"),
-        "盎司": Decimal("28.349523125"),
-    },
-    "length": {
-        "mm": Decimal("1"),
-        "毫米": Decimal("1"),
-        "cm": Decimal("10"),
-        "厘米": Decimal("10"),
-        "m": Decimal("1000"),
-        "米": Decimal("1000"),
-        "in": Decimal("25.4"),
-        "inch": Decimal("25.4"),
-        "英寸": Decimal("25.4"),
-    },
-    "current": {
-        "ma": Decimal("0.001"),
-        "a": Decimal("1"),
-        "安": Decimal("1"),
-        "安培": Decimal("1"),
-    },
-    "voltage": {
-        "mv": Decimal("0.001"),
-        "v": Decimal("1"),
-        "伏": Decimal("1"),
-        "伏特": Decimal("1"),
-    },
-    "power": {
-        "mw": Decimal("0.001"),
-        "w": Decimal("1"),
-        "瓦": Decimal("1"),
-        "kw": Decimal("1000"),
-        "千瓦": Decimal("1000"),
-    },
-    "capacity_volume": {
-        "ml": Decimal("1"),
-        "毫升": Decimal("1"),
-        "l": Decimal("1000"),
-        "升": Decimal("1000"),
-    },
-    "capacity_charge": {
-        "mah": Decimal("1"),
-        "毫安时": Decimal("1"),
-        "ah": Decimal("1000"),
-        "安时": Decimal("1000"),
-    },
+UNIT_RULES = {
+    family.name: family.units
+    for family in REGISTRY.unit_families.values()
 }
-
+# Compatibility view for callers that only need multiplicative factors.
+UNIT_FACTORS: dict[str, dict[str, Decimal]] = {
+    name: {alias: rule.scale for alias, rule in rules.items()}
+    for name, rules in UNIT_RULES.items()
+}
 BASE_UNITS = {
-    "mass": "g",
-    "length": "mm",
-    "current": "A",
-    "voltage": "V",
-    "power": "W",
-    "capacity_volume": "mL",
-    "capacity_charge": "mAh",
+    family.name: family.base_unit
+    for family in REGISTRY.unit_families.values()
 }
 
 
@@ -101,8 +47,10 @@ def normalize_text(value: str) -> str:
 
 
 def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
-    factors = UNIT_FACTORS[family]
-    aliases = sorted(factors, key=len, reverse=True)
+    rules = UNIT_RULES.get(family)
+    if rules is None:
+        return None
+    aliases = sorted(rules, key=len, reverse=True)
     unit_pattern = "|".join(re.escape(item) for item in aliases)
     range_pattern = re.compile(
         rf"(?P<start>{_NUMBER})\s*"
@@ -118,16 +66,18 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
             "end_unit"
         )
         end_unit_text = range_match.group("end_unit")
-        start_factor = factors.get(start_unit_text.casefold()) or factors.get(
-            start_unit_text
-        )
-        end_factor = factors.get(end_unit_text.casefold()) or factors.get(
-            end_unit_text
-        )
-        if start_factor is not None and end_factor is not None:
+        start_rule = rules.get(start_unit_text.casefold())
+        end_rule = rules.get(end_unit_text.casefold())
+        if start_rule is not None and end_rule is not None:
             try:
-                start = Decimal(range_match.group("start")) * start_factor
-                end = Decimal(range_match.group("end")) * end_factor
+                start = (
+                    Decimal(range_match.group("start")) * start_rule.scale
+                    + start_rule.offset
+                )
+                end = (
+                    Decimal(range_match.group("end")) * end_rule.scale
+                    + end_rule.offset
+                )
             except InvalidOperation:
                 pass
             else:
@@ -149,13 +99,10 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
     except InvalidOperation:
         return None
     unit = match.group("unit").casefold()
-    factor = factors.get(unit)
-    if factor is None:
-        # Chinese units are unaffected by casefold but retained as a fallback.
-        factor = factors.get(match.group("unit"))
-    if factor is None:
+    rule = rules.get(unit)
+    if rule is None:
         return None
-    normalized = number * factor
+    normalized = number * rule.scale + rule.offset
     return NormalizedValue(_clean_decimal(normalized), BASE_UNITS[family])
 
 
@@ -181,45 +128,31 @@ def normalize_dimensions(raw: str) -> NormalizedValue | None:
     match = pattern.search(raw)
     if not match:
         return None
-    factor = UNIT_FACTORS["length"].get(match.group("unit").casefold())
-    if factor is None:
-        factor = UNIT_FACTORS["length"].get(match.group("unit"))
-    if factor is None:
+    rule = UNIT_RULES["length"].get(match.group("unit").casefold())
+    if rule is None:
         return None
     values: list[int | float] = []
     for key in ("a", "b", "c"):
         text = match.group(key)
         if text is None:
             continue
-        values.append(_clean_decimal(Decimal(text) * factor))
+        values.append(_clean_decimal(Decimal(text) * rule.scale + rule.offset))
     return NormalizedValue(values, "mm", ("dimension_order_preserved",))
 
 
 def normalize_value(field: str, raw: str) -> NormalizedValue:
-    family_by_field = {
-        "weight": "mass",
-        "net_weight": "mass",
-        "gross_weight": "mass",
-        "length": "length",
-        "width": "length",
-        "height": "length",
-        "current": "current",
-        "voltage": "voltage",
-        "power": "power",
-        "capacity_volume": "capacity_volume",
-        "capacity_charge": "capacity_charge",
-    }
+    definition = field_definition(field)
     if field == "capacity":
         return (
             normalize_number_with_unit(raw, "capacity_charge")
             or normalize_number_with_unit(raw, "capacity_volume")
             or NormalizedValue(normalize_text(raw), None, ("unparsed_capacity",))
         )
-    if field == "dimensions":
+    if definition and definition.value_type == "dimensions":
         return normalize_dimensions(raw) or NormalizedValue(normalize_text(raw), None, ("unparsed_dimensions",))
-    if field == "quantity":
+    if definition and definition.value_type == "count":
         return normalize_count(raw) or NormalizedValue(normalize_text(raw), None, ("unparsed_count",))
-    family = family_by_field.get(field)
+    family = definition.unit_family if definition else None
     if family:
         return normalize_number_with_unit(raw, family) or NormalizedValue(normalize_text(raw), None, ("unparsed_unit",))
     return NormalizedValue(normalize_text(raw), None)

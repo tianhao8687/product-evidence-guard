@@ -31,6 +31,7 @@ ROOT_REQUIRED = (
 )
 RUNTIME_SCRIPTS = (
     "scripts/benchmark-document-visuals.py",
+    "scripts/benchmark-preprocessing.py",
     "scripts/benchmark.py",
     "scripts/client.py",
     "scripts/install-env.ps1",
@@ -50,7 +51,10 @@ DEMO_FILES = (
     "samples/demo/参数表.csv",
     "samples/demo/包装正面.jpg.ocr.json",
 )
-PACKAGE_FILES = ("product_evidence_guard/ocr_review_prompt.txt",) + tuple(
+PACKAGE_FILES = (
+    "product_evidence_guard/ocr_review_prompt.txt",
+    "product_evidence_guard/field_registry.json",
+) + tuple(
     path.relative_to(REPO_ROOT).as_posix()
     for path in sorted((REPO_ROOT / "product_evidence_guard").glob("*.py"))
 )

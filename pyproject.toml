@@ -47,4 +47,4 @@ product-evidence-guard = "product_evidence_guard.cli:main"
 include = ["product_evidence_guard*"]
 
 [tool.setuptools.package-data]
-product_evidence_guard = ["ocr_review_prompt.txt"]
+product_evidence_guard = ["ocr_review_prompt.txt", "field_registry.json"]

@@ -1,48 +1,16 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import hashlib
 import json
 import re
 from typing import Iterable
 
+from .field_registry import FIELD_SPECS, FieldDefinition
 from .models import FactCandidate, SourceBlock
 from .normalization import normalize_text, normalize_value
 
-
-@dataclass(frozen=True, slots=True)
-class FieldSpec:
-    name: str
-    label: str
-    aliases: tuple[str, ...]
-    scope: str | None = None
-    mapping_confidence: float = 0.95
-
-
-FIELD_SPECS: tuple[FieldSpec, ...] = (
-    FieldSpec(
-        "net_weight",
-        "净重",
-        ("产品净重", "商品净重", "净含量", "净重", "net weight", "net wt"),
-        "net",
-    ),
-    FieldSpec("gross_weight", "毛重/包装重量", ("包装重量", "整箱重量", "毛重", "gross weight", "shipping weight"), "gross"),
-    FieldSpec("weight", "重量", ("单个重量", "产品重量", "商品重量", "重量", "weight"), "unspecified", 0.82),
-    FieldSpec("dimensions", "尺寸", ("产品尺寸", "包装尺寸", "规格尺寸", "外形尺寸", "尺寸", "dimensions", "dimension", "size")),
-    FieldSpec("length", "长度", ("总长", "长度", "length")),
-    FieldSpec("width", "宽度", ("宽度", "width")),
-    FieldSpec("height", "高度", ("高度", "height")),
-    FieldSpec("quantity", "数量", ("套装数量", "包装数量", "件数", "数量", "quantity", "qty", "count")),
-    FieldSpec("model", "型号", ("产品型号", "商品型号", "型号", "model no", "model", "sku")),
-    FieldSpec("material", "材质", ("主要材质", "产品材质", "材料", "材质", "material")),
-    FieldSpec("color", "颜色", ("产品颜色", "颜色", "colour", "color")),
-    FieldSpec("voltage", "电压", ("额定电压", "输入电压", "输出电压", "电压", "voltage")),
-    FieldSpec("current", "电流", ("额定电流", "最大电流", "输出电流", "电流", "current")),
-    FieldSpec("power", "功率", ("额定功率", "最大功率", "功率", "power")),
-    FieldSpec("capacity_charge", "电池容量", ("电池容量", "battery capacity")),
-    FieldSpec("capacity_volume", "容积", ("净容量", "容积", "volume capacity", "volume")),
-    FieldSpec("capacity", "容量", ("容量", "capacity"), mapping_confidence=0.78),
-)
+# Compatibility name retained for integrations that imported FieldSpec.
+FieldSpec = FieldDefinition
 
 # Longest aliases first, preventing "重量" from stealing "产品净重".
 _ALIAS_INDEX: list[tuple[str, FieldSpec]] = sorted(
@@ -52,22 +20,13 @@ _ALIAS_INDEX: list[tuple[str, FieldSpec]] = sorted(
 )
 
 _NUMERIC_FIELDS = {
-    "net_weight",
-    "gross_weight",
-    "weight",
-    "dimensions",
-    "length",
-    "width",
-    "height",
-    "quantity",
-    "voltage",
-    "current",
-    "power",
-    "capacity_charge",
-    "capacity_volume",
-    "capacity",
+    spec.name
+    for spec in FIELD_SPECS
+    if spec.value_type in {"number", "dimensions", "count", "capacity"}
 }
-_TEXT_FIELDS = {"model", "material", "color"}
+_TEXT_FIELDS = {
+    spec.name for spec in FIELD_SPECS if spec.value_type == "text"
+}
 _ELECTRICAL_LABEL_RE = re.compile(
     r"^\s*(?:[-*•]\s*)?"
     r"(?P<scope>input|output|输入|输出|entrada|salida|입력|출력)"
@@ -612,20 +571,24 @@ def _value_is_plausible(
     if not compact or len(compact) > 256 or "|" in compact:
         return False
 
-    if spec.name in _NUMERIC_FIELDS:
+    if spec.value_type in {"number", "dimensions", "count", "capacity"}:
         if normalized_unit is None:
             return False
         if any(note.startswith("unparsed_") for note in notes):
             return False
         return isinstance(normalized_value, (int, float, list))
 
-    if spec.name not in _TEXT_FIELDS:
+    if spec.value_type != "text":
         return False
-    if structure == "whitespace" and spec.name != "model":
+    constraints = spec.extraction_constraints
+    if (
+        structure == "whitespace"
+        and not constraints.get("allow_whitespace_separator", False)
+    ):
         return False
-    if len(compact) > (80 if spec.name != "model" else 96):
+    if len(compact) > int(constraints.get("max_length", 80)):
         return False
-    if len(compact.split()) > (10 if spec.name == "material" else 6):
+    if len(compact.split()) > int(constraints.get("max_words", 6)):
         return False
     if re.search(r"[\r\n;；]", compact):
         return False
@@ -706,6 +669,7 @@ def _extract_labeled_electrical_candidates(block: SourceBlock) -> list[FactCandi
                 extraction_method="deterministic_labeled_unit_mapping",
                 scope=scope,
                 notes=notes,
+                provenance=dict(block.provenance),
             )
         )
     return result
@@ -770,6 +734,7 @@ def extract_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
             extraction_method="deterministic_rule",
             scope=infer_semantic_scope(spec.name, block.text) or spec.scope,
             notes=list(normalized.notes),
+            provenance=dict(block.provenance),
         )
         candidates.append(candidate)
         fields_seen.add(spec.name)
@@ -790,6 +755,11 @@ def field_schema_for_prompt() -> str:
             "label": spec.label,
             "aliases": list(spec.aliases),
             "scope": spec.scope,
+            "value_type": spec.value_type,
+            "unit_family": spec.unit_family,
+            "category": spec.category,
+            "allowed_scopes": list(spec.allowed_scopes),
+            "extraction_constraints": dict(spec.extraction_constraints),
         }
         for spec in FIELD_SPECS
     ]

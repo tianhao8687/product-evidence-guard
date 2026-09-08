@@ -8,7 +8,11 @@ import time
 import uuid
 
 from protocol import build_request, success_response, error_response, read_json_object
-from product_evidence_guard.confirmation import ConfirmationRequestError
+from product_evidence_guard.confirmation import (
+    ConfirmationRequestError,
+    apply_batch_decisions,
+    resolve_conflict_group,
+)
 from product_evidence_guard import workflow, conversation
 from product_evidence_guard.state import atomic_write_json, atomic_write_text
 from product_evidence_guard.task_jobs import TaskJobs
@@ -183,6 +187,24 @@ class WorkflowService:
             if not response["ok"]:
                 raise ConfirmationRequestError(response["error"]["message"])
             return response["result"]
+        if action == "batch-decision":
+            with self.app._operation_lock:
+                return apply_batch_decisions(
+                    output,
+                    session_id=body["session_id"],
+                    decisions=body.get("decisions", []),
+                ).to_dict()
+        if action == "resolve-conflict":
+            with self.app._operation_lock:
+                return resolve_conflict_group(
+                    output,
+                    session_id=body["session_id"],
+                    group_id=body["group_id"],
+                    selected_candidate_id=body["candidate_id"],
+                    reason=body["reason"],
+                    reject_others=body.get("reject_others") is True,
+                    expected_candidate_ids=body.get("expected_candidate_ids"),
+                ).to_dict()
         if action in {"authorize", "revoke", "residency"}:
             return self.handle(action, {**body, "output_dir": str(output)})
         if action == "reanalyze":

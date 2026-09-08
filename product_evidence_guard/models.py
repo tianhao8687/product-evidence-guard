@@ -52,6 +52,12 @@ class FactCandidate:
     mapping_confidence_source: str = "deterministic"
     status: str = "pending"
     provenance: dict[str, Any] = field(default_factory=dict)
+    product_id: str | None = None
+    product_sku: str | None = None
+    product_model: str | None = None
+    product_variant: str | None = None
+    product_identity_status: str = "unresolved"
+    identity_version: int = 2
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -75,6 +81,10 @@ class FactGroup:
     mapping_confidence: float
     evidence_consistency: float
     recommendation: str
+    product_id: str | None = None
+    product_label: str | None = None
+    scope: str | None = None
+    group_id: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -87,6 +97,43 @@ class CrossFieldRelation:
     severity: str
     reason: str
     candidate_ids: list[str]
+    product_id: str | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(slots=True)
+class ProductEntity:
+    product_id: str
+    label: str
+    sku: str | None = None
+    model: str | None = None
+    variants: list[str] = field(default_factory=list)
+    identity_status: str = "explicit"
+    candidate_ids: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(slots=True)
+class ClaimCandidate:
+    """A statement found in generated content; never a confirmed fact."""
+
+    claim_id: str
+    raw_text: str
+    line: int
+    field: str | None
+    field_label: str | None
+    normalized_value: Any = None
+    normalized_unit: str | None = None
+    scope: str | None = None
+    product_id: str | None = None
+    status: str = "needs_review"
+    evidence_ids: list[str] = field(default_factory=list)
+    reason: str = ""
+    provenance: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

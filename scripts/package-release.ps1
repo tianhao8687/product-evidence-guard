@@ -64,6 +64,7 @@ $RequiredPaths = @(
     'info.json',
     'meta.json',
     'pyproject.toml',
+    'product_evidence_guard/field_registry.json',
     'requirements.lock',
     'requirements.txt',
     'samples/real/.gitkeep',

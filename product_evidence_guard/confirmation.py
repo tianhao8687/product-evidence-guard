@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 import stat
 from typing import Any, Iterable
+import uuid
 
 from . import __version__
 from .models import CrossFieldRelation, FactCandidate, FactGroup
@@ -19,7 +20,7 @@ from .reports import (
 from .state import atomic_write_json, atomic_write_text
 
 
-CONFIRMATION_SCHEMA_VERSION = 2
+CONFIRMATION_SCHEMA_VERSION = 3
 CONFIRMATION_STATE_NAME = "confirmation-state.json"
 CONFIRMATION_AUDIT_NAME = "confirmation-audit.jsonl"
 CONFIRMED_FACTS_NAME = "confirmed-product-facts.json"
@@ -45,6 +46,12 @@ CANDIDATE_SNAPSHOT_FIELDS = (
     "notes",
     "mapping_confidence_source",
     "provenance",
+    "product_id",
+    "product_sku",
+    "product_model",
+    "product_variant",
+    "product_identity_status",
+    "identity_version",
 )
 
 
@@ -70,6 +77,23 @@ class ConfirmationResult:
             "candidate_id": self.candidate_id,
             "field": self.field,
             "status": self.status,
+            "confirmed_facts_path": self.confirmed_facts_path,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class BatchConfirmationResult:
+    session_id: str
+    transaction_id: str
+    applied: tuple[ConfirmationResult, ...]
+    confirmed_facts_path: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "session_id": self.session_id,
+            "transaction_id": self.transaction_id,
+            "applied_count": len(self.applied),
+            "applied": [item.to_dict() for item in self.applied],
             "confirmed_facts_path": self.confirmed_facts_path,
         }
 
@@ -124,6 +148,8 @@ def _stale_event(
         "action": "stale",
         "status": "stale",
         "field": decision.get("field"),
+        "scope": decision.get("scope"),
+        "product_id": decision.get("product_id"),
         "candidate_id": candidate_id,
         "reason": reason,
         "file_hash": decision.get("file_hash"),
@@ -147,7 +173,7 @@ def _load_confirmation_state(
         return _new_confirmation_state(session_id), [], False
     data = _load_json_object(path)
     schema_version = data.get("schema_version")
-    if schema_version not in {1, CONFIRMATION_SCHEMA_VERSION}:
+    if schema_version not in {1, 2, CONFIRMATION_SCHEMA_VERSION}:
         raise ConfirmationError("确认状态版本不受支持，请重新分析。")
     if not isinstance(data.get("decisions"), dict):
         raise ConfirmationError("确认状态损坏，请保留输出目录并重新分析。")
@@ -519,6 +545,12 @@ def _write_confirmed_facts(
                 "raw_value": snapshot.get("raw_value"),
                 "normalized_value": snapshot.get("normalized_value"),
                 "normalized_unit": snapshot.get("normalized_unit"),
+                "scope": snapshot.get("scope"),
+                "product_id": snapshot.get("product_id"),
+                "product_sku": snapshot.get("product_sku"),
+                "product_model": snapshot.get("product_model"),
+                "product_variant": snapshot.get("product_variant"),
+                "product_identity_status": snapshot.get("product_identity_status"),
                 "candidate_id": candidate_id,
                 "source_file": snapshot.get("source_file"),
                 "file_hash": snapshot.get("file_hash"),
@@ -531,7 +563,7 @@ def _write_confirmed_facts(
     atomic_write_json(
         path,
         {
-            "schema_version": 1,
+            "schema_version": 2,
             "session_id": state["session_id"],
             "status": "human_confirmed",
             "warning": "只包含用户明确确认且源文件哈希仍有效的事实。",
@@ -594,6 +626,8 @@ def apply_decision(
         "action": action,
         "status": status,
         "field": str(candidate.get("field", "")),
+        "scope": candidate.get("scope"),
+        "product_id": candidate.get("product_id"),
         "candidate_id": candidate_id,
         "reason": clean_reason,
         "file_hash": str(candidate.get("file_hash", "")),
@@ -604,6 +638,8 @@ def apply_decision(
     decision = {
         "status": status,
         "field": event["field"],
+        "scope": event["scope"],
+        "product_id": event["product_id"],
         "reason": clean_reason,
         "timestamp": event["timestamp"],
         "file_hash": event["file_hash"],
@@ -629,6 +665,162 @@ def apply_decision(
         status=status,
         confirmed_facts_path=str(confirmed_path),
     )
+
+
+def apply_batch_decisions(
+    output_dir: str | Path,
+    *,
+    session_id: str,
+    decisions: Iterable[dict[str, Any]],
+) -> BatchConfirmationResult:
+    """Validate first, then atomically publish a complete decision set.
+
+    Every candidate receives its own audit row. The shared transaction id and
+    final commit row make a prepared-only audit record distinguishable from a
+    committed batch after an unexpected process interruption.
+    """
+    output = Path(output_dir).expanduser().resolve()
+    requests = list(decisions)
+    if not requests or len(requests) > 500:
+        raise ConfirmationRequestError("批量决定必须包含 1 到 500 条候选。")
+    seen: set[str] = set()
+    clean_requests: list[tuple[str, str, str]] = []
+    for request in requests:
+        if not isinstance(request, dict):
+            raise ConfirmationRequestError("批量决定中的每一项都必须是对象。")
+        candidate_id = str(request.get("candidate_id") or "").strip()
+        action = str(request.get("action") or "").strip()
+        reason = str(request.get("reason") or "").strip()
+        if not candidate_id or candidate_id in seen:
+            raise ConfirmationRequestError("批量决定包含空或重复的候选 ID。")
+        if action not in ALLOWED_ACTIONS:
+            raise ConfirmationRequestError(f"不支持的确认动作：{action}")
+        if not reason or len(reason) > 1000:
+            raise ConfirmationRequestError("每条批量决定都需要 1 到 1000 字的真实理由。")
+        seen.add(candidate_id)
+        clean_requests.append((candidate_id, action, reason))
+
+    product_facts = _load_json_object(output / "product-facts.json")
+    current_session = _session_id(product_facts)
+    if current_session != session_id:
+        raise ConfirmationRequestError("会话 ID 不匹配，请使用最新分析结果中的 session_id。")
+    rows = _candidate_rows(product_facts)
+    by_id = {str(row.get("candidate_id", "")): row for row in rows}
+    input_root, analysis_snapshots = _load_analysis_context(output, session_id=session_id)
+    hash_cache: dict[Path, str] = {}
+    prepared: list[tuple[dict[str, Any], str, str, dict[str, Any]]] = []
+    for candidate_id, action, reason in clean_requests:
+        candidate = by_id.get(candidate_id)
+        if candidate is None:
+            raise ConfirmationRequestError(f"候选 ID 不存在或已失效：{candidate_id}")
+        snapshot = _candidate_snapshot(candidate)
+        if analysis_snapshots.get(candidate_id) != snapshot:
+            raise ConfirmationRequestError("候选与分析状态不一致，请重新分析后再批量处理。")
+        source_error = _source_validation_error(input_root, snapshot, hash_cache)
+        if source_error is not None:
+            raise ConfirmationRequestError(f"{source_error} 请重新分析后再批量处理。")
+        prepared.append((candidate, action, reason, snapshot))
+
+    state, _, _ = _load_confirmation_state(output, session_id)
+    transaction_id = uuid.uuid4().hex
+    timestamp = _utc_now()
+    audit_events: list[dict[str, Any]] = []
+    applied: list[ConfirmationResult] = []
+    for candidate, action, reason, snapshot in prepared:
+        candidate_id = str(candidate["candidate_id"])
+        status = "confirmed" if action == "confirm" else "rejected"
+        event = {
+            "timestamp": timestamp,
+            "action": action,
+            "status": status,
+            "phase": "prepared",
+            "transaction_id": transaction_id,
+            "field": str(candidate.get("field", "")),
+            "scope": candidate.get("scope"),
+            "product_id": candidate.get("product_id"),
+            "candidate_id": candidate_id,
+            "reason": reason,
+            "file_hash": str(candidate.get("file_hash", "")),
+            "source_file": str(candidate.get("source_file", "")),
+            "session_id": session_id,
+            "tool_version": __version__,
+        }
+        audit_events.append(event)
+        state["decisions"][candidate_id] = {
+            "status": status,
+            "field": event["field"],
+            "scope": event["scope"],
+            "product_id": event["product_id"],
+            "reason": reason,
+            "timestamp": timestamp,
+            "file_hash": event["file_hash"],
+            "source_file": event["source_file"],
+            "transaction_id": transaction_id,
+            "candidate_snapshot": snapshot,
+            "candidate_snapshot_sha256": _snapshot_digest(snapshot),
+        }
+        applied.append(ConfirmationResult(
+            session_id=session_id,
+            candidate_id=candidate_id,
+            field=event["field"],
+            status=status,
+            confirmed_facts_path=str(output / CONFIRMED_FACTS_NAME),
+        ))
+
+    # Prepared audit rows are written before the all-or-nothing state replace.
+    _append_audit_events(output, audit_events)
+    atomic_write_json(output / CONFIRMATION_STATE_NAME, state)
+    _append_audit_events(output, [{
+        "timestamp": _utc_now(),
+        "action": "batch_commit",
+        "status": "committed",
+        "transaction_id": transaction_id,
+        "candidate_ids": [item.candidate_id for item in applied],
+        "session_id": session_id,
+        "tool_version": __version__,
+    }])
+    _synchronize_analysis_outputs(output, product_facts=product_facts, state=state)
+    confirmed_path = _write_confirmed_facts(output, product_facts=product_facts, state=state)
+    return BatchConfirmationResult(
+        session_id=session_id,
+        transaction_id=transaction_id,
+        applied=tuple(applied),
+        confirmed_facts_path=str(confirmed_path),
+    )
+
+
+def resolve_conflict_group(
+    output_dir: str | Path,
+    *,
+    session_id: str,
+    group_id: str,
+    selected_candidate_id: str,
+    reason: str,
+    reject_others: bool = False,
+    expected_candidate_ids: Iterable[str] | None = None,
+) -> BatchConfirmationResult:
+    """Confirm one explicit choice; reject peers only when explicitly asked."""
+    output = Path(output_dir).expanduser().resolve()
+    product_facts = _load_json_object(output / "product-facts.json")
+    if _session_id(product_facts) != session_id:
+        raise ConfirmationRequestError("会话 ID 不匹配，请刷新冲突组。")
+    groups = product_facts.get("fact_groups")
+    group = next((item for item in groups or [] if isinstance(item, dict) and item.get("group_id") == group_id), None)
+    if group is None or selected_candidate_id not in group.get("candidate_ids", []):
+        raise ConfirmationRequestError("冲突组或选择已经变化，请刷新后重试。")
+    if expected_candidate_ids is not None:
+        expected = {str(candidate_id) for candidate_id in expected_candidate_ids}
+        current = {str(candidate_id) for candidate_id in group.get("candidate_ids", [])}
+        if not expected or expected != current:
+            raise ConfirmationRequestError("冲突组成员已经变化，请刷新后重新明确选择。")
+    decisions = [{"candidate_id": selected_candidate_id, "action": "confirm", "reason": reason}]
+    if reject_others:
+        decisions.extend(
+            {"candidate_id": candidate_id, "action": "reject", "reason": reason}
+            for candidate_id in group["candidate_ids"]
+            if candidate_id != selected_candidate_id
+        )
+    return apply_batch_decisions(output, session_id=session_id, decisions=decisions)
 
 
 def reconcile_confirmations(

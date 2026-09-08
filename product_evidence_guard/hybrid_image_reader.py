@@ -27,6 +27,7 @@ from .qwen_vl_reader import (
     ocr_review_template,
 )
 from .recognition_cache import RecognitionCache, bind_image_result
+from .field_registry import registry_fingerprint
 from .review_focus import choose_review_region
 
 
@@ -1366,7 +1367,7 @@ class HybridImageReader:
         content_hash = sha256_file(path) if cache_ready else None
         backend = getattr(self._qwen_reader, "_backend", None)
         revision = self.optimization_revision
-        key = (content_hash, observation_only, revision, self.enable_review_region,
+        key = (content_hash, observation_only, revision, registry_fingerprint(), self.enable_review_region,
                id(self._ocr_backend), id(backend), getattr(self._qwen_reader, "_visual_max_new_tokens", None),
                getattr(self._qwen_reader, "_mapping_max_new_tokens", None))
         cached = self._recognition_cache.get(key) if cache_ready and self.use_recognition_cache else None
