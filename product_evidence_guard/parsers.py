@@ -1238,9 +1238,10 @@ def render_pdf_visual_region(
     )
 
 
-def parse_file(path: Path, root: Path) -> list[SourceBlock]:
+def parse_file(path: Path, root: Path, *, file_hash: str | None = None) -> list[SourceBlock]:
     relative_path = path.relative_to(root).as_posix()
-    file_hash = sha256_file(path)
+    if file_hash is None:
+        file_hash = sha256_file(path)
     lowered = path.name.casefold()
     if lowered.endswith(".ocr.json"):
         return parse_ocr_sidecar(path, relative_path, file_hash)

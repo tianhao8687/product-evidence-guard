@@ -7,7 +7,7 @@ from statistics import mean
 from typing import Iterable
 
 from .models import CrossFieldRelation, FactCandidate, FactGroup
-from .identity import conflict_group_id, evidence_identity, graph_identity
+from .identity import conflict_group_id, evidence_identity, graph_identity, identity_needs_review, product_label
 from .normalization import normalize_text, values_equal
 
 
@@ -104,7 +104,12 @@ def build_fact_groups(candidates: Iterable[FactCandidate]) -> list[FactGroup]:
         consistency = max(value_counts.values()) / len(items)
         label = items[0].field_label
 
-        if len(items) == 1 and (product_id, field) in split_scope_keys:
+        if any(identity_needs_review(item) for item in items):
+            classification = "identity_ambiguous"
+            severity = "review"
+            reason = "商品归属尚未确定，需要先确认这条参数属于哪个商品；当前不同值不能直接认定为同商品冲突。"
+            recommendation = "在来源资料中补充明确的 SKU、型号或变体归属并重新分析，再核对同商品、同口径的值。"
+        elif len(items) == 1 and (product_id, field) in split_scope_keys:
             classification = "semantic_scope_split"
             severity = "review"
             reason = (
@@ -172,7 +177,7 @@ def build_fact_groups(candidates: Iterable[FactCandidate]) -> list[FactGroup]:
                 evidence_consistency=round(consistency, 4),
                 recommendation=recommendation,
                 product_id=product_id,
-                product_label=(items[0].product_sku or items[0].product_model or product_id),
+                product_label=product_label(items[0].product_sku, items[0].product_model, items[0].product_variant, product_id),
                 scope=scope_key or None,
                 group_id=conflict_group_id(product_id, field, scope_key or None),
             )
@@ -184,6 +189,8 @@ def build_cross_field_relations(candidates: Iterable[FactCandidate]) -> list[Cro
     by_product_field: dict[tuple[str, str], list[FactCandidate]] = defaultdict(list)
     deduped = _deduplicate(candidates)
     for candidate in deduped:
+        if identity_needs_review(candidate):
+            continue
         by_product_field[(graph_identity(candidate)[0], candidate.field)].append(candidate)
 
     relations: list[CrossFieldRelation] = []

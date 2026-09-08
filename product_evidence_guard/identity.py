@@ -53,6 +53,16 @@ def graph_identity(candidate: FactCandidate) -> tuple[str, str, str]:
     return product, candidate.field, candidate.scope or ""
 
 
+def identity_needs_review(candidate: FactCandidate) -> bool:
+    # No product_id denotes the legacy direct graph API, not a v2 unresolved
+    # entity. Engine-produced candidates always have an explicit status/id.
+    return bool(candidate.product_id and candidate.product_identity_status in {"ambiguous", "unresolved"})
+
+
+def product_label(sku: str | None, model: str | None, variant: str | None, fallback: str) -> str:
+    return sku or " / ".join(part for part in (model, variant) if part) or fallback
+
+
 def evidence_identity(candidate: FactCandidate) -> tuple[str, str, str, str, str, str]:
     """Semantic identity for duplicate evidence, including unit and scope."""
     return (
@@ -132,8 +142,14 @@ def resolve_product_identities(
         by_file[candidate.source_file].append(candidate)
 
     resolved: dict[int, tuple[str, str | None, str | None, str | None, str]] = {}
+    uncertain: set[int] = set()
     for items in by_row.values():
         sku, model, variant = _identity_values(items)
+        row_identities = [item.provenance.get("structured_row", {}).get("identity", {}) for item in items]
+        if any(identity.get("_ambiguous_identity") or
+               (not sku and identity.get("_ambiguous_variant")) for identity in row_identities):
+            uncertain.update(id(item) for item in items)
+            continue
         product_id = product_id_for(sku=sku, model=model, variant=variant)
         if product_id:
             status = "explicit_sku" if sku else "explicit_model_variant" if variant else "explicit_model"
@@ -148,7 +164,8 @@ def resolve_product_identities(
             product_id = next(iter(identities))
             anchor = next(resolved[id(item)] for item in items if id(item) in resolved)
             for candidate in items:
-                resolved.setdefault(id(candidate), (*anchor[:4], "derived_from_unique_source_identity"))
+                if id(candidate) not in uncertain:
+                    resolved.setdefault(id(candidate), (*anchor[:4], "derived_from_unique_source_identity"))
 
     explicit_products = {value[0] for value in resolved.values()}
     dataset_token = stable_id("product", {
@@ -158,7 +175,10 @@ def resolve_product_identities(
     for candidate in rows:
         if id(candidate) in resolved:
             continue
-        if len(explicit_products) == 1:
+        if id(candidate) in uncertain:
+            ambiguous = stable_id("product", {"v": IDENTITY_VERSION, "ambiguous_row": _row_key(candidate)})
+            resolved[id(candidate)] = (ambiguous, None, None, None, "ambiguous")
+        elif len(explicit_products) == 1:
             only = next(iter(explicit_products))
             anchor = next(value for value in resolved.values() if value[0] == only)
             resolved[id(candidate)] = (*anchor[:4], "derived_from_single_dataset_product")
@@ -190,7 +210,7 @@ def product_entities_from_candidates(
     for candidate in candidates:
         if not candidate.product_id:
             continue
-        label = candidate.product_sku or candidate.product_model or (
+        label = product_label(candidate.product_sku, candidate.product_model, candidate.product_variant,
             dataset_name if candidate.product_identity_status == "dataset_default" else "Ambiguous product"
         )
         entity = entities.setdefault(candidate.product_id, ProductEntity(

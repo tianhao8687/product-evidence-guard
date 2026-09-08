@@ -92,11 +92,17 @@ def _public_fact(fact: dict, session: str) -> dict:
     return {"fact_id": digest([session, identity])[:24], "field": fact["field"],
             "field_label": fact["field_label"], "value": fact["normalized_value"],
             "unit": fact["normalized_unit"], "scope": fact.get("scope"),
-            "product_id": fact.get("product_id")}
+            "product_id": fact.get("product_id"),
+            "product_identity_status": fact.get("product_identity_status")}
 
 
 def _current_refs(confirmed: list[dict], session: str) -> dict[str, dict]:
     return {_public_fact(f, session)["fact_id"]: f for f in confirmed}
+
+
+def _require_product_ownership(facts: list[dict]) -> None:
+    if any(f.get("product_identity_status") in {"ambiguous", "unresolved"} for f in facts):
+        raise ConfirmationRequestError("需要先确认参数属于哪个商品：请补充来源中的 SKU/型号/变体并重新分析；可先导出核验表。")
 
 
 def create_handoff(output_dir: str | Path, *, candidate_ids: list[str], recipient: str,
@@ -112,6 +118,7 @@ def create_handoff(output_dir: str | Path, *, candidate_ids: list[str], recipien
     if any(i not in by_id for i in candidate_ids):
         raise ConfirmationRequestError("选择中包含未确认、被拒绝或已经失效的参数。")
     selected = [by_id[i] for i in dict.fromkeys(candidate_ids)]
+    _require_product_ownership(selected)
     seen: dict[tuple, tuple] = {}
     for fact in selected:
         key = (fact.get("product_id"), fact["field"], fact.get("scope"))
@@ -310,6 +317,7 @@ def export_table(output_dir: str | Path, *, session_id: str | None = None) -> di
     output, product, confirmed = context(output_dir, session_id)
     if not confirmed:
         raise ConfirmationRequestError("尚无当前有效的已确认参数。")
+    _require_product_ownership(confirmed)
     values = {}
     for fact in confirmed:
         key = (fact.get("product_id"), fact["field"], fact.get("scope"))
@@ -351,6 +359,7 @@ def export_local(output_dir: str | Path, *, reason: str = "local_only", session_
     output, product, confirmed = context(output_dir, session_id)
     if not confirmed:
         raise ConfirmationRequestError("尚无有效的已确认参数，请先在对话中完成参数确认。")
+    _require_product_ownership(confirmed)
     values = {}
     for fact in confirmed:
         key = (fact.get("product_id"), fact["field"], fact.get("scope"))
@@ -371,13 +380,14 @@ def export_local(output_dir: str | Path, *, reason: str = "local_only", session_
              "交付说明：" + LOCAL_DELIVERY_REASONS[reason] + "。", "",
              "本简报只列出人工确认且来源仍有效的参数，没有生成额外的营销卖点。", "", "## 已确认参数", ""]
     scopes = {"input": "输入", "output": "输出", "rated": "额定", "nominal": "标称",
-              "min": "最小", "max": "最大", "typical": "典型", "net": "净重", "gross": "毛重", "unspecified": "未限定"}
+              "min": "最小", "max": "最大", "typical": "典型", "net": "净重", "gross": "毛重", "unspecified": "未限定",
+              "operating": "工作/运行", "storage": "储存"}
     references = []
     for fact in current_facts:
         scope = fact.get("scope")
         label = fact["field_label"]
         if scope and scope not in {"net", "gross", "unspecified"}:
-            label += "（" + " / ".join(scopes.get(part, part) for part in scope.split("|")) + "）"
+            label += "（" + " / ".join(scopes.get(part.removeprefix("rating:"), part) for part in scope.split("|")) + "）"
         value = fact["normalized_value"]
         if isinstance(value, (list, dict)):
             value = json.dumps(value, ensure_ascii=False)

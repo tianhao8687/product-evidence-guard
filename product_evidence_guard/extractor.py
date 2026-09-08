@@ -473,7 +473,22 @@ def _io_gap_is_structured(field: str, value: str) -> bool:
 
 
 def infer_semantic_scope(field: str, text: str) -> str | None:
-    if field not in {"voltage", "current", "power"}:
+    spec = next((spec for spec in FIELD_SPECS if spec.name == field), None)
+    if spec is None:
+        return None
+
+    # Only a unique, explicit field label establishes a configured scope.
+    # Prefer the longest label so e.g. a compound label is not reinterpreted
+    # using a shorter substring. Conflicting labels remain unspecified.
+    matches = [(alias, scope) for alias, scope in spec.scope_aliases.items()
+               if _extract_value_after_alias(text, alias) is not None]
+    matches = [(alias, scope) for alias, scope in matches
+               if not any(alias.casefold() in longer.casefold() and len(longer) > len(alias)
+                          for longer, _ in matches)]
+    scopes = {scope for _, scope in matches}
+    if scopes:
+        return next(iter(scopes)) if len(scopes) == 1 else None
+    if spec.scope_policy != "electrical":
         return None
 
     scopes = [
@@ -549,13 +564,18 @@ def _extract_value_after_alias(text: str, alias: str) -> tuple[str, str] | None:
         return None
 
     tail = text[match.end() :]
+    unit_annotation = re.match(r"^\s*[（(]([^()（）\n\r]{1,32})[)）]\s*", tail)
+    unit_suffix = ""
+    if unit_annotation:
+        unit_suffix = " " + unit_annotation[1]
+        tail = tail[unit_annotation.end():]
     explicit = re.match(r"^\s*(?:[:：=]|->)\s*(?P<value>.+?)\s*$", tail)
     if explicit:
-        return explicit.group("value"), "explicit"
+        return explicit.group("value") + unit_suffix, "explicit"
 
     whitespace = re.match(r"^\s+(?P<value>.+?)\s*$", tail)
     if whitespace:
-        return whitespace.group("value"), "whitespace"
+        return whitespace.group("value") + unit_suffix, "whitespace"
     return None
 
 
@@ -759,6 +779,9 @@ def field_schema_for_prompt() -> str:
             "unit_family": spec.unit_family,
             "category": spec.category,
             "allowed_scopes": list(spec.allowed_scopes),
+            "scope_aliases": dict(spec.scope_aliases),
+            "scope_policy": spec.scope_policy,
+            "variant_headers": list(spec.variant_headers),
             "extraction_constraints": dict(spec.extraction_constraints),
         }
         for spec in FIELD_SPECS

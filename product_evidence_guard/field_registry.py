@@ -43,6 +43,9 @@ class FieldDefinition:
     mapping_confidence: float = 0.95
     allowed_scopes: tuple[str, ...] = ()
     extraction_constraints: dict[str, Any] = field(default_factory=dict)
+    scope_aliases: dict[str, str] = field(default_factory=dict)
+    scope_policy: str | None = None
+    variant_headers: tuple[str, ...] = ()
 
     @property
     def scope(self) -> str | None:
@@ -138,7 +141,8 @@ def _load_registry() -> FieldRegistry:
     allowed_keys = {
         "name", "label", "aliases", "value_type", "unit_family",
         "default_scope", "category", "mapping_confidence",
-        "allowed_scopes", "extraction_constraints",
+        "allowed_scopes", "extraction_constraints", "scope_aliases",
+        "scope_policy", "variant_headers",
     }
     for index, row in enumerate(fields_data):
         if not isinstance(row, dict) or set(row) - allowed_keys:
@@ -152,6 +156,15 @@ def _load_registry() -> FieldRegistry:
         if not label or not isinstance(aliases_data, list) or not aliases_data:
             raise FieldRegistryError(f"field {name} requires label and aliases")
         aliases: list[str] = []
+        scope_aliases = row.get("scope_aliases", {})
+        if not isinstance(scope_aliases, dict) or any(
+            not isinstance(alias, str) or not isinstance(scope, str)
+            or not scope.strip() or len(scope) > 80
+            for alias, scope in scope_aliases.items()
+        ):
+            raise FieldRegistryError(f"field {name} has invalid scope_aliases")
+        # Scoped labels are ordinary extraction/header aliases too.
+        aliases_data = [*aliases_data, *(alias for alias in scope_aliases if alias not in aliases_data)]
         for alias_value in aliases_data:
             alias = str(alias_value or "").strip()
             folded = alias.casefold()
@@ -200,6 +213,17 @@ def _load_registry() -> FieldRegistry:
             or len(default_scope) > 80
         ):
             raise FieldRegistryError(f"field {name} has invalid default_scope")
+        if any(scope not in scopes_data for scope in scope_aliases.values()):
+            raise FieldRegistryError(f"field {name} has an undeclared alias scope")
+        scope_policy = row.get("scope_policy")
+        if scope_policy not in (None, "electrical"):
+            raise FieldRegistryError(f"field {name} has invalid scope_policy")
+        variant_headers = row.get("variant_headers", [])
+        if not isinstance(variant_headers, list) or any(
+            not isinstance(header, str) or header not in aliases
+            for header in variant_headers
+        ) or len(set(variant_headers)) != len(variant_headers):
+            raise FieldRegistryError(f"field {name} has invalid variant_headers")
         definitions.append(FieldDefinition(
             name=name,
             label=label,
@@ -211,6 +235,9 @@ def _load_registry() -> FieldRegistry:
             mapping_confidence=confidence,
             allowed_scopes=tuple(value.strip() for value in scopes_data),
             extraction_constraints=dict(constraints),
+            scope_aliases=dict(scope_aliases),
+            scope_policy=scope_policy,
+            variant_headers=tuple(variant_headers),
         ))
 
     canonical = json.dumps(data, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")

@@ -70,7 +70,7 @@ def _preprocess_one(
             elif suffix == ".xlsx":
                 parsed = parsers["xlsx"](path, relative, file_hash)
             else:
-                parsed = parsers["generic"](path, root)
+                parsed = parsers["generic"](path, root, file_hash=file_hash)
         except Exception as exc:  # replayed in deterministic input order by the engine
             error = exc
     return PreprocessedFile(

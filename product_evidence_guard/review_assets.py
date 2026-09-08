@@ -36,7 +36,7 @@ const selectedCandidates = new Set();
 const labels = {pending:'待确认',confirmed:'已确认',rejected:'已拒绝',stale:'已失效',block:'存在冲突',review:'需要复核',pass:'证据一致',blocked:'发现参数问题',needs_review:'需要人工复核',covered_fields_match:'覆盖字段一致',source_stale:'引用的事实已失效',content_changed:'内容变化，需重新回检',authorization_revoked:'授权已撤销',active:'有效授权'};
 const el = (tag, cls, text) => {const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 const badge = (key,text) => el('span','badge '+key,text||labels[key]||key);
-const scopeLabel = s => (s||'').split('|').map(x=>({net:'净重',gross:'毛重',unspecified:'未限定',input:'输入',output:'输出',rated:'额定',nominal:'标称',min:'最小',max:'最大',typical:'典型'})[x]||x).join(' / ');
+const scopeLabel = s => (s||'').split('|').map(x=>({net:'净重',gross:'毛重',unspecified:'未限定',input:'输入',output:'输出',rated:'额定',nominal:'标称',min:'最小',max:'最大',typical:'典型',operating:'工作/运行',storage:'储存'})[x.replace(/^rating:/,'')]||x.replace(/^profile:/,'模式：')).join(' / ');
 const value = c => `${typeof c.normalized_value==='object'?JSON.stringify(c.normalized_value):c.normalized_value} ${c.normalized_unit==='count'?'件':c.normalized_unit||''}`.trim();
 function notice(text,error=false){$('notice').hidden=!text;$('notice').textContent=text;$('notice').classList.toggle('error',error);}
 async function api(path,body){const response=await fetch('/api/'+path,{method:body?'POST':'GET',headers:{'X-PEG-Token':token||'',...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});const data=await response.json();if(!response.ok)throw Error(data.error||'操作失败，请重试。');return data;}

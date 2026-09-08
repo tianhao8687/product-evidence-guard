@@ -4,10 +4,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 import hashlib
 import json
+import re
 from typing import Any, Sequence
 
 from .field_registry import FIELD_SPECS
-from .normalization import normalize_text
+from .normalization import normalize_text, normalize_value
 
 
 @dataclass(frozen=True, slots=True)
@@ -26,8 +27,9 @@ _HEADERS = {
     for spec in FIELD_SPECS
     for alias in (*spec.aliases, spec.name)
 }
-_VARIANT_FIELDS = {
-    spec.name for spec in FIELD_SPECS if spec.category == "variant"
+_VARIANT_HEADERS = {
+    normalize_text(header): spec.name
+    for spec in FIELD_SPECS for header in spec.variant_headers
 }
 
 
@@ -49,10 +51,10 @@ def bind_structured_rows(
         seen: set[str] = set()
         for column, (_location, value) in enumerate(cells):
             field = header_field(value)
-            if field and field not in seen:
+            if field:
                 proposed[column] = (str(value).strip(), field)
                 seen.add(field)
-        if len(proposed) >= 2:
+        if len(seen) >= 2:
             header_position = position
             header_map = proposed
             break
@@ -61,37 +63,51 @@ def bind_structured_rows(
 
     result: list[StructuredCell] = []
     for row_number, cells in rows[header_position + 1:]:
-        values: dict[str, str] = {}
-        locations: dict[str, Any] = {}
-        headers: dict[str, str] = {}
+        bound: list[tuple[Any, str, str, str]] = []
+        identity_values: dict[str, set[str]] = {}
+        dimensions: dict[str, set[str]] = {}
+        uncertain_variant = False
         for column, (location, value) in enumerate(cells):
             header = header_map.get(column)
             text = str(value).strip() if value not in (None, "") else ""
             if header and text:
                 header_text, field = header
-                values[field] = text
-                locations[field] = location
-                headers[field] = header_text
-        if not values:
+                bound.append((location, header_text, field, text))
+                if field in {"sku", "model", "variant"}:
+                    identity_values.setdefault(field, set()).add(text)
+                base = header_text.split("(", 1)[0].split("（", 1)[0].strip()
+                if normalize_text(base) in _VARIANT_HEADERS:
+                    # Normalize units so 1 L and 1000 mL are one variant.
+                    unit = re.search(r"[（(]([^()（）]+)[)）]", header_text)
+                    normalized = normalize_value(field, text + (" " + unit[1] if unit else ""))
+                    if any(note.startswith("unparsed_") for note in normalized.notes):
+                        uncertain_variant = True
+                    else:
+                        token = json.dumps([normalized.value, normalized.unit], ensure_ascii=False,
+                                           sort_keys=True, separators=(",", ":"))
+                        dimensions.setdefault(field, set()).add(token)
+        if not bound:
             continue
         identity = {
-            field: values[field]
-            for field in ("sku", "model", "variant")
-            if field in values
+            field: next(iter(values)) for field, values in identity_values.items() if len(values) == 1
         }
+        if any(len(values) > 1 for values in identity_values.values()):
+            identity["_ambiguous_identity"] = "true"
         if "variant" not in identity:
-            dimensions = [f"{field}={values[field]}" for field in sorted(_VARIANT_FIELDS) if field in values]
-            if dimensions:
-                identity["variant"] = "|".join(dimensions)
+            if uncertain_variant or any(len(values) > 1 for values in dimensions.values()):
+                identity["_ambiguous_variant"] = "true"
+            elif dimensions:
+                identity["variant"] = "|".join(f"{field}={next(iter(dimensions[field]))}"
+                                               for field in sorted(dimensions))
         row_payload = {"table": table_id, "row": row_number}
         row_id = hashlib.sha256(json.dumps(row_payload, sort_keys=True).encode("utf-8")).hexdigest()[:20]
-        for field in sorted(values, key=lambda item: next(i for i, (_, name) in header_map.items() if name == item)):
+        for location, header, field, value in bound:
             result.append(StructuredCell(
                 row_number=row_number,
-                location=locations[field],
-                header=headers[field],
+                location=location,
+                header=header,
                 field=field,
-                value=values[field],
+                value=value,
                 row_id=row_id,
                 identity=identity,
             ))

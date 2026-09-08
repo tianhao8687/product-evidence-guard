@@ -283,6 +283,28 @@ v2 的统一证据身份是 `SourceBlock + Product + Field + Scope + Unit + Valu
 口径。`ProductEntity` 首选结构化行中的显式 SKU；没有 SKU 时使用型号与变体组合。
 多商品资料中不能可靠归属的证据保留为歧义 Product，不猜测绑定关系。
 
+`ambiguous` / v2 `unresolved` 身份优先产生 `identity_ambiguous / review`，即使值不同
+也先问商品归属。补充来源 SKU/型号/变体并重新分析后，才比较同商品事实。核验表保留
+这些证据，但可用参数表、内容授权和本地简报要求明确归属；确认数值不会自动确定身份。
+无 product_id 的旧版直接图 API 与没有商品标识的单资料集仍保留历史兼容行为。
+
+注册表中新增的安全数据项：
+
+- `scope_aliases`：完整字段标签到 Scope 的映射，例如 `工作温度: operating`、
+  `储存温度: storage`、`额定扭矩: rating:rated`、`最大扭矩: rating:max`。映射目标必须
+  在该字段 `allowed_scopes` 中声明；这些标签也自动成为提取、表头与声明核验别名。
+  温度、扭矩、压力、频率、流量、续航时间、充电时间已配置；以后增补标签只改 JSON。
+  电压/电流/功率通过 `scope_policy: electrical` 保留既有输入输出、额定与 profile 语法。
+- `variant_headers`：允许参与身份的明确表头白名单，必须属于本字段别名。当前包括
+  颜色、规格尺寸、长度、包装数量、容量/容积/电池容量、电压规格，以及尺码、内存规格、
+  存储规格。普通重量、功率、库存数量不参与。SKU 优先；无 SKU 时才组合型号与变体。
+  只在可靠结构行内生效，不从散文参数或数值差异猜测变体；数值按单位标准化，
+  如 1L 与 1000mL 是同一容量变体。不能解析的数值规格保留为 ambiguous；内存/存储
+  的规格标签目前按文本精确归一化，不推断 GB/GiB 等价。同字段多 Scope 列均保留。
+
+注册表内容变化会更新指纹并使旧缓存失效。新增字段的 Scope/Variant 配置不需要新增
+字段级 Python 分支；未配置的标签不猜 Scope，未配置的表头不参与变体。
+
 决定与导出必须提供同一个 `session_id`。确认和拒绝要求非空理由。
 `confirmation-audit.jsonl` 记录决定及后续 stale。来源一旦改变，文件哈希和
 candidate identity 会变化，旧决定不能静默存活。

@@ -20,6 +20,7 @@ from .normalization import normalize_text, normalize_value, values_equal
 
 LABELS = {spec.name: spec.label for spec in FIELD_SPECS}
 DEFAULT_SCOPES = {spec.name: spec.scope for spec in FIELD_SPECS}
+SCOPE_POLICIES = {spec.name: spec.scope_policy for spec in FIELD_SPECS}
 TEXT_FIELDS = {spec.name for spec in FIELD_SPECS if spec.value_type == "text"}
 NUMBER = r"[-+]?\d+(?:\.\d+)?"
 UNIT_TOKEN = "|".join(
@@ -78,6 +79,8 @@ def _claim_id(*, line: int, clause: str, field: str | None, value: Any,
 
 
 def _product_for_clause(clause: str, facts: list[dict[str, Any]]) -> tuple[str | None, bool]:
+    if any(f.get("product_identity_status") in {"ambiguous", "unresolved"} for f in facts):
+        return None, True
     products = {str(f.get("product_id")) for f in facts if f.get("product_id")}
     if len(products) <= 1:
         return (next(iter(products)) if products else None), False
@@ -125,8 +128,6 @@ def check_draft(text: str, facts: list[dict[str, Any]]) -> dict[str, Any]:
             clause_fields: set[str] = set()
             for index, match in enumerate(aliases):
                 field = ALIAS_FIELDS[match.group().casefold()]
-                if field in clause_fields:
-                    continue
                 clause_fields.add(field)
                 end = aliases[index + 1].start() if index + 1 < len(aliases) else len(clause)
                 tail = clause[match.end():end].strip(" \t:：=|*`是为约")
@@ -153,7 +154,8 @@ def check_draft(text: str, facts: list[dict[str, Any]]) -> dict[str, Any]:
                 if field == "quantity" and not re.fullmatch(r"[-+]?\d+\s*(?:个|件|只|套|pcs?|pieces?|pack)?", raw, re.I):
                     findings.append({"kind": "unverified", "line": line_number, "field": field,
                                      "observed": raw, "message": "数量使用了不受支持的单位，需要人工核对。"})
-                scope = infer_semantic_scope(field, clause[:end]) or DEFAULT_SCOPES.get(field)
+                scope_text = clause[:end] if SCOPE_POLICIES.get(field) == "electrical" else clause[match.start():end]
+                scope = infer_semantic_scope(field, scope_text) or DEFAULT_SCOPES.get(field)
                 if field in {"voltage", "current", "power"}:
                     directions = set(re.findall(r"输入|输出|\binput\b|\boutput\b", clause[:end], re.I))
                     directions = {"input" if value.casefold() in {"输入", "input"} else "output" for value in directions}

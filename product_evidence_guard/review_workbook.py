@@ -13,16 +13,19 @@ from . import workflow
 from .confirmation import ConfirmationRequestError
 from .graph import build_fact_groups
 from .models import FactCandidate
+from .identity import product_label
 
 
 SCOPES = {"input": "输入", "output": "输出", "rated": "额定", "nominal": "标称",
           "min": "最小", "max": "最大", "typical": "典型", "net": "净重", "gross": "毛重",
-          "minimum": "最小", "maximum": "最大", "unspecified": "未限定"}
+          "minimum": "最小", "maximum": "最大", "unspecified": "未限定",
+          "operating": "工作/运行", "storage": "储存"}
 STATUSES = {"pending": "待确认", "confirmed": "已确认", "rejected": "已拒绝", "stale": "确认已失效",
             "source_changed": "来源已变化"}
 CLASSIFICATIONS = {"strong_conflict": "数值冲突", "converted_match": "换算一致", "exact_match": "表达一致",
     "insufficient_evidence": "证据不足", "compatible_expression": "表达待统一", "likely_version_update": "可能版本不同",
-    "semantic_scope_split": "不同口径", "source_changed": "先更新资料", "decided": "已作人工决定"}
+    "semantic_scope_split": "不同口径", "identity_ambiguous": "先确认商品归属",
+    "source_changed": "先更新资料", "decided": "已作人工决定"}
 
 
 def scope_label(scope):
@@ -52,11 +55,13 @@ def group_candidates(rows, hashes):
         else:
             graph = build_fact_groups([FactCandidate.from_dict(c) for c in active])[0]
             kind, severity, reason = graph.classification, graph.severity, graph.reason
-            if not pending and severity != "block":
+            if kind == "identity_ambiguous":
+                pass  # A value decision does not establish product ownership.
+            elif not pending and severity != "block":
                 kind, severity, reason = "decided", "pass", "已按用户决定保留参数，其他候选不自动采用。"
             elif source_count < 2 and severity != "block":
                 kind, severity, reason = "insufficient_evidence", "review", "仅来自一份资料；同文件的多处文字不等于多来源验证。"
-        groups.append({"product_id": product_id, "product_label": items[0].get("product_sku") or items[0].get("product_model") or product_id,
+        groups.append({"product_id": product_id, "product_label": product_label(items[0].get("product_sku"), items[0].get("product_model"), items[0].get("product_variant"), product_id or "未归属商品"),
             "field": field, "label": items[0]["field_label"], "scope": scope,
             "scope_label": scope_label(scope), "classification": kind, "severity": severity,
             "reason": reason, "source_count": source_count, "candidate_ids": [c["candidate_id"] for c in items]})
@@ -160,9 +165,12 @@ def export_review(output_dir, *, session_id=None):
         items = [by_id[cid] for cid in group["candidate_ids"]]
         adopted = [c for c in items if c["candidate_id"] in confirmed_ids]
         adopted_values = {workflow.digest([c["normalized_value"], c["normalized_unit"]]) for c in adopted}
-        conflicting_decisions = len(adopted_values) > 1
+        identity_ambiguous = group["classification"] == "identity_ambiguous"
+        conflicting_decisions = len(adopted_values) > 1 and not identity_ambiguous
         issue = "已确认值互相冲突" if conflicting_decisions else CLASSIFICATIONS.get(group["classification"], group["classification"])
-        if conflicting_decisions:
+        if identity_ambiguous:
+            advice = "先在来源资料补充明确的商品/变体归属并重新分析，再核对数值。"
+        elif conflicting_decisions:
             advice = "请在对话中明确采用哪个已确认值；暂不列入可用参数。"
         elif group["classification"] == "source_changed":
             advice = "重新分析资料，再导出新核验表。"
@@ -181,7 +189,7 @@ def export_review(output_dir, *, session_id=None):
                 c["field_label"], scope_label(c.get("scope")), STATUSES.get(status, status),
                 _value(c["normalized_value"]), _unit(c.get("normalized_unit")), c["raw_value"],
                 c["source_file"], position, c["raw_text"], "" if current else "旧值仅供追溯，不可继续采用。", ""])
-            if c["candidate_id"] in confirmed_ids and not conflicting_decisions and current:
+            if c["candidate_id"] in confirmed_ids and not conflicting_decisions and not identity_ambiguous and current:
                 selected.append([c.get("product_sku") or c.get("product_model") or c.get("product_id") or "未归属商品",
                                  c["field_label"], scope_label(c.get("scope")), _value(c["normalized_value"]),
                                  _unit(c.get("normalized_unit")), c["source_file"], position])

@@ -190,6 +190,9 @@ class ReleasePackageIntegrationTests(unittest.TestCase):
         fixture_files: dict[str, bytes] = {
             ".github/workflows/tests.yml": b"name: tests\n",
             "product_evidence_guard/__init__.py": b'"""fixture"""\n',
+            "product_evidence_guard/field_registry.json": (
+                REPO_ROOT / "product_evidence_guard" / "field_registry.json"
+            ).read_bytes(),
             "samples/generated-benchmark/documents/\u4e2d\u6587 \u8bf4\u660e.txt": (
                 "\u56fa\u5b9a\u5b57\u8282\n".encode("utf-8")
             ),
