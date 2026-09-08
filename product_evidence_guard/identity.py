@@ -4,11 +4,13 @@ from __future__ import annotations
 from collections import defaultdict
 import hashlib
 import json
+import re
 from pathlib import Path
 from typing import Any, Iterable
 
 from .models import FactCandidate, ProductEntity
 from .normalization import normalize_text
+from .field_registry import field_definition
 
 
 IDENTITY_VERSION = 2
@@ -145,7 +147,9 @@ def resolve_product_identities(
     uncertain: set[int] = set()
     for items in by_row.values():
         sku, model, variant = _identity_values(items)
-        row_identities = [item.provenance.get("structured_row", {}).get("identity", {}) for item in items]
+        structured_rows = [item.provenance.get("structured_row") for item in items]
+        row_identities = [row["identity"] for row in structured_rows
+                          if isinstance(row, dict) and isinstance(row.get("identity"), dict)]
         if any(identity.get("_ambiguous_identity") or
                (not sku and identity.get("_ambiguous_variant")) for identity in row_identities):
             uncertain.update(id(item) for item in items)
@@ -191,8 +195,25 @@ def resolve_product_identities(
             })
             resolved[id(candidate)] = (ambiguous, None, None, None, "ambiguous")
 
+    # Without row boundaries, differing configured specifications are only
+    # evidence of *possible* variants. Do not invent variants, but do not
+    # present the broad model bucket as a proven same-product conflict either.
+    possible_dimensions: dict[tuple[str, str, str], set[str]] = defaultdict(set)
     for candidate in rows:
         product_id, sku, model, variant, status = resolved[id(candidate)]
+        spec = field_definition(candidate.field)
+        if sku or not model or variant or not spec or not spec.variant_headers:
+            continue
+        if any(re.match(rf"^\s*(?:[-*•]\s*)?{re.escape(header)}(?:\s*[（(][^()（）]+[)）])?(?:\s*[:：=]|\s+)",
+                        candidate.raw_text, re.IGNORECASE) for header in spec.variant_headers):
+            possible_dimensions[(product_id, candidate.field, candidate.scope or "")].add(
+                canonical_json([candidate.normalized_value, candidate.normalized_unit]))
+    uncertain_models = {key[0] for key, values in possible_dimensions.items() if len(values) > 1}
+
+    for candidate in rows:
+        product_id, sku, model, variant, status = resolved[id(candidate)]
+        if product_id in uncertain_models:
+            status = "ambiguous"
         candidate.product_id = product_id
         candidate.product_sku = sku
         candidate.product_model = model

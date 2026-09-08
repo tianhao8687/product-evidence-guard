@@ -155,10 +155,14 @@ class V2IdentityTests(unittest.TestCase):
             # Neither ordinary weight nor power differences create variants.
             (root / "ordinary.csv").write_text(
                 "Model,Weight,Power\nA300,320g,10W\nA300,450g,20W\n", encoding="utf-8")
+            (root / "unbound-one.txt").write_text("Model: A400\nCapacity: 1L\nWeight: 320g\n", encoding="utf-8")
+            (root / "unbound-two.txt").write_text("Model: A400\nCapacity: 2L\nWeight: 450g\n", encoding="utf-8")
             analyze_directory(root, output)
             product = json.loads((output / "product-facts.json").read_text("utf-8"))
             self.assertEqual({g["field"] for g in product["fact_groups"] if g["severity"] == "block"},
                              {"weight", "power"})
+            self.assertTrue(all(g["classification"] == "identity_ambiguous" for g in product["fact_groups"]
+                                if g["product_label"] == "A400"))
 
     def test_ambiguous_product_requires_ownership_review_before_value_comparison(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
