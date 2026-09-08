@@ -782,6 +782,7 @@ def field_schema_for_prompt() -> str:
             "scope_aliases": dict(spec.scope_aliases),
             "scope_policy": spec.scope_policy,
             "variant_headers": list(spec.variant_headers),
+            "review_unstructured_variants": spec.review_unstructured_variants,
             "extraction_constraints": dict(spec.extraction_constraints),
         }
         for spec in FIELD_SPECS

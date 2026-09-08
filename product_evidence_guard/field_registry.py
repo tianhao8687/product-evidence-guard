@@ -46,6 +46,7 @@ class FieldDefinition:
     scope_aliases: dict[str, str] = field(default_factory=dict)
     scope_policy: str | None = None
     variant_headers: tuple[str, ...] = ()
+    review_unstructured_variants: bool = False
 
     @property
     def scope(self) -> str | None:
@@ -142,7 +143,7 @@ def _load_registry() -> FieldRegistry:
         "name", "label", "aliases", "value_type", "unit_family",
         "default_scope", "category", "mapping_confidence",
         "allowed_scopes", "extraction_constraints", "scope_aliases",
-        "scope_policy", "variant_headers",
+        "scope_policy", "variant_headers", "review_unstructured_variants",
     }
     for index, row in enumerate(fields_data):
         if not isinstance(row, dict) or set(row) - allowed_keys:
@@ -224,6 +225,9 @@ def _load_registry() -> FieldRegistry:
             for header in variant_headers
         ) or len(set(variant_headers)) != len(variant_headers):
             raise FieldRegistryError(f"field {name} has invalid variant_headers")
+        review_unstructured = row.get("review_unstructured_variants", False)
+        if not isinstance(review_unstructured, bool) or (review_unstructured and not variant_headers):
+            raise FieldRegistryError(f"field {name} has invalid review_unstructured_variants")
         definitions.append(FieldDefinition(
             name=name,
             label=label,
@@ -238,6 +242,7 @@ def _load_registry() -> FieldRegistry:
             scope_aliases=dict(scope_aliases),
             scope_policy=scope_policy,
             variant_headers=tuple(variant_headers),
+            review_unstructured_variants=review_unstructured,
         ))
 
     canonical = json.dumps(data, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")

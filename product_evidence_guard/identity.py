@@ -202,7 +202,7 @@ def resolve_product_identities(
     for candidate in rows:
         product_id, sku, model, variant, status = resolved[id(candidate)]
         spec = field_definition(candidate.field)
-        if sku or not model or variant or not spec or not spec.variant_headers:
+        if sku or not model or variant or not spec or not spec.review_unstructured_variants:
             continue
         if any(re.match(rf"^\s*(?:[-*•]\s*)?{re.escape(header)}(?:\s*[（(][^()（）]+[)）])?(?:\s*[:：=]|\s+)",
                         candidate.raw_text, re.IGNORECASE) for header in spec.variant_headers):
