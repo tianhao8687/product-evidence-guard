@@ -62,6 +62,7 @@ $requiredRuntimeFiles = @(
     'product_evidence_guard/ocr_review_prompt.txt',
     'product_evidence_guard/review_assets.py',
     'product_evidence_guard/review_server.py',
+    'product_evidence_guard/source_links.py',
     'product_evidence_guard/state.py',
     'product_evidence_guard/structured_rows.py',
     'product_evidence_guard/task_jobs.py',

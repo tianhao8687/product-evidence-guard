@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -155,6 +156,15 @@ def _create_directory_link(link: Path, target: Path) -> bool:
 
 
 class QoderInstallerContractTests(unittest.TestCase):
+    def test_runtime_allowlist_includes_every_package_module(self) -> None:
+        script = INSTALLER.read_text(encoding="utf-8")
+        runtime_block = script.split("$requiredRuntimeFiles = @(", 1)[1].split(")", 1)[0]
+        runtime_files = set(re.findall(r"'([^']+)'", runtime_block))
+        self.assertTrue(
+            set(PACKAGE_FILES).issubset(runtime_files),
+            f"package files missing from installer: {sorted(set(PACKAGE_FILES) - runtime_files)}",
+        )
+
     def test_installer_contract_is_fail_closed_and_transactional(self) -> None:
         script = INSTALLER.read_text(encoding="utf-8")
         for contract in (
