@@ -137,8 +137,19 @@ try {
     }
     $Facts = Get-Content -LiteralPath (Join-Path $OutputDirectory 'product-facts.json') `
         -Raw -Encoding utf8 | ConvertFrom-Json
-    Assert-True ($Facts.status -eq 'pending_human_confirmation') `
-        '模型候选被错误地自动确认为正式事实。'
+    Assert-True ($Facts.status -eq 'blocked') `
+        '样例中的真实冲突应阻断相关参数。'
+    Assert-True (@($Facts.facts | Where-Object fact_status -eq 'conflict').Count -eq 2) `
+        '事实层没有正确聚合样例冲突。'
+    Assert-True (@($Facts.candidates | Where-Object status -eq 'confirmed').Count -eq 0) `
+        '自动核验不得创建人工决定。'
+    Assert-True (@($Facts.facts | Where-Object human_approved).Count -eq 0) `
+        '自动核验不得伪造用户的正式批准。'
+    $InitialFormalFacts = Get-Content -LiteralPath (
+        Join-Path $OutputDirectory 'confirmed-product-facts.json'
+    ) -Raw -Encoding utf8 | ConvertFrom-Json
+    Assert-True ($InitialFormalFacts.facts.Count -eq 0) `
+        '人工确认前正式事实输出应为空。'
     Assert-True ($Facts.candidates.Count -gt 0) '确定性冒烟测试没有候选。'
     Assert-True ($Facts.run_summary.blocking_conflict_count -eq 2) `
         '确定性冒烟测试应包含两个强冲突。'
@@ -274,10 +285,10 @@ try {
         'HTML 报告没有显示 confirmed。'
     Assert-True ($DecisionHtml.Contains('(rejected)')) `
         'HTML 报告没有显示 rejected。'
-    Assert-True ($DecisionHtml.Contains('已确认 1')) `
-        'HTML 报告确认计数错误。'
-    Assert-True ($DecisionHtml.Contains('已拒绝 1')) `
-        'HTML 报告拒绝计数错误。'
+    Assert-True ($DecisionHtml.Contains('已确认 ' + [string]$DecisionFacts.run_summary.fact_status_counts.verified)) `
+        'HTML 报告应显示事实层已确认数量。'
+    Assert-True ($DecisionHtml.Contains('冲突 ' + [string]$DecisionFacts.run_summary.fact_status_counts.conflict)) `
+        'HTML 报告应显示事实层冲突数量。'
 
     $AuditEvents = @(
         Get-Content -LiteralPath (
