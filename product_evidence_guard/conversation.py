@@ -99,6 +99,9 @@ def review_summary(output_dir, *, review_id: str, recipient: str, session_id: st
     mapping = {}
     from .review_workbook import group_candidates
     groups = group_candidates(rows, hashes)
+    from .source_links import write_source_links
+    review_ids = {cid for g in groups if g["fact_status"] != "verified" for cid in g["candidate_ids"]}
+    source_links = write_source_links(output, [c for c in rows if c["candidate_id"] in review_ids])
     choices_by_id = {}
     needs_reanalysis = False
     for i, c in enumerate(rows, 1):
@@ -108,6 +111,8 @@ def review_summary(output_dir, *, review_id: str, recipient: str, session_id: st
         item = {"choice": choice, "source": aliases[c["source_file"]],
                 "source_type": _source_type(c["source_kind"]),
                 "status": c["status"] if current else "source_changed"}
+        if c["candidate_id"] in source_links:
+            item["source_url"] = source_links[c["candidate_id"]]
         if current:
             item.update(value=c["normalized_value"], unit=c["normalized_unit"], scope=c.get("scope"),
                         product_id=c.get("product_id"))
@@ -126,7 +131,7 @@ def review_summary(output_dir, *, review_id: str, recipient: str, session_id: st
             "groups": groups, "needs_reanalysis": needs_reanalysis,
             "next_action": ("reanalyze" if needs_reanalysis else "request_more_material" if not rows else
                             "ask_user_choice" if any(g["fact_status"] != "verified" for g in groups) else "review_complete"),
-            "data_scope": "仅包含获准字段的标准值、单位、口径、状态、来源别名和类型；不包含原文件名、正文或图片。"}
+            "data_scope": "仅包含获准字段的标准值、单位、口径、状态、来源别名、类型和本机原文链接；不包含原文件名、正文或图片。原文链接只供用户本地打开，宿主不得读取或上传链接内容。"}
 
 
 def resolve_choices(output_dir, *, summary_id: str, choices: list[str], recipient: str,

@@ -26,6 +26,31 @@ def _fact_value_text(group: FactGroup, by_id: dict[str, FactCandidate]) -> str:
     return " / ".join(values) or "等待更新"
 
 
+def _review_links(path, candidates, groups, input_root):
+    from .source_links import write_source_links
+    ids = {cid for g in groups if g.fact_status != "verified" for cid in g.candidate_ids}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return write_source_links(path.parent, [c for c in candidates if c.candidate_id in ids], input_root=input_root)
+
+
+def _linked_values(group, by_id, links, *, html=False):
+    if group.fact_status == "verified":
+        text = _fact_value_text(group, by_id)
+        return escape(text) if html else text
+    values = []
+    for cid in group.candidate_ids:
+        c = by_id[cid]
+        text = f"{c.normalized_value} {c.normalized_unit or ''}".strip()
+        if not c.source_current or c.status == "stale":
+            text = "已失效记录"
+        if c.status == "rejected":
+            text += "（已拒绝）"
+        href = links[cid]
+        values.append(f'{escape(text)} <a href="{escape(href, quote=True)}">查看原文</a>' if html
+                      else f"{text} [查看原文](<{href}>)")
+    return "<br>".join(values) if html else " / ".join(values)
+
+
 _STATUS_LABELS = {
     "pending": "待人工确认",
     "confirmed": "已人工确认",
@@ -197,6 +222,7 @@ def write_conflicts_markdown(
     relations: Iterable[CrossFieldRelation],
     *,
     run_summary: dict[str, Any] | None = None,
+    input_root: Path | None = None,
 ) -> None:
     candidate_list = list(candidates)
     group_list = list(groups)
@@ -204,6 +230,7 @@ def write_conflicts_markdown(
     refresh_fact_status(group_list, candidate_list, relation_list)
     by_id = {candidate.candidate_id: candidate for candidate in candidate_list}
     status_counts = _confirmation_counts(candidate_list, run_summary)
+    links = _review_links(path, candidate_list, group_list, input_root)
     lines = [
         "# Product Evidence Guard 核验结果",
         "",
@@ -214,7 +241,7 @@ def write_conflicts_markdown(
         *["| " + " | ".join(str(v).replace("|", "\\|").replace("\n", " ") for v in (
             g.product_label or g.product_id or "未归属商品", g.field_label, g.scope or "—",
             FACT_STATUS_LABELS[g.fact_status],
-            _fact_value_text(g, by_id) + ("；" + g.reason if g.fact_status != "verified" else ""))) + " |"
+            _linked_values(g, by_id, links) + ("；" + g.reason if g.fact_status != "verified" else ""))) + " |"
           for g in sorted(group_list, key=lambda g: {"conflict": 0, "pending_confirmation": 1, "verified": 2}[g.fact_status])],
         "",
         "<details><summary>查看人工决策与来源明细</summary>",
@@ -347,6 +374,7 @@ def write_html_report(
     groups: Iterable[FactGroup],
     relations: Iterable[CrossFieldRelation],
     run_summary: dict[str, Any],
+    *, input_root: Path | None = None,
 ) -> None:
     candidate_list = list(candidates)
     group_list = list(groups)
@@ -354,6 +382,7 @@ def write_html_report(
     refresh_fact_status(group_list, candidate_list, relation_list)
     by_id = {candidate.candidate_id: candidate for candidate in candidate_list}
     status_counts = _confirmation_counts(candidate_list, run_summary)
+    links = _review_links(path, candidate_list, group_list, input_root)
     severity_class = {"block": "danger", "review": "warn", "pass": "ok", "info": "info"}
     cards: list[str] = []
     ordered = sorted(group_list, key=lambda item: ({"conflict": 0, "pending_confirmation": 1, "verified": 2}[item.fact_status], item.field))
@@ -392,7 +421,7 @@ def write_html_report(
         cards.append(
             f"<section class='card {css_class}'><h2>{escape(group.field_label)} <small>{FACT_STATUS_LABELS[group.fact_status]}</small></h2>"
             f"<p>{escape(group.product_label or group.product_id or '未归属商品')} / {escape(group.scope or '—')}</p>"
-            f"<p><strong>{escape(_fact_value_text(group, by_id))}</strong></p>"
+            f"<p><strong>{_linked_values(group, by_id, links, html=True)}</strong></p>"
             + (f"<p>{escape(group.reason)}</p>" if group.fact_status != "verified" else "") +
             "<details><summary>查看来源与人工决策</summary>"
             f"<p><strong>三层可信度：</strong>识别 {group.recognition_confidence:.0%} · "

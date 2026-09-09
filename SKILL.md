@@ -63,6 +63,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 decide --o
 `next_action=review_complete` 表示无需重复确认，可按用户请求导出。已确认事实不要求逐项依据；
 人工决定记录用户的实际选择即可，不编造核验证明。正式生成授权仍需用户明确选定字段。
 选项使用工具返回的值、单位、口径和来源别名；
+每个冲突、待确认选项后附上工具返回的 `source_url`，将它渲染成文字为“查看原文”的可点击链接；多来源分别保留链接，不自行拼接路径。
+原文链接是只供用户在本机打开的只读证据摘录，含页码、行号或单元格位置及可用的来源文件入口。
+宿主不得自动读取或上传链接内容。来源变化或丢失时显示失效提示，不把旧摘录当作当前事实。
 不自行编造选项或使用过期摘要。只操作用户选中的参数，保留其他 pending 项。
 内部兼容接口只执行用户点名的 candidate ID 和原始理由；不要再次要求处理所有剩余候选。
 审核和生成的完整参数说明见 [内容闭环指南](docs/CONTENT_WORKFLOW.md)。
@@ -86,6 +89,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 decide --o
 需要离线审阅或 Excel 核验表时，调用 `export-review --output-dir "<输出目录>"`。
 它无需先确认全部参数，输出包含“核验总览、冲突、待确认事实、已确认事实、证据明细”的 `product-review.xlsx`。
 该文件含来源和原文，仅交给用户本地查看；不要读取回宿主或自动上传。
+冲突和待确认表的每个选项都带“查看原文”超链接，一个事实组仍只占一行。
+导出目录中的 `source-links` 是链接使用的本机证据页，请保留；链接不是公网地址，换电脑需重新导出。
 Excel 备注不改变正式确认状态，参数选择仍通过对话 `decide` 完成。
 对话摘要已按口径分组并把未解决冲突排在前面；同一文件多处文字不算多个独立来源。
 `task.deliverable_updates` 提示核验表 `needs_refresh` 时重新导出；来源已改变则先重新分析。

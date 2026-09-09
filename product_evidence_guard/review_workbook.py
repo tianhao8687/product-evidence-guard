@@ -99,6 +99,9 @@ def export_review(output_dir, *, session_id=None):
         raise ConfirmationRequestError("当前没有参数候选，请先分析包含商品参数的资料。")
     groups = group_candidates(rows, hashes)
     by_id = {c["candidate_id"]: c for c in rows}
+    from .source_links import write_source_links
+    review_ids = {cid for g in groups if g["fact_status"] != "verified" for cid in g["candidate_ids"]}
+    source_links = write_source_links(output, [c for c in rows if c["candidate_id"] in review_ids])
     generated = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M %z")
     wb = Workbook()
     wb.remove(wb.active)
@@ -148,6 +151,7 @@ def export_review(output_dir, *, session_id=None):
         return ws
 
     overview, conflicts, pending, selected, details = [], [], [], [], []
+    conflict_options, pending_options = [], []
     human_count = 0
     status_labels = {"conflict": "冲突", "pending_confirmation": "待确认", "verified": "已确认"}
     methods = {"single_value": "参数明确，无冲突", "cross_source_exact": "多来源一致",
@@ -172,8 +176,10 @@ def export_review(output_dir, *, session_id=None):
         overview.append([*context, status_labels[status], shown_value, unit, reason])
         if status == "conflict":
             conflicts.append([*context, source_values, group["source_count"], "请选择采用值，或补充说明。"])
+            conflict_options.append(items)
         elif status == "pending_confirmation":
             pending.append([*context, alternatives, group["reason"], group["source_count"], source_summary])
+            pending_options.append(items)
         else:
             human_count += int(group["human_approved"])
             selected.append([*context, shown_value, unit, methods.get(group["verification_method"], ""),
@@ -193,12 +199,34 @@ def export_review(output_dir, *, session_id=None):
         color = "E8EAED" if not group["current"] or group["review_reason_code"] == "all_rejected" else {
             "conflict": "FBE4DE", "pending_confirmation": "FFF3D6", "verified": "E5F1EA"}[group["fact_status"]]
         main.cell(index, 4).fill = PatternFill("solid", fgColor=color)
-    sheet("冲突", "不同值并列展示，不按来源多数自动选择。",
+    def option_sheet(title, subtitle, headings, records, widths, options):
+        # Excel supports one hyperlink per cell: give every option/source its
+        # own cell while keeping one fact group per row and the five sheets.
+        count = max((len(items) for items in options), default=0)
+        base_columns = len(headings)
+        for record, items in zip(records, options):
+            for c in items:
+                value = str(_value(c["normalized_value"], c["field"])) + " " + _unit(c.get("normalized_unit"))
+                if not c.get("source_current", True) or hashes.get(c["source_file"]) != c["file_hash"]:
+                    value = "已失效记录"
+                record.append(f'{value.strip()} · {c["source_file"]} · 查看原文')
+            record.extend([""] * (count - len(items)))
+        ws = sheet(title, subtitle + " 点击选项后的原文链接核对；本机链接，请保留 source-links 文件夹。",
+                   headings + [f"选项{i + 1}原文" for i in range(count)], records, widths + [42] * count)
+        for row_index, items in enumerate(options, 5):
+            for column, c in enumerate(items, base_columns + 1):
+                cell = ws.cell(row_index, column)
+                cell.hyperlink = source_links[c["candidate_id"]]
+                cell.hyperlink.tooltip = _position(c.get("locator", {}))
+                cell.font = Font(name="微软雅黑", size=10, color="006B68", underline="single")
+        return ws
+
+    option_sheet("冲突", "不同值并列展示，不按来源多数自动选择。",
           ["商品", "参数", "口径", "冲突值及来源", "独立来源数", "建议操作"],
-          conflicts, [28, 18, 20, 65, 16, 45])
-    sheet("待确认事实", "只列出归属、口径、识别或来源变化等实际疑问。",
+          conflicts, [28, 18, 20, 65, 16, 45], conflict_options)
+    option_sheet("待确认事实", "只列出归属、口径、识别或来源变化等实际疑问。",
           ["商品", "参数", "口径", "待确认值", "待确认原因", "独立来源数", "来源摘要"],
-          pending, [28, 18, 20, 28, 55, 16, 48])
+          pending, [28, 18, 20, 28, 55, 16, 48], pending_options)
     sheet("已确认事实", "包含自动核验和人工确认。自动核验不代表用户已正式批准。",
           ["商品", "参数", "口径", "已确认值", "单位", "确认方式", "独立来源数", "来源摘要", "是否人工确认", "当前有效"],
           selected, [28, 18, 20, 28, 12, 24, 16, 48, 18, 14])

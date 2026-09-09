@@ -2369,8 +2369,9 @@ def analyze_directory(
         groups,
         relations,
         run_summary=run_summary,
+        input_root=root,
     )
-    write_html_report(output / "evidence-report.html", candidates, groups, relations, run_summary)
+    write_html_report(output / "evidence-report.html", candidates, groups, relations, run_summary, input_root=root)
     atomic_write_json(output / "run-summary.json", run_summary)
     atomic_write_json(
         state_path,
