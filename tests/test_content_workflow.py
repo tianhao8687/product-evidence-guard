@@ -153,10 +153,13 @@ class ContentWorkflowTests(unittest.TestCase):
         self.assertFalse(exported["model_called"])
         book = load_workbook(exported["path"])
         try:
-            self.assertEqual(book.sheetnames, ["核验总览", "候选与证据", "已确认参数"])
-            self.assertEqual(book["候选与证据"].freeze_panes, "C5")
-            self.assertEqual(book["已确认参数"].max_row, 4)
-            self.assertIn("=1+1", [c.value for row in book["候选与证据"].iter_rows(min_row=5) for c in row])
+            self.assertEqual(book.sheetnames, ["核验总览", "冲突", "待确认事实", "已确认事实", "证据明细"])
+            self.assertEqual(book["证据明细"].freeze_panes, "C5")
+            self.assertEqual(book["已确认事实"].max_row, 4 + exported["verified_row_count"])
+            self.assertGreater(exported["verified_row_count"], 0)
+            self.assertEqual(exported["confirmed_row_count"], 0)
+            self.assertEqual(book["核验总览"].max_row, 4 + exported["fact_count"])
+            self.assertIn("=1+1", [c.value for row in book["证据明细"].iter_rows(min_row=5) for c in row])
             self.assertFalse(any(c.data_type == "f" for s in book for row in s for c in row))
         finally:
             book.close()

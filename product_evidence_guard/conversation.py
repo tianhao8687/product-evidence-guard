@@ -124,7 +124,8 @@ def review_summary(output_dir, *, review_id: str, recipient: str, session_id: st
     atomic_write_json(output / workflow.WORKFLOW_FILE, manifest)
     return {"summary_id": summary_id, "review_id": review_id, "session_id": session,
             "groups": groups, "needs_reanalysis": needs_reanalysis,
-            "next_action": "reanalyze" if needs_reanalysis else "ask_user_choice" if rows else "request_more_material",
+            "next_action": ("reanalyze" if needs_reanalysis else "request_more_material" if not rows else
+                            "ask_user_choice" if any(g["fact_status"] != "verified" for g in groups) else "review_complete"),
             "data_scope": "仅包含获准字段的标准值、单位、口径、状态、来源别名和类型；不包含原文件名、正文或图片。"}
 
 

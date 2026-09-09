@@ -9,6 +9,97 @@ from typing import Iterable
 from .models import CrossFieldRelation, FactCandidate, FactGroup
 from .identity import conflict_group_id, evidence_identity, graph_identity, identity_needs_review, product_label
 from .normalization import normalize_text, values_equal
+from .field_registry import field_definition
+
+
+FACT_STATUS_LABELS = {"verified": "已确认", "pending_confirmation": "待确认", "conflict": "冲突"}
+REVIEW_REASONS = {
+    "identity_ambiguous": "这条参数属于哪个商品？",
+    "scope_unclear": "参数口径尚未确定。",
+    "version_unclear": "需要确认哪个版本适用于当前商品。",
+    "compatible_expression": "表达不同，请选择正式写法。",
+    "source_changed": "来源更新了，请重新分析这条参数。",
+    "unclear_value": "识别结果或单位不够清楚，请核对。",
+    "all_rejected": "现有值已全部拒绝，请补充正确参数。",
+    "blocking_relation": "这条参数与其他参数存在未解决的问题。",
+}
+
+
+def refresh_fact_status(groups: Iterable[FactGroup], candidates: Iterable[FactCandidate],
+                        relations: Iterable[CrossFieldRelation] = ()) -> None:
+    """One presentation/export decision, never a synthetic human approval.
+
+    A clear uncontested value is usable even from one file. Source counting is
+    explanatory only; duplicates never vote away a contradictory value.
+    """
+    by_id = {item.candidate_id: item for item in candidates}
+    blocked_ids = {cid for relation in relations if relation.severity == "block" for cid in relation.candidate_ids}
+    for group in groups:
+        items = [by_id[cid] for cid in group.candidate_ids if cid in by_id]
+        active = [item for item in items if item.status != "rejected"]
+        valid = [item for item in active if item.source_current and item.status != "stale"]
+        human = [item for item in valid if item.status == "confirmed"]
+        group.fact_status = "pending_confirmation"
+        group.verification_method = None
+        group.verified_candidate_ids = []
+        group.selected_value = None
+        group.selected_unit = None
+        group.human_approved = False
+        group.review_reason_code = None
+        group.current = len(active) == len(valid)
+        # Same-byte renamed copies are not additional independent documents.
+        group.independent_source_count = len({item.file_hash or item.source_file for item in valid})
+        spec = field_definition(group.field)
+        if not group.current:
+            code = "source_changed"
+        elif not active:
+            code = "all_rejected"
+        elif any(identity_needs_review(item) for item in valid):
+            code = "identity_ambiguous"
+        elif any(item.scope != group.scope for item in valid) or (
+            spec and spec.allowed_scopes and not group.scope
+        ):
+            code = "scope_unclear"
+        elif blocked_ids.intersection(group.candidate_ids):
+            code = "blocking_relation"
+        elif any(any(note.startswith("unparsed_") for note in item.notes) or
+                 (spec and spec.value_type != "text" and item.normalized_unit is None) or
+                 (item.status != "confirmed" and (item.recognition_confidence < 0.8 or
+                    (item.mapping_confidence_source != "deterministic" and item.mapping_confidence < 0.8)))
+                 for item in valid):
+            code = "unclear_value"
+        elif _likely_version_update(valid) and not (human and _all_equal(valid)):
+            code = "version_unclear"
+        elif not _all_equal(valid):
+            if group.field in {"material", "color"} and _compatible_text_values(valid):
+                code = "compatible_expression"
+            else:
+                group.fact_status = "conflict"
+                group.reason = "资料给出了不同的值，请选择采用哪个值，或补充说明。"
+                group.recommendation = "选择采用值并明确处理其他不同值。"
+                continue
+        else:
+            group.fact_status = "verified"
+            chosen = (human or valid)[0]
+            group.selected_value = chosen.normalized_value
+            group.selected_unit = chosen.normalized_unit
+            group.verified_candidate_ids = [item.candidate_id for item in valid]
+            group.human_approved = bool(human)
+            rejected_other_value = any(item.status == "rejected" and not (
+                item.normalized_unit == chosen.normalized_unit and values_equal(item.normalized_value, chosen.normalized_value)
+            ) for item in items)
+            group.verification_method = (
+                "human_resolved_conflict" if human and rejected_other_value else "human_confirmed" if human
+                else "single_value" if group.independent_source_count < 2
+                else "cross_source_exact" if len({normalize_text(item.raw_value) for item in valid}) == 1
+                else "cross_source_converted"
+            )
+            group.reason = "人工确认。" if human else "参数清楚，未发现冲突。"
+            group.recommendation = "无需重复确认。"
+            continue
+        group.review_reason_code = code
+        group.reason = REVIEW_REASONS[code]
+        group.recommendation = group.reason
 
 
 VERSION_RE = re.compile(
@@ -71,7 +162,7 @@ def _version_hint(path: str) -> tuple[int, ...] | None:
 def _likely_version_update(candidates: list[FactCandidate]) -> bool:
     hints = [_version_hint(candidate.source_file) for candidate in candidates]
     usable = [hint for hint in hints if hint is not None]
-    return len(usable) >= 2 and len(set(usable)) == len(usable)
+    return len(set(usable)) > 1 and not _all_equal(candidates)
 
 
 def build_fact_groups(candidates: Iterable[FactCandidate]) -> list[FactGroup]:
@@ -182,6 +273,7 @@ def build_fact_groups(candidates: Iterable[FactCandidate]) -> list[FactGroup]:
                 group_id=conflict_group_id(product_id, field, scope_key or None),
             )
         )
+    refresh_fact_status(result, deduplicated)
     return result
 
 
@@ -224,4 +316,6 @@ def build_cross_field_relations(candidates: Iterable[FactCandidate]) -> list[Cro
 
 def build_graph(candidates: Iterable[FactCandidate]) -> tuple[list[FactCandidate], list[FactGroup], list[CrossFieldRelation]]:
     deduped = _deduplicate(candidates)
-    return deduped, build_fact_groups(deduped), build_cross_field_relations(deduped)
+    groups, relations = build_fact_groups(deduped), build_cross_field_relations(deduped)
+    refresh_fact_status(groups, deduped, relations)
+    return deduped, groups, relations

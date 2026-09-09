@@ -96,7 +96,7 @@ class ConversationWorkflowTests(unittest.TestCase):
         self.assertEqual(result["groups"][0]["severity"], "block")
         voltage = [g for g in result["groups"] if g["field"] == "voltage"]
         self.assertEqual({g["scope"] for g in voltage}, {"input", "output"})
-        self.assertTrue(all(g["severity"] == "review" for g in voltage))
+        self.assertTrue(all(g["fact_status"] == "verified" for g in voltage))
         self.assertEqual(next(g for g in result["groups"] if g["field"] == "power")["scope_label"], "额定")
         self.assertNotIn("electrical.txt", json.dumps(result))
 
@@ -116,6 +116,17 @@ class ConversationWorkflowTests(unittest.TestCase):
         choice = next(c["choice"] for c in summary["groups"][0]["choices"] if c["value"] == 320)
         call("decide", summary_id=summary["summary_id"], choice=choice, recipient="Qoder",
              action="confirm", reason="用户在对话中选择 320g")
+        # Adopting one value does not silently reject a contradictory source.
+        unresolved = app.dispatch(build_request("authorize", {"output_dir": str(self.output),
+            "summary_id": summary["summary_id"], "choices": [choice], "recipient": "Qoder", "purpose": "生成商品介绍"}))
+        self.assertFalse(unresolved["ok"])
+        summary = call("review-summary", recipient="Qoder", review_id=permit["review_id"])
+        other = next(c["choice"] for c in summary["groups"][0]["choices"] if c["value"] != 320)
+        call("decide", summary_id=summary["summary_id"], choice=other, recipient="Qoder",
+             action="reject", reason="用户明确排除另一个值")
+        summary = call("review-summary", recipient="Qoder", review_id=permit["review_id"])
+        self.assertEqual(summary["next_action"], "review_complete")
+        choice = next(c["choice"] for c in summary["groups"][0]["choices"] if c.get("value") == 320)
         grant = call("authorize", summary_id=summary["summary_id"], choices=[choice], recipient="Qoder", purpose="生成商品介绍")
         packet = call("handoff", bundle_id=grant["bundle_id"], recipient="Qoder")
         self.assertEqual(packet["facts"][0]["value"], 320)

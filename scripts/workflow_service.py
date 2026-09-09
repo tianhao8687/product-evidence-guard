@@ -168,7 +168,7 @@ class WorkflowService:
                 return workflow.check_content(output, content_file=payload["content_file"],
                     bundle_id=payload["bundle_id"], recipient=payload["recipient"], **kwargs)
             if operation == "export-table":
-                return workflow.export_table(output, **kwargs)
+                return workflow.export_table(output, mode=payload.get("mode", "human"), **kwargs)
             if operation == "export-review":
                 from product_evidence_guard.review_workbook import export_review
                 return export_review(output, **kwargs)

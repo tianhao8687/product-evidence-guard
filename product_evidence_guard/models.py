@@ -30,7 +30,7 @@ class SourceBlock:
 
 @dataclass(slots=True)
 class FactCandidate:
-    """A proposed product fact. Candidates never become confirmed facts automatically."""
+    """Traceable evidence. Its decision status records human actions only."""
 
     candidate_id: str
     field: str
@@ -58,12 +58,20 @@ class FactCandidate:
     product_variant: str | None = None
     product_identity_status: str = "unresolved"
     identity_version: int = 2
+    source_current: bool = True
+
+    @property
+    def decision_status(self) -> str:
+        return "undecided" if self.status == "pending" else self.status
 
     def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+        return {**asdict(self), "decision_status": self.decision_status}
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "FactCandidate":
+        data = dict(data)
+        if "status" not in data and "decision_status" in data:
+            data["status"] = "pending" if data["decision_status"] == "undecided" else data["decision_status"]
         allowed = {item.name for item in fields(cls)}
         return cls(**{key: value for key, value in data.items() if key in allowed})
 
@@ -85,6 +93,15 @@ class FactGroup:
     product_label: str | None = None
     scope: str | None = None
     group_id: str = ""
+    fact_status: str = "pending_confirmation"
+    verification_method: str | None = None
+    selected_value: Any = None
+    selected_unit: str | None = None
+    independent_source_count: int = 0
+    verified_candidate_ids: list[str] = field(default_factory=list)
+    review_reason_code: str | None = None
+    human_approved: bool = False
+    current: bool = True
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

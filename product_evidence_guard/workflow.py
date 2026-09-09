@@ -105,6 +105,24 @@ def _require_product_ownership(facts: list[dict]) -> None:
         raise ConfirmationRequestError("需要先确认参数属于哪个商品：请补充来源中的 SKU/型号/变体并重新分析；可先导出核验表。")
 
 
+def _verified_facts(product: dict) -> list[dict]:
+    by_id = {c["candidate_id"]: c for c in product["candidates"]}
+    return [{**by_id[g["verified_candidate_ids"][0]],
+             "normalized_value": g["selected_value"], "normalized_unit": g["selected_unit"],
+             "verification_method": g["verification_method"], "human_approved": g["human_approved"]}
+            for g in product.get("facts", []) if g["fact_status"] == "verified" and g["verified_candidate_ids"]]
+
+
+def _require_resolved_facts(facts: list[dict], product: dict) -> None:
+    usable = _usable_candidate_ids(product)
+    if any(f["candidate_id"] not in usable for f in facts):
+        raise ConfirmationRequestError("所选参数仍有冲突或待确认问题，请先处理。")
+
+
+def _usable_candidate_ids(product: dict) -> set[str]:
+    return {cid for g in product.get("facts", []) if g["fact_status"] == "verified" for cid in g["verified_candidate_ids"]}
+
+
 def create_handoff(output_dir: str | Path, *, candidate_ids: list[str], recipient: str,
                    purpose: str, session_id: str | None = None) -> dict:
     output, product, confirmed = context(output_dir, session_id)
@@ -119,6 +137,7 @@ def create_handoff(output_dir: str | Path, *, candidate_ids: list[str], recipien
         raise ConfirmationRequestError("选择中包含未确认、被拒绝或已经失效的参数。")
     selected = [by_id[i] for i in dict.fromkeys(candidate_ids)]
     _require_product_ownership(selected)
+    _require_resolved_facts(selected, product)
     seen: dict[tuple, tuple] = {}
     for fact in selected:
         key = (fact.get("product_id"), fact["field"], fact.get("scope"))
@@ -154,7 +173,7 @@ def get_handoff(output_dir: str | Path, *, bundle_id: str, recipient: str,
     bundle = _bundle(_manifest(output, session), bundle_id)
     if bundle["status"] != "active" or bundle["packet"]["recipient"] != recipient:
         raise ConfirmationRequestError("授权已撤销或接收方不匹配。")
-    current = _current_refs(confirmed, session)
+    current = _current_refs([f for f in confirmed if f["candidate_id"] in _usable_candidate_ids(product)], session)
     if bundle["session_id"] != session or any(f["fact_id"] not in current for f in bundle["packet"]["facts"]):
         raise ConfirmationRequestError("字段包已失效，请重新审核并授权当前参数。")
     packet = bundle["packet"]
@@ -261,12 +280,13 @@ def task_snapshot(output_dir: str | Path, *, session_id: str | None = None, deta
     summary = product["run_summary"]
     session = summary["session_id"]
     manifest = _manifest(output, session)
-    current = _current_refs(confirmed, session)
+    current = _current_refs([f for f in confirmed if f["candidate_id"] in _usable_candidate_ids(product)], session)
+    verified_refs = _current_refs(_verified_facts(product), session)
     review_version = None
     if any(r.get("kind") == "review_workbook" for r in manifest["deliverables"].values()):
         from .review_workbook import snapshot
         review_version = snapshot(output, product)[2]
-    deliverables = [deliverable_status(r, current, manifest["bundles"], review_version=review_version)
+    deliverables = [deliverable_status(r, verified_refs if r.get("kind") == "verified_table" else current, manifest["bundles"], review_version=review_version)
                     for r in manifest["deliverables"].values()]
     bundles = [{"bundle_id": bid, "recipient": b["packet"]["recipient"],
                 "field_count": len(b["packet"]["facts"]), "created_at": b["created_at"],
@@ -274,9 +294,9 @@ def task_snapshot(output_dir: str | Path, *, session_id: str | None = None, deta
                     "active" if b["session_id"] == session and all(f["fact_id"] in current for f in b["packet"]["facts"]) else "stale"}
                for bid, b in manifest["bundles"].items()]
     counts = summary.get("confirmation_status_counts", {})
-    pending = counts.get("pending", 0)
     errors = len(summary.get("errors", []))
-    phase = "needs_attention" if errors or counts.get("stale", 0) else "awaiting_review" if pending else "ready_to_export"
+    fact_counts = summary.get("fact_status_counts", {})
+    phase = "needs_attention" if errors else product.get("status", "awaiting_review")
     if not product["candidates"] and not errors and not counts.get("stale", 0):
         phase = "no_candidates"
     field_counts = Counter(c["field"] for c in product["candidates"] if c["field"] in LABELS)
@@ -285,10 +305,13 @@ def task_snapshot(output_dir: str | Path, *, session_id: str | None = None, deta
                           if grant["status"] == "active" and grant["session_id"] == session]
     active_handoffs = [b for b in bundles if b["status"] == "active"]
     next_action = ("request_more_material" if phase == "no_candidates" else "handoff" if active_handoffs
+                   else "export_verified_table" if phase in {"verified", "ready_to_export"}
                    else "review_summary" if review_permissions else "request_review_permission")
     result = {"session_id": session, "phase": phase,
               "counts": {"files": summary.get("files_discovered", 0), "candidates": len(product["candidates"]),
-                         "errors": errors, **counts}, "bundle_count": len(bundles),
+                         "errors": errors, **counts, "facts": len(product.get("facts", [])),
+                         "verified_facts": fact_counts.get("verified", 0), "pending_facts": fact_counts.get("pending_confirmation", 0),
+                         "conflicts": fact_counts.get("conflict", 0)}, "bundle_count": len(bundles),
               "deliverable_counts": dict(Counter(d["status"] for d in deliverables)),
               "deliverable_updates": [{"artifact_id": d["artifact_id"], "status": d["status"],
                                        "next_action": d["next_action"]} for d in deliverables if d["next_action"] != "none"],
@@ -313,11 +336,16 @@ def task_snapshot(output_dir: str | Path, *, session_id: str | None = None, deta
     return result
 
 
-def export_table(output_dir: str | Path, *, session_id: str | None = None) -> dict:
+def export_table(output_dir: str | Path, *, session_id: str | None = None, mode: str = "human") -> dict:
     output, product, confirmed = context(output_dir, session_id)
+    if mode not in {"human", "verified"}:
+        raise ConfirmationRequestError("请选择已确认参数或仅人工批准参数。")
+    if mode == "verified":
+        confirmed = _verified_facts(product)
     if not confirmed:
         raise ConfirmationRequestError("尚无当前有效的已确认参数。")
     _require_product_ownership(confirmed)
+    _require_resolved_facts(confirmed, product)
     values = {}
     for fact in confirmed:
         key = (fact.get("product_id"), fact["field"], fact.get("scope"))
@@ -325,22 +353,28 @@ def export_table(output_dir: str | Path, *, session_id: str | None = None) -> di
         if key in values and values[key] != value:
             raise ConfirmationRequestError("同一口径存在互相矛盾的已确认值，请先明确采用哪一条；可导出核验表查看差异。")
         values[key] = value
-    rows = [["商品 ID", "SKU", "型号", "变体", "参数", "值", "单位", "口径"]]
+    confirmed = list({(f.get("product_id"), f["field"], f.get("scope")): f for f in confirmed}.values())
+    rows = [["商品 ID", "SKU", "型号", "变体", "参数", "值", "单位", "口径", "确认方式", "人工批准"]]
     for f in confirmed:
         rows.append([f.get("product_id") or "", f.get("product_sku") or "", f.get("product_model") or "",
                      f.get("product_variant") or "", f["field_label"], str(f["normalized_value"]),
-                     f.get("normalized_unit") or "", f.get("scope") or ""])
+                     f.get("normalized_unit") or "", f.get("scope") or "",
+                     "人工确认" if mode == "human" or f.get("human_approved") else "自动核验",
+                     "是" if mode == "human" or f.get("human_approved") else "否"])
     buffer = io.StringIO(newline="")
     writer = csv.writer(buffer)
     for row in rows:
         writer.writerow(["'" + x if x.startswith(("=", "+", "-", "@", "\t", "\r")) else x for x in row])
-    path = output / "confirmed-parameters.csv"
+    path = output / ("verified-parameters.csv" if mode == "verified" else "confirmed-parameters.csv")
+    _, fresh_product, _ = context(output, product["run_summary"]["session_id"])
+    if digest(product.get("facts")) != digest(fresh_product.get("facts")):
+        raise ConfirmationRequestError("来源或决定在导出期间变化，请刷新后重试。")
     atomic_write_text(path, buffer.getvalue(), encoding="utf-8-sig")
     session = product["run_summary"]["session_id"]
     manifest = _manifest(output, session)
     artifact_id = digest(str(path))[:24]
     manifest["deliverables"][artifact_id] = {
-        "artifact_id": artifact_id, "name": path.name, "path": str(path),
+        "artifact_id": artifact_id, "name": path.name, "path": str(path), "kind": "verified_table" if mode == "verified" else "human_table",
         "file_hash": hashlib.sha256(safe_file(path)).hexdigest(), "bundle_id": "local-export",
         "bundle_version": digest([_public_fact(f, session) for f in confirmed]), "checked_at": now(),
         "revision": manifest["deliverables"].get(artifact_id, {}).get("revision", 0) + 1,

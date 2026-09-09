@@ -312,7 +312,7 @@ class ProductEvidenceGuardTests(unittest.TestCase):
             )
             self.assertEqual(group["classification"], "strong_conflict")
 
-    def test_scoped_and_unscoped_electrical_values_still_block(self) -> None:
+    def test_scoped_and_unscoped_electrical_values_need_scope_confirmation(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / "input"
             output = Path(tmp) / "output"
@@ -321,7 +321,8 @@ class ProductEvidenceGuardTests(unittest.TestCase):
             (root / "b.txt").write_text("VOLTAGE: 24V\n", encoding="utf-8")
 
             summary = analyze_directory(root, output)
-            self.assertEqual(summary["blocking_conflict_count"], 1)
+            self.assertEqual(summary["blocking_conflict_count"], 0)
+            self.assertEqual(summary["fact_status_counts"]["pending_confirmation"], 1)
             data = json.loads(
                 (output / "product-facts.json").read_text(encoding="utf-8")
             )

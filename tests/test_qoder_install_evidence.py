@@ -77,18 +77,24 @@ class QoderInstallEvidenceTests(unittest.TestCase):
         self.assertFalse(probe["model_load_requested"])
         self.assertFalse(probe["qoder_cloud_message_sent"])
 
-    def test_six_installed_hashes_match_each_other_and_current_source(self) -> None:
+    def test_six_historical_installed_hashes_match_observed_source(self) -> None:
         rows = self.record["critical_files"]
         self.assertEqual(len(rows), 6)
         self.assertEqual(tuple(row["path"] for row in rows), CRITICAL_FILES)
 
         for row in rows:
-            source = REPO_ROOT / Path(row["path"])
-            digest = hashlib.sha256(source.read_bytes()).hexdigest()
             self.assertRegex(row["source_sha256"], r"^[0-9a-f]{64}$")
-            self.assertEqual(row["source_sha256"], digest)
-            self.assertEqual(row["installed_sha256"], digest)
+            self.assertEqual(row["installed_sha256"], row["source_sha256"])
             self.assertTrue(row["matches"])
+
+    def test_unchanged_runtime_entries_still_match_historical_install(self) -> None:
+        # SKILL.md now teaches the fact-first workflow. Do not rewrite the
+        # August installation observation to claim the new instructions were
+        # installed then. Current-package installs have separate E2E tests.
+        for row in self.record["critical_files"]:
+            if row["path"] != "SKILL.md":
+                digest = hashlib.sha256((REPO_ROOT / row["path"]).read_bytes()).hexdigest()
+                self.assertEqual(row["source_sha256"], digest)
 
     def test_publishable_evidence_has_no_private_path_or_credential(self) -> None:
         self.assertIsNone(re.search(r"(?i)[a-z]:[\\/]", self.serialized))

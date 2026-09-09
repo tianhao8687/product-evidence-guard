@@ -2187,7 +2187,7 @@ def analyze_directory(
         "identity_version": IDENTITY_VERSION,
         "field_registry_sha256": registry_fingerprint(),
         "fact_group_count": len(groups),
-        "blocking_conflict_count": sum(1 for group in groups if group.severity == "block"),
+        "blocking_conflict_count": sum(1 for group in groups if group.fact_status == "conflict"),
         "review_count": sum(1 for group in groups if group.severity == "review"),
         "pass_count": sum(1 for group in groups if group.severity == "pass"),
         "engine_signature_changed": not cache_usable,

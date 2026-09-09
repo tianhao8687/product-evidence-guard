@@ -58,6 +58,7 @@ class EvidenceReportTests(unittest.TestCase):
             mapping_confidence=0.92,
             evidence_consistency=1.0,
             recommendation="人工确认。",
+            scope="net",
         )
         run_summary = {
             "confirmation_status_counts": {
@@ -96,7 +97,9 @@ class EvidenceReportTests(unittest.TestCase):
             self.assertIn("近似坐标 bbox_1000=[100, 200, 500, 280]", report)
             self.assertIn("模型自评（未校准）", report)
             self.assertIn("已人工确认", report)
-            self.assertIn("已确认项可以进入正式导出", report)
+            self.assertIn("已确认", report)
+            self.assertIn("300", report)
+            self.assertIn("<details>", report)
             self.assertIn("已失效", report)
             self.assertIn("源文件或文件哈希变化而失效", report)
 

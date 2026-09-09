@@ -10,10 +10,20 @@ from .models import CrossFieldRelation, FactCandidate, FactGroup
 from .field_registry import registry_fingerprint
 from .identity import IDENTITY_VERSION, product_entities_from_candidates
 from .state import atomic_write_json, atomic_write_text
+from .graph import refresh_fact_status, FACT_STATUS_LABELS
 
 
 def _locator_text(locator: dict[str, Any]) -> str:
     return json.dumps(locator, ensure_ascii=False, sort_keys=True)
+
+
+def _fact_value_text(group: FactGroup, by_id: dict[str, FactCandidate]) -> str:
+    if group.fact_status == "verified":
+        return f"{group.selected_value} {group.selected_unit or ''}".strip()
+    values = dict.fromkeys(f"{c.normalized_value} {c.normalized_unit or ''}".strip()
+                          for cid in group.candidate_ids if (c := by_id.get(cid))
+                          and c.source_current and c.status not in {"rejected", "stale"})
+    return " / ".join(values) or "等待更新"
 
 
 _STATUS_LABELS = {
@@ -127,7 +137,7 @@ def _group_recommendation(
         for candidate_id in group.candidate_ids
         if candidate_id in candidates_by_id
     }
-    if statuses and statuses <= {"confirmed", "rejected"}:
+    if group.fact_status == "verified" and statuses and statuses <= {"confirmed", "rejected"}:
         if "confirmed" in statuses:
             return (
                 "该组已完成人工处理；已确认项可以进入正式导出。"
@@ -146,14 +156,23 @@ def write_product_facts(
     run_summary: dict[str, Any],
 ) -> None:
     candidate_list = list(candidates)
+    group_list, relation_list = list(groups), list(relations)
+    refresh_fact_status(group_list, candidate_list, relation_list)
+    fact_counts = Counter(group.fact_status for group in group_list)
+    status = ("no_facts" if not group_list else "blocked" if fact_counts["conflict"]
+              else "awaiting_review" if fact_counts["pending_confirmation"]
+              else "ready_to_export" if all(g.human_approved for g in group_list) else "verified")
+    run_summary["fact_status_counts"] = {key: fact_counts[key] for key in FACT_STATUS_LABELS}
+    run_summary["fact_count"] = len(group_list)
+    run_summary["blocking_conflict_count"] = fact_counts["conflict"]
     atomic_write_json(
         path,
         {
             "schema_version": 2,
             "identity_version": IDENTITY_VERSION,
             "field_registry_sha256": registry_fingerprint(),
-            "status": "pending_human_confirmation",
-            "warning": "这些是候选事实和核验结果，不是已经确认的正式产品参数。",
+            "status": status,
+            "warning": "已确认包括自动核验与人工确认；自动核验不会代替用户正式批准或对外授权。",
             "run_summary": run_summary,
             "products": [
                 product.to_dict()
@@ -163,8 +182,10 @@ def write_product_facts(
                 )
             ],
             "candidates": [candidate.to_dict() for candidate in candidate_list],
-            "fact_groups": [group.to_dict() for group in groups],
-            "cross_field_relations": [relation.to_dict() for relation in relations],
+            "facts": [group.to_dict() for group in group_list],
+            "evidence_candidates": [candidate.to_dict() for candidate in candidate_list],
+            "fact_groups": [group.to_dict() for group in group_list],
+            "cross_field_relations": [relation.to_dict() for relation in relation_list],
         },
     )
 
@@ -180,12 +201,23 @@ def write_conflicts_markdown(
     candidate_list = list(candidates)
     group_list = list(groups)
     relation_list = list(relations)
+    refresh_fact_status(group_list, candidate_list, relation_list)
     by_id = {candidate.candidate_id: candidate for candidate in candidate_list}
     status_counts = _confirmation_counts(candidate_list, run_summary)
     lines = [
         "# Product Evidence Guard 核验结果",
         "",
-        "> 本报告只给出候选事实和冲突证据，程序不会替用户决定哪个值是真的。",
+        "> 正常参数直接列入已确认。只需处理冲突和待确认项目；自动核验不代表人工批准。",
+        "",
+        "| 商品 | 参数 | 口径 | 状态 | 值 |",
+        "| --- | --- | --- | --- | --- |",
+        *["| " + " | ".join(str(v).replace("|", "\\|").replace("\n", " ") for v in (
+            g.product_label or g.product_id or "未归属商品", g.field_label, g.scope or "—",
+            FACT_STATUS_LABELS[g.fact_status],
+            _fact_value_text(g, by_id) + ("；" + g.reason if g.fact_status != "verified" else ""))) + " |"
+          for g in sorted(group_list, key=lambda g: {"conflict": 0, "pending_confirmation": 1, "verified": 2}[g.fact_status])],
+        "",
+        "<details><summary>查看人工决策与来源明细</summary>",
         "",
         "# 人工确认状态",
         "",
@@ -304,6 +336,7 @@ def write_conflicts_markdown(
                     "",
                 ]
             )
+    lines.append("</details>")
     path.parent.mkdir(parents=True, exist_ok=True)
     atomic_write_text(path, "\n".join(lines).rstrip() + "\n")
 
@@ -318,11 +351,12 @@ def write_html_report(
     candidate_list = list(candidates)
     group_list = list(groups)
     relation_list = list(relations)
+    refresh_fact_status(group_list, candidate_list, relation_list)
     by_id = {candidate.candidate_id: candidate for candidate in candidate_list}
     status_counts = _confirmation_counts(candidate_list, run_summary)
     severity_class = {"block": "danger", "review": "warn", "pass": "ok", "info": "info"}
     cards: list[str] = []
-    ordered = sorted(group_list, key=lambda item: ({"block": 0, "review": 1, "pass": 2}.get(item.severity, 3), item.field))
+    ordered = sorted(group_list, key=lambda item: ({"conflict": 0, "pending_confirmation": 1, "verified": 2}[item.fact_status], item.field))
     for group in ordered:
         recommendation = _group_recommendation(group, by_id)
         evidence_rows: list[str] = []
@@ -354,19 +388,19 @@ def write_html_report(
                 f"<td><span class='status {status_code}'>{status} ({status_code})</span></td>"
                 "</tr>"
             )
-        css_class = severity_class.get(group.severity, "info")
+        css_class = {"conflict": "danger", "pending_confirmation": "warn", "verified": "ok"}[group.fact_status]
         cards.append(
-            f"<section class='card {css_class}'>"
-            f"<h2>{escape(group.field_label)} <small>{escape(group.classification)}</small></h2>"
-            f"<p><strong>商品 / 口径：</strong>{escape(group.product_label or group.product_id or 'unresolved')} / {escape(group.scope or 'unspecified')}</p>"
-            f"<p>{escape(group.reason)}</p>"
-            f"<p><strong>建议：</strong>{escape(recommendation)}</p>"
+            f"<section class='card {css_class}'><h2>{escape(group.field_label)} <small>{FACT_STATUS_LABELS[group.fact_status]}</small></h2>"
+            f"<p>{escape(group.product_label or group.product_id or '未归属商品')} / {escape(group.scope or '—')}</p>"
+            f"<p><strong>{escape(_fact_value_text(group, by_id))}</strong></p>"
+            + (f"<p>{escape(group.reason)}</p>" if group.fact_status != "verified" else "") +
+            "<details><summary>查看来源与人工决策</summary>"
             f"<p><strong>三层可信度：</strong>识别 {group.recognition_confidence:.0%} · "
             f"字段理解 {group.mapping_confidence:.0%} · 证据一致 {group.evidence_consistency:.0%}</p>"
             "<div class='table-wrap'><table><thead><tr><th>原始值</th><th>标准值</th>"
             "<th>来源</th><th>来源类型 / 方法</th><th>证据位置</th>"
             "<th>识别 / 字段理解</th><th>确认状态</th></tr></thead>"
-            f"<tbody>{''.join(evidence_rows)}</tbody></table></div></section>"
+            f"<tbody>{''.join(evidence_rows)}</tbody></table></div></details></section>"
         )
 
     relation_html = ""
@@ -380,15 +414,14 @@ def write_html_report(
     stale_notice = ""
     if status_counts["stale"]:
         stale_notice = (
-            "<p class='stale-notice'><strong>失效提醒：</strong>"
+            "<p class='stale-notice'><strong>旧确认已失效：</strong>"
             "有旧确认因源文件或文件哈希变化而失效，不能继续作为正式事实使用。</p>"
         )
     confirmation_html = (
-        "<section class='confirmation-summary'><h2>人工确认状态</h2>"
-        f"<span class='status pending'>待确认 {status_counts['pending']}</span>"
-        f"<span class='status confirmed'>已确认 {status_counts['confirmed']}</span>"
-        f"<span class='status rejected'>已拒绝 {status_counts['rejected']}</span>"
-        f"<span class='status stale'>已失效 {status_counts['stale']}</span>"
+        "<section class='confirmation-summary'><h2>参数总览</h2>"
+        f"<span class='status rejected'>冲突 {sum(g.fact_status == 'conflict' for g in group_list)}</span>"
+        f"<span class='status pending'>待确认 {sum(g.fact_status == 'pending_confirmation' for g in group_list)}</span>"
+        f"<span class='status confirmed'>已确认 {sum(g.fact_status == 'verified' for g in group_list)}</span>"
         f"{stale_notice}</section>"
     )
     document_visual_summary = run_summary.get("document_visuals")
@@ -460,7 +493,7 @@ small{{font-size:.58em;color:#667085}} .table-wrap{{overflow-x:auto}} table{{wid
 <body>
 <h1>Product Evidence Guard</h1>
 <p class="subtitle">本地多来源商品事实核验报告</p>
-<p class="notice"><strong>注意：</strong>报告中的内容仍是候选事实。强冲突必须人工处理，任何候选都不会自动成为正式产品参数。模型自评分数未经校准。</p>
+<p class="notice">参数明确、没有冲突时自动列入已确认。只需处理冲突和待确认项目。自动核验不代表用户已正式批准。</p>
 {confirmation_html}
 {document_visual_html}
 {''.join(cards)}

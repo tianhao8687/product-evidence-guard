@@ -12,6 +12,8 @@ import uuid
 
 from . import __version__
 from .models import CrossFieldRelation, FactCandidate, FactGroup
+from .graph import build_graph
+from .normalization import values_equal
 from .reports import (
     write_conflicts_markdown,
     write_html_report,
@@ -466,7 +468,14 @@ def _synchronize_analysis_outputs(
 ) -> None:
     candidates = _deserialize_candidates(product_facts)
     decisions = state["decisions"]
+    try:
+        source_root, _ = _load_analysis_context(output_dir, session_id=_session_id(product_facts))
+    except ConfirmationError:
+        source_root = None
+    source_hashes: dict[Path, str] = {}
     for candidate in candidates:
+        candidate.source_current = source_root is not None and _source_validation_error(
+            source_root, candidate.to_dict(), source_hashes) is None
         candidate.status = "pending"
         decision = decisions.get(candidate.candidate_id)
         if not isinstance(decision, dict) or decision.get("status") not in ACTIVE_STATUSES:
@@ -491,12 +500,7 @@ def _synchronize_analysis_outputs(
     run_summary = _json_clone(run_summary)
     run_summary["confirmation_status_counts"] = confirmation_counts
 
-    groups = _deserialize_rows(product_facts, "fact_groups", FactGroup)
-    relations = _deserialize_rows(
-        product_facts,
-        "cross_field_relations",
-        CrossFieldRelation,
-    )
+    candidates, groups, relations = build_graph(candidates)
     write_product_facts(
         output_dir / "product-facts.json",
         candidates=candidates,
@@ -815,10 +819,14 @@ def resolve_conflict_group(
             raise ConfirmationRequestError("冲突组成员已经变化，请刷新后重新明确选择。")
     decisions = [{"candidate_id": selected_candidate_id, "action": "confirm", "reason": reason}]
     if reject_others:
+        rows = {c["candidate_id"]: c for c in product_facts["candidates"]}
+        selected = rows[selected_candidate_id]
         decisions.extend(
             {"candidate_id": candidate_id, "action": "reject", "reason": reason}
             for candidate_id in group["candidate_ids"]
-            if candidate_id != selected_candidate_id
+            if candidate_id != selected_candidate_id and not (
+                rows[candidate_id]["normalized_unit"] == selected["normalized_unit"] and
+                values_equal(rows[candidate_id]["normalized_value"], selected["normalized_value"]))
         )
     return apply_batch_decisions(output, session_id=session_id, decisions=decisions)
 

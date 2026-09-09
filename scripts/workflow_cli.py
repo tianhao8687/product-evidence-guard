@@ -20,6 +20,9 @@ def add_commands(commands):
         parser = commands.add_parser(name)
         parser.add_argument("--output-dir", required=True)
         parser.add_argument("--session-id")
+        if name == "export-table":
+            parser.add_argument("--mode", choices=("human", "verified"), default="human",
+                                help="human 仅人工批准；verified 全部已确认参数（含自动核验）")
         if name == "authorize":
             selection = parser.add_mutually_exclusive_group(required=True)
             selection.add_argument("--candidate-id", action="append", dest="candidate_ids")

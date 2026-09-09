@@ -6,8 +6,8 @@
 
 1. `analyze --background --brief` 启动，`job` 查询，`task` 返回字段类别与现有授权。
 2. 用户允许将本次必要参数摘要展示给 Qoder 后，执行 `allow-review` 记录范围；已有同范围授权直接复用。
-3. `review-summary` 返回 A1/A2 选项、获准字段的标准值/单位/口径、来源别名与类型。不返回原始文件名、原文或图片。
-4. 用户在对话中选择选项并说明理由，Skill 用 `decide` 确认/拒绝。摘要绑定候选版本，来源或候选变化会使旧选项不可用。
+3. `review-summary` 按事实返回冲突、待确认、已确认；同一商品/参数/口径合并展示。单一明确值无需多来源或逐项依据，直接进入已确认。来源明细默认收起，不返回原始文件名、原文或图片。
+4. 只有疑问项目才展示 A1/A2 选项，用户选择后用 `decide` 记录实际决定。`review_complete` 时无需重复确认。摘要绑定候选版本，来源变化会使旧选项不可用。
 5. 用户已要求用确认字段生成内容时，使用 `authorize --summary-id ... --choice A2` 交接所选字段，然后 `handoff` → 生成 → `check-content` → 导出。
 
 ```powershell
@@ -20,6 +20,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 authorize 
 `--field` 和授权时的 `--choice` 可重复。用户明确允许当前全部候选字段时使用 `allow-review --all-fields`。
 对话审核授权只覆盖指定字段和本次分析会话；可以使用 `revoke-review --review-id ... --recipient Qoder` 撤销。
 原始证据页不自动打开；需要查看时才调用 `review`。下文保留可选页面及兼容命令的详细说明。
+
+普通参数表使用 `export-table --mode verified`（含自动核验）；仅人工批准的正式参数使用
+`--mode human`，省略模式沿用原来的人工批准范围。自动核验不创建人工决定或云端授权。
+Excel 的五张表为核验总览、冲突、待确认事实、已确认事实、证据明细；总览每条事实一行。
 
 本次升级在现有本地核验基础上增加证据审核页、后台任务、明确字段授权、生成内容回检和交付件引用追踪。
 模型维持提前预热与常驻复用。本轮实现和测量使用 CPU，不新增 Intel GPU 验证。
