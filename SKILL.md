@@ -1,6 +1,6 @@
 ---
 name: local-product-evidence-guard
-version: 1.0.0
+version: 2.0.0
 description: 本地、离线使用 OpenVINO 在 Intel AIPC 核验商品资料、说明书、参数表、包装图和扫描 PDF，发现冲突并保留证据。Use to verify local/offline product facts, evidence, content and conflicts. 正式事实由用户确认。
 ---
 

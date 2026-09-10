@@ -1,6 +1,6 @@
 # Product Evidence Guard
 
-**本地商品事实核验 · v1.0.0**
+**本地商品事实核验 · v2.0.0**
 
 ## v2 证据架构（Unreleased）
 

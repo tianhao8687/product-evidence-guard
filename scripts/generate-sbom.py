@@ -239,7 +239,7 @@ def build_documents(
         raise ValueError("installed environment does not match requirements.lock: " + " | ".join(details))
 
     lock_digest = sha256_bytes(lock_bytes)
-    root_ref = "pkg:pypi/product-evidence-guard@1.0.0"
+    root_ref = "pkg:pypi/product-evidence-guard@2.0.0"
     components: list[dict[str, object]] = []
     license_rows: list[dict[str, object]] = []
     for package, found in packages:
@@ -295,7 +295,7 @@ def build_documents(
                 "type": "application",
                 "bom-ref": root_ref,
                 "name": "product-evidence-guard",
-                "version": "1.0.0",
+                "version": "2.0.0",
                 "purl": root_ref,
                 "licenses": [{"license": {"id": "MIT"}}],
             },

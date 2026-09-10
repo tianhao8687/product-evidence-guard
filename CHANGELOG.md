@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.0 — 2026-09-10 总决赛发布
+
+- 发布 Product Evidence Guard 2.0：统一 Product、Variant、Field、Scope 与证据身份。
+- 增加中文真实风格多商品资料核验、声明回检、审核工作簿与来源原文链接。
+- 完成 Qoder 与 WorkBuddy Skill 更新，继续使用本地 OpenVINO OCR/Qwen3-VL 路径。
+- 保留人工确认、来源哈希失效、受控字段交接和发布包安全边界。
+
 ## Unreleased — 2026-09-09 选项原文链接
 
 - 冲突和待确认选项增加“查看原文”，覆盖对话摘要、本地审核网页、HTML/Markdown 报告和 Excel 导出。

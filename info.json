@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "name": "local-product-evidence-guard",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "venv_name": ".venv",
   "python_version": "3.11",
   "mem_need_gb": 16,
