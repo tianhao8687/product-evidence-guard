@@ -13,7 +13,7 @@ from product_evidence_guard.confirmation import (
 )
 from product_evidence_guard.content_check import check_draft
 from product_evidence_guard.engine import analyze_directory
-from product_evidence_guard.extractor import extract_rule_candidates
+from product_evidence_guard.extractor import extract_rule_candidates, strip_product_prefix
 from product_evidence_guard.graph import build_graph
 from product_evidence_guard.models import FactCandidate, SourceBlock
 from product_evidence_guard.review_server import _highlight_bbox
@@ -22,6 +22,27 @@ from product_evidence_guard.workflow import export_table, _public_fact
 
 
 class V2IdentityTests(unittest.TestCase):
+    def test_open_parameter_does_not_establish_a_product_prefix(self):
+        for text in ("MTBF1 Ground Benign: 182000 hours", "M10 GNSS technology. T = TCXO",
+                     "X9 New specialist label: 7", "ADC2 Conversion latency: 4 ns"):
+            with self.subTest(text=text):
+                self.assertEqual(strip_product_prefix(text), (text, None))
+        self.assertEqual(strip_product_prefix("A100 Weight: 320g"), ("Weight: 320g", "A100"))
+        self.assertEqual(strip_product_prefix("A100/B200 净重: 320g"), ("净重: 320g", "A100/B200"))
+
+    def test_open_fields_keep_explicit_identity_without_footnote_pollution(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source, output = Path(tmp) / "input", Path(tmp) / "output"
+            source.mkdir()
+            (source / "spec.txt").write_text(
+                "Model: P200\nMTBF1 Ground Benign: 182000 hours\n新参数: 7\nWeight: 320g\n", encoding="utf-8")
+            analyze_directory(source, output)
+            product = json.loads((output / "product-facts.json").read_text("utf-8"))
+        self.assertEqual({c["product_model"] for c in product["candidates"]}, {"P200"})
+        self.assertTrue(any(c["field_label"] == "新参数" for c in product["candidates"]))
+        self.assertFalse(any(c["provenance"].get("explicit_product_token") == "MTBF1"
+                             for c in product["candidates"]))
+
     @staticmethod
     def candidate(*, candidate_id: str, scope: str, unit: str = "V") -> FactCandidate:
         return FactCandidate(

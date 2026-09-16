@@ -2,7 +2,20 @@
 
 **本地商品事实核验 · v2.0.0**
 
+资料放进文件夹 → 只处理冲突和疑问 → 导出已确认参数。
+
+- 明确、无冲突的单来源参数可以自动确认，不要求每项补依据。
+- 采用、修改、撤销在同一个入口；点三张状态卡筛选，也可以搜索参数。
+- 原文按需打开；没读全会明确提醒，部分导出会标明未完成范围。
+
+先看[简单用户指南](docs/USER_GUIDE.md)。当前是本地试运行版本；自动确认不等于准确性保证。
+
+最新检查：[体验简化与新原件正确率](docs/UX_AND_FRESH_ACCURACY_20260916.md)。新测 5 份完整官方 PDF；修复后仍有跨行、条件和单位展示缺口，不把回归通过当成生产可靠性保证。
+
 本轮五批生产化改造与统一测试见[验收结果](docs/PRODUCTION_VALIDATION_20260916.md)、[支持范围与放行标准](docs/PRODUCTION_READINESS.md)及[本地试运行手册](docs/LOCAL_TRIAL_RUNBOOK.md)。当前可受控本地试运行、尚未生产放行，不能用回归通过替代真实原件正确率和独立人工复核。
+
+<details>
+<summary>技术说明、安装命令与历史版本记录</summary>
 
 ## 测试阶段（2026-09-16）
 
@@ -559,3 +572,5 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 analyze `
 
 当前开发协作位于 [Draft PR #1](https://github.com/tianhao8687/product-evidence-guard/pull/1)；
 PR 未合并。本地最终回归已通过；最新远端 CI 状态以 PR Actions 为准。
+
+</details>

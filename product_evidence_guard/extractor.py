@@ -29,7 +29,10 @@ def strip_product_prefix(text: str) -> tuple[str, str | None]:
     if match:
         rest = match["label"]
         label = re.split(r"[:：=]", rest, maxsplit=1)[0].strip()
-        if ((re.search(r"[:：=]", rest) and field_for_label(label))
+        # Open labels are valid parameters, not evidence of a SKU boundary.
+        # Otherwise footnote labels such as "MTBF1 Ground Benign: ..." lend
+        # an invented product identity to every fact in the source file.
+        if ((re.search(r"[:：=]", rest) and field_for_label(label, known_only=True))
                 or re.match(rf"(?:{_NEXT_PARAMETER})(?=\s|[:：=\d])", rest, re.I)):
             return rest, match["sku"]
     return text, None

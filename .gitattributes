@@ -5,6 +5,10 @@
 # byte-for-byte on Linux and Windows checkouts, including ASCII-only PDFs.
 samples/generated-benchmark/** -text
 
+# Pre-run oracle and recorded audit hashes refer to the exact frozen bytes.
+docs/evidence/new-originals-gold-20260916.json -text whitespace=cr-at-eol
+docs/evidence/new-originals-accuracy-20260916.json -text whitespace=cr-at-eol
+
 # These are byte-for-byte copies from the installed wheel.  Preserve upstream
 # line endings so the recorded RECORD/SHA-256 identities survive checkout.
 docs/evidence/licenses/** -text -diff

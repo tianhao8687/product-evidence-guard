@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import hashlib
 import json
+from math import isfinite
 import re
 from typing import Any, Sequence
 
@@ -152,6 +153,16 @@ def bind_structured_rows(
     return result
 
 
+def _physical_cell_key(cell: tuple[Any, Any]) -> tuple | None:
+    """Only real PDF geometry can prove that expanded columns are one cell."""
+    box, value = cell
+    if (not isinstance(box, (tuple, list)) or len(box) != 4
+            or not all(isinstance(n, (int, float)) and not isinstance(n, bool) and isfinite(n) for n in box)
+            or box[0] >= box[2] or box[1] >= box[3]):
+        return None
+    return (*box, re.sub(r"\s+", " ", str(value)).strip() if value is not None else "")
+
+
 def bind_model_matrix(rows: Sequence[tuple[int, Sequence[tuple[Any, Any]]]], *,
                       table_id: str) -> list[StructuredCell] | None:
     """Transpose only an explicit MODEL/SKU header, never inferred product names.
@@ -163,6 +174,13 @@ def bind_model_matrix(rows: Sequence[tuple[int, Sequence[tuple[Any, Any]]]], *,
     result: list[StructuredCell] = []
     identities: list[dict[str, str]] | None = None
     value_columns: list[int] = []
+    aliases: dict[int, list[int]] = {}
+    physical_rows: dict[tuple, set[int]] = {}
+    for row_number, cells in rows:
+        for cell in cells:
+            key = _physical_cell_key(cell)
+            if key is not None:
+                physical_rows.setdefault(key, set()).add(row_number)
     context: tuple[str, ...] = ()
     found = False
     for row_number, cells in rows:
@@ -178,9 +196,23 @@ def bind_model_matrix(rows: Sequence[tuple[int, Sequence[tuple[Any, Any]]]], *,
                 and all(not header_field(texts[i]) and re.search(r"[A-Za-z\u3400-\u9fff]", texts[i])
                         and re.search(r"\d", texts[i]) for i in proposed_columns)):
             found = True
-            value_columns = proposed_columns
+            # PDF grids can have extra subcolumns introduced by another row.
+            # De-duplicate only aliases of the SAME physical merged header,
+            # never repeated model text in distinct cells or CSV columns.
+            value_columns = []
+            aliases = {}
+            physical_columns: dict[tuple, int] = {}
+            for column in proposed_columns:
+                key = _physical_cell_key(cells[column])
+                if key is not None and key in physical_columns:
+                    aliases[physical_columns[key]].append(column)
+                else:
+                    value_columns.append(column)
+                    aliases[column] = []
+                    if key is not None:
+                        physical_columns[key] = column
             values = [texts[i] for i in value_columns]
-            if not all(values) or len(set(values)) != len(values):
+            if len(values) < 2 or not all(values) or len(set(values)) != len(values):
                 identities = None
                 continue
             identities = [{identity_field: value} for value in values]
@@ -195,6 +227,21 @@ def bind_model_matrix(rows: Sequence[tuple[int, Sequence[tuple[Any, Any]]]], *,
         label = labels[-1] if labels else ""
         spec = field_for_label(split_label_unit(label)[0])
         if not spec or len(texts) <= max(value_columns):
+            continue
+        label_column = max((i for i in range(value_columns[0]) if texts[i]), default=-1)
+        label_key = _physical_cell_key(cells[label_column]) if label_column >= 0 else None
+        if label_key is not None and len(physical_rows[label_key]) > 1:
+            # One vertically merged label can describe a threshold AND its
+            # recovery behavior. They are not competing values of one fact.
+            # Until the region is bound as a whole, report it as unread, not
+            # a user-resolvable conflict between fragments.
+            continue
+        # A split sub-row under a merged model header needs its own binding;
+        # selecting its first value would silently discard an applicability
+        # condition. Leave the entire row unbound for coverage reporting.
+        if any(alias >= len(cells) or _physical_cell_key(cells[column]) is None
+               or _physical_cell_key(cells[alias]) != _physical_cell_key(cells[column])
+               for column, extra_columns in aliases.items() for alias in extra_columns):
             continue
         for index, column in enumerate(value_columns):
             value = texts[column]

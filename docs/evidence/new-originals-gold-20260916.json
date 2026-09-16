@@ -1,0 +1,1319 @@
+{
+  "schema_version": 1,
+  "frozen_at": "2026-09-16T09:43:09.143816+00:00",
+  "annotation_method": "agent visual source review BEFORE predictions; not independent human signoff",
+  "scope": "Predeclared source-side checkpoints, including difficult variant/condition rows. NOT exhaustive document recall or population accuracy. An output passes only if displayed value, unit, applicable product and material condition remain correct; raw evidence alone is not an adopted fact. Semantically complete combined expressions may cover multiple explicitly named checkpoints, with this association disclosed.",
+  "excluded": "Marketing prose, legal disclaimers, graph-interpolated values, regulatory boilerplate and unlisted specification rows are outside checkpoint recall; do not silently call them errors or correct outputs.",
+  "sources": [
+    {
+      "case": "energizer",
+      "domain": "battery",
+      "url": "https://data.energizer.com/pdfs/E91_Max_EU.pdf",
+      "sha256": "b8d3d2400935a2dc3a20c0d822b9e3ae5de87fde1ffdc309f2e228d9c81358dd"
+    },
+    {
+      "case": "hdr",
+      "domain": "power_supply",
+      "url": "https://www.meanwell.com/Upload/PDF/HDR-15/HDR-15-SPEC.PDF",
+      "sha256": "c2cd30de2b0a77ff08cd4112426db150c71a4ac1d4bc5ae5b207c3d9edbd15a4"
+    },
+    {
+      "case": "kingston",
+      "domain": "storage",
+      "url": "https://www.kingston.com/datasheets/sa400_us.pdf",
+      "sha256": "59d33aa7deda51256c994d6d4e2f2514386c68742cd91624d6990f3bbe40566f"
+    },
+    {
+      "case": "pico",
+      "domain": "microcontroller",
+      "url": "https://datasheets.raspberrypi.com/pico/pico-2-product-brief.pdf",
+      "sha256": "b2a1e54ebaaec90d68d966da4d9eeaf436ee687fe3ecf429f6d06c8662e83aa2"
+    },
+    {
+      "case": "ublox",
+      "domain": "navigation",
+      "url": "https://www.u-blox.com/sites/default/files/documents/SAM-M10Q_ProductSummary_UBX-22004868.pdf",
+      "sha256": "98fb5301e9b2c4e247a78ecfbda4485d280fafa990198bdfe7d55de6ddfdbe8a"
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "energizer-01",
+      "case": "energizer",
+      "page": 1,
+      "product": "E91",
+      "field": "Classification",
+      "value": "alkaline",
+      "unit": null,
+      "condition": null
+    },
+    {
+      "id": "energizer-02",
+      "case": "energizer",
+      "page": 1,
+      "product": "E91",
+      "field": "Chemical System",
+      "value": "zinc-manganese dioxide (Zn/MnO2), no added mercury or cadmium",
+      "unit": null,
+      "condition": null
+    },
+    {
+      "id": "energizer-03",
+      "case": "energizer",
+      "page": 1,
+      "product": "E91",
+      "field": "Designation",
+      "value": "ANSI-15A, IEC-LR6",
+      "unit": null,
+      "condition": null
+    },
+    {
+      "id": "energizer-04",
+      "case": "energizer",
+      "page": 1,
+      "product": "E91",
+      "field": "Nominal Voltage",
+      "value": 1.5,
+      "unit": "V",
+      "condition": "nominal"
+    },
+    {
+      "id": "energizer-05",
+      "case": "energizer",
+      "page": 1,
+      "product": "E91",
+      "field": "Nominal IR",
+      "value": [
+        150,
+        300
+      ],
+      "unit": "milliohm",
+      "condition": "fresh"
+    },
+    {
+      "id": "energizer-06",
+      "case": "energizer",
+      "page": 1,
+      "product": "E91",
+      "field": "Operating Temp",
+      "value": [
+        -18,
+        55
+      ],
+      "unit": "C",
+      "condition": "operating"
+    },
+    {
+      "id": "energizer-07",
+      "case": "energizer",
+      "page": 1,
+      "product": "E91",
+      "field": "Typical Weight",
+      "value": 23,
+      "unit": "g",
+      "condition": "typical"
+    },
+    {
+      "id": "energizer-08",
+      "case": "energizer",
+      "page": 1,
+      "product": "E91",
+      "field": "Typical Volume",
+      "value": 8.1,
+      "unit": "cm3",
+      "condition": "typical"
+    },
+    {
+      "id": "energizer-09",
+      "case": "energizer",
+      "page": 1,
+      "product": "E91",
+      "field": "Jacket",
+      "value": "plastic label",
+      "unit": null,
+      "condition": null
+    },
+    {
+      "id": "energizer-10",
+      "case": "energizer",
+      "page": 1,
+      "product": "E91",
+      "field": "Shelf Life",
+      "value": 10,
+      "unit": "year",
+      "condition": "at 21 C"
+    },
+    {
+      "id": "energizer-11",
+      "case": "energizer",
+      "page": 1,
+      "product": "E91",
+      "field": "Terminal",
+      "value": "flat contact",
+      "unit": null,
+      "condition": null
+    },
+    {
+      "id": "hdr-01",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-5",
+      "field": "DC VOLTAGE",
+      "value": 5,
+      "unit": "V",
+      "condition": "output DC"
+    },
+    {
+      "id": "hdr-02",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-5",
+      "field": "RATED CURRENT",
+      "value": 2.4,
+      "unit": "A",
+      "condition": "output rated"
+    },
+    {
+      "id": "hdr-03",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-5",
+      "field": "CURRENT RANGE",
+      "value": [
+        0,
+        2.4
+      ],
+      "unit": "A",
+      "condition": "output"
+    },
+    {
+      "id": "hdr-04",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-5",
+      "field": "RATED POWER",
+      "value": 12,
+      "unit": "W",
+      "condition": "output rated"
+    },
+    {
+      "id": "hdr-05",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-5",
+      "field": "RIPPLE & NOISE",
+      "value": 80,
+      "unit": "mVp-p",
+      "condition": "output maximum; Note 2"
+    },
+    {
+      "id": "hdr-06",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-5",
+      "field": "VOLTAGE ADJ. RANGE",
+      "value": [
+        4.5,
+        5.5
+      ],
+      "unit": "V",
+      "condition": "output adjustable"
+    },
+    {
+      "id": "hdr-07",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-5",
+      "field": "WORKING TEMP.",
+      "value": [
+        -30,
+        70
+      ],
+      "unit": "C",
+      "condition": "operating, subject to derating curve"
+    },
+    {
+      "id": "hdr-08",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-5",
+      "field": "DIMENSION",
+      "value": [
+        17.5,
+        90,
+        54.5
+      ],
+      "unit": "mm",
+      "condition": "W x H x D"
+    },
+    {
+      "id": "hdr-09",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-12",
+      "field": "DC VOLTAGE",
+      "value": 12,
+      "unit": "V",
+      "condition": "output DC"
+    },
+    {
+      "id": "hdr-10",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-12",
+      "field": "RATED CURRENT",
+      "value": 1.25,
+      "unit": "A",
+      "condition": "output rated"
+    },
+    {
+      "id": "hdr-11",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-12",
+      "field": "CURRENT RANGE",
+      "value": [
+        0,
+        1.25
+      ],
+      "unit": "A",
+      "condition": "output"
+    },
+    {
+      "id": "hdr-12",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-12",
+      "field": "RATED POWER",
+      "value": 15,
+      "unit": "W",
+      "condition": "output rated"
+    },
+    {
+      "id": "hdr-13",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-12",
+      "field": "RIPPLE & NOISE",
+      "value": 120,
+      "unit": "mVp-p",
+      "condition": "output maximum; Note 2"
+    },
+    {
+      "id": "hdr-14",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-12",
+      "field": "VOLTAGE ADJ. RANGE",
+      "value": [
+        10.8,
+        13.8
+      ],
+      "unit": "V",
+      "condition": "output adjustable"
+    },
+    {
+      "id": "hdr-15",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-12",
+      "field": "WORKING TEMP.",
+      "value": [
+        -30,
+        70
+      ],
+      "unit": "C",
+      "condition": "operating, subject to derating curve"
+    },
+    {
+      "id": "hdr-16",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-12",
+      "field": "DIMENSION",
+      "value": [
+        17.5,
+        90,
+        54.5
+      ],
+      "unit": "mm",
+      "condition": "W x H x D"
+    },
+    {
+      "id": "hdr-17",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-15",
+      "field": "DC VOLTAGE",
+      "value": 15,
+      "unit": "V",
+      "condition": "output DC"
+    },
+    {
+      "id": "hdr-18",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-15",
+      "field": "RATED CURRENT",
+      "value": 1,
+      "unit": "A",
+      "condition": "output rated"
+    },
+    {
+      "id": "hdr-19",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-15",
+      "field": "CURRENT RANGE",
+      "value": [
+        0,
+        1
+      ],
+      "unit": "A",
+      "condition": "output"
+    },
+    {
+      "id": "hdr-20",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-15",
+      "field": "RATED POWER",
+      "value": 15,
+      "unit": "W",
+      "condition": "output rated"
+    },
+    {
+      "id": "hdr-21",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-15",
+      "field": "RIPPLE & NOISE",
+      "value": 120,
+      "unit": "mVp-p",
+      "condition": "output maximum; Note 2"
+    },
+    {
+      "id": "hdr-22",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-15",
+      "field": "VOLTAGE ADJ. RANGE",
+      "value": [
+        13.5,
+        18
+      ],
+      "unit": "V",
+      "condition": "output adjustable"
+    },
+    {
+      "id": "hdr-23",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-15",
+      "field": "WORKING TEMP.",
+      "value": [
+        -30,
+        70
+      ],
+      "unit": "C",
+      "condition": "operating, subject to derating curve"
+    },
+    {
+      "id": "hdr-24",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-15",
+      "field": "DIMENSION",
+      "value": [
+        17.5,
+        90,
+        54.5
+      ],
+      "unit": "mm",
+      "condition": "W x H x D"
+    },
+    {
+      "id": "hdr-25",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-24",
+      "field": "DC VOLTAGE",
+      "value": 24,
+      "unit": "V",
+      "condition": "output DC"
+    },
+    {
+      "id": "hdr-26",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-24",
+      "field": "RATED CURRENT",
+      "value": 0.63,
+      "unit": "A",
+      "condition": "output rated"
+    },
+    {
+      "id": "hdr-27",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-24",
+      "field": "CURRENT RANGE",
+      "value": [
+        0,
+        0.63
+      ],
+      "unit": "A",
+      "condition": "output"
+    },
+    {
+      "id": "hdr-28",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-24",
+      "field": "RATED POWER",
+      "value": 15.2,
+      "unit": "W",
+      "condition": "output rated"
+    },
+    {
+      "id": "hdr-29",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-24",
+      "field": "RIPPLE & NOISE",
+      "value": 150,
+      "unit": "mVp-p",
+      "condition": "output maximum; Note 2"
+    },
+    {
+      "id": "hdr-30",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-24",
+      "field": "VOLTAGE ADJ. RANGE",
+      "value": [
+        21.6,
+        29
+      ],
+      "unit": "V",
+      "condition": "output adjustable"
+    },
+    {
+      "id": "hdr-31",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-24",
+      "field": "WORKING TEMP.",
+      "value": [
+        -30,
+        70
+      ],
+      "unit": "C",
+      "condition": "operating, subject to derating curve"
+    },
+    {
+      "id": "hdr-32",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-24",
+      "field": "DIMENSION",
+      "value": [
+        17.5,
+        90,
+        54.5
+      ],
+      "unit": "mm",
+      "condition": "W x H x D"
+    },
+    {
+      "id": "hdr-33",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-48",
+      "field": "DC VOLTAGE",
+      "value": 48,
+      "unit": "V",
+      "condition": "output DC"
+    },
+    {
+      "id": "hdr-34",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-48",
+      "field": "RATED CURRENT",
+      "value": 0.32,
+      "unit": "A",
+      "condition": "output rated"
+    },
+    {
+      "id": "hdr-35",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-48",
+      "field": "CURRENT RANGE",
+      "value": [
+        0,
+        0.32
+      ],
+      "unit": "A",
+      "condition": "output"
+    },
+    {
+      "id": "hdr-36",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-48",
+      "field": "RATED POWER",
+      "value": 15.4,
+      "unit": "W",
+      "condition": "output rated"
+    },
+    {
+      "id": "hdr-37",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-48",
+      "field": "RIPPLE & NOISE",
+      "value": 240,
+      "unit": "mVp-p",
+      "condition": "output maximum; Note 2"
+    },
+    {
+      "id": "hdr-38",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-48",
+      "field": "VOLTAGE ADJ. RANGE",
+      "value": [
+        43.2,
+        55.2
+      ],
+      "unit": "V",
+      "condition": "output adjustable"
+    },
+    {
+      "id": "hdr-39",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-48",
+      "field": "WORKING TEMP.",
+      "value": [
+        -30,
+        70
+      ],
+      "unit": "C",
+      "condition": "operating, subject to derating curve"
+    },
+    {
+      "id": "hdr-40",
+      "case": "hdr",
+      "page": 2,
+      "product": "HDR-15-48",
+      "field": "DIMENSION",
+      "value": [
+        17.5,
+        90,
+        54.5
+      ],
+      "unit": "mm",
+      "condition": "W x H x D"
+    },
+    {
+      "id": "kingston-01",
+      "case": "kingston",
+      "page": 2,
+      "product": "A400 series",
+      "field": "Form factor",
+      "value": 2.5,
+      "unit": "inch",
+      "condition": null
+    },
+    {
+      "id": "kingston-02",
+      "case": "kingston",
+      "page": 2,
+      "product": "A400 series",
+      "field": "Interface",
+      "value": "SATA Rev 3.0 6 Gb/s; compatible Rev 2.0 3 Gb/s",
+      "unit": null,
+      "condition": null
+    },
+    {
+      "id": "kingston-03",
+      "case": "kingston",
+      "page": 2,
+      "product": "A400 series",
+      "field": "Capacities",
+      "value": [
+        240,
+        480,
+        960
+      ],
+      "unit": "GB",
+      "condition": "available variants, not simultaneous capacities"
+    },
+    {
+      "id": "kingston-04",
+      "case": "kingston",
+      "page": 2,
+      "product": "A400 series",
+      "field": "NAND",
+      "value": "3D",
+      "unit": null,
+      "condition": null
+    },
+    {
+      "id": "kingston-05",
+      "case": "kingston",
+      "page": 2,
+      "product": "A400 series",
+      "field": "Power Consumption",
+      "value": [
+        0.195,
+        0.279,
+        0.642,
+        1.535
+      ],
+      "unit": "W",
+      "condition": "idle / average / maximum read / maximum write, respectively"
+    },
+    {
+      "id": "kingston-06",
+      "case": "kingston",
+      "page": 2,
+      "product": "A400 series",
+      "field": "Storage temperature",
+      "value": [
+        -40,
+        85
+      ],
+      "unit": "C",
+      "condition": "storage"
+    },
+    {
+      "id": "kingston-07",
+      "case": "kingston",
+      "page": 3,
+      "product": "A400 series",
+      "field": "Operating temperature",
+      "value": [
+        0,
+        70
+      ],
+      "unit": "C",
+      "condition": "operating"
+    },
+    {
+      "id": "kingston-08",
+      "case": "kingston",
+      "page": 3,
+      "product": "A400 series",
+      "field": "Dimensions",
+      "value": [
+        100,
+        69.9,
+        7
+      ],
+      "unit": "mm",
+      "condition": "2.5 inch enclosure"
+    },
+    {
+      "id": "kingston-09",
+      "case": "kingston",
+      "page": 3,
+      "product": "A400 series",
+      "field": "Vibration operating",
+      "value": "2.17 G peak; 7-800 Hz",
+      "unit": null,
+      "condition": "operating"
+    },
+    {
+      "id": "kingston-10",
+      "case": "kingston",
+      "page": 3,
+      "product": "A400 series",
+      "field": "Vibration non-operating",
+      "value": "20 G peak; 10-2000 Hz",
+      "unit": null,
+      "condition": "non-operating"
+    },
+    {
+      "id": "kingston-11",
+      "case": "kingston",
+      "page": 3,
+      "product": "A400 series",
+      "field": "Life expectancy",
+      "value": 2000000,
+      "unit": "hour",
+      "condition": "MTBF"
+    },
+    {
+      "id": "kingston-12",
+      "case": "kingston",
+      "page": 3,
+      "product": "A400 series",
+      "field": "Warranty/support",
+      "value": "limited 3 years with free technical support",
+      "unit": null,
+      "condition": "subject to life-remaining warranty condition"
+    },
+    {
+      "id": "kingston-13",
+      "case": "kingston",
+      "page": 2,
+      "product": "SA400S37/240G",
+      "field": "Read speed",
+      "value": 500,
+      "unit": "MB/s",
+      "condition": "up to, ATTO"
+    },
+    {
+      "id": "kingston-14",
+      "case": "kingston",
+      "page": 2,
+      "product": "SA400S37/240G",
+      "field": "Write speed",
+      "value": 350,
+      "unit": "MB/s",
+      "condition": "up to, ATTO"
+    },
+    {
+      "id": "kingston-15",
+      "case": "kingston",
+      "page": 3,
+      "product": "SA400S37/240G",
+      "field": "Weight",
+      "value": 41,
+      "unit": "g",
+      "condition": null
+    },
+    {
+      "id": "kingston-16",
+      "case": "kingston",
+      "page": 3,
+      "product": "SA400S37/240G",
+      "field": "Total Bytes Written",
+      "value": 80,
+      "unit": "TB",
+      "condition": "JEDEC JESD219A"
+    },
+    {
+      "id": "kingston-17",
+      "case": "kingston",
+      "page": 2,
+      "product": "SA400S37/480G",
+      "field": "Read speed",
+      "value": 500,
+      "unit": "MB/s",
+      "condition": "up to, ATTO"
+    },
+    {
+      "id": "kingston-18",
+      "case": "kingston",
+      "page": 2,
+      "product": "SA400S37/480G",
+      "field": "Write speed",
+      "value": 450,
+      "unit": "MB/s",
+      "condition": "up to, ATTO"
+    },
+    {
+      "id": "kingston-19",
+      "case": "kingston",
+      "page": 3,
+      "product": "SA400S37/480G",
+      "field": "Weight",
+      "value": 41,
+      "unit": "g",
+      "condition": null
+    },
+    {
+      "id": "kingston-20",
+      "case": "kingston",
+      "page": 3,
+      "product": "SA400S37/480G",
+      "field": "Total Bytes Written",
+      "value": 160,
+      "unit": "TB",
+      "condition": "JEDEC JESD219A"
+    },
+    {
+      "id": "kingston-21",
+      "case": "kingston",
+      "page": 2,
+      "product": "SA400S37/960G",
+      "field": "Read speed",
+      "value": 500,
+      "unit": "MB/s",
+      "condition": "up to, ATTO"
+    },
+    {
+      "id": "kingston-22",
+      "case": "kingston",
+      "page": 2,
+      "product": "SA400S37/960G",
+      "field": "Write speed",
+      "value": 450,
+      "unit": "MB/s",
+      "condition": "up to, ATTO"
+    },
+    {
+      "id": "kingston-23",
+      "case": "kingston",
+      "page": 3,
+      "product": "SA400S37/960G",
+      "field": "Weight",
+      "value": 41.9,
+      "unit": "g",
+      "condition": null
+    },
+    {
+      "id": "kingston-24",
+      "case": "kingston",
+      "page": 3,
+      "product": "SA400S37/960G",
+      "field": "Total Bytes Written",
+      "value": 300,
+      "unit": "TB",
+      "condition": "JEDEC JESD219A"
+    },
+    {
+      "id": "pico-01",
+      "case": "pico",
+      "page": 3,
+      "product": "Pico 2 series",
+      "field": "Form factor",
+      "value": [
+        21,
+        51
+      ],
+      "unit": "mm",
+      "condition": "board dimensions"
+    },
+    {
+      "id": "pico-02",
+      "case": "pico",
+      "page": 3,
+      "product": "Pico 2 series",
+      "field": "CPU",
+      "value": "dual Arm Cortex-M33 or dual RISC-V Hazard3 at 150 MHz",
+      "unit": null,
+      "condition": null
+    },
+    {
+      "id": "pico-03",
+      "case": "pico",
+      "page": 3,
+      "product": "Pico 2 series",
+      "field": "Memory",
+      "value": "520 KB on-chip SRAM; 4 MB on-board QSPI flash",
+      "unit": null,
+      "condition": null
+    },
+    {
+      "id": "pico-04",
+      "case": "pico",
+      "page": 3,
+      "product": "Pico 2 W",
+      "field": "Connectivity",
+      "value": "2.4 GHz 802.11n wireless LAN and Bluetooth 5.2",
+      "unit": null,
+      "condition": "Pico 2 W ONLY"
+    },
+    {
+      "id": "pico-05",
+      "case": "pico",
+      "page": 3,
+      "product": "Pico 2 series",
+      "field": "Interfacing",
+      "value": "26 GPIO pins, including 3 usable for ADC",
+      "unit": null,
+      "condition": null
+    },
+    {
+      "id": "pico-06",
+      "case": "pico",
+      "page": 3,
+      "product": "Pico 2 series",
+      "field": "UART",
+      "value": 2,
+      "unit": "controller",
+      "condition": null
+    },
+    {
+      "id": "pico-07",
+      "case": "pico",
+      "page": 3,
+      "product": "Pico 2 series",
+      "field": "SPI",
+      "value": 2,
+      "unit": "controller",
+      "condition": null
+    },
+    {
+      "id": "pico-08",
+      "case": "pico",
+      "page": 3,
+      "product": "Pico 2 series",
+      "field": "I2C",
+      "value": 2,
+      "unit": "controller",
+      "condition": null
+    },
+    {
+      "id": "pico-09",
+      "case": "pico",
+      "page": 3,
+      "product": "Pico 2 series",
+      "field": "PWM",
+      "value": 16,
+      "unit": "channel",
+      "condition": null
+    },
+    {
+      "id": "pico-10",
+      "case": "pico",
+      "page": 3,
+      "product": "Pico 2 series",
+      "field": "USB",
+      "value": "1 USB 1.1 controller and PHY, host/device",
+      "unit": null,
+      "condition": null
+    },
+    {
+      "id": "pico-11",
+      "case": "pico",
+      "page": 3,
+      "product": "Pico 2 series",
+      "field": "PIO",
+      "value": 12,
+      "unit": "state machine",
+      "condition": null
+    },
+    {
+      "id": "pico-12",
+      "case": "pico",
+      "page": 3,
+      "product": "Pico 2 series",
+      "field": "Input power",
+      "value": [
+        1.8,
+        5.5
+      ],
+      "unit": "V",
+      "condition": "input DC"
+    },
+    {
+      "id": "pico-13",
+      "case": "pico",
+      "page": 3,
+      "product": "Pico 2 series",
+      "field": "Operating temperature",
+      "value": [
+        -20,
+        85
+      ],
+      "unit": "C",
+      "condition": "operating"
+    },
+    {
+      "id": "pico-14",
+      "case": "pico",
+      "page": 3,
+      "product": "Pico 2 series",
+      "field": "MTBF",
+      "value": 182000,
+      "unit": "hour",
+      "condition": "ground benign"
+    },
+    {
+      "id": "pico-15",
+      "case": "pico",
+      "page": 3,
+      "product": "Pico 2 series",
+      "field": "Production lifetime",
+      "value": "at least January 2040",
+      "unit": null,
+      "condition": null
+    },
+    {
+      "id": "ublox-01",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Nav. update rate",
+      "value": 10,
+      "unit": "Hz",
+      "condition": "up to, 4 concurrent GNSS"
+    },
+    {
+      "id": "ublox-02",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Nav. update rate",
+      "value": 25,
+      "unit": "Hz",
+      "condition": "up to, single GNSS"
+    },
+    {
+      "id": "ublox-03",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Horizontal position accuracy",
+      "value": 1.5,
+      "unit": "m",
+      "condition": "CEP, default mode per Note 1"
+    },
+    {
+      "id": "ublox-04",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Acquisition",
+      "value": 23,
+      "unit": "s",
+      "condition": "cold start"
+    },
+    {
+      "id": "ublox-05",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Acquisition",
+      "value": 1,
+      "unit": "s",
+      "condition": "aided start"
+    },
+    {
+      "id": "ublox-06",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Acquisition",
+      "value": 1,
+      "unit": "s",
+      "condition": "hot start"
+    },
+    {
+      "id": "ublox-07",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Sensitivity",
+      "value": -165,
+      "unit": "dBm",
+      "condition": "tracking/navigation"
+    },
+    {
+      "id": "ublox-08",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Sensitivity",
+      "value": -158,
+      "unit": "dBm",
+      "condition": "reacquisition"
+    },
+    {
+      "id": "ublox-09",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Sensitivity",
+      "value": -146,
+      "unit": "dBm",
+      "condition": "cold start"
+    },
+    {
+      "id": "ublox-10",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Sensitivity",
+      "value": -157,
+      "unit": "dBm",
+      "condition": "hot start"
+    },
+    {
+      "id": "ublox-11",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Power consumption",
+      "value": 31,
+      "unit": "mW",
+      "condition": "3 V, continuous tracking, 2 GNSS"
+    },
+    {
+      "id": "ublox-12",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Power consumption",
+      "value": 34,
+      "unit": "mW",
+      "condition": "3 V, continuous tracking, 3 GNSS"
+    },
+    {
+      "id": "ublox-13",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Power consumption",
+      "value": 37,
+      "unit": "mW",
+      "condition": "3 V, continuous tracking, 4 GNSS"
+    },
+    {
+      "id": "ublox-14",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Power consumption",
+      "value": 21,
+      "unit": "mW",
+      "condition": "3 V, power save mode 1 Hz, 2 GNSS"
+    },
+    {
+      "id": "ublox-15",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Power consumption",
+      "value": 21,
+      "unit": "mW",
+      "condition": "3 V, power save mode 1 Hz, 3 GNSS"
+    },
+    {
+      "id": "ublox-16",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Power supply",
+      "value": [
+        2.7,
+        3.6
+      ],
+      "unit": "V",
+      "condition": "main supply"
+    },
+    {
+      "id": "ublox-17",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Backup supply",
+      "value": [
+        1.65,
+        3.6
+      ],
+      "unit": "V",
+      "condition": "backup"
+    },
+    {
+      "id": "ublox-18",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Package",
+      "value": [
+        15.5,
+        15.5,
+        6.3
+      ],
+      "unit": "mm",
+      "condition": "module dimensions"
+    },
+    {
+      "id": "ublox-19",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Weight",
+      "value": 5.6,
+      "unit": "g",
+      "condition": null
+    },
+    {
+      "id": "ublox-20",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Pins",
+      "value": 20,
+      "unit": null,
+      "condition": "LGA"
+    },
+    {
+      "id": "ublox-21",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Operating temp.",
+      "value": [
+        -40,
+        85
+      ],
+      "unit": "C",
+      "condition": "operating"
+    },
+    {
+      "id": "ublox-22",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Storage temp.",
+      "value": [
+        -40,
+        85
+      ],
+      "unit": "C",
+      "condition": "storage"
+    },
+    {
+      "id": "ublox-23",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "UART",
+      "value": 1,
+      "unit": "interface",
+      "condition": null
+    },
+    {
+      "id": "ublox-24",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "I2C",
+      "value": 1,
+      "unit": "interface",
+      "condition": null
+    },
+    {
+      "id": "ublox-25",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Timepulse",
+      "value": [
+        0.25,
+        10000000
+      ],
+      "unit": "Hz",
+      "condition": "configurable"
+    },
+    {
+      "id": "ublox-26",
+      "case": "ublox",
+      "page": 2,
+      "product": "SAM-M10Q",
+      "field": "Protocols",
+      "value": "NMEA 4.11 and UBX binary",
+      "unit": null,
+      "condition": null
+    }
+  ]
+}

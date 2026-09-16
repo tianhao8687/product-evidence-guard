@@ -52,7 +52,7 @@ from .readiness import reading_issue
 
 QWEN_MODEL_ID = "OpenVINO/Qwen3-VL-8B-Instruct-int4-ov"
 ENGINE_SCHEMA_REVISION = (
-    "v7-layout-coverage-20260916"
+    "v7-layout-physical-headers-20260916"
 )
 MAX_FILES_PER_TASK = 100
 MAX_FILE_BYTES = 100 * 1024 * 1024

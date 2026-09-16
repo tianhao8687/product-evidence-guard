@@ -48,3 +48,4 @@ junit*.xml
 build/
 dist/
 release/
+/tmp/pdfs/

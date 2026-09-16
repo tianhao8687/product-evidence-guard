@@ -103,6 +103,19 @@ class SimpleReviewTests(unittest.TestCase):
         self.assertEqual(coverage["unfinished_pages"], 2)
         self.assertNotIn("private.pdf", json.dumps(coverage))
 
+    def test_selected_product_export_readiness_does_not_borrow_another_conflict(self):
+        (self.root / "a.txt").write_text("SKU：A1\n净重：300g", encoding="utf8")
+        (self.root / "b.txt").write_text("SKU：B2\n净重：320g", encoding="utf8")
+        (self.root / "c.txt").write_text("SKU：B2\n净重：330g", encoding="utf8")
+        analyze_directory(self.root, self.output)
+        snap = self.snapshot()
+        self.assertFalse(snap["delivery_readiness"]["complete"])
+        ready = next(p["product_id"] for p in snap["product"]["products"] if p["sku"] == "A1")
+        blocked = next(p["product_id"] for p in snap["product"]["products"] if p["sku"] == "B2")
+        self.assertTrue(snap["delivery_by_product"][ready]["complete"])
+        self.assertFalse(snap["delivery_by_product"][blocked]["complete"])
+        self.assertTrue(workflow.export_table(self.output, product_ids=[ready])["delivery_scope"]["complete"])
+
     def test_stale_membership_and_empty_value_are_rejected(self):
         with self.assertRaises(ConfirmationRequestError):
             self.act("edit", value="")

@@ -150,12 +150,17 @@ def read_layout_page(page, number: int) -> tuple[list[dict], list[dict]]:
         # Expand only actual merged geometry, never carry a previous value.
         boundaries = sorted({box[0] for box in table.cells} | {table.bbox[2]})
         centers = [(left + right) / 2 for left, right in zip(boundaries, boundaries[1:])]
+        row_boundaries = sorted({box[1] for box in table.cells} | {table.bbox[3]})
+        row_bottoms = dict(zip(row_boundaries, row_boundaries[1:]))
         expanded = []
         for rn, cells in rows:
             if rn < 0:
                 expanded.append((rn, cells))
                 continue
-            y = (table.rows[rn].bbox[1] + table.rows[rn].bbox[3]) / 2
+            # A row bbox includes tall merged side labels. Its midpoint can
+            # land several rows lower; use this actual horizontal grid band.
+            top = table.rows[rn].bbox[1]
+            y = (top + row_bottoms[top]) / 2
             resolved = []
             for column, (box, value) in enumerate(cells):
                 if box is None:

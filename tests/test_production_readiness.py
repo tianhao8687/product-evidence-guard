@@ -5,6 +5,7 @@ import tempfile
 import threading
 import time
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 import zipfile
 
@@ -41,6 +42,71 @@ class StructureTests(unittest.TestCase):
     def test_blank_matrix_value_is_never_forward_filled(self):
         cells = bind_table(table([["MODEL", "A1", "B2"], ["voltage", "12V", None]]), table_id="x")
         self.assertEqual([(c.identity["model"], c.value) for c in cells], [("A1", "12V")])
+
+    def test_same_physical_merged_header_is_one_model_column(self):
+        rows = [(0, [((0, 0, 10, 10), "MODEL"), ((10, 0, 30, 10), "A1"),
+                     ((10, 0, 30, 10), "A1"), ((30, 0, 40, 10), "B2")]),
+                (1, [((0, 10, 10, 20), "新参数"), ((10, 10, 30, 20), "6"),
+                     ((10, 10, 30, 20), "6"), ((30, 10, 40, 20), "9")])]
+        cells = bind_table(rows, table_id="geometry")
+        self.assertEqual([(c.identity["model"], c.value) for c in cells], [("A1", "6"), ("B2", "9")])
+        self.assertEqual(cells[0].location, (10, 10, 30, 20))
+
+    def test_repeated_model_text_without_same_geometry_stays_ambiguous(self):
+        for locations in ((1, 2, 3), ((10, 0, 20, 10), (20, 0, 30, 10), (30, 0, 40, 10))):
+            with self.subTest(locations=locations):
+                rows = [(0, [(0, "MODEL"), *zip(locations, ("A1", "A1", "B2"))]),
+                        (1, [(0, "新参数"), *zip(locations, ("6", "7", "9"))])]
+                self.assertEqual(bind_table(rows, table_id="ambiguous"), [])
+
+    def test_merged_model_header_does_not_swallow_distinct_subrow_values(self):
+        for second_value in ("6", "7", ""):
+            with self.subTest(second_value=second_value):
+                rows = [(0, [((0, 0, 10, 10), "MODEL"), ((10, 0, 30, 10), "A1"),
+                             ((10, 0, 30, 10), "A1"), ((30, 0, 40, 10), "B2")]),
+                        (1, [((0, 10, 10, 20), "新参数"), ((10, 10, 20, 20), "6"),
+                             ((20, 10, 30, 20), second_value), ((30, 10, 40, 20), "9")])]
+                self.assertEqual(bind_table(rows, table_id="split"), [])
+
+    def test_vertical_merged_label_is_not_split_into_competing_facts(self):
+        rows = [(0, [((0, 0, 10, 10), "MODEL"), ((10, 0, 20, 10), "A1"), ((20, 0, 30, 10), "B2")]),
+                (1, [((0, 10, 10, 30), "Protection"), ((10, 10, 20, 20), "120%"), ((20, 10, 30, 20), "120%")]),
+                (2, [((0, 10, 10, 30), "Protection"), ((10, 20, 20, 30), "Auto recovery"), ((20, 20, 30, 30), "Auto recovery")]),
+                (3, [((0, 30, 10, 40), "新参数"), ((10, 30, 20, 40), "6"), ((20, 30, 30, 40), "9")])]
+        cells = bind_table(rows, table_id="vertical")
+        self.assertEqual([(c.header, c.value) for c in cells], [("新参数", "6"), ("新参数", "9")])
+
+    def test_pdf_merged_side_label_never_moves_values_into_another_row(self):
+        from product_evidence_guard.pdf_layout import read_layout_page
+        boxes = [[(0, 0, 20, 10), None, (20, 0, 30, 10), (30, 0, 40, 10), None],
+                 [(0, 10, 10, 40), (10, 10, 20, 20), (20, 10, 40, 20), None, None],
+                 [None, (10, 20, 20, 30), (20, 20, 30, 30), (30, 20, 40, 30), None],
+                 [None, (10, 30, 20, 40), (20, 30, 30, 40), (30, 30, 35, 40), (35, 30, 40, 40)]]
+        raw = [["MODEL", None, "A1", "B2", None], ["INPUT", "Frequency", "47~63Hz", None, None],
+               [None, "Efficiency", "80%", "90%", None], [None, "Mode", "common", "3", "4"]]
+        rows = [SimpleNamespace(cells=cells, bbox=(0, i * 10, 40, 40 if i == 1 else (i + 1) * 10))
+                for i, cells in enumerate(boxes)]
+        words = []
+        for cells, values in zip(boxes, raw):
+            for box, value in zip(cells, values):
+                if box and value:
+                    words.append(dict(text=value, x0=box[0] + 1, x1=box[0] + 3,
+                                      top=box[1] + 1, bottom=box[1] + 3))
+        table_obj = SimpleNamespace(bbox=(0, 0, 40, 40), rows=rows,
+                                    cells=[b for row in boxes for b in row if b],
+                                    extract=lambda **kwargs: raw)
+        edges = [dict(x0=0, x1=40, top=y, bottom=y) for y in (0, 10, 20, 30, 40)]
+        edges += [dict(x0=x, x1=x, top=0, bottom=40) for x in (0, 10, 20, 30, 35, 40)]
+        page = SimpleNamespace(width=40, height=40, chars=[], edges=edges,
+                               extract_words=lambda **kwargs: words, find_tables=lambda settings: [table_obj])
+        page.dedupe_chars = lambda: page
+        records, issues = read_layout_page(page, 1)
+        frequency = [r for r in records if r["text"].startswith("Frequency:")]
+        self.assertEqual(len(frequency), 2)
+        self.assertEqual({r["text"] for r in frequency}, {"Frequency: 47~63Hz"})
+        self.assertEqual({r["provenance"]["structured_row"]["identity"]["model"] for r in frequency}, {"A1", "B2"})
+        self.assertEqual({tuple(r["locator"]["bbox_1000"]) for r in frequency}, {(500.0, 250.0, 1000.0, 500.0)})
+        self.assertTrue(any(3 in issue.get("unbound_rows", []) for issue in issues))
 
     def test_repeated_row_header_is_not_a_product(self):
         cells = bind_table(table([["型号", "电压"], ["A1", "12V"], ["型号", "电压"], ["B2", "24V"]]), table_id="x")

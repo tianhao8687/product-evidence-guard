@@ -442,6 +442,8 @@ def task_snapshot(output_dir: str | Path, *, session_id: str | None = None, deta
     if detailed:
         result.update(product=product, confirmed=confirmed, bundles=bundles, deliverables=deliverables,
                       available_facts=_verified_facts(product), input_name=summary.get("input_name", "商品资料"))
+        result["delivery_by_product"] = {p["product_id"]: assess_delivery(product, product_ids=[p["product_id"]])
+                                         for p in product.get("products", [])}
         from .confirmation import review_undo_token
         result["undo_token"] = review_undo_token(output, session)
         from .field_registry import field_definition
