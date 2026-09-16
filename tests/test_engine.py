@@ -80,7 +80,7 @@ class ProductEvidenceGuardTests(unittest.TestCase):
         )
         self.assertEqual(len(input_candidates), 1)
         self.assertEqual(input_candidates[0].field, "voltage")
-        self.assertEqual(input_candidates[0].scope, "input")
+        self.assertEqual(input_candidates[0].scope, "input|signal:ac")
         self.assertEqual(input_candidates[0].normalized_value, [100, 240])
 
         output_candidates = extract_rule_candidates(

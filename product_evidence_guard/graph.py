@@ -8,7 +8,7 @@ from typing import Iterable
 
 from .models import CrossFieldRelation, FactCandidate, FactGroup
 from .identity import conflict_group_id, evidence_identity, graph_identity, identity_needs_review, product_label
-from .normalization import normalize_text, values_equal, qualified_values_compatible, invalid_fact_value
+from .normalization import normalize_text, normalize_fact_text, values_equal, qualified_values_compatible, invalid_fact_value
 from .field_registry import field_definition
 
 
@@ -126,7 +126,7 @@ def refresh_fact_status(groups: Iterable[FactGroup], candidates: Iterable[FactCa
             group.verification_method = (
                 "human_resolved_conflict" if selected_human and rejected_other_value else "human_confirmed" if selected_human
                 else "single_value" if group.independent_source_count < 2
-                else "cross_source_exact" if len({normalize_text(item.raw_value) for item in verified_sources}) == 1
+                else "cross_source_exact" if len({normalize_fact_text(item.raw_value) for item in verified_sources}) == 1
                 else "cross_source_converted"
             )
             group.reason = "人工确认。" if selected_human else "参数清楚，未发现冲突。"
@@ -264,7 +264,7 @@ def build_fact_groups(candidates: Iterable[FactCandidate]) -> list[FactGroup]:
             reason = "只找到一条证据，暂时无法用其他资料交叉验证。"
             recommendation = "保留为待确认事实，不自动晋升。"
         elif _all_equal(items):
-            raw_signatures = {(normalize_text(item.raw_value), item.normalized_unit) for item in items}
+            raw_signatures = {(normalize_fact_text(item.raw_value), item.normalized_unit) for item in items}
             if len(raw_signatures) == 1:
                 classification = "exact_match"
                 reason = "多份资料给出了相同表达和相同标准值。"

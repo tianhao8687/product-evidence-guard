@@ -5,6 +5,13 @@ is a measured semantic recall claim. Keep them separate and explain both.
 """
 import hashlib
 import json
+from .normalization import VALUE_SEMANTICS_REVISION
+
+
+def needs_value_upgrade(product: dict) -> bool:
+    summary = product.get("run_summary", {})
+    return ("engine_signature_changed" in summary and
+            summary.get("value_semantics_revision") != VALUE_SEMANTICS_REVISION)
 
 
 def reading_issue(*, file: str, file_hash: str, **issue) -> dict:
@@ -39,6 +46,9 @@ def assess_delivery(product: dict, *, product_ids: list[str] | None = None) -> d
     facts = [g for g in product.get("facts", []) if not g.get("excluded") and
              (not selected or g.get("product_id") in selected)]
     blockers = []
+    upgrade = needs_value_upgrade(product)
+    if upgrade:
+        blockers.append({"code": "value_upgrade_required", "message": "单位读取规则已更新，请重新读取一次；原来的人工决定会保留"})
     for status, code, message in (("conflict", "conflict", "存在尚未处理的冲突"),
                                    ("pending_confirmation", "pending", "存在尚未确认的参数")):
         count = sum(g.get("fact_status") == status for g in facts)
@@ -58,7 +68,7 @@ def assess_delivery(product: dict, *, product_ids: list[str] | None = None) -> d
         blockers.append({"code": "source_snapshot_changed", "message": "原资料已改变或移除，请重新读取"})
     if coverage["status"] == "partial":
         blockers.append({"code": "incomplete_reading", "count": coverage["issue_count"], "message": coverage["message"]})
-    verified = sum(g.get("fact_status") == "verified" and g.get("current", True) for g in facts)
+    verified = 0 if upgrade else sum(g.get("fact_status") == "verified" and g.get("current", True) for g in facts)
     if not verified:
         blockers.append({"code": "no_verified_facts", "message": "尚无可交付的已确认参数"})
     return {"status": "complete" if not blockers else "partial" if verified else "blocked",

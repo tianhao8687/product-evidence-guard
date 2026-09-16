@@ -1,4 +1,5 @@
 {
+  "gold_revision": "unit-case-v2-exposed-regression",
   "protocol": "Human-authored expected outcomes frozen before running. UTF-8 unless explicitly specified. Primary unit is a scenario, not a population accuracy estimate. Identity metadata excluded from ordinary fact counts. No model or implementation fixes are injected.",
   "cases": [
     {"id":"01","name":"单一来源清晰净重","files":{"a.txt":"净重：300g"},"groups":[["net_weight","net","verified",[300],"g"]]},
@@ -12,11 +13,11 @@
     {"id":"09","name":"额定与最大压力","files":{"a.txt":"额定压力：100kPa\n最大压力：160kPa"},"groups":[["pressure","rating:rated","verified",[100000],"Pa"],["pressure","rating:max","verified",[160000],"Pa"]]},
     {"id":"10","name":"两个显式版本需确认适用性","files":{"spec_v1.0.txt":"最大压力：100kPa","spec_v2.0.txt":"最大压力：160kPa"},"groups":[["pressure","rating:max","pending_confirmation",[100000,160000],"Pa"]]},
     {"id":"11","name":"正文标明历史版而文件名未标版本","files":{"旧版资料.txt":"资料版本：v1.0\n最大压力：100kPa","当前资料.txt":"资料版本：v2.0\n最大压力：160kPa"},"focus":["pressure"],"groups":[["pressure","rating:max","pending_confirmation",[100000,160000],"Pa"]]},
-    {"id":"12","name":"陌生字段不落入待确认","files":{"a.txt":"噪声：45dB\n转速：3000rpm\n保修期：2年\n适用材质：木材、铝材"},"groups":[["custom:噪声",null,"verified",["45db"],null],["custom:转速",null,"verified",["3000rpm"],null],["custom:保修期",null,"verified",["2年"],null],["custom:适用材质",null,"verified",["木材、铝材"],null]]},
-    {"id":"13","name":"陌生字段大小写空格等价","files":{"a.txt":"噪声：45 dB","b.txt":"噪声：45dB"},"groups":[["custom:噪声",null,"verified",["45db"],null]]},
+    {"id":"12","name":"陌生字段不落入待确认","files":{"a.txt":"噪声：45dB\n转速：3000rpm\n保修期：2年\n适用材质：木材、铝材"},"groups":[["custom:噪声",null,"verified",["45dB"],null],["custom:转速",null,"verified",["3000rpm"],null],["custom:保修期",null,"verified",["2年"],null],["custom:适用材质",null,"verified",["木材、铝材"],null]]},
+    {"id":"13","name":"陌生字段大小写空格等价","files":{"a.txt":"噪声：45 dB","b.txt":"噪声：45dB"},"groups":[["custom:噪声",null,"verified",["45dB"],null]]},
     {"id":"14","name":"未知字段换算2年与24个月","files":{"a.txt":"保修期：2年","b.txt":"保修期：24个月"},"ignore_values":true,"groups":[["custom:保修期",null,"verified",[],null]]},
-    {"id":"15","name":"噪声与噪音是同一参数且值冲突","files":{"a.txt":"噪声：45dB","b.txt":"噪音：65dB"},"groups":[["custom:噪声",null,"conflict",["45db","65db"],null]],"semantic_aliases":{"custom:噪音":"custom:噪声"}},
-    {"id":"16","name":"一行多个参数","files":{"a.txt":"净重：300g；额定功率：20W；噪声：45dB"},"groups":[["net_weight","net","verified",[300],"g"],["power","rating:rated","verified",[20],"W"],["custom:噪声",null,"verified",["45db"],null]]},
+    {"id":"15","name":"噪声与噪音是同一参数且值冲突","files":{"a.txt":"噪声：45dB","b.txt":"噪音：65dB"},"groups":[["custom:噪声",null,"conflict",["45dB","65dB"],null]],"semantic_aliases":{"custom:噪音":"custom:噪声"}},
+    {"id":"16","name":"一行多个参数","files":{"a.txt":"净重：300g；额定功率：20W；噪声：45dB"},"groups":[["net_weight","net","verified",[300],"g"],["power","rating:rated","verified",[20],"W"],["custom:噪声",null,"verified",["45dB"],null]]},
     {"id":"17","name":"已知字段未知单位不猜测","files":{"a.txt":"净重：5 stone"},"groups":[["net_weight","net","pending_confirmation",["5 stone"],null]]},
     {"id":"18","name":"斜杠多个数字不自动任选","files":{"a.txt":"净重：300g/400g"},"groups":[["net_weight","net","pending_confirmation",["300g/400g"],null]]},
     {"id":"19","name":"英文千位分隔","files":{"a.txt":"净重：1,000.5g"},"groups":[["net_weight","net","verified",[1000.5],"g"]]},

@@ -42,7 +42,7 @@ class OpenParameterTests(unittest.TestCase):
     def test_multi_parameter_lines_keep_every_value_and_scope(self):
         rows = extract("净重：300g；额定功率：20W；噪声：45dB")
         self.assertEqual(len(rows), 3)
-        self.assertEqual([c.normalized_value for c in rows], [300, 20, "45db"])
+        self.assertEqual([c.normalized_value for c in rows], [300, 20, "45dB"])
         self.assertEqual(rows[1].scope, "rating:rated")
         rows = extract("该产品净重为300g，额定功率20W")
         self.assertEqual([c.normalized_value for c in rows], [300, 20])
@@ -107,7 +107,7 @@ class OpenParameterTests(unittest.TestCase):
         self.assertEqual(result["claim_count"], 3)
         self.assertEqual(result["counts"]["unsupported"], 2)
         noise = field_for_label("噪声").name
-        ref = [{"fact_id":"f2", "field":noise, "value":"45db", "unit":None}]
+        ref = [{"fact_id":"f2", "field":noise, "value":"45dB", "unit":None}]
         self.assertEqual(check_draft("噪声：45 dB", ref)["status"], "covered_fields_match")
         self.assertEqual(check_draft("噪声：65 dB", ref)["status"], "blocked")
 
@@ -159,7 +159,7 @@ class OpenParameterTests(unittest.TestCase):
         cells = bind_structured_rows([(1,[(1,"噪声"),(2,"转速")]), (2,[(1,"45dB"),(2,"3000rpm")])], table_id="fixture")
         self.assertEqual(len(cells), 2)
         self.assertIsNone(bind_structured_rows([(1,[(1,"型号"),(2,"A1")]), (2,[(1,"净重"),(2,"300g")])], table_id="fixture"))
-        self.assertEqual(extract("噪声 | 45dB")[0].normalized_value, "45db")
+        self.assertEqual(extract("噪声 | 45dB")[0].normalized_value, "45dB")
 
     def test_custom_conflict_confirmation_and_stale_links(self):
         from product_evidence_guard.confirmation import resolve_conflict_group
@@ -175,7 +175,7 @@ class OpenParameterTests(unittest.TestCase):
             self.assertTrue(all(c.get("source_url") for c in summary["groups"][0]["choices"]))
             _, product, _ = workflow.context(output)
             group = product["fact_groups"][0]
-            selected = next(c for c in product["candidates"] if c["normalized_value"] == "45db")
+            selected = next(c for c in product["candidates"] if c["normalized_value"] == "45dB")
             resolve_conflict_group(output, session_id=run["session_id"], group_id=group["group_id"],
                                    selected_candidate_id=selected["candidate_id"], expected_candidate_ids=group["candidate_ids"],
                                    reject_others=True, reason="采用45dB")

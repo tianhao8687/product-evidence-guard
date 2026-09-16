@@ -45,7 +45,7 @@ class MeasurementSemanticsTests(unittest.TestCase):
 
     def test_labeled_electrical_path_keeps_complete_bound_and_tolerance(self):
         for raw, value, unit in (("至少5V", "≥5", "V"), ("5V以下", "≤5", "V"),
-                                  ("5±0.2V", "5±0.2", "V"), ("5V/Hz", "5v/hz", None)):
+                                  ("5±0.2V", "5±0.2", "V"), ("5V/Hz", "5V/Hz", None)):
             with self.subTest(raw=raw):
                 rows = extract_rule_candidates(SourceBlock("b", "a.txt", "text", "hash", {}, "输入电压："+raw))
                 self.assertEqual(len(rows), 1)

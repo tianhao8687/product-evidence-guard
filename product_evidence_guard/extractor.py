@@ -8,7 +8,7 @@ from typing import Iterable
 
 from .field_registry import FIELD_SPECS, FieldDefinition, field_for_label, split_label_unit, scope_for_label
 from .models import FactCandidate, SourceBlock
-from .normalization import normalize_text, normalize_value
+from .normalization import normalize_text, normalize_fact_text, normalize_value
 
 # Compatibility name retained for integrations that imported FieldSpec.
 FieldSpec = FieldDefinition
@@ -496,7 +496,7 @@ def _io_gap_is_structured(field: str, value: str) -> bool:
     return True
 
 
-def infer_semantic_scope(field: str, text: str) -> str | None:
+def _base_semantic_scope(field: str, text: str) -> str | None:
     if field == "dimensions":
         if re.search(r"包装尺寸|packag(?:e|ing) dimensions", text, re.I):
             return "packaging"
@@ -535,6 +535,20 @@ def infer_semantic_scope(field: str, text: str) -> str | None:
         if item
     ]
     return "|".join(scopes) or None
+
+
+def infer_semantic_scope(field: str, text: str) -> str | None:
+    scope = _base_semantic_scope(field, text)
+    scopes = scope.split("|") if scope else []
+    if field in {"voltage", "current"}:
+        signals = {m[1].lower() for m in re.finditer(r"(?<![A-Za-z])(?:[mMkK]?[VA])?\s*(AC|DC)\b", text, re.I)}
+        if len(signals) == 1:
+            scopes.append("signal:" + next(iter(signals)))
+    if field == "dimensions":
+        axes = re.search(r"\b([LWHD])\s*[x×*]\s*([LWHD])(?:\s*[x×*]\s*([LWHD]))?\b", text, re.I)
+        if axes:
+            scopes.append("axes:" + "×".join(a.upper() for a in axes.groups() if a))
+    return "|".join(dict.fromkeys(scopes)) or None
 
 
 def _candidate_id(block: SourceBlock, field: str, raw_value: str) -> str:
@@ -716,7 +730,7 @@ def _extract_labeled_electrical_candidates(block: SourceBlock) -> list[FactCandi
         normalized_values: list[object] = []
         notes: list[str] = []
         for token, normalized in valid_rows:
-            token_casefolded = token.casefold()
+            token_casefolded = normalize_fact_text(token)
             if token_casefolded in raw_values_casefolded:
                 continue
             raw_values.append(token)
@@ -751,7 +765,7 @@ def _extract_labeled_electrical_candidates(block: SourceBlock) -> list[FactCandi
                 recognition_confidence=block.recognition_confidence,
                 mapping_confidence=0.97,
                 extraction_method="deterministic_labeled_unit_mapping",
-                scope=scope,
+                scope="|".join(dict.fromkeys([scope, *(infer_semantic_scope(field, block.text) or "").split("|")])).strip("|"),
                 notes=notes,
                 provenance=dict(block.provenance),
             )
@@ -858,7 +872,7 @@ def explicit_parameter(text: str):
     # A bracketed table unit is metadata, not part of the field identity.
     label, unit = split_label_unit(label)
     if unit:
-        if not re.search(re.escape(unit), raw, re.I):
+        if not re.search(re.escape(unit), raw):
             raw += " " + unit
     spec = field_for_label(label)
     return (spec, raw) if spec and raw and len(raw) <= 512 else None

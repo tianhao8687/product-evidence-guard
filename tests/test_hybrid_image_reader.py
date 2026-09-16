@@ -142,8 +142,8 @@ class HybridImageReaderTests(unittest.TestCase):
             {
                 ("voltage", "input"),
                 ("power", "input"),
-                ("voltage", "output"),
-                ("current", "output"),
+                ("voltage", "output|signal:dc"),
+                ("current", "output|signal:dc"),
             },
         )
         self.assertTrue(

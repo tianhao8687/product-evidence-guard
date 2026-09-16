@@ -17,6 +17,7 @@ class NormalizedValue:
 
 
 _NUMBER = r"[-+]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][-+]?\d+)?"
+VALUE_SEMANTICS_REVISION = 2
 
 
 UNIT_RULES = {
@@ -45,6 +46,26 @@ def normalize_text(value: str) -> str:
     compact = re.sub(r"\s+", " ", value.strip()).casefold()
     compact = compact.replace("，", ",").replace("：", ":")
     return compact
+
+
+def normalize_fact_text(value: str) -> str:
+    """Fold prose, not measurement symbols (including unfamiliar units).
+
+    Used for values AND evidence identities. Protect the whole unit expression
+    following a number, so MB/s, mW, MW, mΩ and MΩ remain distinct without a
+    specialist field whitelist. Cosmetic whitespace is still interchangeable.
+    No conversion is claimed for an opaque symbol.
+    """
+    text = re.sub(r"\s+", " ", value.strip()).replace("，", ",").replace("：", ":")
+    atom = r"[A-Za-zµμΩω°℃℉%][A-Za-zµμΩω°℃℉%²³0-9]*"
+    pattern = rf"(?<![A-Za-z0-9_])(?P<number>{_NUMBER})(?P<gap>\s*)(?P<unit>{atom}(?:\s*[/·⋅]\s*{atom})*)"
+    parts, end = [], 0
+    for match in re.finditer(pattern, text):
+        parts.extend((text[end:match.start()].casefold(), match["number"].casefold(), match["gap"],
+                      re.sub(r"\s+", "", match["unit"])))
+        end = match.end()
+    parts.append(text[end:].casefold())
+    return "".join(parts)
 
 
 def _numeric_text(raw: str) -> str | None:
@@ -99,7 +120,8 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
     if rules is None:
         return None
     aliases = sorted(rules, key=len, reverse=True)
-    unit_pattern = "|".join(re.escape(item) for item in aliases)
+    # Inline case sensitivity survives the surrounding natural-language re.I.
+    unit_pattern = "(?-i:" + "|".join(re.escape(item) for item in aliases) + ")"
     for word, operator in _BOUND_PREFIX.items():
         raw = re.sub(re.escape(word) + r"\s*(?=[+\-]?\d)", operator, raw, flags=re.I)
     for word, operator in _BOUND_SUFFIX.items():
@@ -117,8 +139,8 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
             return None
         if not tolerance["delta_unit"] and re.match(r"\s*[A-Za-z]", raw[tolerance.end():]):
             return None
-        center_rule = rules[center_unit.casefold()]
-        delta_rule = rules[(tolerance["delta_unit"] or center_unit).casefold()]
+        center_rule = rules[center_unit]
+        delta_rule = rules[tolerance["delta_unit"] or center_unit]
         center = Decimal(tolerance["center"]) * center_rule.scale + center_rule.offset
         delta = Decimal(tolerance["delta"]) * delta_rule.scale
         if delta < 0 or "%" in raw[tolerance.end():]:
@@ -138,9 +160,9 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
         if not _measurement_context_safe(raw, [m.span() for m in all_ranges], family):
             return None
         converted_ranges = [
-            [Decimal(m["start"]) * rules[(m["start_unit"] or m["end_unit"]).casefold()].scale
-             + rules[(m["start_unit"] or m["end_unit"]).casefold()].offset,
-             Decimal(m["end"]) * rules[m["end_unit"].casefold()].scale + rules[m["end_unit"].casefold()].offset]
+            [Decimal(m["start"]) * rules[m["start_unit"] or m["end_unit"]].scale
+             + rules[m["start_unit"] or m["end_unit"]].offset,
+             Decimal(m["end"]) * rules[m["end_unit"]].scale + rules[m["end_unit"]].offset]
             for m in all_ranges
         ]
         if any(any(abs(a - b) > Decimal("0.000001") for a, b in zip(converted_ranges[0], pair))
@@ -165,7 +187,7 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
         number = Decimal(match.group("number"))
     except InvalidOperation:
         return None
-    unit = match.group("unit").casefold()
+    unit = match.group("unit")
     rule = rules.get(unit)
     if rule is None:
         return None
@@ -207,7 +229,7 @@ def normalize_dimensions(raw: str) -> NormalizedValue | None:
         return None  # preserve unsupported dimensional constraints as text
     pattern = re.compile(
         rf"(?P<a>{_NUMBER})\s*[x×*]\s*(?P<b>{_NUMBER})(?:\s*[x×*]\s*(?P<c>{_NUMBER}))?\s*"
-        rf"(?P<unit>mm|cm|m|in|inch|毫米|厘米|米|英寸)",
+        rf"(?P<unit>(?-i:mm|cm|m|in|inch|毫米|厘米|米|英寸))(?![A-Za-z])",
         re.IGNORECASE,
     )
     match = pattern.search(raw)
@@ -236,19 +258,23 @@ def normalize_dimensions(raw: str) -> NormalizedValue | None:
 
 def normalize_value(field: str, raw: str) -> NormalizedValue:
     definition = field_definition(field)
+    if field in {"sku", "model"}:
+        # These are identifiers, not physical measurements; display still uses
+        # the original label while the established case-insensitive key stays stable.
+        return NormalizedValue(normalize_text(raw), None)
     if field.startswith("custom_"):
-        text = normalize_text(raw)
+        text = normalize_fact_text(raw)
         # Spacing is cosmetic; unfamiliar units are retained, never converted.
-        text = re.sub(r"(?<=\d)\s+(?=[a-z%°\u3400-\u9fff])", "", text)
+        text = re.sub(r"(?<=\d)\s+(?=[A-Za-zµμΩω%°\u3400-\u9fff])", "", text)
         # Native text and OCR often differ only around a range/tolerance sign.
         # Preserve the operator, bounds, units and trailing conditions verbatim;
         # do not interpret a hyphen as a range or infer compatible expressions.
         text = re.sub(r"\s*([~±])\s*(?=[+\-]?(?:\d|\.\d))", r"\1", text)
         # Calendar periods are not fixed numbers of seconds. Only exact,
         # whole-year/month expressions are interchangeable here.
-        period = re.fullmatch(r"(\d+)\s*(年|years?|个月|月|months?)", text)
+        period = re.fullmatch(r"(\d+)\s*(年|years?|个月|月|months?)", text, re.I)
         if period:
-            months = int(period[1]) * (12 if period[2] in {"年", "year", "years"} else 1)
+            months = int(period[1]) * (12 if period[2].lower() in {"年", "year", "years"} else 1)
             text = f"{months // 12}年" if months % 12 == 0 else f"{months}个月"
         return NormalizedValue(text, None)
     if field == "color":
@@ -260,16 +286,16 @@ def normalize_value(field: str, raw: str) -> NormalizedValue:
         return (
             normalize_number_with_unit(raw, "capacity_charge")
             or normalize_number_with_unit(raw, "capacity_volume")
-            or NormalizedValue(normalize_text(raw), None, ("unparsed_capacity",))
+            or NormalizedValue(normalize_fact_text(raw), None, ("unparsed_capacity",))
         )
     if definition and definition.value_type == "dimensions":
-        return normalize_dimensions(raw) or NormalizedValue(normalize_text(raw), None, ("unparsed_dimensions",))
+        return normalize_dimensions(raw) or NormalizedValue(normalize_fact_text(raw), None, ("unparsed_dimensions",))
     if definition and definition.value_type == "count":
-        return normalize_count(raw) or NormalizedValue(normalize_text(raw), None, ("unparsed_count",))
+        return normalize_count(raw) or NormalizedValue(normalize_fact_text(raw), None, ("unparsed_count",))
     family = definition.unit_family if definition else None
     if family:
-        return normalize_number_with_unit(raw, family) or NormalizedValue(normalize_text(raw), None, ("unparsed_unit",))
-    return NormalizedValue(normalize_text(raw), None)
+        return normalize_number_with_unit(raw, family) or NormalizedValue(normalize_fact_text(raw), None, ("unparsed_unit",))
+    return NormalizedValue(normalize_fact_text(raw), None)
 
 
 def invalid_fact_value(field: str, raw: str, value: Any) -> bool:

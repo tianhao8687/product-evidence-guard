@@ -104,6 +104,59 @@ def _aligned_pairs(lines):
     return result
 
 
+def _wrapped_pairs(lines):
+    """Extend proven key/value columns across indented continuation lines.
+
+    A colon is an explicit boundary even when the label nearly touches its
+    value. Otherwise require the existing repeated-column evidence. Stop at
+    another label, a paragraph gap, or a different indent; never forward-fill
+    a label into a neighboring column or the next section.
+    """
+    pairs = _aligned_pairs(lines)
+    for index, line in enumerate(lines):
+        chunks = _chunks(line)
+        for chunk in reversed(chunks):
+            for split, word in enumerate(chunk):
+                if not word["text"].endswith((":", "：")):
+                    continue
+                left = chunk[:split + 1]
+                label = _text(left).rstrip(":：")
+                right = [w for w in line if w["x0"] >= word["x1"] and w not in left]
+                if right and field_for_label(split_label_unit(label)[0]) and len(label.split()) <= 8:
+                    pairs[index] = (left, right)
+                    break
+            if index in pairs:
+                break
+    results = {}
+    for index, (left, right) in pairs.items():
+        value_words = list(right)
+        last_top = min(w["top"] for w in right)
+        max_gap = max(22, 2 * max(w["bottom"] - w["top"] for w in right))
+        for next_index in range(index + 1, len(lines)):
+            line = lines[next_index]
+            if next_index in pairs or line[0]["top"] - last_top > max_gap:
+                break
+            # The label column is empty on a continuation. Body copy in an
+            # unrelated column to its left is deliberately not consumed.
+            if any(left[0]["x0"] - 3 <= w["x0"] < right[0]["x0"] - 3 for w in line):
+                break
+            chunks = [c for c in _chunks(line) if abs(c[0]["x0"] - right[0]["x0"]) <= 3]
+            if len(chunks) != 1 or re.search(r"[:：=]", _text(chunks[0])):
+                break
+            value_words.extend(chunks[0])
+            if len(_text(value_words)) > 512:
+                break  # the caller reports this whole value, never its prefix
+            last_top = line[0]["top"]
+        results[index] = (left, value_words)
+    return results
+
+
+def _cell_text(value):
+    # A physical cell is a single logical value. Its line breaks are layout,
+    # not permission to discard the conditions/variants on the second line.
+    return re.sub(r"\s+", " ", str(value or "")).strip()
+
+
 def read_layout_page(page, number: int) -> tuple[list[dict], list[dict]]:
     """Return text/locator/provenance records and grouped reading issues."""
     if len(page.chars) > MAX_PAGE_CHARACTERS:
@@ -174,7 +227,7 @@ def read_layout_page(page, number: int) -> tuple[list[dict], list[dict]]:
         # Vertical key/value tables use the identical explicit label contract.
         if structured is None and all(len(row) == 2 for _, row in expanded):
             for rn, cells in expanded:
-                label, value = (str(v or "").strip() for _, v in cells)
+                label, value = (_cell_text(v) for _, v in cells)
                 if field_for_label(split_label_unit(label)[0]) and value:
                     box = cells[1][0] or table.bbox
                     records.append({"text": f"{label}: {value}", "locator": _locator(page, number, box, table=index, row=rn),
@@ -204,9 +257,9 @@ def read_layout_page(page, number: int) -> tuple[list[dict], list[dict]]:
             nested_spec = field_for_label(nested[1]) if nested else None
             if nested_spec and nested_spec.name != cell.field:
                 parents.append(cell.header)
-                text = cell.value
+                text = _cell_text(cell.value)
             else:
-                text = f"{cell.header}: {cell.value}"
+                text = f"{_cell_text(cell.header)}: {_cell_text(cell.value)}"
             records.append({"text": text,
                             "locator": _locator(page, number, cell.location, table=index, row=cell.row_number),
                             "provenance": {"table_id": table_id, "parent_labels": list(dict.fromkeys(parents)),
@@ -223,15 +276,19 @@ def read_layout_page(page, number: int) -> tuple[list[dict], list[dict]]:
     remainder = [w for w in words if not any(_inside(w, box) for box in consumed)]
     uncertain = []
     lines = _lines(remainder)
-    aligned = _aligned_pairs(lines)
+    aligned = _wrapped_pairs(lines)
+    bound_words = {id(w) for left, right in aligned.values() for w in left + right}
     for line_number, line in enumerate(lines):
         if line_number in aligned:
             left, right = aligned[line_number]
-            records.append({"text": f"{_text(left)}: {_text(right)}", "locator": _locator(page, number, _bbox(left + right), text_block=line_number),
-                            "provenance": {"layout_binding": "repeated_aligned_pair"}})
-            line = [word for word in line if word not in left and word not in right]
-            if not line:
-                continue
+            if len(_text(right)) > 512:
+                uncertain.append(line_number)
+            else:
+                records.append({"text": f"{_text(left).rstrip(':：')}: {_text(right)}", "locator": _locator(page, number, _bbox(left + right), text_block=line_number),
+                                "provenance": {"layout_binding": "wrapped_aligned_pair"}})
+        line = [word for word in line if id(word) not in bound_words]
+        if not line:
+            continue
         chunks = _chunks(line)
         parts = [_text(chunk) for chunk in chunks]
         if len(parts) >= 3 and sum(bool(re.search(r"\d", p)) for p in parts) >= 2:

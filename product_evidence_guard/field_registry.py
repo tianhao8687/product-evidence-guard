@@ -117,7 +117,9 @@ def _load_registry() -> FieldRegistry:
             raise FieldRegistryError(f"unit family {name} has no units")
         units: dict[str, UnitRule] = {}
         for alias, rule in units_data.items():
-            unit_alias = str(alias).strip().casefold()
+            # SI symbols are case-sensitive: mW and MW cannot share a rule.
+            # Tolerated spellings must be explicit aliases in the registry.
+            unit_alias = str(alias).strip()
             if not unit_alias or len(unit_alias) > 32 or unit_alias in units:
                 raise FieldRegistryError(f"unit family {name} has an invalid alias")
             if isinstance(rule, dict):

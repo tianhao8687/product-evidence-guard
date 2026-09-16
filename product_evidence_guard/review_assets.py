@@ -41,7 +41,7 @@ const selectedCandidates = new Set();
 const labels = {verified:'已确认',pending_confirmation:'待确认',conflict:'冲突',pending:'待确认',confirmed:'已确认',rejected:'已拒绝',stale:'已失效',block:'存在冲突',review:'需要复核',pass:'证据一致',blocked:'发现参数问题',needs_review:'需要人工复核',covered_fields_match:'覆盖字段一致',source_stale:'引用的事实已失效',content_changed:'内容变化，需重新回检',authorization_revoked:'授权已撤销',active:'有效授权'};
 const el = (tag, cls, text) => {const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 const badge = (key,text) => el('span','badge '+key,text||labels[key]||key);
-const scopeLabel = s => (s||'').split('|').map(x=>({net:'净重',gross:'毛重',unspecified:'未限定',input:'输入',output:'输出',rated:'额定',nominal:'标称',min:'最小',max:'最大',typical:'典型',operating:'工作/运行',storage:'储存',product:'产品',packaging:'包装','signal:ac':'交流','signal:dc':'直流'})[x.replace(/^rating:/,'')]||x.replace(/^profile:/,'模式：').replace(/^context:/,'条件：')).join(' / ');
+const scopeLabel = s => (s||'').split('|').map(x=>({net:'净重',gross:'毛重',unspecified:'未限定',input:'输入',output:'输出',rated:'额定',nominal:'标称',min:'最小',max:'最大',typical:'典型',operating:'工作/运行',storage:'储存',product:'产品',packaging:'包装','signal:ac':'交流','signal:dc':'直流'})[x.replace(/^rating:/,'')]||(x.startsWith('axes:')?'尺寸顺序：'+x.slice(5).replace(/L/g,'长').replace(/W/g,'宽').replace(/H/g,'高').replace(/D/g,'深'):x.replace(/^profile:/,'模式：').replace(/^context:/,'条件：'))).join(' / ');
 const value = c => `${Array.isArray(c.normalized_value)?c.normalized_value.join(c.field==='dimensions'?' × ':' 至 '):typeof c.normalized_value==='object'?JSON.stringify(c.normalized_value):c.normalized_value} ${c.normalized_unit==='count'?'件':c.normalized_unit||''}`.trim();
 function notice(text,error=false){$('notice').hidden=!text;$('notice').textContent=text;$('notice').classList.toggle('error',error);}
 async function api(path,body){const response=await fetch('/api/'+path,{method:body?'POST':'GET',headers:{'X-PEG-Token':token||'',...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});const data=await response.json();if(!response.ok)throw Error(data.error||'操作失败，请重试。');return data;}
@@ -135,7 +135,7 @@ function renderReviewTools(){
  for(const [name,items] of files){const box=el('div','reading-issue notice'),title=el('strong','',name);box.append(title);const list=el('ul'),seen=new Set();for(const issue of items){const message=`${issue.locator&&Object.keys(issue.locator).length?position(issue.locator)+'：':''}${issue.message||'本次未能完成读取，请补充资料或重试。'}`;if(!seen.has(message)){list.append(el('li','',message));seen.add(message);}}box.append(list);issueRoot.append(box);}
  if(state.showing_previous_result)$('phase').textContent='本次更新未完成 · 当前显示上次结果';
  const needsSupplement=issues.some(i=>['table_binding_unclear','unruled_table_unclear','hidden_sheet','formula_unverified','unsupported_format'].includes(i.code||i.reason));
- $('retry-incomplete').textContent=state.showing_previous_result?'继续处理':needsSupplement?'补充资料后重新读取':'重试未完成部分';
+ $('retry-incomplete').textContent=issues.some(i=>i.code==='value_upgrade_required')?'更新已有结果':state.showing_previous_result?'继续处理':needsSupplement?'补充资料后重新读取':'重试未完成部分';
 }
 async function reanalyze(){await api('reanalyze',{});await refresh();notice('已开始重新读取，将复用有效缓存，重试未完成部分。');}
 function optionAction(g,c){

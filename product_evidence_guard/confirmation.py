@@ -585,14 +585,16 @@ def _write_confirmed_facts(
             }
         )
     path = output_dir / CONFIRMED_FACTS_NAME
+    from .readiness import needs_value_upgrade
+    upgrade = needs_value_upgrade(product_facts)
     atomic_write_json(
         path,
         {
             "schema_version": 2,
             "session_id": state["session_id"],
-            "status": "human_confirmed",
-            "warning": "只包含用户明确确认且源文件哈希仍有效的事实。",
-            "facts": confirmed,
+            "status": "reanalyze_required" if upgrade else "human_confirmed",
+            "warning": "单位读取规则已更新，请重新读取；人工决定仍保留在审计记录中。" if upgrade else "只包含用户明确确认且源文件哈希仍有效的事实。",
+            "facts": [] if upgrade else confirmed,
         },
     )
     return path

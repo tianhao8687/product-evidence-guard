@@ -144,7 +144,7 @@ class StructureTests(unittest.TestCase):
         facts = extract_rule_candidates(block)
         self.assertEqual(len(facts), 1)
         self.assertTrue(facts[0].field.startswith("custom_"))
-        self.assertEqual(facts[0].normalized_value, "0.75ma")
+        self.assertEqual(facts[0].normalized_value, "0.75mA")
 
     def test_compound_io_label_still_uses_existing_electrical_binder(self):
         block = SourceBlock("id", "x.txt", "text", "hash", {}, "输入：5V/3A")

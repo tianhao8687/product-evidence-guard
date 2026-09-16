@@ -1,0 +1,2702 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-09-16T11:28:46.481283+00:00",
+  "kind": "exposed_original_native_retest_agent_visual_adjudication",
+  "base_commit": "ecc613eaa631bedaa9392be8d14fea0f74f53969",
+  "gold_sha256": "7692e56cbbdc4ab6194fed2a108d61663a35d8c2606ccfe0cfb3b5ef82bdb22a",
+  "previous_audit_sha256": "171a2eeb8717ad1860919392f2cf195c5ff256cc0f2b0be2ff4e99b3ef4cc102",
+  "sources": [
+    {
+      "case": "energizer",
+      "domain": "battery",
+      "url": "https://data.energizer.com/pdfs/E91_Max_EU.pdf",
+      "sha256": "b8d3d2400935a2dc3a20c0d822b9e3ae5de87fde1ffdc309f2e228d9c81358dd"
+    },
+    {
+      "case": "hdr",
+      "domain": "power_supply",
+      "url": "https://www.meanwell.com/Upload/PDF/HDR-15/HDR-15-SPEC.PDF",
+      "sha256": "c2cd30de2b0a77ff08cd4112426db150c71a4ac1d4bc5ae5b207c3d9edbd15a4"
+    },
+    {
+      "case": "kingston",
+      "domain": "storage",
+      "url": "https://www.kingston.com/datasheets/sa400_us.pdf",
+      "sha256": "59d33aa7deda51256c994d6d4e2f2514386c68742cd91624d6990f3bbe40566f"
+    },
+    {
+      "case": "pico",
+      "domain": "microcontroller",
+      "url": "https://datasheets.raspberrypi.com/pico/pico-2-product-brief.pdf",
+      "sha256": "b2a1e54ebaaec90d68d966da4d9eeaf436ee687fe3ecf429f6d06c8662e83aa2"
+    },
+    {
+      "case": "ublox",
+      "domain": "navigation",
+      "url": "https://www.u-blox.com/sites/default/files/documents/SAM-M10Q_ProductSummary_UBX-22004868.pdf",
+      "sha256": "98fb5301e9b2c4e247a78ecfbda4485d280fafa990198bdfe7d55de6ddfdbe8a"
+    }
+  ],
+  "gold_unchanged": true,
+  "method": "Same strict adopted-value/product/unit/condition criteria as the previous audit; all verified groups scored. Multi-item facts credit only individually complete frozen checkpoints. Agent visual inspection, not independent human signoff. Unit-test fixtures are excluded from these scores.",
+  "limitations": [
+    "Same exposed five PDFs and 116 checkpoints; NOT a new blind test or production accuracy guarantee.",
+    "No new real-model run in this turn; this comparison measures the native PDF route only.",
+    "Macro per-document precision is reported because HDR supplies 140 of 183 verified groups.",
+    "Multi-column tables, superscripts/subscripts, external footnotes and prose false positives remain unresolved.",
+    "Old synthetic fixtures were explicitly amended for unit case/GHz support/axis scope; these are regression maintenance, never counted as fresh business evidence."
+  ],
+  "before": {
+    "correct_verified_outputs": 138,
+    "verified_outputs": 183,
+    "verified_output_precision": 0.754098,
+    "macro_document_precision": 0.536667,
+    "covered_checkpoints": 52,
+    "checkpoint_count": 116,
+    "checkpoint_coverage": 0.448276
+  },
+  "after": {
+    "correct_verified_outputs": 154,
+    "verified_outputs": 183,
+    "verified_output_precision": 0.84153,
+    "macro_document_precision": 0.635714,
+    "covered_checkpoints": 68,
+    "checkpoint_count": 116,
+    "checkpoint_coverage": 0.586207,
+    "total_seconds": 9.631
+  },
+  "cases": [
+    {
+      "case": "energizer",
+      "prediction_sha256": "cc9bd7e4782c6694bc348bd98c33f0c6a539c81c927384268f8e339a26896d7c",
+      "seconds": 0.755,
+      "counts": {
+        "verified": 10,
+        "pending_confirmation": 1
+      },
+      "errors": 0,
+      "delivery_complete": false,
+      "correct_verified_outputs": 9,
+      "verified_outputs": 10,
+      "covered_checkpoint_count": 9,
+      "checkpoint_count": 11,
+      "covered_checkpoints": [
+        "energizer-01",
+        "energizer-03",
+        "energizer-05",
+        "energizer-06",
+        "energizer-07",
+        "energizer-08",
+        "energizer-09",
+        "energizer-10",
+        "energizer-11"
+      ],
+      "uncovered_checkpoints": [
+        "energizer-02",
+        "energizer-04"
+      ],
+      "adjudications": [
+        {
+          "group_id": "group_164244897dcb4365a313",
+          "field_label": "chemical system",
+          "product_label": "product_4fad054b42de725a7dc511b7",
+          "scope": null,
+          "semantic_signature_sha256": "e6539e702752beb3e8c41f1e42a1f58406fcf8c94fcd1d74d70e285fd6015304",
+          "correct": false,
+          "reason_code": "chemical_formula_and_continuation_truncated",
+          "related_checkpoints": [
+            "energizer-02"
+          ],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_c338cf42201de276b390",
+          "field_label": "classification",
+          "product_label": "product_4fad054b42de725a7dc511b7",
+          "scope": null,
+          "semantic_signature_sha256": "de87a9bfefc7975678eaacb929a5ddf91c5449c18a61c4cf2f771d07efdbb0a9",
+          "correct": true,
+          "reason_code": "value_and_source_family_match",
+          "related_checkpoints": [
+            "energizer-01"
+          ],
+          "covered_checkpoints": [
+            "energizer-01"
+          ]
+        },
+        {
+          "group_id": "group_cdbbc0c3410444597521",
+          "field_label": "designation",
+          "product_label": "product_4fad054b42de725a7dc511b7",
+          "scope": null,
+          "semantic_signature_sha256": "2a3fcc012831bed4e9e23bc3f98482ff58103f840d90d7aa135acdb52fff9316",
+          "correct": true,
+          "reason_code": "value_and_source_family_match",
+          "related_checkpoints": [
+            "energizer-03"
+          ],
+          "covered_checkpoints": [
+            "energizer-03"
+          ]
+        },
+        {
+          "group_id": "group_5b874460499db84f955f",
+          "field_label": "jacket",
+          "product_label": "product_4fad054b42de725a7dc511b7",
+          "scope": null,
+          "semantic_signature_sha256": "b52aff7ee5422c1afa118d9106adc1b47a90aac398ade539e68e49e688d7ee48",
+          "correct": true,
+          "reason_code": "value_and_source_family_match",
+          "related_checkpoints": [
+            "energizer-09"
+          ],
+          "covered_checkpoints": [
+            "energizer-09"
+          ]
+        },
+        {
+          "group_id": "group_da64af2eeccf4a2971cd",
+          "field_label": "nominal ir",
+          "product_label": "product_4fad054b42de725a7dc511b7",
+          "scope": null,
+          "semantic_signature_sha256": "4f5ea9119d3bbfee67ef02a00ad9ae53fa7c8b58bdc1eb9b1f07a2260ee89ceb",
+          "correct": true,
+          "reason_code": "numeric_range_and_fresh_condition_match_but_label_polluted",
+          "related_checkpoints": [
+            "energizer-05"
+          ],
+          "covered_checkpoints": [
+            "energizer-05"
+          ]
+        },
+        {
+          "group_id": "group_ff5679d14a5534376ff6",
+          "field_label": "operating temp",
+          "product_label": "product_4fad054b42de725a7dc511b7",
+          "scope": null,
+          "semantic_signature_sha256": "ae6844c0a1b99336eb670dc1e18f930d201e6e0183954b9e06ad20eff2f199ce",
+          "correct": true,
+          "reason_code": "temperature_range_and_condition_match",
+          "related_checkpoints": [
+            "energizer-06"
+          ],
+          "covered_checkpoints": [
+            "energizer-06"
+          ]
+        },
+        {
+          "group_id": "group_60a81aa3157a64038ce5",
+          "field_label": "shelf life",
+          "product_label": "product_4fad054b42de725a7dc511b7",
+          "scope": null,
+          "semantic_signature_sha256": "a5391fc1b9b68934e4821eb53731f462f38d75598a0c63b5f00207b7b3980193",
+          "correct": true,
+          "reason_code": "shelf_life_and_temperature_condition_match",
+          "related_checkpoints": [
+            "energizer-10"
+          ],
+          "covered_checkpoints": [
+            "energizer-10"
+          ]
+        },
+        {
+          "group_id": "group_fcbac8197a932710a438",
+          "field_label": "terminal",
+          "product_label": "product_4fad054b42de725a7dc511b7",
+          "scope": null,
+          "semantic_signature_sha256": "e6545a448f4d0e2d99068c6b5869e666d3488565f447220adc23967e0bcd031e",
+          "correct": true,
+          "reason_code": "value_and_source_family_match",
+          "related_checkpoints": [
+            "energizer-11"
+          ],
+          "covered_checkpoints": [
+            "energizer-11"
+          ]
+        },
+        {
+          "group_id": "group_7b1ca2335db832c9c103",
+          "field_label": "typical volume",
+          "product_label": "product_4fad054b42de725a7dc511b7",
+          "scope": null,
+          "semantic_signature_sha256": "b0669b9fd8a5a80e6b8fa07ac9da859b1c24d9018ed0ac20852e6f6f427a991c",
+          "correct": true,
+          "reason_code": "value_unit_and_typical_qualifier_match",
+          "related_checkpoints": [
+            "energizer-08"
+          ],
+          "covered_checkpoints": [
+            "energizer-08"
+          ]
+        },
+        {
+          "group_id": "group_95eeff334ef9adc51f9b",
+          "field_label": "typical weight",
+          "product_label": "product_4fad054b42de725a7dc511b7",
+          "scope": null,
+          "semantic_signature_sha256": "13fc2302976592808335f302d285a8face1d013badbf653da8e030a03f652dae",
+          "correct": true,
+          "reason_code": "weight_value_and_unit_match_but_label_polluted",
+          "related_checkpoints": [
+            "energizer-07"
+          ],
+          "covered_checkpoints": [
+            "energizer-07"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "hdr",
+      "prediction_sha256": "6d5469a783c517d7327cd7f83f9f0dce850c1a92857f427de3a83ba9f4c9e2c1",
+      "seconds": 5.501,
+      "counts": {
+        "verified": 140,
+        "pending_confirmation": 1
+      },
+      "errors": 0,
+      "delivery_complete": false,
+      "correct_verified_outputs": 125,
+      "verified_outputs": 140,
+      "covered_checkpoint_count": 35,
+      "checkpoint_count": 40,
+      "covered_checkpoints": [
+        "hdr-01",
+        "hdr-02",
+        "hdr-03",
+        "hdr-04",
+        "hdr-06",
+        "hdr-07",
+        "hdr-08",
+        "hdr-09",
+        "hdr-10",
+        "hdr-11",
+        "hdr-12",
+        "hdr-14",
+        "hdr-15",
+        "hdr-16",
+        "hdr-17",
+        "hdr-18",
+        "hdr-19",
+        "hdr-20",
+        "hdr-22",
+        "hdr-23",
+        "hdr-24",
+        "hdr-25",
+        "hdr-26",
+        "hdr-27",
+        "hdr-28",
+        "hdr-30",
+        "hdr-31",
+        "hdr-32",
+        "hdr-33",
+        "hdr-34",
+        "hdr-35",
+        "hdr-36",
+        "hdr-38",
+        "hdr-39",
+        "hdr-40"
+      ],
+      "uncovered_checkpoints": [
+        "hdr-05",
+        "hdr-13",
+        "hdr-21",
+        "hdr-29",
+        "hdr-37"
+      ],
+      "adjudications": [
+        {
+          "group_id": "group_1da5af4e24ef33e8e875",
+          "field_label": "电流",
+          "product_label": "HDR-15-15",
+          "scope": "output|rating:rated",
+          "semantic_signature_sha256": "bba46327ab01ebb5ddd36e23c39d91c2d3f049751154b5d2ffae0f74b22f5dcb",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-18"
+          ],
+          "covered_checkpoints": [
+            "hdr-18"
+          ]
+        },
+        {
+          "group_id": "group_957ab1c1d6b946f14a94",
+          "field_label": "ac current (typ.)",
+          "product_label": "HDR-15-15",
+          "scope": "input",
+          "semantic_signature_sha256": "2aa4884f484580ad23e07080a586dec3c3773479e89a3d25e40e47764227a871",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_c032f1ce319960127b08",
+          "field_label": "bis is13252(part1)",
+          "product_label": "HDR-15-15",
+          "scope": "context:safety & emc (note 4)",
+          "semantic_signature_sha256": "9cfe333685fa37a150555b4f31bf834a800a65adcf06c64710da189d4852fbad",
+          "correct": false,
+          "reason_code": "IEC_60950_1_identifier_mangled_and_fragment_detached_from_safety_heading",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_003348743fdd7bafd0dc",
+          "field_label": "current range",
+          "product_label": "HDR-15-15",
+          "scope": "output",
+          "semantic_signature_sha256": "6d541797ed2ea59f69141d191e6bae29c69171b53fe8360731592241415aa334",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-19"
+          ],
+          "covered_checkpoints": [
+            "hdr-19"
+          ]
+        },
+        {
+          "group_id": "group_573453d3d61512e27ad2",
+          "field_label": "efficiency (typ.)",
+          "product_label": "HDR-15-15",
+          "scope": "input",
+          "semantic_signature_sha256": "8c8b2b48c805e2871826c9f4f4e3368d97b71ab638ecee361f53e97086b67693",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_018d318f8d493e7342e6",
+          "field_label": "frequency range",
+          "product_label": "HDR-15-15",
+          "scope": "input",
+          "semantic_signature_sha256": "84083b3d093365d568233b91b328fc8f453068a4e48283564f8e89c4e9cd2160",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_e909d126c765706b19d5",
+          "field_label": "hold up time (typ.)",
+          "product_label": "HDR-15-15",
+          "scope": "output",
+          "semantic_signature_sha256": "d72bbe3c5c0760af46d6f4a4d7779816a10e0193c854d1b2c6d68a99f56bcb66",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_31d94347177706cd483b",
+          "field_label": "i/p-o/p",
+          "product_label": "HDR-15-15",
+          "scope": "context:isolation resistance|context:safety & emc (note 4)",
+          "semantic_signature_sha256": "3a2ca43bc8186d5fa3b6e77e3974c9acf1a01b37a3e1e71f0b41c0f220abd4e6",
+          "correct": true,
+          "reason_code": "megaohm_prefix_and_test_conditions_retained",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_537a74d725f9968984ff",
+          "field_label": "i/p-o/p",
+          "product_label": "HDR-15-15",
+          "scope": "context:safety & emc (note 4)|context:withstand voltage",
+          "semantic_signature_sha256": "9710bba7eec0dd5abcb06425e2d52c81f61b4724172ac34e6fa6f9bad9b3eb1f",
+          "correct": true,
+          "reason_code": "withstand_voltage_condition_and_value_match",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_6902d0b32967e5c7d0af",
+          "field_label": "inrush current (typ.)",
+          "product_label": "HDR-15-15",
+          "scope": "input",
+          "semantic_signature_sha256": "0e432c09edde0267cca80c71a9fd3ea762f69bb7a2549d2f3a68907ece9c193e",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_5101e3bc83d0c71708fe",
+          "field_label": "line regulation",
+          "product_label": "HDR-15-15",
+          "scope": "output",
+          "semantic_signature_sha256": "a801897fdb25b131752c072d77a837e39e029060869e344cbc1be7da09e152b0",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_27a381e14ad70dea8898",
+          "field_label": "load regulation",
+          "product_label": "HDR-15-15",
+          "scope": "output",
+          "semantic_signature_sha256": "afcf9670d2e1011a932aafb6d2ef19c1f8ac730cf5b281dcb07402fb95b7d658",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_94b8979fabc9885c0a9b",
+          "field_label": "mounting",
+          "product_label": "HDR-15-15",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "3a67cda3fb10648a9e7dc305931bdc38628a2af95f0a34cafb97d7441726f942",
+          "correct": false,
+          "reason_code": "vibration_mounting_condition_split_into_an_unqualified_parameter",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_c5b36800fa8c08a3ece9",
+          "field_label": "mtbf",
+          "product_label": "HDR-15-15",
+          "scope": "context:others",
+          "semantic_signature_sha256": "0a0e46dd4e966b7e5744313b81b3657d6c9d0baf6b64333e62e0e5c896f8b9e8",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_281ba7ff20670d6344e8",
+          "field_label": "operating altitude",
+          "product_label": "HDR-15-15",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "db057cfeaff51dbabf8e30082b52f7478387937ad11a16637afcd3eb1e5c09cd",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_4d7673441250caf3ae88",
+          "field_label": "over voltage category",
+          "product_label": "HDR-15-15",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "0486b251309c2b00d1f148472358adcbb5a2c3892779609e8f0139edd53b917d",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_55883981ea8c2e135db1",
+          "field_label": "packing",
+          "product_label": "HDR-15-15",
+          "scope": "context:others",
+          "semantic_signature_sha256": "f03f1afccf6cad512f6debc6c5ad8ff7b9723c37e78c548818ff4f3810ffaef6",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_66e044c97e6e6b32604e",
+          "field_label": "safety standards",
+          "product_label": "HDR-15-15",
+          "scope": "context:safety & emc (note 4)",
+          "semantic_signature_sha256": "a3bc321169d2ef9822cd318d10261b8f4b5a86c227cf68ce13bad30e679fe8a3",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_693ff99a31142b6a3411",
+          "field_label": "temp. coefficient",
+          "product_label": "HDR-15-15",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "80b010257e20f691412b267138ac7ad39f30862eef1ebb91d9534c87ddaa6bf6",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_1d0303709880074901c7",
+          "field_label": "vibration",
+          "product_label": "HDR-15-15",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "96e35f9f04f3219b3bc7e7cac4d9a0e33c9253386a2c34f594354ea13379c6af",
+          "correct": false,
+          "reason_code": "mounting_test_condition_not_attached_to_vibration_fact",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_280841398ea53d74d303",
+          "field_label": "voltage adj. range",
+          "product_label": "HDR-15-15",
+          "scope": "output",
+          "semantic_signature_sha256": "63c353935e0109eddd47123e958effd8b1edc9b5fdbf704adb34b3de528c64b1",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-22"
+          ],
+          "covered_checkpoints": [
+            "hdr-22"
+          ]
+        },
+        {
+          "group_id": "group_0fa266c77f33bfb7f911",
+          "field_label": "voltage range",
+          "product_label": "HDR-15-15",
+          "scope": "input",
+          "semantic_signature_sha256": "28a26f384e830985055fc38347697160ac53d1f13310c2280e829f8a3bfe9596",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_c7bc90d36a23b719a5d5",
+          "field_label": "voltage tolerance note.3",
+          "product_label": "HDR-15-15",
+          "scope": "output",
+          "semantic_signature_sha256": "91272814dd01736a0edb26fc94642a77acbe9c9b9e343f4373662d8dcaf6ee3c",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_c41d595ba5191828dd56",
+          "field_label": "working humidity",
+          "product_label": "HDR-15-15",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "d96f5e094be7fcf0d45d1d9b7785f377c28384a0ad5aa0114930ca30a581c17e",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_2c7a8da75f7ae5728aca",
+          "field_label": "working temp.",
+          "product_label": "HDR-15-15",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "9f46410a9be0b78a2f410903c7d98fb7377d118e985b0c3d15d7aedcbc5c5671",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-23"
+          ],
+          "covered_checkpoints": [
+            "hdr-23"
+          ]
+        },
+        {
+          "group_id": "group_738383aa11f6b3f2a073",
+          "field_label": "尺寸",
+          "product_label": "HDR-15-15",
+          "scope": "axes:W×H×D|context:others",
+          "semantic_signature_sha256": "6d26fadb1f82446a63968b4c4c3b0636783173c9a2c26d1033a19b90d6839fc1",
+          "correct": true,
+          "reason_code": "dimension_value_unit_and_W_H_D_order_retained",
+          "related_checkpoints": [
+            "hdr-24"
+          ],
+          "covered_checkpoints": [
+            "hdr-24"
+          ]
+        },
+        {
+          "group_id": "group_67d309d5d7dc88335a6e",
+          "field_label": "功率",
+          "product_label": "HDR-15-15",
+          "scope": "output|rating:rated",
+          "semantic_signature_sha256": "59300f7b772f0a72375be9413df0608af16a79546ee675b72433b084e4c20695",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-20"
+          ],
+          "covered_checkpoints": [
+            "hdr-20"
+          ]
+        },
+        {
+          "group_id": "group_4615b8a5a95398227696",
+          "field_label": "电压",
+          "product_label": "HDR-15-15",
+          "scope": "output|signal:dc",
+          "semantic_signature_sha256": "327620ffe1111a0b91d8f129cb776b5e658e8ce6d57d7004976c178b4b0db17a",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-17"
+          ],
+          "covered_checkpoints": [
+            "hdr-17"
+          ]
+        },
+        {
+          "group_id": "group_bd61ca42d76a261e1b1d",
+          "field_label": "电流",
+          "product_label": "HDR-15-12",
+          "scope": "output|rating:rated",
+          "semantic_signature_sha256": "9b0d14b2d81a2dd0d4f67b00a8c0c168337980dafe20f8335d5f828877aff76c",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-10"
+          ],
+          "covered_checkpoints": [
+            "hdr-10"
+          ]
+        },
+        {
+          "group_id": "group_0564e5a31cf24eddefa9",
+          "field_label": "ac current (typ.)",
+          "product_label": "HDR-15-12",
+          "scope": "input",
+          "semantic_signature_sha256": "00b5317fb9638cd5430452eef3ca8d2aa74feb88b3fa567d0485c574159bc040",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_b7324f8399237ae27464",
+          "field_label": "bis is13252(part1)",
+          "product_label": "HDR-15-12",
+          "scope": "context:safety & emc (note 4)",
+          "semantic_signature_sha256": "fe5c7724d167454f75f450f991c9726a974094d32bb8491f60912ac31f12b3b1",
+          "correct": false,
+          "reason_code": "IEC_60950_1_identifier_mangled_and_fragment_detached_from_safety_heading",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_5ad68857c901680b1185",
+          "field_label": "current range",
+          "product_label": "HDR-15-12",
+          "scope": "output",
+          "semantic_signature_sha256": "0d097f45d04d786a15ff727ba4ad22d3406b7964ecba09079d55af243d6d7feb",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-11"
+          ],
+          "covered_checkpoints": [
+            "hdr-11"
+          ]
+        },
+        {
+          "group_id": "group_d17079c5908dbf581cdb",
+          "field_label": "efficiency (typ.)",
+          "product_label": "HDR-15-12",
+          "scope": "input",
+          "semantic_signature_sha256": "2e9abf32487653099be7b30ff24d805c81a96e44908149d61e6fa952b8363094",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_9e375bb5e04946857047",
+          "field_label": "frequency range",
+          "product_label": "HDR-15-12",
+          "scope": "input",
+          "semantic_signature_sha256": "0be298bee20e94472aba3f39b07223d951c01160e2d53e6a82af2d0f79929fc2",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_81ecf829b3eec8d8af56",
+          "field_label": "hold up time (typ.)",
+          "product_label": "HDR-15-12",
+          "scope": "output",
+          "semantic_signature_sha256": "c764df08c3eddd06da38afcaed45d80893a866ee9d2b467ce3a94b4537a19fe8",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_bd3c8f4e06d28210d1da",
+          "field_label": "i/p-o/p",
+          "product_label": "HDR-15-12",
+          "scope": "context:isolation resistance|context:safety & emc (note 4)",
+          "semantic_signature_sha256": "a292d3a2557cd8e98ca90a38fbfa140e97691b372f5e900a0f10945c1b350f18",
+          "correct": true,
+          "reason_code": "megaohm_prefix_and_test_conditions_retained",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_309862430a6f6ac00849",
+          "field_label": "i/p-o/p",
+          "product_label": "HDR-15-12",
+          "scope": "context:safety & emc (note 4)|context:withstand voltage",
+          "semantic_signature_sha256": "3cc067c08465a5742718f9830c9aec907333c06e50e7e3c41a91adfe9b2db4d6",
+          "correct": true,
+          "reason_code": "withstand_voltage_condition_and_value_match",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_d2684a09d82c5f602417",
+          "field_label": "inrush current (typ.)",
+          "product_label": "HDR-15-12",
+          "scope": "input",
+          "semantic_signature_sha256": "3dccf4eea3a78c14ec8cb2897fe0fd386371f136b957a00b2024404fdd5dda1d",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_fe84f5e976ad784f0c3d",
+          "field_label": "line regulation",
+          "product_label": "HDR-15-12",
+          "scope": "output",
+          "semantic_signature_sha256": "52118b5e26d13bb72b29dbf369762af9d01566c9dc5f0e77463c4a40bc8958a5",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_e61efa747fe42d953f86",
+          "field_label": "load regulation",
+          "product_label": "HDR-15-12",
+          "scope": "output",
+          "semantic_signature_sha256": "b651236d3020a5f30e9d048afc88de5d65d4fa4918d2691da048f6b01130d7df",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_138e9ca93dec2e65b5d7",
+          "field_label": "mounting",
+          "product_label": "HDR-15-12",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "e1ecd6b23c84fc991edf11ff412608805e5d565c66b442b7c72075355e93d08f",
+          "correct": false,
+          "reason_code": "vibration_mounting_condition_split_into_an_unqualified_parameter",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_7818c902ed979600182d",
+          "field_label": "mtbf",
+          "product_label": "HDR-15-12",
+          "scope": "context:others",
+          "semantic_signature_sha256": "faeaafe90faed401a25b7c0242b91e4275eed8c34b19c48fddb8c1186b763dd7",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_32ede8151f47c21591bc",
+          "field_label": "operating altitude",
+          "product_label": "HDR-15-12",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "84150495f56e4d34e335e9402fe0dfa491bbb87a38819218e69a01547ed02358",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_adb39d7b760327963a5c",
+          "field_label": "over voltage category",
+          "product_label": "HDR-15-12",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "a2c6c1c49964f4e74f3d6003f04b7709b0700fdbee1ac3c63fb600ee0729f30f",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_da3d11da767877398000",
+          "field_label": "packing",
+          "product_label": "HDR-15-12",
+          "scope": "context:others",
+          "semantic_signature_sha256": "21cf176eaf46cb582c829b4b97c63f5ae65f84d0d3709f2a0e5d2c1c08fdf0e3",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_567c50a510e6bae6ad21",
+          "field_label": "safety standards",
+          "product_label": "HDR-15-12",
+          "scope": "context:safety & emc (note 4)",
+          "semantic_signature_sha256": "a2f5cfafaf4903a4bc89b11432f2daa0f6a33a6113af1ffae7fd4acf8c43a0ea",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_6fd1e464f2c7d6bdcb4b",
+          "field_label": "temp. coefficient",
+          "product_label": "HDR-15-12",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "de338e2d3ad5ad8bf18cfd475c479ad7a29d99355643602d3b1762c24202cc07",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_d064ecd5c461058c980e",
+          "field_label": "vibration",
+          "product_label": "HDR-15-12",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "1254050b785e775666bca483e0df54a0ad10af7f9e3164e43c700a188c994f48",
+          "correct": false,
+          "reason_code": "mounting_test_condition_not_attached_to_vibration_fact",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_c380ae34e68553dbb1a3",
+          "field_label": "voltage adj. range",
+          "product_label": "HDR-15-12",
+          "scope": "output",
+          "semantic_signature_sha256": "12188bb44997b9e805b10e5cf79be870debbc14d3beb66f042a7e6debe104e35",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-14"
+          ],
+          "covered_checkpoints": [
+            "hdr-14"
+          ]
+        },
+        {
+          "group_id": "group_abe2615b529bf060e4cb",
+          "field_label": "voltage range",
+          "product_label": "HDR-15-12",
+          "scope": "input",
+          "semantic_signature_sha256": "c004acfaf6948d3373cef2bff8fc0e4005019fb3b5c2251135cc9e1aad47a6ef",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_6e570dab6f7c1c9a2bc4",
+          "field_label": "voltage tolerance note.3",
+          "product_label": "HDR-15-12",
+          "scope": "output",
+          "semantic_signature_sha256": "0e71926f10c14206e81af9240248aff69381368e38d348c8b1e7575bd9ffa914",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_a1bd5d8580282c8eccc7",
+          "field_label": "working humidity",
+          "product_label": "HDR-15-12",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "f1e3a4400e9b76af5b49c2e4d68b76a65fd07bd9e5ff57a5383046a285ac49ca",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_a11ddd8e04749057a7ba",
+          "field_label": "working temp.",
+          "product_label": "HDR-15-12",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "c9e425dcb06ebe4c0829d753fe6b9db3b9c5bd7e17aadccfeba02710f45e58fe",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-15"
+          ],
+          "covered_checkpoints": [
+            "hdr-15"
+          ]
+        },
+        {
+          "group_id": "group_394e0a66608582e10b3f",
+          "field_label": "尺寸",
+          "product_label": "HDR-15-12",
+          "scope": "axes:W×H×D|context:others",
+          "semantic_signature_sha256": "ee6eb959378574cda631e532857f55f50656c3eb92d8ee7651fb9fbdfb70e249",
+          "correct": true,
+          "reason_code": "dimension_value_unit_and_W_H_D_order_retained",
+          "related_checkpoints": [
+            "hdr-16"
+          ],
+          "covered_checkpoints": [
+            "hdr-16"
+          ]
+        },
+        {
+          "group_id": "group_62bc2f0c012dbabe57b0",
+          "field_label": "功率",
+          "product_label": "HDR-15-12",
+          "scope": "output|rating:rated",
+          "semantic_signature_sha256": "e82a699ca4dbeaefe8a866f2ddf80c8c7a7f410f3a0b7f96d3b0bb2e2d9c6f48",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-12"
+          ],
+          "covered_checkpoints": [
+            "hdr-12"
+          ]
+        },
+        {
+          "group_id": "group_fabf2d6a64763cd01302",
+          "field_label": "电压",
+          "product_label": "HDR-15-12",
+          "scope": "output|signal:dc",
+          "semantic_signature_sha256": "4e802a5cfd0de4d426c16c73a7e4daf5d414c1e4e0dcea890bc5db762817eb4d",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-09"
+          ],
+          "covered_checkpoints": [
+            "hdr-09"
+          ]
+        },
+        {
+          "group_id": "group_945e821c9bdce78c7e42",
+          "field_label": "电流",
+          "product_label": "HDR-15-5",
+          "scope": "output|rating:rated",
+          "semantic_signature_sha256": "0ae1e69d3aedf587e9c4691b335ad5a78923cfb482bc3a9f2023f7c0cbf021bd",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-02"
+          ],
+          "covered_checkpoints": [
+            "hdr-02"
+          ]
+        },
+        {
+          "group_id": "group_7b5ca3525ab6d8d0a8d1",
+          "field_label": "ac current (typ.)",
+          "product_label": "HDR-15-5",
+          "scope": "input",
+          "semantic_signature_sha256": "5becd174525a5d16b6c241574098340c66be83800c71dd16f59d7e66ec630688",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_11b71e01aa982b88aea4",
+          "field_label": "bis is13252(part1)",
+          "product_label": "HDR-15-5",
+          "scope": "context:safety & emc (note 4)",
+          "semantic_signature_sha256": "6bd0d2ae95ab73c1c82fb58f333c744655b5862c082c81b640fe97ef1b0ed5d4",
+          "correct": false,
+          "reason_code": "IEC_60950_1_identifier_mangled_and_fragment_detached_from_safety_heading",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_2a604c17db9c966a00b8",
+          "field_label": "current range",
+          "product_label": "HDR-15-5",
+          "scope": "output",
+          "semantic_signature_sha256": "991081e80ba599d286da9af68db51382975a822c539440e31378148e4e93f28c",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-03"
+          ],
+          "covered_checkpoints": [
+            "hdr-03"
+          ]
+        },
+        {
+          "group_id": "group_0c8aa520a77cda80ef80",
+          "field_label": "efficiency (typ.)",
+          "product_label": "HDR-15-5",
+          "scope": "input",
+          "semantic_signature_sha256": "505326632c152acd722c4820f1f5652484f24c86412c3742cdefa984c9a01787",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_662b25935d8d8e135d18",
+          "field_label": "frequency range",
+          "product_label": "HDR-15-5",
+          "scope": "input",
+          "semantic_signature_sha256": "a576e70644bf5ecbebc1aa4fef4cfc53312ea36dfb60cd490f9ed5394ab81e42",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_5c038c8dbd545ab1c6c9",
+          "field_label": "hold up time (typ.)",
+          "product_label": "HDR-15-5",
+          "scope": "output",
+          "semantic_signature_sha256": "09646c4d69c97e9f747c7a2cd2253e0c7eab2bb776d38a533ed1386b4dfdbaa3",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_569c2fdaaca8896144c3",
+          "field_label": "i/p-o/p",
+          "product_label": "HDR-15-5",
+          "scope": "context:isolation resistance|context:safety & emc (note 4)",
+          "semantic_signature_sha256": "e43737d3eb208abdc45a2ee12c65c5de8c818387a1721941a5dfed078f34933f",
+          "correct": true,
+          "reason_code": "megaohm_prefix_and_test_conditions_retained",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_1b5d6dd57263b158d17f",
+          "field_label": "i/p-o/p",
+          "product_label": "HDR-15-5",
+          "scope": "context:safety & emc (note 4)|context:withstand voltage",
+          "semantic_signature_sha256": "2677af161028cb20b9ac7b6332d5ff0a1d4b20296932bd2b4a3c3f792f8c65f1",
+          "correct": true,
+          "reason_code": "withstand_voltage_condition_and_value_match",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_2e4a6ccc5d14811785d6",
+          "field_label": "inrush current (typ.)",
+          "product_label": "HDR-15-5",
+          "scope": "input",
+          "semantic_signature_sha256": "f322be54b5bcc4d257f6cfa8c9bb4ab8b74a4ec2b1443c92394ddf3332dacce9",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_fc46e6433e40e04cda66",
+          "field_label": "line regulation",
+          "product_label": "HDR-15-5",
+          "scope": "output",
+          "semantic_signature_sha256": "1176cdf847200a5150a4fdfd4698d4f7817a47c49b53d5aa4f1c196b49d4aac7",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_1d4d51eea1502f63db7e",
+          "field_label": "load regulation",
+          "product_label": "HDR-15-5",
+          "scope": "output",
+          "semantic_signature_sha256": "43438e5a11ac218212a98a01f55d720e5d367faf630c5d91cfde53660ef06c91",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_b1e874967e1aa7d6feaf",
+          "field_label": "mounting",
+          "product_label": "HDR-15-5",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "386c07af2ffaef78f313e956d5bb12b439ba415c468d5a7d51dd2d1f29416136",
+          "correct": false,
+          "reason_code": "vibration_mounting_condition_split_into_an_unqualified_parameter",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_5dcfeb86dd3b30c9b0e3",
+          "field_label": "mtbf",
+          "product_label": "HDR-15-5",
+          "scope": "context:others",
+          "semantic_signature_sha256": "1d9096797c071a8d10362eaebab753326c4ab5852a9f77888de48c1437be762d",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_21de358259c953e75c14",
+          "field_label": "operating altitude",
+          "product_label": "HDR-15-5",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "3234d281c38239418aaef3afc5755b1cd8362b67ae3f403a3dce29a7eb54facb",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_e6591ea7d7ad5c26857d",
+          "field_label": "over voltage category",
+          "product_label": "HDR-15-5",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "c9003f8853bd477ebcfe38671a730722858e6961f63790b9952c4717ea33b814",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_0c5882b1395752ef5982",
+          "field_label": "packing",
+          "product_label": "HDR-15-5",
+          "scope": "context:others",
+          "semantic_signature_sha256": "c9d376f5ee07d6fecdd32743979113d9700c506fd8e4f76a1fc4e1d74b07d0f1",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_14abda7133bd6289e055",
+          "field_label": "safety standards",
+          "product_label": "HDR-15-5",
+          "scope": "context:safety & emc (note 4)",
+          "semantic_signature_sha256": "c7ba1e50c286d6816d1c60bc72634336c27dab850743fd95006c36fe0089539e",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_f44126961e328a3ab8e6",
+          "field_label": "temp. coefficient",
+          "product_label": "HDR-15-5",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "9fb51592f3abe1b983bb2331ad29333fb2e3035ba31d646dcbec389110f15ee8",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_97fb27742dd6ba42ec66",
+          "field_label": "vibration",
+          "product_label": "HDR-15-5",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "176db60b4ed22462daa03a61247748729365109082926617dfd831733c70cf99",
+          "correct": false,
+          "reason_code": "mounting_test_condition_not_attached_to_vibration_fact",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_c64195b3171be1ad4349",
+          "field_label": "voltage adj. range",
+          "product_label": "HDR-15-5",
+          "scope": "output",
+          "semantic_signature_sha256": "7a1245bcf538a96545a9d0add21186629c057ef368033c0dd6bbef246d4f9ee3",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-06"
+          ],
+          "covered_checkpoints": [
+            "hdr-06"
+          ]
+        },
+        {
+          "group_id": "group_9a8ef417c275abd3ad41",
+          "field_label": "voltage range",
+          "product_label": "HDR-15-5",
+          "scope": "input",
+          "semantic_signature_sha256": "c7f619263bf62079b21489d4ec8cae2e5b16afca85569a1d66ff40ffa50bec5c",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_e04675d3011b7c0d290f",
+          "field_label": "voltage tolerance note.3",
+          "product_label": "HDR-15-5",
+          "scope": "output",
+          "semantic_signature_sha256": "7a04d9a1c01d48080378b3c77e4867da27d347bfab9d8534ead08afcd3966c84",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_64e24dca5a01dab06629",
+          "field_label": "working humidity",
+          "product_label": "HDR-15-5",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "b3d0ccabe51c0b08a97d5c0dd0e702bef2fcea33ccb1e6574ae4b34676df11af",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_82bb3d30d149ed7faf60",
+          "field_label": "working temp.",
+          "product_label": "HDR-15-5",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "df298fe3e639d8b8c78cda51c018d92cbe0f291c1fa08da7e909af62c0c61130",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-07"
+          ],
+          "covered_checkpoints": [
+            "hdr-07"
+          ]
+        },
+        {
+          "group_id": "group_e749c431e9b1aed4cb7b",
+          "field_label": "尺寸",
+          "product_label": "HDR-15-5",
+          "scope": "axes:W×H×D|context:others",
+          "semantic_signature_sha256": "9ec7346d23ff2682bdb96dc99435bf7aeaf91b0e0ab2c367c3d7e9d8f10bc5c0",
+          "correct": true,
+          "reason_code": "dimension_value_unit_and_W_H_D_order_retained",
+          "related_checkpoints": [
+            "hdr-08"
+          ],
+          "covered_checkpoints": [
+            "hdr-08"
+          ]
+        },
+        {
+          "group_id": "group_b455bc35cc4c88376485",
+          "field_label": "功率",
+          "product_label": "HDR-15-5",
+          "scope": "output|rating:rated",
+          "semantic_signature_sha256": "cf01f4f905177d94b964ad991835867fb64d50257544c3b5945004c56215b02a",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-04"
+          ],
+          "covered_checkpoints": [
+            "hdr-04"
+          ]
+        },
+        {
+          "group_id": "group_27e71eeadbb2cdf27bf4",
+          "field_label": "电压",
+          "product_label": "HDR-15-5",
+          "scope": "output|signal:dc",
+          "semantic_signature_sha256": "bbb0c4b9c77c2c7576142c5388864a14a01ffe305703d062ae2435bddeff555e",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-01"
+          ],
+          "covered_checkpoints": [
+            "hdr-01"
+          ]
+        },
+        {
+          "group_id": "group_76359c639a9de57c109b",
+          "field_label": "电流",
+          "product_label": "HDR-15-48",
+          "scope": "output|rating:rated",
+          "semantic_signature_sha256": "2bc7ec447f1fc39ece16f736d31fc579e0118dd281758ffd358ed18ab6b90b3c",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-34"
+          ],
+          "covered_checkpoints": [
+            "hdr-34"
+          ]
+        },
+        {
+          "group_id": "group_fe311ce0162d6993836c",
+          "field_label": "ac current (typ.)",
+          "product_label": "HDR-15-48",
+          "scope": "input",
+          "semantic_signature_sha256": "faca765ffaf3e737965b517bd10b4e11eafdfe01a6f10ac009bb9ac866ba9a7d",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_f5479c9d2fd921084937",
+          "field_label": "bis is13252(part1)",
+          "product_label": "HDR-15-48",
+          "scope": "context:safety & emc (note 4)",
+          "semantic_signature_sha256": "31c512c5c3d3f32036a0a6c24806e01c8d60ab6033f6912b50df4619ef56fa5f",
+          "correct": false,
+          "reason_code": "IEC_60950_1_identifier_mangled_and_fragment_detached_from_safety_heading",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_8f7e14dc51e70d1b1c91",
+          "field_label": "current range",
+          "product_label": "HDR-15-48",
+          "scope": "output",
+          "semantic_signature_sha256": "f339673ca47795ae69e1c6fca29671973052b14d3a5ee6513e0028f2ced18d77",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-35"
+          ],
+          "covered_checkpoints": [
+            "hdr-35"
+          ]
+        },
+        {
+          "group_id": "group_69a6410a90cde0b6fbe0",
+          "field_label": "efficiency (typ.)",
+          "product_label": "HDR-15-48",
+          "scope": "input",
+          "semantic_signature_sha256": "716a6807fc28cd09022bf3384411eb8da078673397fc63d886ebaa0c7cbf0848",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_8fcdecd7ea0c51c86b5d",
+          "field_label": "frequency range",
+          "product_label": "HDR-15-48",
+          "scope": "input",
+          "semantic_signature_sha256": "60f46156121decf305574d6d3b19dc3a73c1688d23eed9585de67d6b91f606bf",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_347d1b4d9add65bcd8d8",
+          "field_label": "hold up time (typ.)",
+          "product_label": "HDR-15-48",
+          "scope": "output",
+          "semantic_signature_sha256": "03eeb23821a778c2aa0c750ae3702ea3acebc428090f736bfa5c18a548c9805c",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_c786420d2915edc5051f",
+          "field_label": "i/p-o/p",
+          "product_label": "HDR-15-48",
+          "scope": "context:isolation resistance|context:safety & emc (note 4)",
+          "semantic_signature_sha256": "c05b82a4593d507b0ad11eeaa21969fd5657ccb430a158ad3b0eef9eb3850788",
+          "correct": true,
+          "reason_code": "megaohm_prefix_and_test_conditions_retained",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_88d605fd7ac9e3e593db",
+          "field_label": "i/p-o/p",
+          "product_label": "HDR-15-48",
+          "scope": "context:safety & emc (note 4)|context:withstand voltage",
+          "semantic_signature_sha256": "15d35fef66ba0f4b859377c87ffa1afce01a868d759df382a7d45ed8e3c15e1a",
+          "correct": true,
+          "reason_code": "withstand_voltage_condition_and_value_match",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_b9f28f02d62e55c4a2d9",
+          "field_label": "inrush current (typ.)",
+          "product_label": "HDR-15-48",
+          "scope": "input",
+          "semantic_signature_sha256": "cabb69d68e2b46ac5eac524e43dda34d91d33e7df4339f083187926c67cb1a37",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_39fb7d9d681a92456dff",
+          "field_label": "line regulation",
+          "product_label": "HDR-15-48",
+          "scope": "output",
+          "semantic_signature_sha256": "b665b489e328ef715dac66e3b1087249a2a59114bf839e49128ad500a399d4fc",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_e4e9f32a5bab1b533f49",
+          "field_label": "load regulation",
+          "product_label": "HDR-15-48",
+          "scope": "output",
+          "semantic_signature_sha256": "11a673ef9b6c65a23190a2cd1075de42ff1434a85065e45967447d89db6bc550",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_c78c6ee9f9cba18e3d72",
+          "field_label": "mounting",
+          "product_label": "HDR-15-48",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "63d44cb09f454f4ce1893f34cbd83b742f3fe575c022f5e7453e3f9683cdd173",
+          "correct": false,
+          "reason_code": "vibration_mounting_condition_split_into_an_unqualified_parameter",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_c51c5a6064ec482dbaad",
+          "field_label": "mtbf",
+          "product_label": "HDR-15-48",
+          "scope": "context:others",
+          "semantic_signature_sha256": "f5f22dd7eed3f2873307bb435be5a22a298412cb89145714c45539d1c6f63f8d",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_e602a9b0988148bd18ac",
+          "field_label": "operating altitude",
+          "product_label": "HDR-15-48",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "5584b31d11c26942d1a2acfac592eb8bb824af066ef77bb10dc0e3f13688f1b4",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_b71028ae683e387265ef",
+          "field_label": "over voltage category",
+          "product_label": "HDR-15-48",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "bd8ddb6a4c770305000d6a58a74d7ef268a451334a7321b473520f0c0733bd01",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_0fefd3ad50bd7a591f51",
+          "field_label": "packing",
+          "product_label": "HDR-15-48",
+          "scope": "context:others",
+          "semantic_signature_sha256": "b6c5aa8bc6ea46d0879bd61c2a00534a2f032b747221bbc9901ee8db2ec5fc82",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_f383257df09cb9eefee4",
+          "field_label": "safety standards",
+          "product_label": "HDR-15-48",
+          "scope": "context:safety & emc (note 4)",
+          "semantic_signature_sha256": "b75245ea6732a32fbe2e2669530f1b8b8232e0f26ba44536f3a91476d651713c",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_2a4d6c9860e2d3a4874e",
+          "field_label": "temp. coefficient",
+          "product_label": "HDR-15-48",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "bff492899c9faa6f4c411a2b7f33e75517a1386b7094ef5a0e2a9793f1891ee7",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_84467b11b3daf1ad7817",
+          "field_label": "vibration",
+          "product_label": "HDR-15-48",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "bd786d53f0397894fa592b2d187055f446c1493807290b4500d455ccedf7e132",
+          "correct": false,
+          "reason_code": "mounting_test_condition_not_attached_to_vibration_fact",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_acb5f88eb3b35cb5aca5",
+          "field_label": "voltage adj. range",
+          "product_label": "HDR-15-48",
+          "scope": "output",
+          "semantic_signature_sha256": "e09446bfb32890d54b47f9c3a98e4f578356d28bf6808920ba16dfb17ea6f5f3",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-38"
+          ],
+          "covered_checkpoints": [
+            "hdr-38"
+          ]
+        },
+        {
+          "group_id": "group_c3ceafac7a69058a72d5",
+          "field_label": "voltage range",
+          "product_label": "HDR-15-48",
+          "scope": "input",
+          "semantic_signature_sha256": "4d5e50632eb80d2f0c6c58500301c323026dadc795ba1d1f40529a6cf9a35c34",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_5ab5ca3c2a747493698d",
+          "field_label": "voltage tolerance note.3",
+          "product_label": "HDR-15-48",
+          "scope": "output",
+          "semantic_signature_sha256": "c16cdb0b1551ed9c336f2bbc35f29fc68c755761a071d1e8eb8da34930cae086",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_cdb6ffb59d76c4dc8260",
+          "field_label": "working humidity",
+          "product_label": "HDR-15-48",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "0da22f3a43489d0a40f40d1c2f8b70b5f2951086cddf3ceaeb379f387489d3f7",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_fd2d24d6a6be450de1c1",
+          "field_label": "working temp.",
+          "product_label": "HDR-15-48",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "4c7dccbfc229f94814ff033f50b35665990d94f08056202d5932e81032940efd",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-39"
+          ],
+          "covered_checkpoints": [
+            "hdr-39"
+          ]
+        },
+        {
+          "group_id": "group_95bb95ea3ae711b47997",
+          "field_label": "尺寸",
+          "product_label": "HDR-15-48",
+          "scope": "axes:W×H×D|context:others",
+          "semantic_signature_sha256": "cc89e5b9124ed92675961ca97e604fc9390d425ff1a6ae2660f75f1a01401fe9",
+          "correct": true,
+          "reason_code": "dimension_value_unit_and_W_H_D_order_retained",
+          "related_checkpoints": [
+            "hdr-40"
+          ],
+          "covered_checkpoints": [
+            "hdr-40"
+          ]
+        },
+        {
+          "group_id": "group_39f38afaa2b27a3afa2a",
+          "field_label": "功率",
+          "product_label": "HDR-15-48",
+          "scope": "output|rating:rated",
+          "semantic_signature_sha256": "3dc4da809d031d274da8d8c87333719b50daa7bf50c53b481ae90627616447f8",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-36"
+          ],
+          "covered_checkpoints": [
+            "hdr-36"
+          ]
+        },
+        {
+          "group_id": "group_a124a3c143bae85a1362",
+          "field_label": "电压",
+          "product_label": "HDR-15-48",
+          "scope": "output|signal:dc",
+          "semantic_signature_sha256": "7dff22c32d4c926d252cb56e2cbe090844bb9c1a70c1b6fbab8381e4790bbb1c",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-33"
+          ],
+          "covered_checkpoints": [
+            "hdr-33"
+          ]
+        },
+        {
+          "group_id": "group_c50856bb088c0c95dea8",
+          "field_label": "电流",
+          "product_label": "HDR-15-24",
+          "scope": "output|rating:rated",
+          "semantic_signature_sha256": "bec86dc831d87c5a4454476af941cf442cb548731881bcae65eee9f23821ea05",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-26"
+          ],
+          "covered_checkpoints": [
+            "hdr-26"
+          ]
+        },
+        {
+          "group_id": "group_bc4ca7e2d4d2287d3bf8",
+          "field_label": "ac current (typ.)",
+          "product_label": "HDR-15-24",
+          "scope": "input",
+          "semantic_signature_sha256": "45a277fae4cdcccb082ecbe811f97975a3ae21ad6e51d4db118fe3ef886a678b",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_94070e3bb5c5a0e33155",
+          "field_label": "bis is13252(part1)",
+          "product_label": "HDR-15-24",
+          "scope": "context:safety & emc (note 4)",
+          "semantic_signature_sha256": "2493dadb7d5ead212dbf5bb2121ce35433c79d4ef560ee4a0d32654b20b9efca",
+          "correct": false,
+          "reason_code": "IEC_60950_1_identifier_mangled_and_fragment_detached_from_safety_heading",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_9a785f39d446c1c4e991",
+          "field_label": "current range",
+          "product_label": "HDR-15-24",
+          "scope": "output",
+          "semantic_signature_sha256": "cd5ceec230d6e783e27f4f66a716dfc9ced10c05a60e0fbc43237fec74524d18",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-27"
+          ],
+          "covered_checkpoints": [
+            "hdr-27"
+          ]
+        },
+        {
+          "group_id": "group_f4ac47de3e55c4dabb27",
+          "field_label": "efficiency (typ.)",
+          "product_label": "HDR-15-24",
+          "scope": "input",
+          "semantic_signature_sha256": "805ff2d8346afb5aab78a22730a1022261e4a7f233cfa8793ce34928c2bdadea",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_de66ac0ec908ac4f3823",
+          "field_label": "frequency range",
+          "product_label": "HDR-15-24",
+          "scope": "input",
+          "semantic_signature_sha256": "fc9a5a60d5ce6a37223a67a2549a8e88a19fdda54f8d2ac4f216d90b6eca14b5",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_798596d943a59ae0ce88",
+          "field_label": "hold up time (typ.)",
+          "product_label": "HDR-15-24",
+          "scope": "output",
+          "semantic_signature_sha256": "5b1a3948901a41fc408f504121229649a34d6df0caa47474a797550687830bb7",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_2ff79de544f06963b0dc",
+          "field_label": "i/p-o/p",
+          "product_label": "HDR-15-24",
+          "scope": "context:isolation resistance|context:safety & emc (note 4)",
+          "semantic_signature_sha256": "1919fc7876646b5a5d3d2ef2efc4c11ce800a232ae1a642c2fc2b9df8aaa4b97",
+          "correct": true,
+          "reason_code": "megaohm_prefix_and_test_conditions_retained",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_1fa4b6ec200e9106f738",
+          "field_label": "i/p-o/p",
+          "product_label": "HDR-15-24",
+          "scope": "context:safety & emc (note 4)|context:withstand voltage",
+          "semantic_signature_sha256": "15f3b1273fcc9ab6c546beefc927a0e52da991179e20b281f9da218491a57152",
+          "correct": true,
+          "reason_code": "withstand_voltage_condition_and_value_match",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_a98d76bc31e3838305fc",
+          "field_label": "inrush current (typ.)",
+          "product_label": "HDR-15-24",
+          "scope": "input",
+          "semantic_signature_sha256": "45c2595009c9d73ff862721c09cdbb312161ec45476391ebfb9c5f1f56e168a7",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_bf8c01a707e0fefec72e",
+          "field_label": "line regulation",
+          "product_label": "HDR-15-24",
+          "scope": "output",
+          "semantic_signature_sha256": "fb41757d489a0afafc591df20fe2e1f98c78bb6b5fab0bbbd43d2bf4eab60cda",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_df09bbc012b0c8af68f9",
+          "field_label": "load regulation",
+          "product_label": "HDR-15-24",
+          "scope": "output",
+          "semantic_signature_sha256": "2490d506653a5b5a66475ae13c34843b1b669e55c377b37ec9af4ae435cedb26",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_3ed6e292e44ef7305c2c",
+          "field_label": "mounting",
+          "product_label": "HDR-15-24",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "5ac45f3123537cb8e16ee3aa474d4f04a84d6fa7ce5245aa2277fcddc9015185",
+          "correct": false,
+          "reason_code": "vibration_mounting_condition_split_into_an_unqualified_parameter",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_dc35ba3a76f45c014c97",
+          "field_label": "mtbf",
+          "product_label": "HDR-15-24",
+          "scope": "context:others",
+          "semantic_signature_sha256": "bfbb5388ac4b69d9e1a9d020f888bbdcf72f85dd2b5e91e10b1123ed50d5ac69",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_02aefdbf22e39643f456",
+          "field_label": "operating altitude",
+          "product_label": "HDR-15-24",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "3cca1a433d2683d205acdc7fccee367e1d5fe93bc781374226af44f9c739063e",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_894129bdcb0c9f920b81",
+          "field_label": "over voltage category",
+          "product_label": "HDR-15-24",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "fcbd825fef377d3659884bdcfc9aa0ca472593bec5752f4b61c9b338317c9161",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_56ca8ebc4ffc0db5f383",
+          "field_label": "packing",
+          "product_label": "HDR-15-24",
+          "scope": "context:others",
+          "semantic_signature_sha256": "225ec84cdcb91d86534963de617224725ebc7c744673f5db35cffa34b957a643",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_76c0aa081d9988e2f429",
+          "field_label": "safety standards",
+          "product_label": "HDR-15-24",
+          "scope": "context:safety & emc (note 4)",
+          "semantic_signature_sha256": "b9353cc5dfbaad07c6c6997f4c777b77c456dd27b7013c47b08518cc0d5088eb",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_c48ded122e7a6c22f3bb",
+          "field_label": "temp. coefficient",
+          "product_label": "HDR-15-24",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "4b9528dabc1ba5b83a8ec1681b43701aa5b41838ca83a3d6a0d8a8eb2f52f076",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_b2548e6e877d8326f5eb",
+          "field_label": "vibration",
+          "product_label": "HDR-15-24",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "965030ad9314b3abb715cee5f0df65ffcb46718f61a5eac6f310b350e8e09b71",
+          "correct": false,
+          "reason_code": "mounting_test_condition_not_attached_to_vibration_fact",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_6511e8c3dc6cc7a04b9f",
+          "field_label": "voltage adj. range",
+          "product_label": "HDR-15-24",
+          "scope": "output",
+          "semantic_signature_sha256": "3963a29b1dd22739453102fa6af1f9acbadd9b5670d949193c88965466c6015d",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-30"
+          ],
+          "covered_checkpoints": [
+            "hdr-30"
+          ]
+        },
+        {
+          "group_id": "group_0321b12eef26dacdc0c7",
+          "field_label": "voltage range",
+          "product_label": "HDR-15-24",
+          "scope": "input",
+          "semantic_signature_sha256": "4d46f0d8dbf86707ada3b897ff5c46d6c7fab51f1f2b95fbe450e0b1ec4fa2ff",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_2bd10921907e480454d7",
+          "field_label": "voltage tolerance note.3",
+          "product_label": "HDR-15-24",
+          "scope": "output",
+          "semantic_signature_sha256": "76bae741e23a6f90ed13c53607b15f096ad4dcdffd0ecad2f29d80955ce00b75",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_e7ee377a6fe7a5e3d123",
+          "field_label": "working humidity",
+          "product_label": "HDR-15-24",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "07f47c7398bc9502fcbd3329c8a857b13980719f2766b011f9b80f7cd8ab648a",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_ef355c84cbc3bf72dc5c",
+          "field_label": "working temp.",
+          "product_label": "HDR-15-24",
+          "scope": "context:environment",
+          "semantic_signature_sha256": "e33832684cbcdc08a55b048cd3b8a5248c2f73d4f902a74ae94e7099ef6bf721",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-31"
+          ],
+          "covered_checkpoints": [
+            "hdr-31"
+          ]
+        },
+        {
+          "group_id": "group_1028944ab58945ab6bdc",
+          "field_label": "尺寸",
+          "product_label": "HDR-15-24",
+          "scope": "axes:W×H×D|context:others",
+          "semantic_signature_sha256": "5731164f96027df9eb88d28ed493aaa88075df4683df72f598745a93b3bec970",
+          "correct": true,
+          "reason_code": "dimension_value_unit_and_W_H_D_order_retained",
+          "related_checkpoints": [
+            "hdr-32"
+          ],
+          "covered_checkpoints": [
+            "hdr-32"
+          ]
+        },
+        {
+          "group_id": "group_9425255a652118e21a18",
+          "field_label": "功率",
+          "product_label": "HDR-15-24",
+          "scope": "output|rating:rated",
+          "semantic_signature_sha256": "da425a470ff1baa8b4eeb41ef76d902c31cf08e84180e9292ac47d8664321b0a",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-28"
+          ],
+          "covered_checkpoints": [
+            "hdr-28"
+          ]
+        },
+        {
+          "group_id": "group_3ff228916be65adbd292",
+          "field_label": "电压",
+          "product_label": "HDR-15-24",
+          "scope": "output|signal:dc",
+          "semantic_signature_sha256": "dee08885ee8a4ee1e1f00b9f44a816deee3bda4bf1193d747f62efe4ec577993",
+          "correct": true,
+          "reason_code": "model_value_unit_and_explicit_conditions_match_visual_source",
+          "related_checkpoints": [
+            "hdr-25"
+          ],
+          "covered_checkpoints": [
+            "hdr-25"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "kingston",
+      "prediction_sha256": "7e9e8bfae0bed2e691b78b6472ceb55f10bdbc1faa88447c189aa663bdcaddc8",
+      "seconds": 0.998,
+      "counts": {
+        "verified": 15,
+        "pending_confirmation": 2
+      },
+      "errors": 0,
+      "delivery_complete": false,
+      "correct_verified_outputs": 9,
+      "verified_outputs": 15,
+      "covered_checkpoint_count": 9,
+      "checkpoint_count": 24,
+      "covered_checkpoints": [
+        "kingston-01",
+        "kingston-03",
+        "kingston-04",
+        "kingston-05",
+        "kingston-06",
+        "kingston-07",
+        "kingston-09",
+        "kingston-10",
+        "kingston-11"
+      ],
+      "uncovered_checkpoints": [
+        "kingston-02",
+        "kingston-08",
+        "kingston-12",
+        "kingston-13",
+        "kingston-14",
+        "kingston-15",
+        "kingston-16",
+        "kingston-17",
+        "kingston-18",
+        "kingston-19",
+        "kingston-20",
+        "kingston-21",
+        "kingston-22",
+        "kingston-23",
+        "kingston-24"
+      ],
+      "adjudications": [
+        {
+          "group_id": "group_924e8b79cd62f584df66",
+          "field_label": "capacities2",
+          "product_label": "product_f5cd95ccebc655e31f99655b",
+          "scope": null,
+          "semantic_signature_sha256": "36461eb85a7d1b19ad834cc7031310d2fbfdaa116b533e7dae683832391c35d5",
+          "correct": true,
+          "reason_code": "GB_case_and_all_three_variants_retained",
+          "related_checkpoints": [
+            "kingston-03"
+          ],
+          "covered_checkpoints": [
+            "kingston-03"
+          ]
+        },
+        {
+          "group_id": "group_1fc621a39248251b5b0b",
+          "field_label": "form factor",
+          "product_label": "product_f5cd95ccebc655e31f99655b",
+          "scope": null,
+          "semantic_signature_sha256": "d398ee18b0329f6ee31b9860b510a76d9288932912c20e91c2d09403e0a2621b",
+          "correct": true,
+          "reason_code": "form_factor_and_unit_match",
+          "related_checkpoints": [
+            "kingston-01"
+          ],
+          "covered_checkpoints": [
+            "kingston-01"
+          ]
+        },
+        {
+          "group_id": "group_86547ab67918517fb5ec",
+          "field_label": "life expectancy",
+          "product_label": "product_f5cd95ccebc655e31f99655b",
+          "scope": null,
+          "semantic_signature_sha256": "1a417422e81dc3c6be692c27047f87626b82af258849ccc66805f45be6e620d5",
+          "correct": true,
+          "reason_code": "MTBF_and_hours_match",
+          "related_checkpoints": [
+            "kingston-11"
+          ],
+          "covered_checkpoints": [
+            "kingston-11"
+          ]
+        },
+        {
+          "group_id": "group_302b24ab8c8a8633d2b3",
+          "field_label": "nand",
+          "product_label": "product_f5cd95ccebc655e31f99655b",
+          "scope": null,
+          "semantic_signature_sha256": "384b4c7753c56fc5ea97bfada096fcd0c88e966a325e78231b6fb626ff356fc6",
+          "correct": true,
+          "reason_code": "value_match",
+          "related_checkpoints": [
+            "kingston-04"
+          ],
+          "covered_checkpoints": [
+            "kingston-04"
+          ]
+        },
+        {
+          "group_id": "group_5498c579d4edac167b81",
+          "field_label": "power consumption",
+          "product_label": "product_f5cd95ccebc655e31f99655b",
+          "scope": null,
+          "semantic_signature_sha256": "d30d99810744a3462bb8e1ab091d872e6f615cfe4e7c61af72526becc9012295",
+          "correct": true,
+          "reason_code": "all_four_modes_and_values_preserved",
+          "related_checkpoints": [
+            "kingston-05"
+          ],
+          "covered_checkpoints": [
+            "kingston-05"
+          ]
+        },
+        {
+          "group_id": "group_1578460d3b48c1344505",
+          "field_label": "product image",
+          "product_label": "product_f5cd95ccebc655e31f99655b",
+          "scope": null,
+          "semantic_signature_sha256": "efdd6d0cc0499f2fe9df0ea6557b3c99682febd9e5bdb58821b9e2b522847e3b",
+          "correct": false,
+          "reason_code": "non_parameter_image_heading_copied_as_value",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_ab2e26a9b806b9cc541a",
+          "field_label": "sa400s37/240g",
+          "product_label": "product_f5cd95ccebc655e31f99655b",
+          "scope": null,
+          "semantic_signature_sha256": "565a801cca75cb131643cf21811ba32185dccbb96883d74857e53a3ef5779c05",
+          "correct": false,
+          "reason_code": "SKU_copied_as_its_own_parameter_not_bound_as_identity",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_90660d3d4541250feea7",
+          "field_label": "sa400s37/480g",
+          "product_label": "product_f5cd95ccebc655e31f99655b",
+          "scope": null,
+          "semantic_signature_sha256": "1c851890e74540389f33dac4a69520cbe78900c4f00d13189acf91f08e48ea6d",
+          "correct": false,
+          "reason_code": "SKU_copied_as_its_own_parameter_not_bound_as_identity",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_493133c1f62c6c88bf4e",
+          "field_label": "sa400s37/960g",
+          "product_label": "product_f5cd95ccebc655e31f99655b",
+          "scope": null,
+          "semantic_signature_sha256": "4cba664473188d48f2c2dfb6869168781702e581cbb48ea56530a06a83128044",
+          "correct": false,
+          "reason_code": "SKU_copied_as_its_own_parameter_not_bound_as_identity",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_9d4ad4f0754f652ab6a6",
+          "field_label": "total bytes written (tbw)4",
+          "product_label": "product_f5cd95ccebc655e31f99655b",
+          "scope": null,
+          "semantic_signature_sha256": "a0ae5d2033553a68c57d3a3964ed0265ae0b171024ee0f1ebd52e211a65a1024",
+          "correct": false,
+          "reason_code": "variant_values_recovered_but_JESD219A_footnote_not_attached",
+          "related_checkpoints": [
+            "kingston-16",
+            "kingston-20",
+            "kingston-24"
+          ],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_ced41e8f98ddcb9419b4",
+          "field_label": "vibration non-operating",
+          "product_label": "product_f5cd95ccebc655e31f99655b",
+          "scope": null,
+          "semantic_signature_sha256": "527cf89aac836971ab3b28d5e05ef60a8f7990aa11636bb3a1bce573e3e06eef",
+          "correct": true,
+          "reason_code": "peak_acceleration_and_frequency_condition_match",
+          "related_checkpoints": [
+            "kingston-10"
+          ],
+          "covered_checkpoints": [
+            "kingston-10"
+          ]
+        },
+        {
+          "group_id": "group_2e77eebe70cc7f379cbd",
+          "field_label": "vibration operating",
+          "product_label": "product_f5cd95ccebc655e31f99655b",
+          "scope": null,
+          "semantic_signature_sha256": "a7685058780949f634401a01126a40571957562e956602a5fcf5785f88289a56",
+          "correct": true,
+          "reason_code": "peak_acceleration_and_frequency_condition_match",
+          "related_checkpoints": [
+            "kingston-09"
+          ],
+          "covered_checkpoints": [
+            "kingston-09"
+          ]
+        },
+        {
+          "group_id": "group_51e48d3837f3681bf0a5",
+          "field_label": "warranty/support3",
+          "product_label": "product_f5cd95ccebc655e31f99655b",
+          "scope": null,
+          "semantic_signature_sha256": "ffc783ea8790dcba609663f00b386d5b718143c955beaa298e38d7a42b05f276",
+          "correct": false,
+          "reason_code": "material_life_remaining_condition_not_in_adopted_fact",
+          "related_checkpoints": [
+            "kingston-12"
+          ],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_962213092936230403f7",
+          "field_label": "温度",
+          "product_label": "product_f5cd95ccebc655e31f99655b",
+          "scope": "operating",
+          "semantic_signature_sha256": "1210accedabe1a986b70950b82cdfa1426763796f523e73826deccfa93bc1efe",
+          "correct": true,
+          "reason_code": "temperature_range_and_scope_match",
+          "related_checkpoints": [
+            "kingston-07"
+          ],
+          "covered_checkpoints": [
+            "kingston-07"
+          ]
+        },
+        {
+          "group_id": "group_0f8fc3be902c89128c62",
+          "field_label": "温度",
+          "product_label": "product_f5cd95ccebc655e31f99655b",
+          "scope": "storage",
+          "semantic_signature_sha256": "6593f360e5713c46133defc0dd19b0747144b9190c4e64330c64c895a0558646",
+          "correct": true,
+          "reason_code": "temperature_range_and_scope_match",
+          "related_checkpoints": [
+            "kingston-06"
+          ],
+          "covered_checkpoints": [
+            "kingston-06"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "pico",
+      "prediction_sha256": "ac6c91b2ab70ae1d7254dba6cb0ad5fc8d714e533fd40fe52e442e036e1a9164",
+      "seconds": 1.288,
+      "counts": {
+        "verified": 14
+      },
+      "errors": 0,
+      "delivery_complete": false,
+      "correct_verified_outputs": 11,
+      "verified_outputs": 14,
+      "covered_checkpoint_count": 15,
+      "checkpoint_count": 15,
+      "covered_checkpoints": [
+        "pico-01",
+        "pico-02",
+        "pico-03",
+        "pico-04",
+        "pico-05",
+        "pico-06",
+        "pico-07",
+        "pico-08",
+        "pico-09",
+        "pico-10",
+        "pico-11",
+        "pico-12",
+        "pico-13",
+        "pico-14",
+        "pico-15"
+      ],
+      "uncovered_checkpoints": [],
+      "adjudications": [
+        {
+          "group_id": "group_f4fb2ee8e20fa34d416c",
+          "field_label": "compliance",
+          "product_label": "product_4c324365bcc5e18f23df781f",
+          "scope": null,
+          "semantic_signature_sha256": "e984912e6c3a64286fe6c7c5e7fdedb7bd782403450d94e3c3d397205c5ad197",
+          "correct": false,
+          "reason_code": "incomplete_instruction_fragment_not_a_product_parameter",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_422d3d8022ea38df24a8",
+          "field_label": "connectivity",
+          "product_label": "product_4c324365bcc5e18f23df781f",
+          "scope": null,
+          "semantic_signature_sha256": "b1fa5789b3fd0544e1a923d2a7a0ad9604082384d574052abb351a17e068fefa",
+          "correct": true,
+          "reason_code": "complete_value_unit_and_applicability_retained",
+          "related_checkpoints": [
+            "pico-04"
+          ],
+          "covered_checkpoints": [
+            "pico-04"
+          ]
+        },
+        {
+          "group_id": "group_d5cf766374562596bc2f",
+          "field_label": "cpu",
+          "product_label": "product_4c324365bcc5e18f23df781f",
+          "scope": null,
+          "semantic_signature_sha256": "c02365ab6e659f826c94ffc80d74974f99610df319ce7753cb3caf8d79232174",
+          "correct": true,
+          "reason_code": "complete_value_unit_and_applicability_retained",
+          "related_checkpoints": [
+            "pico-02"
+          ],
+          "covered_checkpoints": [
+            "pico-02"
+          ]
+        },
+        {
+          "group_id": "group_0502f103fb8a73b95674",
+          "field_label": "form factor",
+          "product_label": "product_4c324365bcc5e18f23df781f",
+          "scope": null,
+          "semantic_signature_sha256": "8ba3d659b51ebb8ae5346d780ec1bfcf905c8b71476a75917a05b4bfd6c6629d",
+          "correct": true,
+          "reason_code": "board_dimensions_match",
+          "related_checkpoints": [
+            "pico-01"
+          ],
+          "covered_checkpoints": [
+            "pico-01"
+          ]
+        },
+        {
+          "group_id": "group_cf220b4340f8ec1500ae",
+          "field_label": "interfacing",
+          "product_label": "product_4c324365bcc5e18f23df781f",
+          "scope": null,
+          "semantic_signature_sha256": "fca7fab01110fbf947075e04592147a8f5e5f9b102512e30bc46adacabf485ba",
+          "correct": true,
+          "reason_code": "GPIO_count_and_ADC_subset_match",
+          "related_checkpoints": [
+            "pico-05"
+          ],
+          "covered_checkpoints": [
+            "pico-05"
+          ]
+        },
+        {
+          "group_id": "group_cd657ef52b2439a490fe",
+          "field_label": "list price",
+          "product_label": "product_4c324365bcc5e18f23df781f",
+          "scope": null,
+          "semantic_signature_sha256": "23cdded099fae1a09477a6dfed0ec7c8c011130d69849e898a2e2cedd5a3a941",
+          "correct": true,
+          "reason_code": "Pico_2_price_explicitly_qualified_snapshot_not_live_price",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_15eb96c63883ed1240ec",
+          "field_label": "memory",
+          "product_label": "product_4c324365bcc5e18f23df781f",
+          "scope": null,
+          "semantic_signature_sha256": "0d02b1f89aaa42372d9812066ea0f6b6fde744f58c3a7af623ad476f4a1e9a94",
+          "correct": true,
+          "reason_code": "complete_value_unit_and_applicability_retained",
+          "related_checkpoints": [
+            "pico-03"
+          ],
+          "covered_checkpoints": [
+            "pico-03"
+          ]
+        },
+        {
+          "group_id": "group_76ba8397415160dcc931",
+          "field_label": "mtbf1 ground benign",
+          "product_label": "product_4c324365bcc5e18f23df781f",
+          "scope": null,
+          "semantic_signature_sha256": "05a003d97c8c43a41546e0e46fc8e9e37a48153e648fc19f8261d22173deb860",
+          "correct": true,
+          "reason_code": "MTBF_hours_and_condition_match",
+          "related_checkpoints": [
+            "pico-14"
+          ],
+          "covered_checkpoints": [
+            "pico-14"
+          ]
+        },
+        {
+          "group_id": "group_b005c4022c4fd5dccf1e",
+          "field_label": "peripherals",
+          "product_label": "product_4c324365bcc5e18f23df781f",
+          "scope": null,
+          "semantic_signature_sha256": "209f53634988987b279d3317ef5d98231bc5c3178a3251d8ccd58b3a1ef61d2e",
+          "correct": true,
+          "reason_code": "all_six_explicit_peripheral_checkpoints_in_one_complete_value",
+          "related_checkpoints": [
+            "pico-06",
+            "pico-07",
+            "pico-08",
+            "pico-09",
+            "pico-10",
+            "pico-11"
+          ],
+          "covered_checkpoints": [
+            "pico-06",
+            "pico-07",
+            "pico-08",
+            "pico-09",
+            "pico-10",
+            "pico-11"
+          ]
+        },
+        {
+          "group_id": "group_233b985a774af4b38a4f",
+          "field_label": "production lifetime",
+          "product_label": "product_4c324365bcc5e18f23df781f",
+          "scope": null,
+          "semantic_signature_sha256": "86c1d00370231ed59a5140915c60c4230ad933c5e7242e76422a25a2e2ecf590",
+          "correct": true,
+          "reason_code": "complete_value_unit_and_applicability_retained",
+          "related_checkpoints": [
+            "pico-15"
+          ],
+          "covered_checkpoints": [
+            "pico-15"
+          ]
+        },
+        {
+          "group_id": "group_a2b49cd26b00eb66682f",
+          "field_label": "rp2350",
+          "product_label": "product_4c324365bcc5e18f23df781f",
+          "scope": null,
+          "semantic_signature_sha256": "b0b51a09baa97be14cba7c927428e5ecea3d94540cfdadd2c19f20705e6e3fc4",
+          "correct": false,
+          "reason_code": "marketing_prose_fragment_not_a_parameter",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_10e8fdb5c0653c7910c9",
+          "field_label": "without restriction",
+          "product_label": "product_4c324365bcc5e18f23df781f",
+          "scope": null,
+          "semantic_signature_sha256": "682961f8365d15623e2c35de92fdc4abf6b0ffd395a5716d69afc28376434ceb",
+          "correct": false,
+          "reason_code": "prose_fragment_not_a_parameter",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_9ddb6bc6ad798fd6827f",
+          "field_label": "温度",
+          "product_label": "product_4c324365bcc5e18f23df781f",
+          "scope": "operating",
+          "semantic_signature_sha256": "5d857f2b1328a4e6c6970187fb39cfe54da39b896a04664aa277e1e1cdb62332",
+          "correct": true,
+          "reason_code": "operating_temperature_range_match",
+          "related_checkpoints": [
+            "pico-13"
+          ],
+          "covered_checkpoints": [
+            "pico-13"
+          ]
+        },
+        {
+          "group_id": "group_86d9cba9d70659f46d7c",
+          "field_label": "电压",
+          "product_label": "product_4c324365bcc5e18f23df781f",
+          "scope": "input|signal:dc",
+          "semantic_signature_sha256": "05c90a82d5f83bab53f55760a4d4a602690f5f0611db1daef6f44e258f01e90a",
+          "correct": true,
+          "reason_code": "complete_value_unit_and_applicability_retained",
+          "related_checkpoints": [
+            "pico-12"
+          ],
+          "covered_checkpoints": [
+            "pico-12"
+          ]
+        }
+      ]
+    },
+    {
+      "case": "ublox",
+      "prediction_sha256": "57469cfc04264fe1e52b2a2a744e968c67edb97fbf50ae713cc30cfc51aea503",
+      "seconds": 1.089,
+      "counts": {
+        "verified": 4
+      },
+      "errors": 0,
+      "delivery_complete": false,
+      "correct_verified_outputs": 0,
+      "verified_outputs": 4,
+      "covered_checkpoint_count": 0,
+      "checkpoint_count": 26,
+      "covered_checkpoints": [],
+      "uncovered_checkpoints": [
+        "ublox-01",
+        "ublox-02",
+        "ublox-03",
+        "ublox-04",
+        "ublox-05",
+        "ublox-06",
+        "ublox-07",
+        "ublox-08",
+        "ublox-09",
+        "ublox-10",
+        "ublox-11",
+        "ublox-12",
+        "ublox-13",
+        "ublox-14",
+        "ublox-15",
+        "ublox-16",
+        "ublox-17",
+        "ublox-18",
+        "ublox-19",
+        "ublox-20",
+        "ublox-21",
+        "ublox-22",
+        "ublox-23",
+        "ublox-24",
+        "ublox-25",
+        "ublox-26"
+      ],
+      "adjudications": [
+        {
+          "group_id": "group_4caa382091041cf1073f",
+          "field_label": "configurable",
+          "product_label": "product_cfc5c77feefe8ea6b24de352",
+          "scope": null,
+          "semantic_signature_sha256": "b6f239321a1482fba6e2febff2257913387e7530b84f91cc59981b26043449df",
+          "correct": false,
+          "reason_code": "MHz_case_fixed_but_Timepulse_parameter_label_still_missing",
+          "related_checkpoints": [
+            "ublox-25"
+          ],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_9c0b4f99324d20f04e13",
+          "field_label": "different user profiles",
+          "product_label": "product_cfc5c77feefe8ea6b24de352",
+          "scope": null,
+          "semantic_signature_sha256": "f9242767c0d5a15861f8867ecd04dbf5d0d401a24fa0158a2bc15423a989256c",
+          "correct": false,
+          "reason_code": "unrelated_left_column_text_used_as_EXTINT_parameter_label",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_cdaae2dd46c72885a494",
+          "field_label": "m10 gnss technology. t",
+          "product_label": "product_cfc5c77feefe8ea6b24de352",
+          "scope": null,
+          "semantic_signature_sha256": "ca040a6bcc39d149246602165234271e0fdfd7cc823d6e86a233429ac7745c36",
+          "correct": false,
+          "reason_code": "model_nomenclature_legend_mistaken_for_parameter",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        },
+        {
+          "group_id": "group_bf08c65f64c71aaa9eca",
+          "field_label": "sbas l1 c/a",
+          "product_label": "product_cfc5c77feefe8ea6b24de352",
+          "scope": null,
+          "semantic_signature_sha256": "8751d6f2951bbac0c3fbdfe4f61585dc5c3c4eddaf42c4961244c40db912c067",
+          "correct": false,
+          "reason_code": "right_column_heading_appended_to_SBAS_value",
+          "related_checkpoints": [],
+          "covered_checkpoints": []
+        }
+      ]
+    }
+  ],
+  "source_hashes": {
+    "product_evidence_guard/__init__.py": "9fe20aebf6bb675447dc3e28e011fb315f34af72438c7e314b2bd173ee53a6a0",
+    "product_evidence_guard/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "product_evidence_guard/cli.py": "e91dcfa2abe65b59c4b8f446f1f807ed123f6d1836a4e9614ac2d6a582ed85ed",
+    "product_evidence_guard/confirmation.py": "43ceada92a55c718f00bf71fba8525848df411693b85045b7fedfd822874fb76",
+    "product_evidence_guard/content_check.py": "dd34a8add54fd62d7c5fea4ff68f5e17ba21b2511c3cfd92da2bdc02f0d758d2",
+    "product_evidence_guard/conversation.py": "13df73e083f03ca41246d10b6afed8ad644cb2536dffd4b25ada2d670688a413",
+    "product_evidence_guard/document_visuals.py": "3d79f2341fd68a6a05d061f96a5f5f1f09694a25b63dcf1050c60d849d1e6520",
+    "product_evidence_guard/engine.py": "209691c342a38eb0059ff911efd2962b49da44a5cfb4860efbd4de7a4d462b65",
+    "product_evidence_guard/extractor.py": "304e5cfc3d032037a6e0b0b12d3da6d3563772165c2724104c12392bd8562824",
+    "product_evidence_guard/field_registry.py": "197c838663f2f38ef5b9e8b6959a252906d843abdc88f1bb5a0002fab8853589",
+    "product_evidence_guard/graph.py": "8335eaf6bd759833726008593ca84cb3e77f64c0af49a2dc2c5eb2eb3fd722d6",
+    "product_evidence_guard/hybrid_image_reader.py": "623266cbebc3d047c76ee7529bc93e284e605f9497c64328e9e8644b5efd34b9",
+    "product_evidence_guard/identity.py": "6709db3d20d0dc6f89084f97fdb50147a5c26d7e393c0e5e3d069e66cc62964e",
+    "product_evidence_guard/input_safety.py": "89cd6746358a62814744044a8713b38990644a47eff0c5cc5dadca518bd3ead0",
+    "product_evidence_guard/model_output_schema.py": "7116e2f03de6a22ede3340ef3634573c1922ae2ba2423377abe49d569d91018f",
+    "product_evidence_guard/models.py": "ed498cbfa85d8530844b9ead1fedf2f418bf790753072e670c8190a278e4dfd1",
+    "product_evidence_guard/normalization.py": "6de549fc9ab51c8176d59eebabf66718572bca858f41eb5f92ef630418df6fd1",
+    "product_evidence_guard/openvino_adapter.py": "fd80e559e5b0ed1c63278816cf6474e85b95b52a89f5e237eb176d83dd7bd305",
+    "product_evidence_guard/parsers.py": "a285b2f4d56f5e4bf1ad5822d35f331a6be43418647ca5cc012d83b3f3d12824",
+    "product_evidence_guard/pdf_layout.py": "38bf1b867a7521a8b5f360ba411f7a3f34fbde56d38e159ca1484e1c664243c9",
+    "product_evidence_guard/preprocessing.py": "16b98f5c62076c7201674fd592facd2db4bede03c20ae452f8ce2b1f3fa26053",
+    "product_evidence_guard/qwen_vl_reader.py": "e5bfe1d0a865510fa2bef7460ba807b9b9337472852227b28507e19631783c70",
+    "product_evidence_guard/readiness.py": "abf123e553dedd052d96426e46333fde777061f4b601f69fad97892261a70247",
+    "product_evidence_guard/recognition_cache.py": "d53b9a05bd722814d6bb13014dac86560a072dc625ef45b0f2ef109935374858",
+    "product_evidence_guard/reports.py": "5236217c6b684a47d853772c2605e5ca83c08e9fdc487ada9740446a238d3573",
+    "product_evidence_guard/review_assets.py": "a2b56fbb7d068669217e960d7b982a6974fcf823fc2a227b5e1b1face8351e7a",
+    "product_evidence_guard/review_focus.py": "1a500e635d8610dc2248e34e10c3223d76d4116424c3461214eb42bd91659d0d",
+    "product_evidence_guard/review_server.py": "dc50df80f1fa71f39509307fcb79c567d89a009017d1e474f15415a06a94a605",
+    "product_evidence_guard/review_workbook.py": "7b10eb4910cfa63ac72cdffb355be923aa0298c92fd6051262c19c83986f549f",
+    "product_evidence_guard/source_context.py": "b5acce93cb84cbda65bfb0c378030dc35dc10ac730b8ee101d8fce256f4f6c64",
+    "product_evidence_guard/source_links.py": "0940b7be6927b38e5f6650f03ecc3809733dd533e11d38d7e3101b9895595124",
+    "product_evidence_guard/state.py": "73fbbba79ec4b0d5e5d1ab2365b44981b6d950290a30fc45fd29de1365505c9d",
+    "product_evidence_guard/structured_rows.py": "ad3bc2cd14536ac601733ea904cc17ff694f8fef348244481eace89ac5af02ea",
+    "product_evidence_guard/task_jobs.py": "1e7c38dfa4464effa32f3839a350f6dd42fbaf249217d52fd6542e85f9348e6c",
+    "product_evidence_guard/workflow.py": "c4e751348c30a19406f5b621bc2d9fca5601a1c83b763f7a8eef9896e55abf0e"
+  },
+  "registry_sha256": "fdc81ba8788e89b716b3a174b7391110d87d7d1a8e005cc0ef4b0863e6738605",
+  "validation": {
+    "unittest": {
+      "total": 680,
+      "passed": 677,
+      "skipped": 3,
+      "failed": 0,
+      "seconds": 297.406,
+      "skip_reason": "Windows symlink privileges unavailable",
+      "log_sha256": "de3a36bba582513a0681f234785ba0523e4be402039eff7825f3c95a1beb975c"
+    },
+    "headless_browser": {
+      "passed": true,
+      "log_sha256": "a3f6744a1143e16646461056a62b52f0919b23d4aca55ff056c4ad0199a5971a"
+    },
+    "previous_originals": {
+      "files": 4,
+      "runtime_errors": 0,
+      "targeted_anchors_passed": 18,
+      "whole_document_accuracy_claim": false
+    },
+    "docs_contract": {
+      "passed": 9,
+      "log_sha256": "0e155b0af945c161386be5068b628b2d8cb8475ff2fa32255fa8dde7b0d8a7ad"
+    }
+  },
+  "historical_fixture_amendments": [
+    {
+      "fixture": "tests/fixtures/accuracy_cases.json",
+      "input_files_unchanged": true,
+      "changed_case_ids": [
+        "12",
+        "13",
+        "15",
+        "16"
+      ],
+      "new_revision": "unit-case-v2-exposed-regression"
+    },
+    {
+      "fixture": "tests/fixtures/generalization_cases.json",
+      "input_files_unchanged": true,
+      "changed_case_ids": [
+        "n02",
+        "n03",
+        "n28",
+        "m07",
+        "m08"
+      ],
+      "new_revision": "unit-case-v2-exposed-regression"
+    },
+    {
+      "fixture": "tests/fixtures/public_source_cases.json",
+      "input_files_unchanged": true,
+      "changed_case_ids": [
+        "p02",
+        "p09"
+      ],
+      "new_revision": "unit-case-v2-exposed-regression"
+    },
+    {
+      "fixture": "tests/fixtures/cross_domain_100.json",
+      "input_files_unchanged": true,
+      "changed_case_ids": [
+        "01-09",
+        "02-02",
+        "02-03",
+        "02-07",
+        "03-01",
+        "03-02",
+        "03-07",
+        "03-08",
+        "04-01",
+        "04-02",
+        "04-04",
+        "04-06",
+        "05-03",
+        "05-06",
+        "06-01",
+        "06-02",
+        "06-03",
+        "06-04",
+        "07-04",
+        "07-09",
+        "08-05",
+        "09-07",
+        "09-08",
+        "10-02",
+        "10-06",
+        "10-09"
+      ],
+      "new_revision": "unit-case-v2-exposed-regression"
+    }
+  ]
+}

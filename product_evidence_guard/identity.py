@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from .models import FactCandidate, ProductEntity
-from .normalization import normalize_text
+from .normalization import normalize_text, normalize_fact_text
 from .field_registry import field_definition
 from .extractor import product_tokens
 
@@ -29,7 +29,7 @@ def stable_id(prefix: str, value: Any, *, length: int = 24) -> str:
 
 def canonical_value(value: Any) -> Any:
     if isinstance(value, str):
-        return normalize_text(value)
+        return normalize_fact_text(value)
     if isinstance(value, list):
         return [canonical_value(item) for item in value]
     if isinstance(value, dict):
@@ -83,7 +83,7 @@ def candidate_identity(candidate: FactCandidate) -> str:
     return stable_id("candidate", {
         "v": IDENTITY_VERSION,
         "evidence": evidence_identity(candidate),
-        "raw": normalize_text(candidate.raw_value),
+        "raw": normalize_fact_text(candidate.raw_value),
         "method": candidate.extraction_method,
     }, length=20)
 

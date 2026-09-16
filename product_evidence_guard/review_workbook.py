@@ -17,7 +17,8 @@ from .models import FactCandidate
 SCOPES = {"input": "输入", "output": "输出", "rated": "额定", "nominal": "标称",
           "min": "最小", "max": "最大", "typical": "典型", "net": "净重", "gross": "毛重",
           "minimum": "最小", "maximum": "最大", "unspecified": "未限定",
-          "operating": "工作/运行", "storage": "储存", "product": "产品", "packaging": "包装"}
+          "operating": "工作/运行", "storage": "储存", "product": "产品", "packaging": "包装",
+          "signal:ac": "交流", "signal:dc": "直流"}
 STATUSES = {"pending": "未作人工决定", "confirmed": "已人工确认", "rejected": "已拒绝", "stale": "确认已失效",
             "source_changed": "来源已变化"}
 CLASSIFICATIONS = {"strong_conflict": "数值冲突", "converted_match": "换算一致", "exact_match": "表达一致",
@@ -27,7 +28,8 @@ CLASSIFICATIONS = {"strong_conflict": "数值冲突", "converted_match": "换算
 
 
 def scope_label(scope):
-    return " / ".join(SCOPES.get(part.removeprefix("rating:"), part.replace("profile:", "模式：").replace("variant:", "变体："))
+    return " / ".join(("尺寸顺序：" + part[5:].translate(str.maketrans({"L": "长", "W": "宽", "H": "高", "D": "深"})))
+                      if part.startswith("axes:") else SCOPES.get(part.removeprefix("rating:"), part.replace("profile:", "模式：").replace("variant:", "变体：").replace("context:", "条件："))
                       for part in (scope or "unspecified").split("|"))
 
 

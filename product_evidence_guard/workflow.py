@@ -99,6 +99,12 @@ def context(output_dir: str | Path, session_id: str | None = None, *, read_only:
         export_confirmed(output, session_id=actual)
         product = _load_json_object(output / "product-facts.json")
     confirmed = _load_json_object(output / "confirmed-product-facts.json")["facts"]
+    from .readiness import needs_value_upgrade
+    if needs_value_upgrade(product):
+        confirmed = []
+        product["run_summary"].setdefault("reading_issues", []).append(reading_issue(
+            file="此前的分析结果", file_hash="value_semantics_upgrade", code="value_upgrade_required", locator={},
+            message="单位读取规则已更新，请重新读取一次；原人工决定保留，只有读取结果变化的项目需要重新核对。"))
     candidates = {c["candidate_id"]: c for c in product["candidates"]}
     for fact in confirmed:
         fact["scope"] = candidates[fact["candidate_id"]].get("scope")
@@ -175,6 +181,9 @@ def _require_product_ownership(facts: list[dict]) -> None:
 
 
 def _verified_facts(product: dict) -> list[dict]:
+    from .readiness import needs_value_upgrade
+    if needs_value_upgrade(product):
+        return []
     by_id = {c["candidate_id"]: c for c in product["candidates"]}
     facts = [{**by_id[g["verified_candidate_ids"][0]],
              "normalized_value": g["selected_value"], "normalized_unit": g["selected_unit"],
@@ -197,6 +206,9 @@ def _require_resolved_facts(facts: list[dict], product: dict) -> None:
 
 
 def _usable_candidate_ids(product: dict) -> set[str]:
+    from .readiness import needs_value_upgrade
+    if needs_value_upgrade(product):
+        return set()
     return {cid for g in product.get("facts", []) if not g.get("excluded") and g["fact_status"] == "verified" for cid in g["verified_candidate_ids"]}
 
 

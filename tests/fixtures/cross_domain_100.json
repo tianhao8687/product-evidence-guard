@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "protocol": "See docs/TEST_PHASE_100.md; assistant-labelled, not population accuracy or independent blind data.",
+  "gold_revision": "unit-case-v2-exposed-regression",
   "created_date": "2026-09-16",
   "sample_unit": "distinct curated package",
   "facts_columns": [
@@ -647,7 +648,7 @@
           "pending_confirmation",
           [
             [
-              "30w/channel",
+              "30W/channel",
               null
             ]
           ]
@@ -895,7 +896,7 @@
           "verified",
           [
             [
-              "16gbps",
+              "16Gbps",
               null
             ]
           ]
@@ -965,11 +966,11 @@
           },
           "frequency",
           "operating",
-          "pending_confirmation",
+          "verified",
           [
             [
-              "2.4ghz",
-              null
+              2400000000,
+              "Hz"
             ]
           ]
         ]
@@ -1238,7 +1239,7 @@
           "verified",
           [
             [
-              "120w",
+              "120W",
               null
             ]
           ]
@@ -1252,7 +1253,7 @@
           "verified",
           [
             [
-              "30w",
+              "30W",
               null
             ]
           ]
@@ -1551,7 +1552,7 @@
           "verified",
           [
             [
-              "530rpm",
+              "530RPM",
               null
             ]
           ]
@@ -1579,7 +1580,7 @@
           "verified",
           [
             [
-              "0.2a",
+              "0.2A",
               null
             ]
           ]
@@ -1638,7 +1639,7 @@
           "verified",
           [
             [
-              "200rpm",
+              "200RPM",
               null
             ]
           ]
@@ -1652,7 +1653,7 @@
           "verified",
           [
             [
-              "5.5a",
+              "5.5A",
               null
             ]
           ]
@@ -2004,7 +2005,7 @@
           "verified",
           [
             [
-              "1.5a",
+              "1.5A",
               null
             ]
           ]
@@ -2077,7 +2078,7 @@
           "verified",
           [
             [
-              "1024ppr",
+              "1024PPR",
               null
             ]
           ]
@@ -2324,7 +2325,7 @@
           "verified",
           [
             [
-              "50ah",
+              "50Ah",
               null
             ]
           ]
@@ -2411,7 +2412,7 @@
           "verified",
           [
             [
-              "100ah",
+              "100Ah",
               null
             ]
           ]
@@ -2425,7 +2426,7 @@
           "verified",
           [
             [
-              "80ah",
+              "80Ah",
               null
             ]
           ]
@@ -2558,7 +2559,7 @@
           "verified",
           [
             [
-              "160wh",
+              "160Wh",
               null
             ]
           ]
@@ -2718,7 +2719,7 @@
           "verified",
           [
             [
-              "0~45°c",
+              "0~45°C",
               null
             ]
           ]
@@ -2732,7 +2733,7 @@
           "verified",
           [
             [
-              "-20~60°c",
+              "-20~60°C",
               null
             ]
           ]
@@ -3259,7 +3260,7 @@
           "verified",
           [
             [
-              "18db(a)",
+              "18dB(a)",
               null
             ]
           ]
@@ -3273,7 +3274,7 @@
           "verified",
           [
             [
-              "28db(a)",
+              "28dB(a)",
               null
             ]
           ]
@@ -3497,7 +3498,7 @@
           "verified",
           [
             [
-              "25 db(a)",
+              "25 dB(a)",
               null
             ]
           ]
@@ -3821,7 +3822,7 @@
           "verified",
           [
             [
-              "400w",
+              "400W",
               null
             ]
           ]
@@ -3835,7 +3836,7 @@
           "verified",
           [
             [
-              "30.8v",
+              "30.8V",
               null
             ]
           ]
@@ -3849,7 +3850,7 @@
           "verified",
           [
             [
-              "12.99a",
+              "12.99A",
               null
             ]
           ]
@@ -3911,7 +3912,7 @@
           "verified",
           [
             [
-              "405w",
+              "405W",
               null
             ]
           ]
@@ -3925,7 +3926,7 @@
           "verified",
           [
             [
-              "304w",
+              "304W",
               null
             ]
           ]
@@ -3984,7 +3985,7 @@
           "verified",
           [
             [
-              "-0.34%/°c",
+              "-0.34%/°C",
               null
             ]
           ]
@@ -4057,7 +4058,7 @@
           "verified",
           [
             [
-              "430w",
+              "430W",
               null
             ]
           ]
@@ -4071,7 +4072,7 @@
           "verified",
           [
             [
-              "325w",
+              "325W",
               null
             ]
           ]
@@ -4758,7 +4759,7 @@
           "verified",
           [
             [
-              "0~100%rh",
+              "0~100%RH",
               null
             ]
           ]
@@ -5115,7 +5116,7 @@
           "verified",
           [
             [
-              "±0.5%fs",
+              "±0.5%FS",
               null
             ]
           ]
@@ -5553,7 +5554,7 @@
           "pending_confirmation",
           [
             [
-              "300°c / 500°c",
+              "300°C / 500°C",
               null
             ]
           ]
@@ -6430,7 +6431,7 @@
           "verified",
           [
             [
-              "90°c",
+              "90°C",
               null
             ]
           ]
@@ -6444,7 +6445,7 @@
           "verified",
           [
             [
-              "150°c",
+              "150°C",
               null
             ]
           ]
@@ -6503,7 +6504,7 @@
           "verified",
           [
             [
-              "4000cp",
+              "4000cP",
               null
             ]
           ]
@@ -6517,7 +6518,7 @@
           "verified",
           [
             [
-              "2000cp",
+              "2000cP",
               null
             ]
           ]
@@ -6802,7 +6803,7 @@
           "verified",
           [
             [
-              "-30~500°c",
+              "-30~500°C",
               null
             ]
           ]
@@ -7119,7 +7120,7 @@
           "verified",
           [
             [
-              "100 mhz",
+              "100 MHz",
               null
             ]
           ]
@@ -7344,7 +7345,7 @@
           "verified",
           [
             [
-              "30~130db",
+              "30~130dB",
               null
             ]
           ]
@@ -7358,7 +7359,7 @@
           "verified",
           [
             [
-              "35~130db",
+              "35~130dB",
               null
             ]
           ]

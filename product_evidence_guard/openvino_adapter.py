@@ -224,8 +224,8 @@ class OpenVinoFactExtractor:
                 or spec is None
                 or not raw_value
                 or len(raw_value) > 256
-                or re.sub(r"\s+", "", raw_value).casefold()
-                not in re.sub(r"\s+", "", block.text).casefold()
+                or re.sub(r"\s+", "", raw_value)
+                not in re.sub(r"\s+", "", block.text)
             ):
                 continue
             confidence_value = row.get("mapping_confidence")

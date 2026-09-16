@@ -25,6 +25,7 @@ from .hybrid_image_reader import (
 )
 from .model_output_schema import ModelOutputIssue
 from .models import FactCandidate, SourceBlock
+from .normalization import VALUE_SEMANTICS_REVISION
 from .source_context import document_context
 from .openvino_adapter import (
     OpenVinoDeviceSelection,
@@ -52,7 +53,7 @@ from .readiness import reading_issue
 
 QWEN_MODEL_ID = "OpenVINO/Qwen3-VL-8B-Instruct-int4-ov"
 ENGINE_SCHEMA_REVISION = (
-    "v7-layout-physical-headers-20260916"
+    "v8-case-sensitive-units-wrapped-values-20260916"
 )
 MAX_FILES_PER_TASK = 100
 MAX_FILE_BYTES = 100 * 1024 * 1024
@@ -2221,6 +2222,7 @@ def analyze_directory(
         for item in visual_results
     )
     run_summary = {
+        "value_semantics_revision": VALUE_SEMANTICS_REVISION,
         "session_id": session_id,
         "input_name": root.name,
         "files_discovered": len(discovered) + len(unsupported_files),

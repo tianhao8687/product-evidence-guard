@@ -1,4 +1,5 @@
 {
+  "gold_revision": "unit-case-v2-exposed-regression",
   "protocol": "Public-source-derived adapted fixtures, 4 manufacturer source families; not original-PDF end-to-end tests and not independent business blind samples. Source facts selected and oracle frozen before execution. SKU pseudonymization and table translations declared per case; injected conflicts explicitly marked.",
   "retrieved_date": "2026-09-16",
   "facts_columns": [
@@ -236,7 +237,7 @@
         [
           "PSU5",
           "dimensions",
-          "product",
+          "product|axes:L×W×H",
           "verified",
           [
             [
@@ -609,7 +610,7 @@
           "verified",
           [
             [
-              "5.5a",
+              "5.5A",
               null
             ]
           ]
@@ -621,7 +622,7 @@
           "verified",
           [
             [
-              "200ma",
+              "200mA",
               null
             ]
           ]
