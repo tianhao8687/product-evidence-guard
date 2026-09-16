@@ -1,0 +1,684 @@
+{
+  "protocol": "Public-source-derived adapted fixtures, 4 manufacturer source families; not original-PDF end-to-end tests and not independent business blind samples. Source facts selected and oracle frozen before execution. SKU pseudonymization and table translations declared per case; injected conflicts explicitly marked.",
+  "retrieved_date": "2026-09-16",
+  "facts_columns": [
+    "product_sku",
+    "field",
+    "scope",
+    "fact_status",
+    "distinct_value_unit_pairs"
+  ],
+  "cases": [
+    {
+      "id": "p01",
+      "family": "meanwell_output_matrix",
+      "source": "https://www.meanwell.com/Upload/PDF/LRS-35/LRS-35-SPEC.PDF",
+      "adaptation": "Page 2 selected four models, pseudonymous SKU; transposed matrix into row-oriented CSV; labels translated. Output current/power remain rated; electrical direction tested separately.",
+      "files": {
+        "master.csv": "SKU,输出电压,额定电流,额定功率\nPSU5,5V,7A,35W\nPSU12,12V,3A,36W\nPSU24,24V,1.5A,36W\nPSU48,48V,0.8A,38.4W\n"
+      },
+      "facts": [
+        [
+          "PSU5",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "psu5",
+              null
+            ]
+          ]
+        ],
+        [
+          "PSU5",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              5,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "PSU5",
+          "current",
+          "rating:rated",
+          "verified",
+          [
+            [
+              7,
+              "A"
+            ]
+          ]
+        ],
+        [
+          "PSU5",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              35,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "PSU12",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "psu12",
+              null
+            ]
+          ]
+        ],
+        [
+          "PSU12",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "PSU12",
+          "current",
+          "rating:rated",
+          "verified",
+          [
+            [
+              3,
+              "A"
+            ]
+          ]
+        ],
+        [
+          "PSU12",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              36,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "PSU24",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "psu24",
+              null
+            ]
+          ]
+        ],
+        [
+          "PSU24",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              24,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "PSU24",
+          "current",
+          "rating:rated",
+          "verified",
+          [
+            [
+              1.5,
+              "A"
+            ]
+          ]
+        ],
+        [
+          "PSU24",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              36,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "PSU48",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "psu48",
+              null
+            ]
+          ]
+        ],
+        [
+          "PSU48",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              48,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "PSU48",
+          "current",
+          "rating:rated",
+          "verified",
+          [
+            [
+              0.8,
+              "A"
+            ]
+          ]
+        ],
+        [
+          "PSU48",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              38.4,
+              "W"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "p02",
+      "family": "meanwell_dimensions",
+      "source": "https://www.meanwell.com/Upload/PDF/LRS-35/LRS-35-SPEC.PDF",
+      "adaptation": "Page 2 dimension expression retained; SKU replaced.",
+      "files": {
+        "spec.txt": "SKU：PSU5\n产品尺寸：99*82*30mm (L*W*H)\n"
+      },
+      "facts": [
+        [
+          "PSU5",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "psu5",
+              null
+            ]
+          ]
+        ],
+        [
+          "PSU5",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                99,
+                82,
+                30
+              ],
+              "mm"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "p03",
+      "family": "tplink_model_matrix",
+      "source": "https://static.tp-link.com/res/down/doc/TL-SG105_V2_Datasheet.pdf",
+      "adaptation": "Page 3 V2 only; transposed to SKU rows, translated labels; selected metric dimension expression, not imperial approximation.",
+      "files": {
+        "master.csv": "SKU,最大功率,产品尺寸\nSW5,3.2W,99.8×98×25mm\nSW8,3.97W,158×101×25mm\n"
+      },
+      "facts": [
+        [
+          "SW5",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "sw5",
+              null
+            ]
+          ]
+        ],
+        [
+          "SW8",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "sw8",
+              null
+            ]
+          ]
+        ],
+        [
+          "SW5",
+          "power",
+          "rating:max",
+          "verified",
+          [
+            [
+              3.2,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "SW8",
+          "power",
+          "rating:max",
+          "verified",
+          [
+            [
+              3.97,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "SW5",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                99.8,
+                98,
+                25
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "SW8",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                158,
+                101,
+                25
+              ],
+              "mm"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "p04",
+      "family": "tplink_dual_temperature",
+      "source": "https://static.tp-link.com/res/down/doc/TL-SG105_V2_Datasheet.pdf",
+      "adaptation": "Page 3 both unit expressions retained exactly; translated labels.",
+      "files": {
+        "spec.txt": "SKU：SW5\n工作温度：0°C~40°C (32°F~104°F)\n储存温度：-40°C~70°C (-40°F~158°F)\n"
+      },
+      "facts": [
+        [
+          "SW5",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "sw5",
+              null
+            ]
+          ]
+        ],
+        [
+          "SW5",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                0,
+                40
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "SW5",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -40,
+                70
+              ],
+              "°C"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "p05",
+      "family": "tplink_dual_dimensions",
+      "source": "https://static.tp-link.com/res/down/doc/TL-SG105_V2_Datasheet.pdf",
+      "adaptation": "Page 3 rounded imperial and metric dimensions are not exact equivalents. Must not silently select one; this is an expected review, not a conflict.",
+      "files": {
+        "spec.txt": "SKU：SW5\n产品尺寸：3.9 x 3.9 x 1.0 in. (99.8 x 98 x 25 mm)\n"
+      },
+      "facts": [
+        [
+          "SW5",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "sw5",
+              null
+            ]
+          ]
+        ],
+        [
+          "SW5",
+          "dimensions",
+          "product",
+          "pending_confirmation",
+          [
+            [
+              "3.9 x 3.9 x 1.0 in. (99.8 x 98 x 25 mm)",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "p06",
+      "family": "sensirion_supply",
+      "source": "https://sensirion.com/products/catalog/SCD41?show_inventory=SCD41-D-R2",
+      "adaptation": "Generic supply, size, operating temperature facts; labels translated, pseudonymous SKU.",
+      "files": {
+        "spec.txt": "SKU：CO241\n输入电压：2.4 - 5.5 V\n产品尺寸：10.1 x 10.1 x 6.5 mm\n工作温度：-10 - 60°C\n"
+      },
+      "facts": [
+        [
+          "CO241",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "co241",
+              null
+            ]
+          ]
+        ],
+        [
+          "CO241",
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              [
+                2.4,
+                5.5
+              ],
+              "V"
+            ]
+          ]
+        ],
+        [
+          "CO241",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                10.1,
+                10.1,
+                6.5
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "CO241",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                -10,
+                60
+              ],
+              "°C"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "p07",
+      "family": "sensirion_open_fields",
+      "source": "https://sensirion.com/products/catalog/SCD41?show_inventory=SCD41-D-R2",
+      "adaptation": "Different CO2 output and specified measurement ranges remain different field labels, not conflicting values.",
+      "files": {
+        "spec.txt": "SKU：CO241\nCO2输出范围：0 - 40000 ppm\nCO2指定测量范围：400 - 5000 ppm\n"
+      },
+      "facts": [
+        [
+          "CO241",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "co241",
+              null
+            ]
+          ]
+        ],
+        [
+          "CO241",
+          "custom:CO2输出范围",
+          null,
+          "verified",
+          [
+            [
+              "0 - 40000ppm",
+              null
+            ]
+          ]
+        ],
+        [
+          "CO241",
+          "custom:CO2指定测量范围",
+          null,
+          "verified",
+          [
+            [
+              "400 - 5000ppm",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "p08",
+      "family": "pololu_rated",
+      "source": "https://www.pololu.com/category/271/12v-37d-metal-gearmotors",
+      "adaptation": "Motor rated voltage; SKU replaced.",
+      "files": {
+        "spec.txt": "SKU：MOTOR12\n额定电压：12V\n"
+      },
+      "facts": [
+        [
+          "MOTOR12",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "motor12",
+              null
+            ]
+          ]
+        ],
+        [
+          "MOTOR12",
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "p09",
+      "family": "pololu_load_context",
+      "source": "https://www.pololu.com/category/271/12v-37d-metal-gearmotors",
+      "adaptation": "Load-qualified fields must preserve their whole label; no general-current scope invented.",
+      "files": {
+        "spec.txt": "SKU：MOTOR12\n堵转电流：5.5A\n空载电流：200mA\n"
+      },
+      "facts": [
+        [
+          "MOTOR12",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "motor12",
+              null
+            ]
+          ]
+        ],
+        [
+          "MOTOR12",
+          "custom:堵转电流",
+          null,
+          "verified",
+          [
+            [
+              "5.5a",
+              null
+            ]
+          ]
+        ],
+        [
+          "MOTOR12",
+          "custom:空载电流",
+          null,
+          "verified",
+          [
+            [
+              "200ma",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "p10",
+      "family": "meanwell_injected_conflict",
+      "source": "https://www.meanwell.com/Upload/PDF/LRS-35/LRS-35-SPEC.PDF",
+      "adaptation": "Base facts from page 2; 38 W is a deliberately injected synthetic conflict, NOT a manufacturer claim.",
+      "files": {
+        "master.csv": "SKU,输出电压,额定功率\nPSU24,24V,36W\n",
+        "batch.txt": "SKU：PSU24\n额定功率：38W\n"
+      },
+      "facts": [
+        [
+          "PSU24",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "psu24",
+              null
+            ]
+          ]
+        ],
+        [
+          "PSU24",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              24,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "PSU24",
+          "power",
+          "rating:rated",
+          "conflict",
+          [
+            [
+              36,
+              "W"
+            ],
+            [
+              38,
+              "W"
+            ]
+          ]
+        ]
+      ]
+    }
+  ]
+}

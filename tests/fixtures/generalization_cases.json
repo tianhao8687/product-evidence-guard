@@ -1,0 +1,1502 @@
+{
+  "protocol": "Synthetic diagnostic scenarios; labels authored before baseline execution, not independent customer blind data. Whole-output gold, including SKU, exact values, units, scopes and states. Never call production normalization to construct gold.",
+  "facts_columns": [
+    "product_sku",
+    "field",
+    "scope",
+    "fact_status",
+    "distinct_value_unit_pairs"
+  ],
+  "cases": [
+    {
+      "id": "n01",
+      "family": "range",
+      "files": {
+        "spec.txt": "SKU：T100\n工作温度：0~40°C\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                0,
+                40
+              ],
+              "°C"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n02",
+      "family": "range",
+      "files": {
+        "spec.txt": "SKU：T100\n工作温度：0~40°C / -20~60°C\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "temperature",
+          "operating",
+          "pending_confirmation",
+          [
+            [
+              "0~40°c / -20~60°c",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n03",
+      "family": "range",
+      "files": {
+        "spec.txt": "SKU：T100\n工作温度：0~40°C或60°C\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "temperature",
+          "operating",
+          "pending_confirmation",
+          [
+            [
+              "0~40°c或60°c",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n04",
+      "family": "range",
+      "files": {
+        "spec.txt": "SKU：T100\n工作温度：40~0°C\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "temperature",
+          "operating",
+          "pending_confirmation",
+          [
+            [
+              [
+                40,
+                0
+              ],
+              "°C"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n05",
+      "family": "dimensions",
+      "files": {
+        "spec.txt": "SKU：T100\n产品尺寸：10×20×30cm\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                100,
+                200,
+                300
+              ],
+              "mm"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n06",
+      "family": "dimensions",
+      "files": {
+        "spec.txt": "SKU：T100\n产品尺寸：10×20cm / 20×30cm\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "dimensions",
+          "product",
+          "pending_confirmation",
+          [
+            [
+              "10×20cm / 20×30cm",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n07",
+      "family": "dimensions",
+      "files": {
+        "spec.txt": "SKU：T100\n产品尺寸：10×20×30×40mm\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "dimensions",
+          "product",
+          "pending_confirmation",
+          [
+            [
+              "10×20×30×40mm",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n08",
+      "family": "dimensions",
+      "files": {
+        "spec.txt": "SKU：T100\n产品尺寸：10×20cm（另一个版本30×40cm）\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "dimensions",
+          "product",
+          "pending_confirmation",
+          [
+            [
+              "10×20cm（另一个版本30×40cm）",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n09",
+      "family": "bound",
+      "files": {
+        "spec.txt": "SKU：T100\n净重：不超过300g\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              "≤300",
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n10",
+      "family": "bound",
+      "files": {
+        "spec.txt": "SKU：T100\n净重：至少300g\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              "≥300",
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n11",
+      "family": "bound",
+      "files": {
+        "spec.txt": "SKU：T100\n净重：300g以下\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              "≤300",
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n12",
+      "family": "bound",
+      "files": {
+        "spec.txt": "SKU：T100\n净重：300g以上\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              "≥300",
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n13",
+      "family": "bound",
+      "files": {
+        "spec.txt": "SKU：T100\n净重：小于300g\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              "<300",
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n14",
+      "family": "bound",
+      "files": {
+        "spec.txt": "SKU：T100\n净重：大于300g\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              ">300",
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n15",
+      "family": "number",
+      "files": {
+        "spec.txt": "SKU：T100\n净重：0.45kg\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              450,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n16",
+      "family": "number",
+      "files": {
+        "spec.txt": "SKU：T100\n净重：1,250g\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              1250,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n17",
+      "family": "number",
+      "files": {
+        "spec.txt": "SKU：T100\n净重：1.250,5g\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "pending_confirmation",
+          [
+            [
+              "1.250,5g",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n18",
+      "family": "number",
+      "files": {
+        "spec.txt": "SKU：T100\n净重：1e3g\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "pending_confirmation",
+          [
+            [
+              "1e3g",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n19",
+      "family": "compound_unit",
+      "files": {
+        "spec.txt": "SKU：T100\n净重：300g/m²\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "pending_confirmation",
+          [
+            [
+              "300g/m²",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n20",
+      "family": "compound_unit",
+      "files": {
+        "spec.txt": "SKU：T100\n净重：300g/kg\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "pending_confirmation",
+          [
+            [
+              "300g/kg",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n21",
+      "family": "tolerance",
+      "files": {
+        "spec.txt": "SKU：T100\n净重：300g±5g\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              "300±5",
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n22",
+      "family": "tolerance",
+      "files": {
+        "spec.txt": "SKU：T100\n净重：300g±5%\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "pending_confirmation",
+          [
+            [
+              "300g±5%",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n23",
+      "family": "tolerance",
+      "files": {
+        "spec.txt": "SKU：T100\n净重：300±5g\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              "300±5",
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n24",
+      "family": "tolerance",
+      "files": {
+        "spec.txt": "SKU：T100\n净重：300g(+/-5g)\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              "300±5",
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n25",
+      "family": "range",
+      "files": {
+        "spec.txt": "SKU：T100\n净重：0.3kg~500g\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              [
+                300,
+                500
+              ],
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n26",
+      "family": "range",
+      "files": {
+        "spec.txt": "SKU：T100\n储存温度：−20～60°C\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -20,
+                60
+              ],
+              "°C"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n27",
+      "family": "open_fields",
+      "files": {
+        "spec.txt": "SKU：T100\n保修期：24个月\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "custom:保修期",
+          null,
+          "verified",
+          [
+            [
+              "2年",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n28",
+      "family": "open_fields",
+      "files": {
+        "spec.txt": "SKU：T100\n噪声：37 dB\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "custom:噪声",
+          null,
+          "verified",
+          [
+            [
+              "37db",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n29",
+      "family": "missing",
+      "files": {
+        "spec.txt": "SKU：T100\n保修期：TBD\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "custom:保修期",
+          null,
+          "pending_confirmation",
+          [
+            [
+              "tbd",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "n30",
+      "family": "count",
+      "files": {
+        "spec.txt": "SKU：T100\n包装数量：2件\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              2,
+              "count"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "m01",
+      "family": "agreement",
+      "files": {
+        "a.txt": "SKU：T100\n净重：450g",
+        "b.txt": "SKU：T100\n净重：0.45kg"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              450,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "m02",
+      "family": "minority_conflict",
+      "files": {
+        "a.txt": "SKU：T100\n净重：450g",
+        "b.txt": "SKU：T100\n净重：450g",
+        "c.txt": "SKU：T100\n净重：470g"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "conflict",
+          [
+            [
+              450,
+              "g"
+            ],
+            [
+              470,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "m03",
+      "family": "independent_scope",
+      "files": {
+        "a.txt": "SKU：T100\n工作温度：0~40°C\n储存温度：-20~60°C"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                0,
+                40
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -20,
+                60
+              ],
+              "°C"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "m04",
+      "family": "product_ownership",
+      "files": {
+        "a.csv": "SKU,净重\nT100,450g\nT200,470g\n",
+        "b.txt": "SKU：T200\n净重：490g"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T200",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t200",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              450,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "T200",
+          "net_weight",
+          "net",
+          "conflict",
+          [
+            [
+              470,
+              "g"
+            ],
+            [
+              490,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "m05",
+      "family": "copy_invariance",
+      "files": {
+        "a.txt": "SKU：T100\n净重：450g",
+        "copy.txt": "SKU：T100\n净重：450g"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              450,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "m06",
+      "family": "version",
+      "files": {
+        "spec_v1.0.txt": "SKU：T100\n净重：450g",
+        "spec_v2.0.txt": "SKU：T100\n净重：470g"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "pending_confirmation",
+          [
+            [
+              450,
+              "g"
+            ],
+            [
+              470,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "m07",
+      "family": "new_secondary_field",
+      "files": {
+        "a.txt": "SKU：T100\n净重：450g",
+        "b.txt": "SKU：T100\n噪声：37dB"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              450,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "custom:噪声",
+          null,
+          "verified",
+          [
+            [
+              "37db",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "m08",
+      "family": "open_alias",
+      "files": {
+        "a.txt": "SKU：T100\n噪声：37dB",
+        "b.txt": "SKU：T100\n噪音：42dB"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "custom:噪声",
+          null,
+          "conflict",
+          [
+            [
+              "37db",
+              null
+            ],
+            [
+              "42db",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "m09",
+      "family": "table_scope",
+      "files": {
+        "a.csv": "SKU,输入电压,输出电压\nT100,12V,5V\nT200,24V,9V\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T200",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t200",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              5,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "T200",
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              24,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "T200",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              9,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "m10",
+      "family": "empty",
+      "files": {
+        "a.txt": "欢迎使用本产品\n请保留使用手册\n产品参数"
+      },
+      "facts": []
+    },
+    {
+      "id": "m11",
+      "family": "template",
+      "files": {
+        "a.txt": "示例：净重300g，仅为模板，不代表真实参数"
+      },
+      "facts": []
+    },
+    {
+      "id": "m12",
+      "family": "table_layout",
+      "files": {
+        "a.csv": "SKU;净重;颜色\nT100;450g;Black\n"
+      },
+      "facts": [
+        [
+          "T100",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "t100",
+              null
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              450,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "T100",
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "黑色",
+              null
+            ]
+          ]
+        ]
+      ]
+    }
+  ]
+}

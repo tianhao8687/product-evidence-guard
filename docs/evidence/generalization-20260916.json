@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-16",
+  "baseline_commit": "f18324a14a6e971603910e7b81be2d2c28c8fd92",
+  "claims_boundary": "Diagnostic developer scenarios and public-source adaptations; neither representative population accuracy nor an independent human-labelled blind test. Native public PDFs inspected to label adapted inputs, not passed through the complete recognizer.",
+  "corpus": [
+    {
+      "name": "synthetic_pressure",
+      "fixture": "tests/fixtures/generalization_cases.json",
+      "sha256": "2f0b175e32ef6611e6c0e7697542d5b1edea54f59426cb7ddcbf5d77cb986885",
+      "scenarios": 42,
+      "business_facts": 47,
+      "baseline": {
+        "passed": 26,
+        "expected_business_facts": 47,
+        "predicted_business_facts": 47,
+        "auto_confirmed": 38,
+        "wrong_auto_confirmed": 15,
+        "missing_fact_keys": 0,
+        "missed_conflicts": 0,
+        "false_conflicts": 0,
+        "review_items": 9,
+        "unnecessary_review_items": 1
+      },
+      "post_fix": {
+        "current": {
+          "passed": 42,
+          "expected_business_facts": 47,
+          "predicted_business_facts": 47,
+          "auto_confirmed": 31,
+          "wrong_auto_confirmed": 0,
+          "missing_fact_keys": 0,
+          "missed_conflicts": 0,
+          "false_conflicts": 0,
+          "review_items": 16,
+          "unnecessary_review_items": 0
+        },
+        "strict_multisource": {
+          "passed": 6,
+          "expected_business_facts": 47,
+          "predicted_business_facts": 47,
+          "auto_confirmed": 1,
+          "wrong_auto_confirmed": 0,
+          "missing_fact_keys": 0,
+          "missed_conflicts": 0,
+          "false_conflicts": 0,
+          "review_items": 46,
+          "unnecessary_review_items": 30
+        },
+        "primary_only_control": {
+          "passed": 37,
+          "expected_business_facts": 47,
+          "predicted_business_facts": 46,
+          "auto_confirmed": 34,
+          "wrong_auto_confirmed": 4,
+          "missing_fact_keys": 1,
+          "missed_conflicts": 3,
+          "false_conflicts": 0,
+          "review_items": 12,
+          "unnecessary_review_items": 0
+        }
+      },
+      "baseline_failed_ids": [
+        "n02",
+        "n03",
+        "n04",
+        "n06",
+        "n07",
+        "n08",
+        "n09",
+        "n10",
+        "n11",
+        "n12",
+        "n13",
+        "n14",
+        "n19",
+        "n20",
+        "n23",
+        "n24"
+      ]
+    },
+    {
+      "name": "public_source_derived",
+      "fixture": "tests/fixtures/public_source_cases.json",
+      "sha256": "51b246fd5cfcae9ce5e5fee141d26ca146b2a10f4777d30bea6c00ff96cd6c20",
+      "scenarios": 10,
+      "source_families": 4,
+      "business_facts": 30,
+      "baseline": {
+        "passed": 9,
+        "expected_business_facts": 30,
+        "predicted_business_facts": 30,
+        "auto_confirmed": 29,
+        "wrong_auto_confirmed": 1,
+        "missing_fact_keys": 0,
+        "missed_conflicts": 0,
+        "false_conflicts": 0,
+        "review_items": 1,
+        "unnecessary_review_items": 0
+      },
+      "post_fix": {
+        "current": {
+          "passed": 10,
+          "expected_business_facts": 30,
+          "predicted_business_facts": 30,
+          "auto_confirmed": 28,
+          "wrong_auto_confirmed": 0,
+          "missing_fact_keys": 0,
+          "missed_conflicts": 0,
+          "false_conflicts": 0,
+          "review_items": 2,
+          "unnecessary_review_items": 0
+        },
+        "strict_multisource": {
+          "passed": 0,
+          "expected_business_facts": 30,
+          "predicted_business_facts": 30,
+          "auto_confirmed": 0,
+          "wrong_auto_confirmed": 0,
+          "missing_fact_keys": 0,
+          "missed_conflicts": 0,
+          "false_conflicts": 0,
+          "review_items": 30,
+          "unnecessary_review_items": 28
+        },
+        "primary_only_control": {
+          "passed": 9,
+          "expected_business_facts": 30,
+          "predicted_business_facts": 30,
+          "auto_confirmed": 29,
+          "wrong_auto_confirmed": 1,
+          "missing_fact_keys": 0,
+          "missed_conflicts": 1,
+          "false_conflicts": 0,
+          "review_items": 1,
+          "unnecessary_review_items": 0
+        }
+      },
+      "baseline_failed_ids": [
+        "p05"
+      ]
+    }
+  ],
+  "annotation_audit": {
+    "fixture_changed": false,
+    "scorer_correction": "Custom field label CO2/co2 case is cosmetic; rescored saved baseline predictions with unchanged gold, without engine rerun. Values, units, SKU and scope remain checked.",
+    "second_annotator": false
+  },
+  "public_pdf_provenance": [
+    {
+      "url": "https://www.meanwell.com/Upload/PDF/LRS-35/LRS-35-SPEC.PDF",
+      "sha256": "43ceb7255f0613bf50b1b749aa30c993e143ec72338d611f960c9e74269af3b7",
+      "inspected_page": 2
+    },
+    {
+      "url": "https://static.tp-link.com/res/down/doc/TL-SG105_V2_Datasheet.pdf",
+      "sha256": "49acbeb1d4032f92df8dd3ad67d659be9870461881d754da495b6e43cd170d98",
+      "inspected_page": 3
+    }
+  ],
+  "known_package_regression": {
+    "files": 9,
+    "source_unchanged": true,
+    "candidates_unchanged": true,
+    "facts_unchanged": true,
+    "candidate_count": 130,
+    "fact_status_counts": {
+      "verified": 57,
+      "pending_confirmation": 4,
+      "conflict": 1
+    },
+    "errors": [],
+    "elapsed_seconds": 86.94638620001206,
+    "actual_local_model": true,
+    "device": "CPU",
+    "logical_cores": 4,
+    "priority": "below_normal"
+  },
+  "browser": {
+    "result": "passed",
+    "coverage": [
+      "adopt",
+      "edit",
+      "undo",
+      "skip",
+      "authorize",
+      "content_check",
+      "four_widths",
+      "6000_fact_paging",
+      "loading_navigation",
+      "failed_update_notice"
+    ]
+  },
+  "engineering_tests": {
+    "status": "passed",
+    "discovered": 505,
+    "passed": 502,
+    "skipped": 3,
+    "skip_reason": "Windows symbolic-link privilege unavailable",
+    "seconds": 209.274,
+    "follow_up_measurement_checks": 8,
+    "follow_up_evaluation_checks": 59
+  }
+}

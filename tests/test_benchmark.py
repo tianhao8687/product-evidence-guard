@@ -281,7 +281,8 @@ class BenchmarkDatasetTests(unittest.TestCase):
             metrics["nonexistent_content_hallucination_rate"]["value"],
             0.0,
         )
-        self.assertEqual(metrics["conflict_classification"]["accuracy"], 1.0)
+        self.assertIsNone(metrics["conflict_classification"]["accuracy"])
+        self.assertEqual(metrics["conflict_classification"]["identity_coverage"], "partial")
         self.assertEqual(metrics["incremental_analysis"]["status"], "completed")
         self.assertTrue(metrics["hash_stabilization"]["stable"])
         self.assertTrue((output / benchmark.RESULT_NAME).is_file())
@@ -428,7 +429,7 @@ class BenchmarkMetricTests(unittest.TestCase):
                 "sample_id": "expected",
                 "expected_empty": False,
                 "contains_prompt_injection_text": False,
-                "expected_mappings": [{"field": "net_weight", "raw_value": "320g"}],
+                "expected_mappings": [{"field": "net_weight", "raw_value": "320g", "normalized_value": 320, "normalized_unit": "g"}],
                 "expected_transcriptions": [
                     {
                         "raw_text": "净重 320g",

@@ -34,6 +34,7 @@ RUNTIME_SCRIPTS = (
     "scripts/benchmark-document-visuals.py",
     "scripts/benchmark-preprocessing.py",
     "scripts/benchmark.py",
+    "scripts/evaluation_metrics.py",
     "scripts/client.py",
     "scripts/install-env.ps1",
     "scripts/install-qoder-skill.ps1",

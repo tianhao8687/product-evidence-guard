@@ -147,7 +147,7 @@ class ReliabilityTests(unittest.TestCase):
     def test_benchmark_does_not_score_wrong_values_or_units_as_correct(self):
         sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
         import benchmark
-        expected = [{"sample_id": "a", "expected_mappings": [{"field": "net_weight", "raw_value": "100g"}]}]
+        expected = [{"sample_id": "a", "expected_mappings": [{"field": "net_weight", "raw_value": "100g", "normalized_value": 100, "normalized_unit": "g"}]}]
         for value, unit in ((999, "g"), (100, "kg")):
             metrics, _ = benchmark._quality_metrics(expected, {"a": {"fact_candidates": [
                 {"field": "net_weight", "normalized_value": value, "normalized_unit": unit}]}})

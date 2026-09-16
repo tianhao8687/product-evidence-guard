@@ -625,7 +625,10 @@ def _value_is_plausible(
 
     if spec.value_type in {"number", "dimensions", "count", "capacity"}:
         if normalized_unit is None:
-            return False
+            # An explicit compact numeric label with an unreadable unit is
+            # still evidence to review, not a field that should disappear.
+            return (len(compact) <= 128 and bool(re.match(r"^[≤≥<>≈约+\-−\d]", compact))
+                    and any(note.startswith("unparsed_") for note in notes))
         if any(note.startswith("unparsed_") for note in notes):
             return False
         return isinstance(normalized_value, (int, float, list)) or "qualifier_preserved" in notes
@@ -665,6 +668,7 @@ def _extract_labeled_electrical_candidates(block: SourceBlock) -> list[FactCandi
     scope = _electrical_scope(match.group("scope"))
     result: list[FactCandidate] = []
     specs = {spec.name: spec for spec in FIELD_SPECS}
+    field_kinds = [name for name, pattern in _ELECTRICAL_TOKEN_PATTERNS.items() if pattern.search(value_text)]
     for field, token_pattern in _ELECTRICAL_TOKEN_PATTERNS.items():
         # Bounds and tolerances belong to the measurement, not decoration.
         tokens = []
@@ -689,6 +693,15 @@ def _extract_labeled_electrical_candidates(block: SourceBlock) -> list[FactCandi
             if normalized.unit is not None
             and not any(note.startswith("unparsed_") for note in normalized.notes)
         ]
+        if len(field_kinds) == 1:
+            # When the label contains only one electrical quantity, normalize
+            # its complete expression. Token search alone loses 'at least',
+            # Chinese bounds, compound units and shared-unit tolerances.
+            alternatives = [part.strip() for part in re.split(r"[/;；,，]", value_text)]
+            complete_alternatives = len(tokens) > 1 and alternatives == tokens
+            if not complete_alternatives:
+                full = normalize_value(field, value_text)
+                valid_rows = [(value_text, full)]
         if not valid_rows:
             continue
 

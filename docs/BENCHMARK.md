@@ -178,7 +178,9 @@ samples/
   "expected_mappings": [
     {
       "field": "net_weight",
-      "raw_value": "320g"
+      "raw_value": "320g",
+      "normalized_value": 320,
+      "normalized_unit": "g"
     }
   ],
   "expected_empty": false,
@@ -189,6 +191,10 @@ samples/
 
 Ground truth 必须独立于模型输出审核。不能为了提高分数而修改标签；排除项及理由
 必须保留。
+
+2026-09-16 评分修订：`normalized_value` 与 `normalized_unit` 必须独立填写（无单位明确写 `null`），不再调用生产换算函数生成答案。旧 manifest 缺少这些字段时，在加载模型前明确报错；请另存并独立补标，不覆盖历史结果。冲突按已标注的商品、字段、口径逐条一对一比较，重复预测计为误报；缺少商品/口径标注时输出 `identity_coverage: partial`，不能据此宣称端到端正确率。未标注完整负样本全集时，`accuracy` 和 `true_negative` 为 `null`，不再拿字段名称数量拼出“准确率”。含注入文字的页面允许正常商品事实，只统计金标准之外的输出。
+
+新增[公开资料改编与压力测试报告](GENERALIZATION_EVALUATION_20260916.md)，与本页历史图片基准分开统计。它覆盖整组事实的归属、值、单位、口径、状态及多余输出，不把测试用例数量当作独立客户数量。
 
 ### 真实样本隐私
 
