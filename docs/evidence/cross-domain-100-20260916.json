@@ -3,6 +3,8 @@
   "base_commit": "ba9a3451578b399e68ce381afe0cfe47667d9a80",
   "claim_boundary": "100 curated structured packages, NOT 100 independent customer packs or original PDFs. Assistant-labelled. Original PDF release gate not met.",
   "fixture_sha256": "63308aa3be867915438d31f523f178f1eeecb3be137d502d5d145199d0b69ba9",
+  "fixture_repository_lf_sha256": "9f0bb886c6704b3c82dcfeb63e7ef4a1d888916bf616038fc3eb9cbe747915ec",
+  "fingerprint_note": "fixture_sha256 identifies the executed Windows CRLF artifact; repository_lf identifies Git's LF-normalized copy with identical parsed JSON. code_sha256 is the local execution-byte fingerprint, not a Git commit hash. Fresh checkouts must start a new run, not reuse this local checkpoint.",
   "code_sha256": "ccd1c37d27b801cf4513d4fe59d68acaa875510b6c01a09d51adbe9a03de54b0",
   "source_mix": {
     "public_adapted": 20,
