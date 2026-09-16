@@ -12,8 +12,8 @@ import json
 import re
 from typing import Any
 
-from .extractor import FIELD_SPECS, infer_semantic_scope
-from .field_registry import REGISTRY
+from .extractor import FIELD_SPECS, infer_semantic_scope, explicit_parameter, parameter_segments
+from .field_registry import REGISTRY, field_definition
 from .models import ClaimCandidate
 from .normalization import normalize_text, normalize_value, values_equal
 
@@ -22,7 +22,7 @@ LABELS = {spec.name: spec.label for spec in FIELD_SPECS}
 DEFAULT_SCOPES = {spec.name: spec.scope for spec in FIELD_SPECS}
 SCOPE_POLICIES = {spec.name: spec.scope_policy for spec in FIELD_SPECS}
 TEXT_FIELDS = {spec.name for spec in FIELD_SPECS if spec.value_type == "text"}
-NUMBER = r"[-+]?\d+(?:\.\d+)?"
+NUMBER = r"[-+]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?"
 UNIT_TOKEN = "|".join(
     re.escape(unit)
     for unit in sorted(
@@ -33,9 +33,13 @@ UNIT_TOKEN = "|".join(
     )
 )
 MEASUREMENT = re.compile(
-    rf"(?<![A-Za-z0-9_.]){NUMBER}(?:\s*(?:[-–—~～至到]|to)\s*{NUMBER})?"
-    rf"(?:\s*[×xX*]\s*{NUMBER}){{0,2}}\s*(?:{UNIT_TOKEN})(?![A-Za-z])",
+    rf"(?<![A-Za-z0-9_.,])(?:<=|>=|[≤≥<>≈~]|约|大约|about\s+)?{NUMBER}(?:\s*(?:[-–—~～至到]|to)\s*{NUMBER})?"
+    rf"(?:\s*[×xX*]\s*{NUMBER}){{0,2}}\s*(?:{UNIT_TOKEN})(?![A-Za-z])"
+    rf"(?:\s*(?:±|\+/-)\s*{NUMBER}\s*(?:{UNIT_TOKEN})?)?",
     re.I,
+)
+UNFAMILIAR_MEASUREMENT = re.compile(
+    rf"(?<![A-Za-z0-9_.,]){NUMBER}\s*(?:[A-Za-z%°][A-Za-z0-9%°/.-]*|[\u3400-\u9fff]{{1,8}})", re.I
 )
 ALIASES = sorted(
     {(alias.casefold(), spec.name) for spec in FIELD_SPECS for alias in spec.aliases},
@@ -111,30 +115,46 @@ def check_draft(text: str, facts: list[dict[str, Any]]) -> dict[str, Any]:
     claims: list[dict[str, Any]] = []
     used: set[str] = set()
     references: dict[str, list[dict[str, Any]]] = {}
+    aliases_by_name = dict(ALIASES)
+    labels = dict(LABELS)
+    text_fields = set(TEXT_FIELDS)
     for fact in facts:
         if isinstance(fact, dict) and isinstance(fact.get("field"), str):
             references.setdefault(fact["field"], []).append(fact)
+            spec = field_definition(fact["field"])
+            if spec and spec.name.startswith("custom_"):
+                aliases_by_name[spec.label] = spec.name
+                labels[spec.name] = spec.label
+                text_fields.add(spec.name)
 
     for line_number, line in enumerate(text.splitlines(), 1):
         offset = 0
-        for clause in re.split(r"[，,；;。！？!?\n]|(?<!\d)\.(?!\d)", line):
+        for clause in (part for segment in parameter_segments(line)
+                       for part in re.split(r"[。！？!?]|(?<!\d)\.(?!\d)", segment)):
             clause_start = line.find(clause, offset)
             offset = max(offset, clause_start + len(clause))
             if not clause.strip():
                 continue
             product_id, product_ambiguous = _product_for_clause(clause, facts)
-            aliases = list(ALIAS_PATTERN.finditer(clause))
+            explicit = explicit_parameter(clause)
+            if explicit and explicit[0].name.startswith("custom_"):
+                spec, _raw = explicit
+                aliases_by_name[spec.label] = spec.name
+                labels[spec.name] = spec.label
+                text_fields.add(spec.name)
+            alias_pattern = re.compile("|".join(f"(?:{_bounded_alias(alias)})" for alias in sorted(aliases_by_name, key=len, reverse=True)), re.I)
+            aliases = list(alias_pattern.finditer(clause))
             consumed: list[tuple[int, int]] = []
             clause_fields: set[str] = set()
             for index, match in enumerate(aliases):
-                field = ALIAS_FIELDS[match.group().casefold()]
+                field = aliases_by_name[match.group().casefold()]
                 clause_fields.add(field)
                 end = aliases[index + 1].start() if index + 1 < len(aliases) else len(clause)
-                tail = clause[match.end():end].strip(" \t:：=|*`是为约")
+                tail = clause[match.end():end].strip(" \t:：=|*`是为")
                 if not tail:
                     continue
-                if field in TEXT_FIELDS:
-                    raw = re.split(r"[|\t。；;]", tail, maxsplit=1)[0].strip(" *`\"'。")
+                if field in text_fields:
+                    raw = re.split(r"[|\t。]", tail, maxsplit=1)[0].strip(" *`\"'。")
                     if field in {"model", "sku"}:
                         identity_match = re.match(r"[A-Za-z0-9][A-Za-z0-9._/+-]*", raw)
                         raw = identity_match.group() if identity_match else raw
@@ -151,9 +171,13 @@ def check_draft(text: str, facts: list[dict[str, Any]]) -> dict[str, Any]:
                     raw = measurement.group()
                     span = measurement.span()
                 normalized = normalize_value(field, raw)
-                if field == "quantity" and not re.fullmatch(r"[-+]?\d+\s*(?:个|件|只|套|pcs?|pieces?|pack)?", raw, re.I):
+                if field == "capacity" and normalized.unit == "mAh" and references.get("capacity_charge"):
+                    field = "capacity_charge"
+                if field == "quantity" and not re.fullmatch(rf"{NUMBER}\s*(?:个|件|只|套|pcs?|pieces?|pack)?", raw, re.I):
                     findings.append({"kind": "unverified", "line": line_number, "field": field,
                                      "observed": raw, "message": "数量使用了不受支持的单位，需要人工核对。"})
+                    consumed.append(span)
+                    continue
                 scope_text = clause[:end] if SCOPE_POLICIES.get(field) == "electrical" else clause[match.start():end]
                 scope = infer_semantic_scope(field, scope_text) or DEFAULT_SCOPES.get(field)
                 if field in {"voltage", "current", "power"}:
@@ -192,7 +216,7 @@ def check_draft(text: str, facts: list[dict[str, Any]]) -> dict[str, Any]:
                                        value=normalized.value, unit=normalized.unit,
                                        scope=scope, product_id=product_id),
                     raw_text=clause.strip(), line=line_number, field=field,
-                    field_label=LABELS.get(field), normalized_value=normalized.value,
+                    field_label=labels.get(field), normalized_value=normalized.value,
                     normalized_unit=normalized.unit, scope=scope, product_id=product_id,
                     status=claim_status, evidence_ids=evidence_ids, reason=reason,
                     provenance={"extraction_method": "deterministic_claim_extraction"},
@@ -200,7 +224,7 @@ def check_draft(text: str, facts: list[dict[str, Any]]) -> dict[str, Any]:
                 claims.append(_claim_row(claim, raw))
                 if kind:
                     findings.append({"kind": kind, "line": line_number, "field": field,
-                                     "field_label": LABELS.get(field), "observed": raw,
+                                     "field_label": labels.get(field), "observed": raw,
                                      "expected": [{k: f.get(k) for k in ("fact_id", "product_id", "value", "unit", "scope")}
                                                   for f in expected], "message": reason})
 
@@ -252,6 +276,12 @@ def check_draft(text: str, facts: list[dict[str, Any]]) -> dict[str, Any]:
                     findings.append({"kind": "unverified", "line": line_number,
                                      "observed": measurement.group(),
                                      "message": "检测到未明确对应字段的数值，请补充字段名称后复核。"})
+                    consumed.append(measurement.span())
+            for measurement in UNFAMILIAR_MEASUREMENT.finditer(clause):
+                if not any(start <= measurement.start() and measurement.end() <= end for start, end in consumed):
+                    findings.append({"kind": "unverified", "line": line_number,
+                                     "observed": measurement.group(),
+                                     "message": "这处参数尚未完成核对，不能算作已通过。"})
             if not any(c["line"] == line_number and c["field"] == "model" for c in claims):
                 for model in UNLABELED_MODEL.finditer(clause):
                     findings.append({"kind": "unverified", "line": line_number,

@@ -7,7 +7,7 @@ import json
 import re
 from typing import Any, Sequence
 
-from .field_registry import FIELD_SPECS
+from .field_registry import FIELD_SPECS, field_for_label
 from .normalization import normalize_text, normalize_value
 
 
@@ -46,7 +46,7 @@ def bind_structured_rows(
     """Return cells only when a genuine multi-field header is present."""
     header_position: int | None = None
     header_map: dict[int, tuple[str, str]] = {}
-    for position, (_row_number, cells) in enumerate(rows[:10]):
+    for position, (_row_number, cells) in enumerate(rows):
         proposed: dict[int, tuple[str, str]] = {}
         seen: set[str] = set()
         for column, (_location, value) in enumerate(cells):
@@ -59,7 +59,31 @@ def bind_structured_rows(
             header_map = proposed
             break
     if header_position is None:
-        return None
+        # Unknown columns need a header/value layout, not just two arbitrary
+        # strings. In particular '型号,A1' is a key/value row, not a header.
+        for position, (_row_number, cells) in enumerate(rows[:-1]):
+            has_identity = any(header_field(value) in {"sku", "model", "variant"} for _, value in cells)
+            # An all-new header is still recognizable above a row of values.
+            next_cells = rows[position + 1][1]
+            unknown_header = (len(cells) == len(next_cells) and
+                              all(not re.search(r"\d", str(value)) for _, value in cells) and
+                              any(re.match(r"^\s*[-+≤≥<>]?\d", str(value)) for _, value in next_cells))
+            if not has_identity and not unknown_header:
+                continue
+            if any(re.search(r"\d", str(value)) and not header_field(value) for _, value in cells):
+                continue
+            if len(cells) < 2 or not all(field_for_label(str(value).split("(")[0].split("（")[0].strip()) for _, value in cells):
+                continue
+            header_position = position
+            break
+        if header_position is None:
+            return None
+    # Never discard a column just because there is no specialist rule for it.
+    for column, (_location, value) in enumerate(rows[header_position][1]):
+        label = str(value or "").strip()
+        spec = field_for_label(label.split("(")[0].split("（")[0].strip())
+        if spec:
+            header_map.setdefault(column, (label, spec.name))
 
     result: list[StructuredCell] = []
     for row_number, cells in rows[header_position + 1:]:

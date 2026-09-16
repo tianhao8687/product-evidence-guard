@@ -17,7 +17,7 @@ from .models import FactCandidate
 SCOPES = {"input": "输入", "output": "输出", "rated": "额定", "nominal": "标称",
           "min": "最小", "max": "最大", "typical": "典型", "net": "净重", "gross": "毛重",
           "minimum": "最小", "maximum": "最大", "unspecified": "未限定",
-          "operating": "工作/运行", "storage": "储存"}
+          "operating": "工作/运行", "storage": "储存", "product": "产品", "packaging": "包装"}
 STATUSES = {"pending": "未作人工决定", "confirmed": "已人工确认", "rejected": "已拒绝", "stale": "确认已失效",
             "source_changed": "来源已变化"}
 CLASSIFICATIONS = {"strong_conflict": "数值冲突", "converted_match": "换算一致", "exact_match": "表达一致",

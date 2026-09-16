@@ -177,12 +177,9 @@ class ProductEvidenceGuardTests(unittest.TestCase):
                         "INPUT: 12 V; OUTPUT: 5 V 2 A",
                     )
                 )
-        self.assertEqual(
-            extract_rule_candidates(
-                self._source_block("INPUT: 12 V; OUTPUT: 5 V 2 A")
-            ),
-            [],
-        )
+        split = extract_rule_candidates(self._source_block("INPUT: 12 V; OUTPUT: 5 V 2 A"))
+        self.assertEqual({(c.field, c.scope, c.normalized_value) for c in split},
+                         {("voltage", "input", 12), ("voltage", "output", 5), ("current", "output", 2)})
         self.assertIsNone(
             infer_semantic_scope(
                 "voltage",

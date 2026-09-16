@@ -15,7 +15,7 @@ import uuid
 from . import __version__
 from .confirmation import initialize_confirmation_outputs, reconcile_confirmations
 from .document_visuals import EmbeddedVisualAsset
-from .extractor import extract_rule_candidates
+from .extractor import extract_rule_candidates, parameter_segments
 from .field_registry import registry_fingerprint
 from .graph import build_graph
 from .identity import IDENTITY_VERSION, resolve_product_identities
@@ -50,7 +50,7 @@ from .state import STATE_SCHEMA_VERSION, atomic_write_json, load_state
 
 QWEN_MODEL_ID = "OpenVINO/Qwen3-VL-8B-Instruct-int4-ov"
 ENGINE_SCHEMA_REVISION = (
-    "v2-product-evidence-identity-claims-registry-batch-bbox-parallel"
+    "v3-open-parameters-qualified-values-segment-coverage"
 )
 MAX_FILES_PER_TASK = 100
 MAX_FILE_BYTES = 100 * 1024 * 1024
@@ -1202,11 +1202,13 @@ def analyze_directory(
             rule_candidates: list[FactCandidate] = []
             unmatched_blocks: list[SourceBlock] = []
             for block in blocks:
-                extracted = extract_rule_candidates(block)
-                if extracted:
-                    rule_candidates.extend(extracted)
-                else:
-                    unmatched_blocks.append(block)
+                for segment in parameter_segments(block.text):
+                    part = replace(block, text=segment)
+                    extracted = extract_rule_candidates(part)
+                    if extracted:
+                        rule_candidates.extend(extracted)
+                    else:
+                        unmatched_blocks.append(part)
 
             model_candidates: list[FactCandidate] = []
             if llm_extractor and unmatched_blocks:

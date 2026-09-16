@@ -8,6 +8,7 @@ import uuid
 
 from .confirmation import ConfirmationRequestError, apply_decision, _load_json_object
 from .extractor import FIELD_SPECS
+from .field_registry import field_definition
 from .state import atomic_write_json
 from . import workflow
 
@@ -26,7 +27,7 @@ def allow_review(output_dir, *, recipient: str, reason: str, fields: list[str] |
     if all_fields and fields:
         raise ConfirmationRequestError("字段列表与全部当前字段不能同时指定。")
     selected = sorted({c["field"] for c in product["candidates"]}) if all_fields else sorted(set(fields or []))
-    if not selected or any(f not in FIELD_LABELS for f in selected):
+    if not selected or any(field_definition(f) is None for f in selected):
         raise ConfirmationRequestError("请指定受支持的商品字段；没有候选时无需开启对话审核。")
     recipient = recipient.strip()
     manifest = workflow._manifest(output, session)

@@ -299,7 +299,8 @@ def task_snapshot(output_dir: str | Path, *, session_id: str | None = None, deta
     phase = "needs_attention" if errors else product.get("status", "awaiting_review")
     if not product["candidates"] and not errors and not counts.get("stale", 0):
         phase = "no_candidates"
-    field_counts = Counter(c["field"] for c in product["candidates"] if c["field"] in LABELS)
+    field_counts = Counter(c["field"] for c in product["candidates"])
+    field_labels = {c["field"]: c["field_label"] for c in product["candidates"]}
     review_permissions = [{"review_id": rid, "recipient": grant["recipient"], "fields": grant["fields"]}
                           for rid, grant in manifest.get("review_access", {}).items()
                           if grant["status"] == "active" and grant["session_id"] == session]
@@ -316,7 +317,7 @@ def task_snapshot(output_dir: str | Path, *, session_id: str | None = None, deta
               "deliverable_updates": [{"artifact_id": d["artifact_id"], "status": d["status"],
                                        "next_action": d["next_action"]} for d in deliverables if d["next_action"] != "none"],
               "available_handoffs": active_handoffs,
-              "review_fields": [{"field": f, "label": LABELS[f], "candidates": n} for f, n in sorted(field_counts.items())],
+              "review_fields": [{"field": f, "label": field_labels[f], "candidates": n} for f, n in sorted(field_counts.items())],
               "review_permissions": review_permissions,
               "next_action": next_action,
               "processing": "local", "network_sent": False,

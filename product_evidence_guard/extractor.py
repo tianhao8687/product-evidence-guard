@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+from dataclasses import replace
 import hashlib
 import json
 import re
 from typing import Iterable
 
-from .field_registry import FIELD_SPECS, FieldDefinition
+from .field_registry import FIELD_SPECS, FieldDefinition, field_for_label
 from .models import FactCandidate, SourceBlock
 from .normalization import normalize_text, normalize_value
 
@@ -18,6 +19,7 @@ _ALIAS_INDEX: list[tuple[str, FieldSpec]] = sorted(
     key=lambda item: len(item[0]),
     reverse=True,
 )
+_NEXT_PARAMETER = "|".join(re.escape(alias) for alias, _ in _ALIAS_INDEX)
 
 _NUMERIC_FIELDS = {
     spec.name
@@ -34,19 +36,20 @@ _ELECTRICAL_LABEL_RE = re.compile(
     r"(?P<value>.+?)\s*$",
     re.IGNORECASE,
 )
+_ELECTRICAL_NUMBER = r"[-+]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?"
 _ELECTRICAL_TOKEN_PATTERNS = {
     "voltage": re.compile(
-        r"(?<![A-Za-z0-9])[-+]?\d+(?:\.\d+)?"
+        rf"(?<![A-Za-z0-9,.]){_ELECTRICAL_NUMBER}"
         r"(?:\s*(?:-|–|—|~|to|至|到)\s*[-+]?\d+(?:\.\d+)?)?"
         r"\s*(?:mV|V)(?:ac|dc)?(?![A-Za-z])",
         re.IGNORECASE,
     ),
     "current": re.compile(
-        r"(?<![A-Za-z0-9])[-+]?\d+(?:\.\d+)?\s*(?:mA|A)(?![A-Za-z])",
+        rf"(?<![A-Za-z0-9,.]){_ELECTRICAL_NUMBER}\s*(?:mA|A)(?![A-Za-z])",
         re.IGNORECASE,
     ),
     "power": re.compile(
-        r"(?<![A-Za-z0-9])[-+]?\d+(?:\.\d+)?\s*(?:mW|kW|W)(?![A-Za-z])",
+        rf"(?<![A-Za-z0-9,.]){_ELECTRICAL_NUMBER}\s*(?:mW|kW|W)(?![A-Za-z])",
         re.IGNORECASE,
     ),
 }
@@ -473,6 +476,11 @@ def _io_gap_is_structured(field: str, value: str) -> bool:
 
 
 def infer_semantic_scope(field: str, text: str) -> str | None:
+    if field == "dimensions":
+        if re.search(r"包装尺寸|packag(?:e|ing) dimensions", text, re.I):
+            return "packaging"
+        if re.search(r"产品尺寸|外形尺寸|product dimensions", text, re.I):
+            return "product"
     spec = next((spec for spec in FIELD_SPECS if spec.name == field), None)
     if spec is None:
         return None
@@ -504,7 +512,7 @@ def infer_semantic_scope(field: str, text: str) -> str | None:
 
 
 def _candidate_id(block: SourceBlock, field: str, raw_value: str) -> str:
-    payload = f"{block.block_id}\0{field}\0{raw_value}".encode("utf-8")
+    payload = f"{block.block_id}\0{field}\0{raw_value}\0{infer_semantic_scope(field, block.text)}".encode("utf-8")
     return hashlib.sha256(payload).hexdigest()[:20]
 
 
@@ -557,7 +565,7 @@ def _extract_value_after_alias(text: str, alias: str) -> tuple[str, str] | None:
                 return parts[pos - 1], "table"
 
     pattern = _alias_pattern(alias)
-    leading = re.match(r"^\s*(?:[-*•]\s*)?", text)
+    leading = re.match(r"^\s*(?:[-*•]\s*)?(?:(?:该|本)产品)?", text)
     start = leading.end() if leading else 0
     match = pattern.match(text, start)
     if not match:
@@ -569,13 +577,15 @@ def _extract_value_after_alias(text: str, alias: str) -> tuple[str, str] | None:
     if unit_annotation:
         unit_suffix = " " + unit_annotation[1]
         tail = tail[unit_annotation.end():]
-    explicit = re.match(r"^\s*(?:[:：=]|->)\s*(?P<value>.+?)\s*$", tail)
+    explicit = re.match(r"^\s*(?:[:：=]|->|为|是)\s*(?P<value>.+?)\s*$", tail)
     if explicit:
         return explicit.group("value") + unit_suffix, "explicit"
 
     whitespace = re.match(r"^\s+(?P<value>.+?)\s*$", tail)
     if whitespace:
         return whitespace.group("value") + unit_suffix, "whitespace"
+    if re.match(r"^[≤≥<>≈约±+\-\d]", tail):
+        return tail + unit_suffix, "explicit"
     return None
 
 
@@ -596,7 +606,7 @@ def _value_is_plausible(
             return False
         if any(note.startswith("unparsed_") for note in notes):
             return False
-        return isinstance(normalized_value, (int, float, list))
+        return isinstance(normalized_value, (int, float, list)) or "qualifier_preserved" in notes
 
     if spec.value_type != "text":
         return False
@@ -610,7 +620,7 @@ def _value_is_plausible(
         return False
     if len(compact.split()) > int(constraints.get("max_words", 6)):
         return False
-    if re.search(r"[\r\n;；]", compact):
+    if re.search(r"[\r\n]", compact):
         return False
     return bool(re.search(r"[A-Za-z0-9\u3400-\u9fff]", compact))
 
@@ -634,7 +644,20 @@ def _extract_labeled_electrical_candidates(block: SourceBlock) -> list[FactCandi
     result: list[FactCandidate] = []
     specs = {spec.name: spec for spec in FIELD_SPECS}
     for field, token_pattern in _ELECTRICAL_TOKEN_PATTERNS.items():
-        tokens = [item.group(0).strip() for item in token_pattern.finditer(value_text)]
+        # Bounds and tolerances belong to the measurement, not decoration.
+        tokens = []
+        consumed_end = 0
+        for item in token_pattern.finditer(value_text):
+            if item.start() < consumed_end:
+                continue
+            qualifier = re.search(r"(?:<=|>=|[≤≥<>≈~]|约|大约)\s*$", value_text[:item.start()])
+            tolerance = re.match(r"\s*(?:±|\+/-)\s*[-+]?\d+(?:\.\d+)?\s*(?:mV|V|mA|A|mW|kW|W)?", value_text[item.end():], re.I)
+            start = qualifier.start() if qualifier else item.start()
+            end = item.end() + (tolerance.end() if tolerance else 0)
+            if item.start() and value_text[item.start() - 1] in ",.±":
+                continue
+            tokens.append(value_text[start:end].strip())
+            consumed_end = end
         if not tokens:
             continue
         normalized_rows = [normalize_value(field, token) for token in tokens]
@@ -695,7 +718,7 @@ def _extract_labeled_electrical_candidates(block: SourceBlock) -> list[FactCandi
     return result
 
 
-def extract_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
+def _extract_single_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
     text = block.text.strip()
     if not text:
         return []
@@ -723,7 +746,7 @@ def extract_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
         raw_value, structure = extracted
         # Keep one compact logical value rather than swallowing the next
         # sentence from a paragraph-style source block.
-        raw_value = re.split(r"[\n\r;；]", raw_value, maxsplit=1)[0].strip()
+        raw_value = raw_value.strip()
         if not raw_value:
             continue
         normalized = normalize_value(spec.name, raw_value)
@@ -759,6 +782,59 @@ def extract_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
         candidates.append(candidate)
         fields_seen.add(spec.name)
     return candidates
+
+
+def parameter_segments(text: str) -> list[str]:
+    """Split only at a new explicit label; preserve lists and thousands commas."""
+    return [part.strip() for part in re.split(
+        r"[\n\r]|[;；。]\s*(?=[^:：=;；。]{1,64}[:：=])|[,，]\s*(?=[A-Za-z\u3400-\u9fff][^:：=,，;；。]{0,63}[:：=])"
+        + rf"|[;；,，。]\s*(?=(?:{_NEXT_PARAMETER})(?:\s|[:：=为是≤≥<>≈约+\-\d]))", text, flags=re.I
+    ) if part.strip()]
+
+
+def explicit_parameter(text: str):
+    if "|" in text or "\t" in text:
+        cells = [cell.strip() for cell in re.split(r"[|\t]", text) if cell.strip()]
+        if len(cells) == 2 and field_for_label(cells[0]):
+            text = cells[0] + ":" + cells[1]
+    match = re.fullmatch(r"\s*(?:[-*•]\s*)?([^:：=\n]{1,64})\s*[:：=]\s*(.+)", text, re.S)
+    if not match:
+        return None
+    label, raw = match[1].strip(), match[2].strip()
+    # A bracketed table unit is metadata, not part of the field identity.
+    unit = re.fullmatch(r"(.+?)\s*[（(]([^()（）]{1,24})[)）]", label)
+    if unit:
+        label = unit[1].strip()
+        if not re.search(re.escape(unit[2]), raw, re.I):
+            raw += " " + unit[2]
+    spec = field_for_label(label)
+    return (spec, raw) if spec and raw and len(raw) <= 512 else None
+
+
+def extract_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
+    result = []
+    for segment in parameter_segments(block.text):
+        part = replace(block, text=segment)
+        items = _extract_single_rule_candidates(part)
+        explicit = explicit_parameter(segment)
+        if explicit and not items:
+            spec, raw = explicit
+            if spec.value_type != "text" and not re.search(r"\d", raw):
+                continue  # a disclaimer is not an unparsed measurement
+            normalized = normalize_value(spec.name, raw)
+            items = [FactCandidate(
+                candidate_id=_candidate_id(part, spec.name, raw), field=spec.name,
+                field_label=spec.label, raw_value=raw, normalized_value=normalized.value,
+                normalized_unit=normalized.unit, source_block_id=part.block_id,
+                source_file=part.source_file, source_kind=part.source_kind, file_hash=part.file_hash,
+                locator=part.locator, raw_text=segment,
+                recognition_confidence=part.recognition_confidence, mapping_confidence=.95,
+                extraction_method="deterministic_parameter_pair",
+                scope=infer_semantic_scope(spec.name, segment) or spec.scope,
+                notes=list(normalized.notes), provenance=dict(part.provenance),
+            )]
+        result.extend(items)
+    return result
 
 
 def extract_candidates(blocks: Iterable[SourceBlock]) -> list[FactCandidate]:

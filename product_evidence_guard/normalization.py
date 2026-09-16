@@ -46,7 +46,19 @@ def normalize_text(value: str) -> str:
     return compact
 
 
+def _numeric_text(raw: str) -> str | None:
+    # Never start matching inside a comma-separated number (1,000g -> 0g).
+    for token in re.findall(r"\d[\d,]*,\d[\d,]*(?:\.\d+)?", raw):
+        if not re.fullmatch(r"\d{1,3}(?:,\d{3})+(?:\.\d+)?", token):
+            return None
+        raw = raw.replace(token, token.replace(",", ""))
+    return raw
+
+
 def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
+    raw = _numeric_text(raw)
+    if raw is None:
+        return None
     rules = UNIT_RULES.get(family)
     if rules is None:
         return None
@@ -62,6 +74,8 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
     )
     range_match = range_pattern.search(raw)
     if range_match:
+        if re.search(r"[≤≥<>±≈]|约|\+/-", raw):
+            return None
         start_unit_text = range_match.group("start_unit") or range_match.group(
             "end_unit"
         )
@@ -88,7 +102,8 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
                 )
 
     pattern = re.compile(
-        rf"(?P<number>{_NUMBER})\s*(?P<unit>{unit_pattern})",
+        rf"(?<![A-Za-z0-9_.,])(?P<number>{_NUMBER})\s*(?P<unit>{unit_pattern})"
+        + (r"(?:ac|dc)?" if family in {"voltage", "current"} else "") + r"(?![A-Za-z])",
         re.IGNORECASE,
     )
     match = pattern.search(raw)
@@ -103,11 +118,31 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
     if rule is None:
         return None
     normalized = number * rule.scale + rule.offset
+    prefix = raw[:match.start()].strip()
+    qualifier = re.search(r"(<=|>=|≤|≥|<|>|约|大约|≈|~|about|approx\.?)\s*$", prefix, re.I)
+    tail = raw[match.end():].strip()
+    if tail.startswith(("±", "+/-")):
+        tolerance = re.fullmatch(rf"(?:±|\+/-)\s*({_NUMBER})\s*({unit_pattern})?", tail, re.I)
+        if not tolerance or qualifier:
+            return None
+        delta_rule = rules[(tolerance[2] or unit).casefold()]
+        delta = Decimal(tolerance[1]) * delta_rule.scale
+        if delta < 0:
+            return None
+        return NormalizedValue(f"{_clean_decimal(normalized)}±{_clean_decimal(delta)}", BASE_UNITS[family], ("qualifier_preserved",))
+    if len(list(pattern.finditer(raw))) > 1:
+        return None  # alternatives must not silently become the first value
+    if qualifier:
+        operator = {"<=": "≤", ">=": "≥", "约": "≈", "大约": "≈", "~": "≈", "about": "≈", "approx": "≈", "approx.": "≈"}.get(qualifier[1].lower(), qualifier[1])
+        return NormalizedValue(f"{operator}{_clean_decimal(normalized)}", BASE_UNITS[family], ("qualifier_preserved",))
     return NormalizedValue(_clean_decimal(normalized), BASE_UNITS[family])
 
 
 def normalize_count(raw: str) -> NormalizedValue | None:
-    match = re.search(rf"(?P<number>{_NUMBER})\s*(?:个|件|只|套|pcs?|pieces?|pack)?", raw, re.IGNORECASE)
+    raw = _numeric_text(raw)
+    if raw is None:
+        return None
+    match = re.fullmatch(rf"(?P<number>{_NUMBER})\s*(?:个|件|只|套|pcs?|pieces?|pack)?", raw.strip(), re.IGNORECASE)
     if not match:
         return None
     try:
@@ -120,6 +155,9 @@ def normalize_count(raw: str) -> NormalizedValue | None:
 
 
 def normalize_dimensions(raw: str) -> NormalizedValue | None:
+    raw = _numeric_text(raw)
+    if raw is None or re.search(r"[≤≥<>±≈]|约", raw):
+        return None  # preserve unsupported dimensional constraints as text
     pattern = re.compile(
         rf"(?P<a>{_NUMBER})\s*[x×*]\s*(?P<b>{_NUMBER})(?:\s*[x×*]\s*(?P<c>{_NUMBER}))?\s*"
         rf"(?P<unit>mm|cm|m|in|inch|毫米|厘米|米|英寸)",
@@ -142,6 +180,11 @@ def normalize_dimensions(raw: str) -> NormalizedValue | None:
 
 def normalize_value(field: str, raw: str) -> NormalizedValue:
     definition = field_definition(field)
+    if field.startswith("custom_"):
+        text = normalize_text(raw)
+        # Spacing is cosmetic; unfamiliar units are retained, never converted.
+        text = re.sub(r"(?<=\d)\s+(?=[a-z%°\u3400-\u9fff])", "", text)
+        return NormalizedValue(text, None)
     if field == "capacity":
         return (
             normalize_number_with_unit(raw, "capacity_charge")
@@ -162,3 +205,24 @@ def values_equal(a: Any, b: Any, tolerance: float = 1e-6) -> bool:
     if isinstance(a, (int, float)) and isinstance(b, (int, float)):
         return abs(float(a) - float(b)) <= tolerance
     return a == b
+
+
+def qualified_values_compatible(a: Any, b: Any) -> bool:
+    """Detect non-contradictory bounds without claiming exact equivalence."""
+    def bounds(value):
+        if isinstance(value, (int, float)):
+            return float(value), float(value)
+        text = str(value)
+        match = re.fullmatch(rf"([≤≥<>≈])({_NUMBER})", text)
+        if match:
+            op, number = match[1], float(match[2])
+            if op == "≈":
+                return None  # no invented tolerance for 'approximately'
+            if op in {"≤", "≥"}:
+                return (-float("inf"), number) if op == "≤" else (number, float("inf"))
+        match = re.fullmatch(rf"({_NUMBER})±({_NUMBER})", text)
+        if match:
+            return float(match[1]) - float(match[2]), float(match[1]) + float(match[2])
+        return None
+    left, right = bounds(a), bounds(b)
+    return bool(left and right and max(left[0], right[0]) <= min(left[1], right[1]))

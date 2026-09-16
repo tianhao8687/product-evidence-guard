@@ -10,7 +10,7 @@ import re
 import time
 from typing import Any, Protocol
 
-from .extractor import FIELD_SPECS, infer_semantic_scope
+from .extractor import FIELD_SPECS, infer_semantic_scope, explicit_parameter
 from .model_output_schema import (
     FieldMappingItem,
     ModelOutputIssue,
@@ -27,7 +27,7 @@ from .qwen_vl_reader import (
     ocr_review_template,
 )
 from .recognition_cache import RecognitionCache, bind_image_result
-from .field_registry import registry_fingerprint
+from .field_registry import registry_fingerprint, field_definition
 from .review_focus import choose_review_region
 
 
@@ -867,10 +867,14 @@ def _looks_target_like(text: str) -> bool:
     return (
         any(marker in lowered for marker in _TARGET_MARKERS)
         or _KNOWN_MEASUREMENT_RE.search(text) is not None
+        or explicit_parameter(text) is not None
     )
 
 
 def _has_unknown_unit_like_token(text: str) -> bool:
+    pair = explicit_parameter(text)
+    if pair and pair[0].name.startswith("custom_"):
+        return False  # preserved as literal text, no unsupported conversion
     dimension_spans = [
         match.span() for match in _DIMENSION_CHAIN_RE.finditer(text)
     ]
@@ -971,8 +975,8 @@ def _has_distinct_line_mapping_conflict(
             continue
         normalized = normalize_value(mapping.field, mapping.raw_value)
         scope = (
-            infer_semantic_scope(mapping.field, transcription.raw_text)
-            or _FIELD_SPECS_BY_NAME[mapping.field].scope
+            mapping.scope_hint or infer_semantic_scope(mapping.field, transcription.raw_text)
+            or field_definition(mapping.field).scope
         )
         normalized_key = json.dumps(
             [normalized.value, normalized.unit],
@@ -1043,8 +1047,8 @@ def _routing_reasons(
             continue
         normalized = normalize_value(mapping.field, mapping.raw_value)
         scope = (
-            infer_semantic_scope(mapping.field, transcription.raw_text)
-            or _FIELD_SPECS_BY_NAME[mapping.field].scope
+            mapping.scope_hint or infer_semantic_scope(mapping.field, transcription.raw_text)
+            or field_definition(mapping.field).scope
         )
         values_by_scope.setdefault((mapping.field, scope), set()).add(
             json.dumps(
@@ -1082,7 +1086,7 @@ def _block_id(
 def _candidate_id(block: SourceBlock, mapping: FieldMappingItem) -> str:
     payload = (
         f"{block.block_id}\0{mapping.field}\0{mapping.raw_value}\0"
-        f"{mapping.transcription_id}\0rapidocr"
+        f"{mapping.transcription_id}\0{mapping.scope_hint}\0rapidocr"
     ).encode("utf-8")
     return hashlib.sha256(payload).hexdigest()[:20]
 
@@ -1197,7 +1201,7 @@ def _build_fast_result(
         block = blocks_by_transcription.get(mapping.transcription_id)
         if block is None:
             continue
-        spec = _FIELD_SPECS_BY_NAME[mapping.field]
+        spec = field_definition(mapping.field)
         normalized = normalize_value(mapping.field, mapping.raw_value)
         notes = list(normalized.notes)
         notes.extend(
@@ -1227,7 +1231,7 @@ def _build_fast_result(
                 mapping_confidence=mapping.mapping_confidence_estimate,
                 extraction_method="rapidocr_deterministic_mapping",
                 scope=(
-                    infer_semantic_scope(mapping.field, block.text)
+                    mapping.scope_hint or infer_semantic_scope(mapping.field, block.text)
                     or spec.scope
                 ),
                 notes=notes,
@@ -1585,10 +1589,10 @@ class HybridImageReader:
             )
             return result
 
-        hint_lines = target_lines or all_lines[:24]
+        hint_lines = target_lines or all_lines
         hints = [
-            {"text": line.text, "score": round(line.confidence, 6)}
-            for line in hint_lines[:24]
+            {"text": line.text, "score": round(line.confidence, 6), "bbox_1000": line.bbox_1000}
+            for line in hint_lines
         ]
         review_started = time.perf_counter()
         region = (choose_review_region(path, all_lines, target_lines)
@@ -1608,8 +1612,8 @@ class HybridImageReader:
         if region is not None:
             text_by_id = {line.id: line.raw_text for line in transcriptions}
             expected_fields = Counter(
-                (mapping.field, infer_semantic_scope(mapping.field, text_by_id[mapping.transcription_id])
-                 or _FIELD_SPECS_BY_NAME[mapping.field].scope)
+                (mapping.field, mapping.scope_hint or infer_semantic_scope(mapping.field, text_by_id[mapping.transcription_id])
+                 or field_definition(mapping.field).scope)
                 for mapping in mappings)
             actual_fields = Counter((candidate.field, candidate.scope) for candidate in reviewed.fact_candidates)
             expected_conflict = _has_distinct_line_mapping_conflict(transcriptions, mappings)
@@ -1638,6 +1642,8 @@ class HybridImageReader:
             time.perf_counter() - started,
             4,
         )
+        if any(error.code in {"incomplete_review_coverage", "coverage_limit", "file_timeout"} for error in reviewed.errors):
+            return reviewed  # never hide incomplete batches behind a smaller full-page retry
         if reviewed.ok:
             if not reviewed.fact_candidates:
                 reviewed.fallback_reasons.append(

@@ -7,6 +7,7 @@ import re
 from typing import Any, Callable, Generic, Mapping, Sequence, TypeVar
 
 from .extractor import FIELD_SPECS
+from .field_registry import field_definition, field_for_label
 
 
 SCHEMA_VERSION = 1
@@ -88,13 +89,16 @@ class FieldMappingItem:
     raw_value: str
     mapping_confidence_estimate: float
     confidence_source: str = MODEL_CONFIDENCE_SOURCE
+    scope_hint: str | None = None  # set by deterministic segmentation, never by model JSON
 
     @property
     def mapping_confidence(self) -> float:
         return self.mapping_confidence_estimate
 
     def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+        data = asdict(self)
+        data.pop("scope_hint")
+        return data
 
 
 ItemT = TypeVar("ItemT")
@@ -654,7 +658,15 @@ def parse_field_mapping_output(
         field_name = raw_row.get("field")
         field_error = None
         if not isinstance(field_name, str) or field_name not in ALLOWED_FIELDS:
-            field_error = _issue(stage, "field_not_allowed", "field 不在商品字段白名单内。", index)
+            source_text = source_texts.get(transcription_id, "")
+            spec = field_definition(field_name) if isinstance(field_name, str) else None
+            spec = spec or (field_for_label(field_name) if isinstance(field_name, str) else None)
+            if spec and spec.name.startswith("custom_") and re.search(
+                re.escape(spec.label) + r"\s*[:：=]", source_text, re.I
+            ):
+                field_name = spec.name
+            else:
+                field_error = _issue(stage, "field_not_allowed", "新参数名必须来自对应原文的明确标签。", index)
 
         association_error = None
         if transcription_id is not None:
@@ -673,6 +685,16 @@ def parse_field_mapping_output(
                     "raw_value 必须逐字出现在关联的第一步原文中。",
                     index,
                 )
+            elif raw_value is not None and isinstance(field_name, str):
+                definition = field_definition(field_name)
+                if definition and definition.value_type != "text":
+                    matches = list(re.finditer(re.escape(raw_value), source_text))
+                    if matches and all(
+                        re.search(r"(?:<=|>=|[≤≥<>≈±~]|约|大约)\s*$", source_text[:match.start()])
+                        or re.match(r"\s*(?:±|\+/-)", source_text[match.end():])
+                        for match in matches
+                    ):
+                        association_error = _issue(stage, "truncated_measurement", "数值摘录遗漏了上下限、约数或公差。", index)
 
         errors = (
             identifier_error,

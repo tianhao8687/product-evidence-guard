@@ -8,7 +8,7 @@ from typing import Iterable
 
 from .models import CrossFieldRelation, FactCandidate, FactGroup
 from .identity import conflict_group_id, evidence_identity, graph_identity, identity_needs_review, product_label
-from .normalization import normalize_text, values_equal
+from .normalization import normalize_text, values_equal, qualified_values_compatible
 from .field_registry import field_definition
 
 
@@ -33,6 +33,11 @@ def refresh_fact_status(groups: Iterable[FactGroup], candidates: Iterable[FactCa
     explanatory only; duplicates never vote away a contradictory value.
     """
     by_id = {item.candidate_id: item for item in candidates}
+    groups = list(groups)
+    explicit_scopes = defaultdict(set)
+    for group in groups:
+        if group.scope:
+            explicit_scopes[(group.product_id, group.field)].add(group.scope)
     blocked_ids = {cid for relation in relations if relation.severity == "block" for cid in relation.candidate_ids}
     for group in groups:
         items = [by_id[cid] for cid in group.candidate_ids if cid in by_id]
@@ -57,7 +62,8 @@ def refresh_fact_status(groups: Iterable[FactGroup], candidates: Iterable[FactCa
         elif any(identity_needs_review(item) for item in valid):
             code = "identity_ambiguous"
         elif any(item.scope != group.scope for item in valid) or (
-            spec and spec.allowed_scopes and not group.scope
+            not group.scope and ((spec and spec.scope_policy == "electrical") or
+                                 explicit_scopes[(group.product_id, group.field)])
         ):
             code = "scope_unclear"
         elif blocked_ids.intersection(group.candidate_ids):
@@ -71,7 +77,12 @@ def refresh_fact_status(groups: Iterable[FactGroup], candidates: Iterable[FactCa
         elif _likely_version_update(valid) and not (human and _all_equal(valid)):
             code = "version_unclear"
         elif not _all_equal(valid):
-            if group.field in {"material", "color"} and _compatible_text_values(valid):
+            if (group.field in {"material", "color"} and _compatible_text_values(valid)) or all(
+                a.normalized_unit == b.normalized_unit and (
+                    values_equal(a.normalized_value, b.normalized_value) or
+                    qualified_values_compatible(a.normalized_value, b.normalized_value))
+                for i, a in enumerate(valid) for b in valid[i + 1:]
+            ):
                 code = "compatible_expression"
             else:
                 group.fact_status = "conflict"
@@ -293,7 +304,7 @@ def build_cross_field_relations(candidates: Iterable[FactCandidate]) -> list[Cro
             continue
         all_candidates = [candidate for field in weight_fields for candidate in by_product_field[(product_id, field)]]
         values = {
-            (candidate.normalized_value, candidate.normalized_unit)
+            (repr(candidate.normalized_value), candidate.normalized_unit)
             for candidate in all_candidates
             if candidate.normalized_unit == "g"
         }

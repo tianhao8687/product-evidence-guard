@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 import hashlib
 import json
+import re
 from importlib.resources import files
 from typing import Any
 
@@ -258,4 +259,33 @@ def registry_fingerprint() -> str:
 
 
 def field_definition(name: str) -> FieldDefinition | None:
-    return REGISTRY.by_name(name)
+    known = REGISTRY.by_name(name)
+    if known is not None:
+        return known
+    # Reversible, task-independent IDs: no mutable global registry and no code
+    # supplied by documents. Names survive serialization/restarts unchanged.
+    if isinstance(name, str) and name.startswith("custom_") and len(name) <= 391:
+        try:
+            label = bytes.fromhex(name[7:]).decode("utf-8")
+        except (ValueError, UnicodeDecodeError):
+            return None
+        spec = field_for_label(label, known_only=False)
+        if spec and spec.name == name:
+            return spec
+    return None
+
+
+def field_for_label(label: str, *, known_only: bool = False) -> FieldDefinition | None:
+    label = re.sub(r"\s+", " ", str(label).strip()).casefold()
+    for spec in FIELD_SPECS:
+        if label in {spec.name, *(alias.casefold() for alias in spec.aliases)}:
+            return spec
+    if known_only or not re.fullmatch(r"[a-z\u3400-\u9fff][a-z0-9\u3400-\u9fff _/()（）%+.-]{0,63}", label):
+        return None
+    # These are document structure, not product attributes. Their contents are
+    # still retained in source blocks for later extraction/coverage reporting.
+    if label in {"备注", "说明", "注", "注意", "提示", "note", "notes", "description", "参数", "数值", "单位", "字段", "值", "field", "value", "parameter", "unit"}:
+        return None
+    if re.match(r"^(?:figure|fig\.?|table)\s+(?:\d|context\s+line\s+\d)|^[图表]\s*\d+", label):
+        return None
+    return FieldDefinition("custom_" + label.encode("utf-8").hex(), label, (label,), "text")

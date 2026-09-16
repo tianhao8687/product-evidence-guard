@@ -221,6 +221,14 @@ def resolve_product_identities(
         candidate.product_identity_status = status
         candidate.identity_version = IDENTITY_VERSION
         candidate.candidate_id = candidate_identity(candidate)
+    # Generic charge capacity can share the explicitly named battery field
+    # only within an already resolved product; volume/capacity is not guessed.
+    battery_products = {c.product_id for c in rows if c.field == "capacity_charge" and not identity_needs_review(c)}
+    for candidate in rows:
+        if (candidate.field == "capacity" and candidate.normalized_unit == "mAh"
+                and candidate.product_id in battery_products and not identity_needs_review(candidate)):
+            candidate.field, candidate.field_label = "capacity_charge", "电池容量"
+            candidate.candidate_id = candidate_identity(candidate)
     return product_entities_from_candidates(rows, dataset_name=Path(dataset_root).name)
 
 
