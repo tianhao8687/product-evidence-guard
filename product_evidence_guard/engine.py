@@ -25,6 +25,7 @@ from .hybrid_image_reader import (
 )
 from .model_output_schema import ModelOutputIssue
 from .models import FactCandidate, SourceBlock
+from .source_context import document_context
 from .openvino_adapter import (
     OpenVinoDeviceSelection,
     OpenVinoFactExtractor,
@@ -50,7 +51,7 @@ from .state import STATE_SCHEMA_VERSION, atomic_write_json, load_state
 
 QWEN_MODEL_ID = "OpenVINO/Qwen3-VL-8B-Instruct-int4-ov"
 ENGINE_SCHEMA_REVISION = (
-    "v3-open-parameters-qualified-values-segment-coverage"
+    "v4-fact-reliability-context-and-review-20260916"
 )
 MAX_FILES_PER_TASK = 100
 MAX_FILE_BYTES = 100 * 1024 * 1024
@@ -1080,6 +1081,11 @@ def analyze_directory(
 
         changed_files.append(relative)
         try:
+            named_context = document_context(relative, [])
+            if named_context["role"] == "draft":
+                new_state_files[relative] = {"file_hash": file_hash, "candidate_count": 0,
+                                             "candidates": [], "document_context": named_context}
+                continue
             if suffix in IMAGE_EXTENSIONS:
                 if image_reader is None:
                     skipped_files.append({"file": relative, "reason": "no_local_image_model_or_ocr_sidecar"})
@@ -1198,6 +1204,15 @@ def analyze_directory(
                 }
                 continue
             total_text_chars += block_char_count
+
+            source_context = document_context(relative, blocks)
+            for block in blocks:
+                block.provenance["document_context"] = source_context
+            if source_context["role"] == "draft":
+                # Also exclude embedded/scanned claims, not just native text.
+                new_state_files[relative] = {"file_hash": file_hash, "candidate_count": 0,
+                                             "candidates": [], "document_context": source_context}
+                continue
 
             rule_candidates: list[FactCandidate] = []
             unmatched_blocks: list[SourceBlock] = []
@@ -1935,6 +1950,8 @@ def analyze_directory(
                 + embedded_visual_candidates
                 + pdf_visual_candidates
             )
+            for candidate in candidates:
+                candidate.provenance["document_context"] = source_context
             all_candidates.extend(candidates)
             document_visuals.extend(file_document_visuals)
             state_entry: dict[str, Any] = {

@@ -95,6 +95,11 @@ class WorkflowService:
             data["phase"] = "analyzing"
             data["next_action"] = "wait_for_analysis"
             data.pop("performance", None)
+        elif jobs and jobs[-1]["phase"] in {"failed", "interrupted"}:
+            data.update(phase="needs_attention", next_action="resume", retry_job_id=jobs[-1]["job_id"],
+                        showing_previous_result=True)
+            data["coverage"] = {**data.get("coverage", {}), "status": "partial", "can_retry": True,
+                                "message": "本次更新未完成，下面保留的是上次结果，新资料尚未完整参与核对。请点击继续处理。"}
         return data
 
     def handle(self, operation, payload):

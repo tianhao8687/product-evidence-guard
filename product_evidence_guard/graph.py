@@ -8,7 +8,7 @@ from typing import Iterable
 
 from .models import CrossFieldRelation, FactCandidate, FactGroup
 from .identity import conflict_group_id, evidence_identity, graph_identity, identity_needs_review, product_label
-from .normalization import normalize_text, values_equal, qualified_values_compatible
+from .normalization import normalize_text, values_equal, qualified_values_compatible, invalid_fact_value
 from .field_registry import field_definition
 
 
@@ -20,9 +20,21 @@ REVIEW_REASONS = {
     "compatible_expression": "表达不同，请选择正式写法。",
     "source_changed": "来源更新了，请重新分析这条参数。",
     "unclear_value": "识别结果或单位不够清楚，请核对。",
+    "invalid_value": "数值待补充或明显不合理，请填写正确参数。",
     "all_rejected": "现有值已全部拒绝，请补充正确参数。",
     "blocking_relation": "这条参数与其他参数存在未解决的问题。",
 }
+
+
+def _clear_recognition(item: FactCandidate) -> bool:
+    review = item.provenance.get("visual_review", {})
+    return (item.status == "confirmed" or item.recognition_confidence >= 0.8
+            or (review.get("complete") is True and review.get("ocr_agrees") is True))
+
+
+def _corroborated(item: FactCandidate, candidates: list[FactCandidate]) -> bool:
+    return any(_clear_recognition(other) and other.normalized_unit == item.normalized_unit
+               and values_equal(other.normalized_value, item.normalized_value) for other in candidates)
 
 
 def refresh_fact_status(groups: Iterable[FactGroup], candidates: Iterable[FactCandidate],
@@ -44,6 +56,13 @@ def refresh_fact_status(groups: Iterable[FactGroup], candidates: Iterable[FactCa
         group.excluded = bool(items) and all(item.excluded_from_review for item in items)
         active = [item for item in items if item.status != "rejected"]
         valid = [item for item in active if item.source_current and item.status != "stale"]
+        scoped = [item for item in valid if item.scope == group.scope]
+        # A correctly scoped source can establish this value on its own.
+        # Equal unscoped copies are retained as evidence, but do not certify
+        # the scope and are not counted/authorized as verified sources.
+        agreeing_unscoped = bool(group.scope and scoped and valid and _all_equal(valid)
+                                  and all(item.scope in {None, group.scope} for item in valid))
+        verified_sources = scoped if agreeing_unscoped else valid
         human = [item for item in valid if item.status == "confirmed"]
         group.fact_status = "pending_confirmation"
         group.verification_method = None
@@ -54,7 +73,7 @@ def refresh_fact_status(groups: Iterable[FactGroup], candidates: Iterable[FactCa
         group.review_reason_code = None
         group.current = len(active) == len(valid)
         # Same-byte renamed copies are not additional independent documents.
-        group.independent_source_count = len({item.file_hash or item.source_file for item in valid})
+        group.independent_source_count = len({item.file_hash or item.source_file for item in verified_sources})
         spec = field_definition(group.field)
         if not group.current:
             code = "source_changed"
@@ -62,16 +81,18 @@ def refresh_fact_status(groups: Iterable[FactGroup], candidates: Iterable[FactCa
             code = "all_rejected"
         elif any(identity_needs_review(item) for item in valid):
             code = "identity_ambiguous"
-        elif any(item.scope != group.scope for item in valid) or (
+        elif (any(item.scope != group.scope for item in valid) and not agreeing_unscoped) or (
             not group.scope and ((spec and spec.scope_policy == "electrical") or
                                  explicit_scopes[(group.product_id, group.field)])
         ):
             code = "scope_unclear"
         elif blocked_ids.intersection(group.candidate_ids):
             code = "blocking_relation"
+        elif any(invalid_fact_value(item.field, item.raw_value, item.normalized_value) for item in valid):
+            code = "invalid_value"
         elif any((any(note.startswith("unparsed_") for note in item.notes) or
                  (spec and spec.value_type != "text" and item.normalized_unit is None) or
-                 (item.status != "confirmed" and (item.recognition_confidence < 0.8 or
+                 (item.status != "confirmed" and (not _corroborated(item, valid) or
                     (item.mapping_confidence_source != "deterministic" and item.mapping_confidence < 0.8))))
                  and not (item.status == "confirmed" and item.extraction_method == "human_correction")
                  for item in valid):
@@ -93,21 +114,22 @@ def refresh_fact_status(groups: Iterable[FactGroup], candidates: Iterable[FactCa
                 continue
         else:
             group.fact_status = "verified"
-            chosen = (human or valid)[0]
+            selected_human = [item for item in verified_sources if item.status == "confirmed"]
+            chosen = (selected_human or verified_sources)[0]
             group.selected_value = chosen.normalized_value
             group.selected_unit = chosen.normalized_unit
-            group.verified_candidate_ids = [item.candidate_id for item in valid]
-            group.human_approved = bool(human)
+            group.verified_candidate_ids = [item.candidate_id for item in verified_sources]
+            group.human_approved = bool(selected_human)
             rejected_other_value = any(item.status == "rejected" and not (
                 item.normalized_unit == chosen.normalized_unit and values_equal(item.normalized_value, chosen.normalized_value)
             ) for item in items)
             group.verification_method = (
-                "human_resolved_conflict" if human and rejected_other_value else "human_confirmed" if human
+                "human_resolved_conflict" if selected_human and rejected_other_value else "human_confirmed" if selected_human
                 else "single_value" if group.independent_source_count < 2
-                else "cross_source_exact" if len({normalize_text(item.raw_value) for item in valid}) == 1
+                else "cross_source_exact" if len({normalize_text(item.raw_value) for item in verified_sources}) == 1
                 else "cross_source_converted"
             )
-            group.reason = "人工确认。" if human else "参数清楚，未发现冲突。"
+            group.reason = "人工确认。" if selected_human else "参数清楚，未发现冲突。"
             group.recommendation = "无需重复确认。"
             continue
         group.review_reason_code = code
@@ -173,9 +195,22 @@ def _version_hint(path: str) -> tuple[int, ...] | None:
 
 
 def _likely_version_update(candidates: list[FactCandidate]) -> bool:
-    hints = [_version_hint(candidate.source_file) for candidate in candidates]
+    hints = []
+    buckets: dict[object, list[FactCandidate]] = defaultdict(list)
+    for candidate in candidates:
+        context = candidate.provenance.get("document_context", {})
+        body_version = context.get("version")
+        hint = tuple(int(n) for n in body_version.split(".")) if body_version else _version_hint(candidate.source_file)
+        if hint is None and context.get("historical"):
+            hint = ("historical",)
+        hints.append(hint)
+        buckets[hint].append(candidate)
     usable = [hint for hint in hints if hint is not None]
-    return len(set(usable)) > 1 and not _all_equal(candidates)
+    # A difference within the same applicability bucket is still a conflict.
+    if any(not _all_equal(items) for items in buckets.values()):
+        return False
+    historical = any(c.provenance.get("document_context", {}).get("historical") for c in candidates)
+    return (len(set(usable)) > 1 or (historical and len(buckets) > 1)) and not _all_equal(candidates)
 
 
 def build_fact_groups(candidates: Iterable[FactCandidate]) -> list[FactGroup]:

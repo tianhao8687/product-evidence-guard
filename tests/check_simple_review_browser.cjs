@@ -62,8 +62,33 @@ let browser;
   await page.screenshot({path:path.join(root,'.runtime','simple-review-mobile.png'),fullPage:true});
   await page.setViewportSize({width:1440,height:1000});
   await page.screenshot({path:path.join(root,'.runtime','simple-review-wide.png'),fullPage:true});
+  // Large synthetic state: do not eagerly build thousands of cards or the hidden
+  // handoff view. Filtering and "show more" must still expose every fact.
+  const large=await page.evaluate(()=>structuredClone(state));
+  const template=large.product.facts.find(g=>g.fact_status==='verified');
+  const candidate=large.product.candidates.find(c=>template.candidate_ids.includes(c.candidate_id));
+  large.product.candidates=Array.from({length:6000},(_,i)=>({...candidate,candidate_id:'large-c-'+i}));
+  large.product.facts=large.product.candidates.map((c,i)=>({...template,group_id:'large-g-'+i,candidate_ids:[c.candidate_id]}));
+  large.available_facts=large.product.candidates;
+  large.counts={...large.counts,conflicts:0,pending_facts:0,verified_facts:6000,candidates:6000};
+  large.showing_previous_result=true;
+  large.coverage={status:'partial',message:'本次更新未完成，下面保留的是上次结果。',can_retry:true};
+  const bulk=await browser.newPage({viewport:{width:1440,height:1000}});
+  bulk.on('pageerror',e=>errors.push(e.message));
+  await bulk.route('**/api/state',route=>route.fulfill({json:large}));
+  await bulk.goto(url);
+  await bulk.getByRole('button',{name:'已确认',exact:true}).click();
+  assert.equal(await bulk.locator('.group').count(),50);
+  assert.equal(await bulk.locator('.approved-row').count(),0);
+  assert.match(await bulk.locator('#phase').textContent(),/当前显示上次结果/);
+  await bulk.getByRole('button',{name:'继续处理',exact:true}).waitFor();
+  await bulk.getByRole('button',{name:'显示更多',exact:true}).click();
+  assert.equal(await bulk.locator('.group').count(),100);
+  await bulk.locator('#source-filter').selectOption(candidate.source_file);
+  assert.equal(await bulk.locator('.group').count(),50);
+  await bulk.close();
   assert.deepEqual(errors,[]);
-  console.log('Headless review E2E passed: adopt, edit, undo, skip, authorize, content check and four widths.');
+  console.log('Headless review E2E passed: adopt, edit, undo, skip, authorize, content check, four widths, 6000-fact paging and failed-update notice.');
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{
   if(browser)await browser.close();
   child.stdin.end('\n');

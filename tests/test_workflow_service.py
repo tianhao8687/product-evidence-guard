@@ -142,6 +142,27 @@ class WorkflowServiceTests(unittest.TestCase):
         self.app.dispatch(build_request("residency", {"keep_alive": False}))
         self.assertFalse(self.app.workflow.resident["keep_alive"])
 
+    def test_failed_update_marks_previous_results_and_a_later_success_clears_warning(self):
+        def fail(*args, **kwargs):
+            raise RuntimeError("injected update failure")
+        self.app._analyze = fail
+        (self.source / "new.txt").write_text("净重：350g", encoding="utf-8")
+        payload = {"input_dir": str(self.source), "output_dir": str(self.output), "background": True}
+        self.app.dispatch(build_request("analyze", payload))
+        for thread in self.app.workflow.jobs.threads:
+            thread.join(5)
+        snapshot = self.app.workflow.snapshot(self.output)
+        self.assertEqual(snapshot["phase"], "needs_attention")
+        self.assertTrue(snapshot["showing_previous_result"])
+        self.assertTrue(snapshot["coverage"]["can_retry"])
+        self.app._analyze = lambda a, b, **kw: analyze_directory(a, b, **kw)
+        self.app.workflow.jobs.resume(snapshot["retry_job_id"])
+        for thread in self.app.workflow.jobs.threads:
+            thread.join(5)
+        snapshot = self.app.workflow.snapshot(self.output)
+        self.assertNotIn("showing_previous_result", snapshot)
+        self.assertEqual(snapshot["phase"], "blocked")
+
 
 if __name__ == "__main__":
     unittest.main()

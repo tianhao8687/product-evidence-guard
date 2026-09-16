@@ -48,6 +48,7 @@ $requiredRuntimeFiles = @(
     'product_evidence_guard/graph.py',
     'product_evidence_guard/hybrid_image_reader.py',
     'product_evidence_guard/identity.py',
+    'product_evidence_guard/source_context.py',
     'product_evidence_guard/model_output_schema.py',
     'product_evidence_guard/models.py',
     'product_evidence_guard/normalization.py',
@@ -465,7 +466,39 @@ function Assert-RegularSourceFile {
             throw "无法验证 Qoder 安装源硬链接数量：$Path"
         }
         $links = @(& $fsutil.Source hardlink list $fullPath 2>$null)
-        if ($LASTEXITCODE -ne 0 -or $links.Count -ne 1) {
+        if ($LASTEXITCODE -ne 0) {
+            # ReFS/dev-drive temp directories may reject fsutil hardlink list
+            # with ERROR_NOT_SUPPORTED. Query the open handle; never bypass
+            # the single-link guard just because enumeration is unavailable.
+            if (-not ('PegNativeLinkCount' -as [type])) {
+                Add-Type -TypeDefinition @'
+using System;
+using System.IO;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
+public static class PegNativeLinkCount {
+    [StructLayout(LayoutKind.Sequential)] struct Info {
+        public uint Attributes;
+        public System.Runtime.InteropServices.ComTypes.FILETIME Created, Accessed, Written;
+        public uint Volume, SizeHigh, SizeLow, Links, IndexHigh, IndexLow;
+    }
+    [DllImport("kernel32.dll", SetLastError=true)]
+    static extern bool GetFileInformationByHandle(SafeFileHandle handle, out Info info);
+    public static uint Read(string path) {
+        using (var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete)) {
+            Info info;
+            if (!GetFileInformationByHandle(file.SafeFileHandle, out info)) throw new Win32Exception(Marshal.GetLastWin32Error());
+            return info.Links;
+        }
+    }
+}
+'@
+            }
+            $linkCount = [PegNativeLinkCount]::Read($fullPath)
+        }
+        else { $linkCount = $links.Count }
+        if ($linkCount -ne 1) {
             throw "Qoder 安装源是硬链接或无法验证：$Path"
         }
     }

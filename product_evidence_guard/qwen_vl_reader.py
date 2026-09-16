@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
+from collections import Counter
 import hashlib
 import json
 from pathlib import Path
@@ -23,7 +24,7 @@ from .model_output_schema import (
     parse_visual_transcription_output,
 )
 from .models import FactCandidate, SourceBlock
-from .normalization import normalize_value
+from .normalization import normalize_value, values_equal
 from .parsers import sha256_file
 from .field_registry import field_definition
 
@@ -31,7 +32,7 @@ from .field_registry import field_definition
 VISUAL_MAX_NEW_TOKENS = 2048
 MAPPING_MAX_NEW_TOKENS = 480
 OCR_REVIEW_MAX_NEW_TOKENS = 640
-OCR_REVIEW_PROMPT_REVISION = "open-parameters-batches-v5"
+OCR_REVIEW_PROMPT_REVISION = "complete-review-agreement-v6"
 OCR_REVIEW_TEMPLATE_PATH = Path(__file__).with_name("ocr_review_prompt.txt")
 MAX_REPAIR_INPUT_CHARS = 20_000
 
@@ -158,6 +159,18 @@ class QwenVlReadResult:
 
 def _runtime_issue(stage: str, code: str, message: str) -> ModelOutputIssue:
     return ModelOutputIssue(stage=stage, code=code, message=message)
+
+
+def _hint_candidates(hints):
+    return [candidate for index, hint in enumerate(hints) for candidate in extract_rule_candidates(SourceBlock(
+        block_id=f"hint-{index}", source_file="ocr-hint", source_kind="ocr", file_hash="",
+        locator={}, text=str(hint.get("text", ""))))]
+
+
+def _missing_review_fields(hints, candidates):
+    expected = Counter((c.field, c.scope) for c in _hint_candidates(hints))
+    actual = Counter((c.field, c.scope) for c in candidates)
+    return expected - actual
 
 
 def _visual_prompt() -> str:
@@ -593,7 +606,7 @@ END_BROKEN_JSON"""
                 outputs.append(child.raw_transcription_output)
                 for key, value in child.stage_timings.items():
                     combined.stage_timings[key] = combined.stage_timings.get(key, 0) + value
-                if len(child.transcriptions) < len(batch) and not child.errors:
+                if _missing_review_fields(batch, child.fact_candidates) and not child.errors:
                     combined.errors.append(_runtime_issue("visual_review", "incomplete_review_coverage", "部分图片位置尚未核对完整，请补充清晰图片或重试。"))
                 if deadline is not None and time.perf_counter() >= deadline:
                     if start + len(batch) < len(ocr_hints):
@@ -747,6 +760,9 @@ END_BROKEN_JSON"""
         )
 
         if not transcription_items:
+            if review_mode and _hint_candidates(ocr_hints or []) and not result.errors:
+                result.errors.append(_runtime_issue("visual_review", "incomplete_review_coverage",
+                    "图片中的参数尚未核对完成，请重试或补充清晰图片。"))
             return result
 
         if review_mode:
@@ -776,6 +792,18 @@ END_BROKEN_JSON"""
                     block.locator["review_region_1000"] = list(review_region)
                 for candidate in result.fact_candidates:
                     candidate.locator["review_region_1000"] = list(review_region)
+            missing = _missing_review_fields(ocr_hints or [], result.fact_candidates)
+            if missing:
+                result.errors.append(_runtime_issue("visual_review", "incomplete_review_coverage",
+                    "部分图片参数尚未核对完整，请补充清晰图片或重试。"))
+            original = _hint_candidates(ocr_hints or [])
+            for candidate in result.fact_candidates:
+                candidate.provenance["visual_review"] = {
+                    "complete": not result.errors,
+                    "ocr_agrees": any(c.field == candidate.field and c.scope == candidate.scope
+                        and c.normalized_unit == candidate.normalized_unit
+                        and values_equal(c.normalized_value, candidate.normalized_value) for c in original),
+                }
             return result
 
         mapping_started = time.perf_counter()

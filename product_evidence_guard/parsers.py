@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 from dataclasses import dataclass
 import hashlib
+import io
 from itertools import islice
 import json
 from math import ceil, isfinite
@@ -174,8 +175,20 @@ def _make_block(
     )
 
 
+def read_source_text(path: Path) -> str:
+    raw = path.read_bytes()
+    if raw.startswith((b"\xff\xfe", b"\xfe\xff")):
+        return raw.decode("utf-16")
+    try:
+        return raw.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        # Strict fallback for legacy Chinese supplier documents. Never replace
+        # undecodable bytes with characters that could alter measurements.
+        return raw.decode("gb18030")
+
+
 def parse_text(path: Path, relative_path: str, file_hash: str) -> list[SourceBlock]:
-    text = path.read_text(encoding="utf-8-sig")
+    text = read_source_text(path)
     blocks: list[SourceBlock] = []
     for line_number, line in enumerate(text.splitlines(), start=1):
         value = line.strip()
@@ -194,8 +207,13 @@ def parse_text(path: Path, relative_path: str, file_hash: str) -> list[SourceBlo
 
 def parse_csv(path: Path, relative_path: str, file_hash: str) -> list[SourceBlock]:
     blocks: list[SourceBlock] = []
-    with path.open("r", encoding="utf-8-sig", newline="") as handle:
-        reader = csv.reader(handle)
+    text = read_source_text(path)
+    try:
+        dialect = csv.Sniffer().sniff(text[:65536], delimiters=",;\t")
+    except csv.Error:
+        dialect = csv.excel_tab if path.suffix.lower() == ".tsv" else csv.excel
+    with io.StringIO(text, newline="") as handle:
+        reader = csv.reader(handle, dialect)
         source_rows = [
             (row_number, [(index + 1, cell) for index, cell in enumerate(row)])
             for row_number, row in enumerate(reader, start=1)

@@ -873,6 +873,8 @@ def _looks_target_like(text: str) -> bool:
 
 def _has_unknown_unit_like_token(text: str) -> bool:
     pair = explicit_parameter(text)
+    if pair and pair[0].name in {"sku", "model", "variant", "ip_rating"}:
+        return False  # digits in an identity/code are not a physical unit
     if pair and pair[0].name.startswith("custom_"):
         return False  # preserved as literal text, no unsupported conversion
     dimension_spans = [
@@ -1589,13 +1591,42 @@ class HybridImageReader:
             )
             return result
 
-        hint_lines = target_lines or all_lines
+        preserved = None
+        review_lines, review_transcriptions, review_mappings = target_lines, transcriptions, mappings
+        if len(target_lines) > 1 and not {"conflicting_ocr_values", "multiple_io_scopes_in_one_line"}.intersection(reasons):
+            # One uncertain label must not discard all the clear parameters
+            # elsewhere on the page. Apply exactly the ordinary fast-path
+            # checks to each line, then visually review only the remainder.
+            safe_ids = set()
+            for line, transcription in zip(target_lines, transcriptions):
+                line_mappings = [m for m in mappings if m.transcription_id == transcription.id]
+                if line_mappings and not _routing_reasons(all_lines=[line], target_lines=[line],
+                        transcriptions=[transcription], mappings=line_mappings):
+                    safe_ids.add(transcription.id)
+            if safe_ids and len(safe_ids) < len(target_lines):
+                preserved = _build_fast_result(image_path=path, root_path=root_path,
+                    transcriptions=[t for t in transcriptions if t.id in safe_ids],
+                    mappings=[m for m in mappings if m.transcription_id in safe_ids],
+                    route="ocr_fast", ocr_seconds=ocr_seconds, ocr_line_count=len(all_lines), all_lines=all_lines)
+                review_lines = [line for line, t in zip(target_lines, transcriptions) if t.id not in safe_ids]
+                review_transcriptions = [t for t in transcriptions if t.id not in safe_ids]
+                review_mappings = [m for m in mappings if m.transcription_id not in safe_ids]
+        def include_preserved(result):
+            if preserved is not None:
+                result.transcriptions.extend(preserved.transcriptions)
+                result.mappings.extend(preserved.mappings)
+                result.source_blocks.extend(preserved.source_blocks)
+                result.fact_candidates.extend(preserved.fact_candidates)
+                result.fallback_reasons.append("clear_ocr_lines_preserved_partial_review")
+            return result
+
+        hint_lines = review_lines or all_lines
         hints = [
             {"text": line.text, "score": round(line.confidence, 6), "bbox_1000": line.bbox_1000}
             for line in hint_lines
         ]
         review_started = time.perf_counter()
-        region = (choose_review_region(path, all_lines, target_lines)
+        region = (choose_review_region(path, all_lines, review_lines)
                   if self.enable_review_region and getattr(self._qwen_reader, "supports_review_region", False)
                   and "unknown_unit_like_token" not in reasons
                   and not any(_has_ambiguous_same_field_measurements(line.text)
@@ -1610,16 +1641,16 @@ class HybridImageReader:
             **region_options,
         )
         if region is not None:
-            text_by_id = {line.id: line.raw_text for line in transcriptions}
+            text_by_id = {line.id: line.raw_text for line in review_transcriptions}
             expected_fields = Counter(
                 (mapping.field, mapping.scope_hint or infer_semantic_scope(mapping.field, text_by_id[mapping.transcription_id])
                  or field_definition(mapping.field).scope)
-                for mapping in mappings)
+                for mapping in review_mappings)
             actual_fields = Counter((candidate.field, candidate.scope) for candidate in reviewed.fact_candidates)
-            expected_conflict = _has_distinct_line_mapping_conflict(transcriptions, mappings)
+            expected_conflict = _has_distinct_line_mapping_conflict(review_transcriptions, review_mappings)
             actual_conflict = _has_distinct_line_mapping_conflict(reviewed.transcriptions, reviewed.mappings)
             if (not reviewed.ok or bool(expected_fields - actual_fields)
-                    or len(reviewed.transcriptions) < len(target_lines)
+                    or len(reviewed.transcriptions) < len(review_lines)
                     or (expected_conflict and not actual_conflict)):
                 # A crop must not silently remove a known field or conflict.
                 region_seconds = time.perf_counter() - review_started
@@ -1643,13 +1674,13 @@ class HybridImageReader:
             4,
         )
         if any(error.code in {"incomplete_review_coverage", "coverage_limit", "file_timeout"} for error in reviewed.errors):
-            return reviewed  # never hide incomplete batches behind a smaller full-page retry
+            return include_preserved(reviewed)  # do not hide incomplete review errors
         if reviewed.ok:
             if not reviewed.fact_candidates:
                 reviewed.fallback_reasons.append(
                     "guided_review_no_safe_candidate_no_deep_retry"
                 )
-            return reviewed
+            return include_preserved(reviewed)
 
         deep = self._qwen_reader.analyze_image(
             path,
@@ -1671,4 +1702,4 @@ class HybridImageReader:
             time.perf_counter() - started,
             4,
         )
-        return deep
+        return include_preserved(deep)

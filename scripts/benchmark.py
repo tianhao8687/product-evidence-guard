@@ -857,7 +857,23 @@ def _quality_metrics(
             for item in candidates
             if isinstance(item.get("field"), str)
         )
-        correct_fields = sum((expected_fields & predicted_fields).values())
+        # A right field attached to a wrong value is not a correct fact.
+        # Match one-to-one so duplicates cannot inflate recall either.
+        from product_evidence_guard.normalization import normalize_value, values_equal
+        remaining = list(candidates)
+        correct_fields = 0
+        for expected in expected_mappings:
+            normalized = normalize_value(expected["field"], str(expected.get("raw_value", "")))
+            expected_value = expected.get("normalized_value", normalized.value)
+            expected_unit = expected.get("normalized_unit", normalized.unit)
+            match = next((i for i, predicted in enumerate(remaining)
+                          if predicted.get("field") == expected["field"]
+                          and values_equal(predicted.get("normalized_value"), expected_value)
+                          and predicted.get("normalized_unit") == expected_unit
+                          and all(predicted.get(k) == expected[k] for k in ("scope", "product_id") if k in expected)), None)
+            if match is not None:
+                correct_fields += 1
+                remaining.pop(match)
         expected_count = sum(expected_fields.values())
         predicted_count = sum(predicted_fields.values())
         mapping_expected += expected_count
@@ -926,6 +942,7 @@ def _quality_metrics(
             "definition": "expected unit tokens found with unit-boundary matching",
         },
         "field_mapping": {
+            "definition": "one-to-one field + normalized value + unit; scope/product when annotated",
             "precision": precision,
             "recall": recall,
             "f1": _f1(precision, recall),

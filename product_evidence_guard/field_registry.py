@@ -277,6 +277,7 @@ def field_definition(name: str) -> FieldDefinition | None:
 
 def field_for_label(label: str, *, known_only: bool = False) -> FieldDefinition | None:
     label = re.sub(r"\s+", " ", str(label).strip()).casefold()
+    label = {"噪音": "噪声", "质保期": "保修期", "凈重": "净重", "淨重": "净重"}.get(label, label)
     for spec in FIELD_SPECS:
         if label in {spec.name, *(alias.casefold() for alias in spec.aliases)}:
             return spec
@@ -284,7 +285,8 @@ def field_for_label(label: str, *, known_only: bool = False) -> FieldDefinition 
         return None
     # These are document structure, not product attributes. Their contents are
     # still retained in source blocks for later extraction/coverage reporting.
-    if label in {"备注", "说明", "注", "注意", "提示", "note", "notes", "description", "参数", "数值", "单位", "字段", "值", "field", "value", "parameter", "unit"}:
+    if label in {"备注", "说明", "注", "注意", "提示", "note", "notes", "description", "参数", "数值", "单位", "字段", "值", "field", "value", "parameter", "unit",
+                 "项目", "内容", "主产品", "资料版本", "文档版本", "测试意图", "示例", "样例", "example", "example only"}:
         return None
     if re.match(r"^(?:figure|fig\.?|table)\s+(?:\d|context\s+line\s+\d)|^[图表]\s*\d+", label):
         return None

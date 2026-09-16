@@ -14,7 +14,7 @@ import stat
 from typing import Any
 import uuid
 
-from .confirmation import ConfirmationRequestError, export_confirmed, _load_json_object
+from .confirmation import ConfirmationError, ConfirmationRequestError, export_confirmed, _load_json_object, _source_validation_error
 from .content_check import check_draft, value_key, LABELS
 from .state import atomic_write_json, atomic_write_text
 
@@ -59,15 +59,43 @@ def safe_file(path: Path, *, max_bytes: int = MAX_CONTENT_BYTES) -> bytes:
     return path.read_bytes()
 
 
-def context(output_dir: str | Path, session_id: str | None = None) -> tuple[Path, dict, list[dict]]:
+def _sources_need_refresh(output: Path, product: dict) -> bool:
+    """Read-only status path. Delivery/decisions still do full validation."""
+    if any(not (output / name).exists() for name in (
+            "confirmation-state.json", "analysis-state.json", "confirmed-product-facts.json")):
+        return True  # preserve the existing recovery/stale-report path
+    # Recover a committed decision whose report write was interrupted.
+    if (output / "confirmation-state.json").stat().st_mtime_ns > (output / "product-facts.json").stat().st_mtime_ns:
+        decisions = _load_json_object(output / "confirmation-state.json")
+        if decisions.get("decisions") or decisions.get("review_edits") or decisions.get("review_history"):
+            return True
+    try:
+        analysis = _load_json_object(output / "analysis-state.json")
+    except ConfirmationError:
+        return True
+    if analysis.get("session_id") != product["run_summary"]["session_id"]:
+        return True
+    root = Path(analysis.get("input_root") or "")
+    hashes, checked = {}, {}
+    for candidate in product["candidates"]:
+        key = (candidate.get("source_file"), candidate.get("file_hash"))
+        if key not in checked:
+            checked[key] = _source_validation_error(root, candidate, hashes) is None
+        if checked[key] != candidate.get("source_current", True):
+            return True
+    return False
+
+
+def context(output_dir: str | Path, session_id: str | None = None, *, read_only: bool = False) -> tuple[Path, dict, list[dict]]:
     output = safe_output(output_dir)
     product = _load_json_object(output / "product-facts.json")
     actual = product["run_summary"]["session_id"]
     if session_id and session_id != actual:
         raise ConfirmationRequestError("会话已变化，请使用当前任务摘要。")
     # Revalidates source hashes even if the user has not re-run analysis yet.
-    export_confirmed(output, session_id=actual)
-    product = _load_json_object(output / "product-facts.json")
+    if not read_only or _sources_need_refresh(output, product):
+        export_confirmed(output, session_id=actual)
+        product = _load_json_object(output / "product-facts.json")
     confirmed = _load_json_object(output / "confirmed-product-facts.json")["facts"]
     candidates = {c["candidate_id"]: c for c in product["candidates"]}
     for fact in confirmed:
@@ -312,7 +340,7 @@ def performance_summary(summary: dict) -> dict:
 
 
 def task_snapshot(output_dir: str | Path, *, session_id: str | None = None, detailed: bool = False) -> dict:
-    output, product, confirmed = context(output_dir, session_id)
+    output, product, confirmed = context(output_dir, session_id, read_only=True)
     summary = product["run_summary"]
     session = summary["session_id"]
     manifest = _manifest(output, session)

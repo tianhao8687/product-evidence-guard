@@ -47,6 +47,8 @@ def normalize_text(value: str) -> str:
 
 
 def _numeric_text(raw: str) -> str | None:
+    # PDF/OCR typography must not turn a negative value into a positive one.
+    raw = raw.translate(str.maketrans({"−": "-", "﹣": "-", "－": "-", "＋": "+", "～": "~"}))
     # Never start matching inside a comma-separated number (1,000g -> 0g).
     for token in re.findall(r"\d[\d,]*,\d[\d,]*(?:\.\d+)?", raw):
         if not re.fullmatch(r"\d{1,3}(?:,\d{3})+(?:\.\d+)?", token):
@@ -184,7 +186,18 @@ def normalize_value(field: str, raw: str) -> NormalizedValue:
         text = normalize_text(raw)
         # Spacing is cosmetic; unfamiliar units are retained, never converted.
         text = re.sub(r"(?<=\d)\s+(?=[a-z%°\u3400-\u9fff])", "", text)
+        # Calendar periods are not fixed numbers of seconds. Only exact,
+        # whole-year/month expressions are interchangeable here.
+        period = re.fullmatch(r"(\d+)\s*(年|years?|个月|月|months?)", text)
+        if period:
+            months = int(period[1]) * (12 if period[2] in {"年", "year", "years"} else 1)
+            text = f"{months // 12}年" if months % 12 == 0 else f"{months}个月"
         return NormalizedValue(text, None)
+    if field == "color":
+        text = normalize_text(raw)
+        colors = {"black": "黑色", "white": "白色", "red": "红色", "blue": "蓝色",
+                  "green": "绿色", "yellow": "黄色", "orange": "橙色", "grey": "灰色", "gray": "灰色"}
+        return NormalizedValue(colors.get(text, text), None)
     if field == "capacity":
         return (
             normalize_number_with_unit(raw, "capacity_charge")
@@ -199,6 +212,17 @@ def normalize_value(field: str, raw: str) -> NormalizedValue:
     if family:
         return normalize_number_with_unit(raw, family) or NormalizedValue(normalize_text(raw), None, ("unparsed_unit",))
     return NormalizedValue(normalize_text(raw), None)
+
+
+def invalid_fact_value(field: str, raw: str, value: Any) -> bool:
+    """Reject missing/physically impossible values, not unusual valid specs."""
+    if normalize_text(raw) in {"待定", "待确认", "待补充", "未知", "未提供", "tbd", "tbc", "n/a", "-", "--", "暂无"}:
+        return True
+    spec = field_definition(field)
+    nonnegative = field == "quantity" or bool(spec and spec.unit_family in {
+        "mass", "length", "capacity_volume", "capacity_charge", "duration"})
+    values = value if isinstance(value, list) else [value]
+    return nonnegative and any(isinstance(v, (int, float)) and v < 0 for v in values)
 
 
 def values_equal(a: Any, b: Any, tolerance: float = 1e-6) -> bool:

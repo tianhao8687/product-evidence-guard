@@ -453,10 +453,38 @@ function Assert-SingleHardLink {
             throw "无法验证硬链接数量（缺少 fsutil.exe）：$Path"
         }
         $Links = @(& $Fsutil.Source hardlink list $Path 2>$null)
-        if ($LASTEXITCODE -ne 0 -or $Links.Count -lt 1) {
-            throw "无法验证硬链接数量：$Path"
+        if ($LASTEXITCODE -ne 0) {
+            # Keep the fail-closed link-count guard on filesystems where
+            # fsutil cannot enumerate hard links (for example ReFS temp).
+            if (-not ('PegNativeLinkCount' -as [type])) {
+                Add-Type -TypeDefinition @'
+using System;
+using System.IO;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
+public static class PegNativeLinkCount {
+    [StructLayout(LayoutKind.Sequential)] struct Info {
+        public uint Attributes;
+        public System.Runtime.InteropServices.ComTypes.FILETIME Created, Accessed, Written;
+        public uint Volume, SizeHigh, SizeLow, Links, IndexHigh, IndexLow;
+    }
+    [DllImport("kernel32.dll", SetLastError=true)]
+    static extern bool GetFileInformationByHandle(SafeFileHandle handle, out Info info);
+    public static uint Read(string path) {
+        using (var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete)) {
+            Info info;
+            if (!GetFileInformationByHandle(file.SafeFileHandle, out info)) throw new Win32Exception(Marshal.GetLastWin32Error());
+            return info.Links;
         }
-        if ($Links.Count -ne 1) {
+    }
+}
+'@
+            }
+            $NativeLinks = [PegNativeLinkCount]::Read($Path)
+        }
+        else { $NativeLinks = $Links.Count }
+        if ($NativeLinks -ne 1) {
             throw "发布文件是硬链接：$Path"
         }
         return

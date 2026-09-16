@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from dataclasses import replace
 import hashlib
 import json
 import re
@@ -11,6 +12,7 @@ from typing import Any, Iterable
 from .models import FactCandidate, ProductEntity
 from .normalization import normalize_text
 from .field_registry import field_definition
+from .extractor import product_tokens
 
 
 IDENTITY_VERSION = 2
@@ -105,12 +107,15 @@ def _row_key(candidate: FactCandidate) -> str:
     structured = candidate.provenance.get("structured_row")
     if isinstance(structured, dict) and structured.get("row_id"):
         return f"row:{structured['row_id']}"
-    return f"block:{candidate.source_block_id}"
+    return f"block:{candidate.source_block_id}:{candidate.provenance.get('applicable_sku', '')}"
 
 
 def _identity_values(items: Iterable[FactCandidate]) -> tuple[str | None, str | None, str | None]:
     fields: dict[str, list[str]] = defaultdict(list)
     for item in items:
+        token = item.provenance.get("applicable_sku") or item.provenance.get("explicit_product_token")
+        if token and token not in fields["sku"]:
+            fields["sku"].append(token)
         if item.field in {"sku", "model", "variant"}:
             value = _candidate_text(item).strip()
             if value and normalize_text(value) not in {normalize_text(existing) for existing in fields[item.field]}:
@@ -127,6 +132,34 @@ def _identity_values(items: Iterable[FactCandidate]) -> tuple[str | None, str | 
     ))  # type: ignore[return-value]
 
 
+def _expand_applicability(rows: list[FactCandidate]) -> list[FactCandidate]:
+    declarations: dict[str, list[list[str]]] = defaultdict(list)
+    for item in rows:
+        if item.field == "sku" and not item.provenance.get("structured_row"):
+            tokens = product_tokens(_candidate_text(item))
+            if tokens:
+                declarations[item.source_file].append(tokens)
+    expanded = []
+    for item in rows:
+        if item.provenance.get("structured_row") or item.provenance.get("applicable_sku"):
+            expanded.append(item)
+            continue
+        inline = product_tokens(str(item.provenance.get("explicit_product_token") or ""))
+        declared = declarations.get(item.source_file, [])
+        shared = declared[0] if len(declared) == 1 and len(declared[0]) > 1 else []
+        tokens = inline or (product_tokens(_candidate_text(item)) if item.field == "sku" else shared)
+        if not tokens:
+            expanded.append(item)
+            continue
+        for index, token in enumerate(tokens):
+            candidate = item if index == 0 else replace(item)
+            candidate.provenance = {**item.provenance, "applicable_sku": token}
+            if item.field == "sku" and len(tokens) > 1:
+                candidate.raw_value, candidate.normalized_value = token, normalize_text(token)
+            expanded.append(candidate)
+    return expanded
+
+
 def resolve_product_identities(
     candidates: Iterable[FactCandidate], *, dataset_root: str | Path
 ) -> list[ProductEntity]:
@@ -136,7 +169,9 @@ def resolve_product_identities(
     a unique model within one source.  If a dataset contains several products,
     unowned evidence stays source-local and ambiguous instead of being merged.
     """
-    rows = list(candidates)
+    rows = _expand_applicability(list(candidates))
+    if isinstance(candidates, list):
+        candidates[:] = rows
     by_row: dict[str, list[FactCandidate]] = defaultdict(list)
     by_file: dict[str, list[FactCandidate]] = defaultdict(list)
     for candidate in rows:
@@ -160,8 +195,57 @@ def resolve_product_identities(
             for candidate in items:
                 resolved[id(candidate)] = (product_id, sku, model, variant, status)
 
-    # A file containing exactly one explicit product may safely lend that
-    # identity to its other lines. Multiple row products never do.
+    # Resolve vertical labels together. A SKU and its shared model are two
+    # descriptions of one product, not two independent products. Structured
+    # rows remain hard boundaries and are never overwritten by file context.
+    for items in by_file.values():
+        unstructured = [item for item in items if not item.provenance.get("structured_row")]
+        sku, model, variant = _identity_values(unstructured)
+        models = {normalize_text(_candidate_text(item)) for item in unstructured if item.field == "model"}
+        explicit_skus = {value[1] for item in items if (value := resolved.get(id(item))) and value[1]}
+        if sku and len(explicit_skus) == 1 and len(models) <= 1:
+            anchor = (product_id_for(sku=sku), sku, model, variant, "derived_from_unique_source_identity")
+            for candidate in unstructured:
+                if id(candidate) not in uncertain and not candidate.provenance.get("applicable_sku"):
+                    resolved[id(candidate)] = anchor
+        elif len(explicit_skus) > 1:
+            # Explicit SKU headings own following lines until the next SKU.
+            # Never propagate a row in a multi-product table to other rows.
+            anchor = None
+            for candidate in unstructured:
+                own = resolved.get(id(candidate))
+                if own and own[1] and candidate.field == "sku":
+                    anchor = own
+                elif anchor and id(candidate) not in uncertain and not candidate.provenance.get("applicable_sku"):
+                    resolved[id(candidate)] = (*anchor[:4], "derived_from_source_section")
+
+    # Enrich explicit SKU references from an already-bound structured row.
+    # Do not invent a variant or attach a different explicit model.
+    sku_anchors = {}
+    for value in resolved.values():
+        if value[1] and value[2]:
+            sku_anchors.setdefault(value[0], value)
+    for key, value in list(resolved.items()):
+        if value[1] and value[0] in sku_anchors and not value[2]:
+            anchor = sku_anchors[value[0]]
+            resolved[key] = (value[0], value[1], anchor[2], value[3] or anchor[3], value[4])
+
+    # Model-only evidence can be linked only when that model has exactly one
+    # explicit SKU. A common model shared by multiple SKUs remains ambiguous.
+    model_skus: dict[str, dict[str, tuple]] = defaultdict(dict)
+    for product in resolved.values():
+        if product[1] and product[2]:
+            model_skus[normalize_text(product[2])][product[0]] = product
+    for key, product in list(resolved.items()):
+        if not product[1] and product[2]:
+            owners = model_skus.get(normalize_text(product[2]), {})
+            if len(owners) == 1 and not product[3]:
+                anchor = next(iter(owners.values()))
+                resolved[key] = (*anchor[:4], "derived_from_unique_model")
+            elif len(owners) > 1 and not product[3]:
+                resolved[key] = (*product[:4], "ambiguous")
+
+    # A file containing exactly one resolved product may lend its identity.
     for items in by_file.values():
         identities = {resolved[id(item)][0] for item in items if id(item) in resolved}
         if len(identities) == 1:
@@ -169,7 +253,7 @@ def resolve_product_identities(
             anchor = next(resolved[id(item)] for item in items if id(item) in resolved)
             for candidate in items:
                 if id(candidate) not in uncertain:
-                    resolved.setdefault(id(candidate), (*anchor[:4], "derived_from_unique_source_identity"))
+                    resolved.setdefault(id(candidate), (*anchor[:4], "ambiguous" if anchor[4] == "ambiguous" else "derived_from_unique_source_identity"))
 
     explicit_products = {value[0] for value in resolved.values()}
     dataset_token = stable_id("product", {

@@ -12,7 +12,7 @@ import json
 import re
 from typing import Any
 
-from .extractor import FIELD_SPECS, infer_semantic_scope, explicit_parameter, parameter_segments
+from .extractor import FIELD_SPECS, infer_semantic_scope, explicit_parameter, parameter_segments, strip_product_prefix
 from .field_registry import REGISTRY, field_definition
 from .models import ClaimCandidate
 from .normalization import normalize_text, normalize_value, values_equal
@@ -56,7 +56,7 @@ ALIAS_FIELDS = dict(ALIASES)
 UNLABELED_MODEL = re.compile(
     r"\b(?=[A-Za-z0-9-]*[A-Za-z])(?=[A-Za-z0-9-]*\d)[A-Za-z][A-Za-z0-9]*[-_][A-Za-z0-9_-]+\b"
 )
-STANDALONE_IP = re.compile(r"(?<![A-Za-z0-9])IP\s*\d{2}[A-Za-z]?(?![A-Za-z0-9])", re.I)
+STANDALONE_IP = re.compile(r"(?<![A-Za-z0-9])IP\s*[0-6X][0-9X][A-Za-z]?(?![A-Za-z0-9])", re.I)
 INFERENTIAL_ASSERTION = re.compile(
     r"适合户外|户外使用|长期浸水|效率提升\s*\d+(?:\.\d+)?%|"
     r"supports?\s+[^,.;，。；]{1,80}|兼容[^，。；;]{1,80}",
@@ -136,6 +136,15 @@ def check_draft(text: str, facts: list[dict[str, Any]]) -> dict[str, Any]:
             if not clause.strip():
                 continue
             product_id, product_ambiguous = _product_for_clause(clause, facts)
+            parameter_text, product_token = strip_product_prefix(clause)
+            if product_token:
+                # Strip only a product token supported by identity references.
+                # An unfamiliar token still gets explicit identity feedback.
+                owners = {f.get("product_id") for f in facts if f.get("field") in {"sku", "model"}
+                          and normalize_text(str(f.get("value", ""))) == normalize_text(product_token)}
+                if len(owners) == 1:
+                    product_id, product_ambiguous = next(iter(owners)), False
+                    clause = parameter_text
             explicit = explicit_parameter(clause)
             if explicit and explicit[0].name.startswith("custom_"):
                 spec, _raw = explicit
@@ -179,6 +188,8 @@ def check_draft(text: str, facts: list[dict[str, Any]]) -> dict[str, Any]:
                     consumed.append(span)
                     continue
                 scope_text = clause[:end] if SCOPE_POLICIES.get(field) == "electrical" else clause[match.start():end]
+                # Narrative glue such as '仅需' is not part of the scope label.
+                scope_text = re.sub(r"(?<=时间)(?:仅需|需要)|(?<=压力)(?:可达|达到)", ":", scope_text)
                 scope = infer_semantic_scope(field, scope_text) or DEFAULT_SCOPES.get(field)
                 if field in {"voltage", "current", "power"}:
                     directions = set(re.findall(r"输入|输出|\binput\b|\boutput\b", clause[:end], re.I))

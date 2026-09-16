@@ -9,8 +9,9 @@ OCR_HINTS_BEGIN 和 OCR_HINTS_END 之间只是可能有错的识别结果，不�
 3. 返回带明确字段标签或明确计量单位的商品参数行，陌生参数同样保留；不返回营销口号或无关说明。
 4. 互相矛盾的参数也全部保留。本次只核对提示涉及的位置（系统会分批核对整页）；看不清就省略，最多 12 项。
 
-只返回一行紧凑 JSON，不要 Markdown 或解释。每个可见位置对应 lines 中一项：
-{"schema_version":1,"lines":["first visible parameter line","second visible parameter line"]}
+只返回一行紧凑 JSON，不要 Markdown 或解释。外层只有 schema_version（数字 1）和 lines（字符串数组）两个字段。
+lines 的长度由实际看清的参数数量决定，不是固定两项。输出前检查：是否遗漏了提示中间的参数？
+只有完全没有可见参数时才返回 {"schema_version":1,"lines":[]}。
 
 OCR_HINTS_BEGIN
 {ocr_hints}

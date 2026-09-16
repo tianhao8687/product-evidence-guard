@@ -21,6 +21,24 @@ _ALIAS_INDEX: list[tuple[str, FieldSpec]] = sorted(
 )
 _NEXT_PARAMETER = "|".join(re.escape(alias) for alias, _ in _ALIAS_INDEX)
 
+
+def strip_product_prefix(text: str) -> tuple[str, str | None]:
+    """Separate an explicit product token from a parameter label, not prose."""
+    token = r"(?=[A-Za-z0-9_.-]*\d)[A-Za-z][A-Za-z0-9_.-]*"
+    match = re.match(rf"^\s*(?P<sku>{token}(?:\s*(?:/|、|,|，)\s*{token})*)\s+(?P<label>.+)", text)
+    if match:
+        rest = match["label"]
+        label = re.split(r"[:：=]", rest, maxsplit=1)[0].strip()
+        if ((re.search(r"[:：=]", rest) and field_for_label(label))
+                or re.match(rf"(?:{_NEXT_PARAMETER})(?=\s|[:：=\d])", rest, re.I)):
+            return rest, match["sku"]
+    return text, None
+
+
+def product_tokens(value: str) -> list[str]:
+    tokens = [token.strip() for token in re.split(r"\s*(?:/|、|,|，)\s*", value)]
+    return tokens if 1 <= len(tokens) <= 32 and all(re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", t) for t in tokens) else []
+
 _NUMERIC_FIELDS = {
     spec.name
     for spec in FIELD_SPECS
@@ -568,6 +586,10 @@ def _extract_value_after_alias(text: str, alias: str) -> tuple[str, str] | None:
     leading = re.match(r"^\s*(?:[-*•]\s*)?(?:(?:该|本)产品)?", text)
     start = leading.end() if leading else 0
     match = pattern.match(text, start)
+    if not match and any(spec.name in _NUMERIC_FIELDS and alias in {a.casefold() for a in spec.aliases} for spec in FIELD_SPECS):
+        # OCR commonly joins an English label to its first digit. Permit only
+        # numeric fields here; never split a model token such as MODEL120.
+        match = re.compile(re.escape(alias) + r"(?=[+\-−\d])", re.I).match(text, start)
     if not match:
         return None
 
@@ -584,7 +606,7 @@ def _extract_value_after_alias(text: str, alias: str) -> tuple[str, str] | None:
     whitespace = re.match(r"^\s+(?P<value>.+?)\s*$", tail)
     if whitespace:
         return whitespace.group("value") + unit_suffix, "whitespace"
-    if re.match(r"^[≤≥<>≈约±+\-\d]", tail):
+    if re.match(r"^[≤≥<>≈约±+\-−﹣－\d]", tail):
         return tail + unit_suffix, "explicit"
     return None
 
@@ -793,6 +815,7 @@ def parameter_segments(text: str) -> list[str]:
 
 
 def explicit_parameter(text: str):
+    text, _ = strip_product_prefix(text)
     if "|" in text or "\t" in text:
         cells = [cell.strip() for cell in re.split(r"[|\t]", text) if cell.strip()]
         if len(cells) == 2 and field_for_label(cells[0]):
@@ -813,8 +836,26 @@ def explicit_parameter(text: str):
 
 def extract_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
     result = []
+    if re.search(r"仅为模板|不代表真实参数|(?:仅供|只是)(?:示例|演示)|\bexample only\b", block.text, re.I):
+        return result
     for segment in parameter_segments(block.text):
-        part = replace(block, text=segment)
+        original = segment
+        segment, sku = strip_product_prefix(segment)
+        # A negated old value cannot be recovered by searching for its number.
+        # Only use an explicit correction; keep the complete source as evidence.
+        if re.search(r"不是|并非|不为", segment):
+            correction = re.search(r"(?:正确|更正为|应为)\s*(.+)$", segment)
+            if not correction:
+                continue
+            corrected = correction[1]
+            if not re.match(rf"(?:{_NEXT_PARAMETER})", corrected, re.I):
+                label = re.split(r"不是|并非|不为", segment, maxsplit=1)[0].strip()
+                corrected = label + ":" + corrected
+            segment = corrected
+        provenance = dict(block.provenance)
+        if sku:
+            provenance["explicit_product_token"] = sku
+        part = replace(block, text=segment, provenance=provenance)
         items = _extract_single_rule_candidates(part)
         explicit = explicit_parameter(segment)
         if explicit and not items:
@@ -833,6 +874,8 @@ def extract_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
                 scope=infer_semantic_scope(spec.name, segment) or spec.scope,
                 notes=list(normalized.notes), provenance=dict(part.provenance),
             )]
+        for item in items:
+            item.raw_text = original
         result.extend(items)
     return result
 
