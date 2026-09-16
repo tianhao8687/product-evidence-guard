@@ -25,7 +25,7 @@ VALID_OPERATIONS = frozenset(
     {"status", "analyze", "confirm", "reject", "export", "shutdown",
      "warmup", "residency", "review", "task", "job", "resume", "authorize",
      "handoff", "revoke", "check-content", "deliverables", "export-table", "export-local", "export-review"}
-    | {"allow-review", "review-summary", "decide", "revoke-review"}
+    | {"allow-review", "review-summary", "decide", "revoke-review", "review-action"}
 )
 VALID_STATES = frozenset(
     {"starting", "downloading", "loading", "running", "error", "shutdown"}

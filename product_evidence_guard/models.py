@@ -59,6 +59,7 @@ class FactCandidate:
     product_identity_status: str = "unresolved"
     identity_version: int = 2
     source_current: bool = True
+    excluded_from_review: bool = False
 
     @property
     def decision_status(self) -> str:
@@ -102,6 +103,7 @@ class FactGroup:
     review_reason_code: str | None = None
     human_approved: bool = False
     current: bool = True
+    excluded: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

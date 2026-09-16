@@ -103,17 +103,19 @@ class AutomaticFactWorkflowTests(unittest.TestCase):
         (self.source / "b.txt").write_text("净重：0.32kg\n", encoding="utf-8")
         self.summary = analyze_directory(self.source, self.output)
 
-    def test_auto_export_is_one_fact_but_not_a_human_decision_or_handoff(self):
+    def test_auto_export_is_one_fact_and_handoff_still_requires_explicit_selection(self):
         _, product, human = workflow.context(self.output)
         self.assertEqual(product["status"], "verified")
         self.assertEqual(len(product["facts"]), 1)
         self.assertEqual(len(product["evidence_candidates"]), 2)
         self.assertEqual(human, [])
         with self.assertRaises(ConfirmationRequestError):
-            workflow.export_table(self.output)
-        with self.assertRaises(ConfirmationRequestError):
-            workflow.create_handoff(self.output, candidate_ids=[product["candidates"][0]["candidate_id"]],
-                                    recipient="Qoder", purpose="test")
+            workflow.export_table(self.output, mode="human")
+        self.assertEqual(workflow.task_snapshot(self.output)["bundle_count"], 0)
+        grant = workflow.create_handoff(self.output, candidate_ids=[product["candidates"][0]["candidate_id"]],
+                                       recipient="Qoder", purpose="test")
+        self.assertEqual(workflow.get_handoff(self.output, bundle_id=grant["bundle_id"], recipient="Qoder")["facts"][0]["value"], 320)
+        self.assertEqual(workflow.context(self.output)[2], [])
         result = workflow.export_table(self.output, mode="verified")
         with Path(result["path"]).open(encoding="utf-8-sig", newline="") as stream:
             rows = list(csv.reader(stream))

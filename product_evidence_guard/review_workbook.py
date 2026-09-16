@@ -55,6 +55,7 @@ def group_candidates(rows, hashes):
             "verification_method": graph.verification_method, "selected_value": graph.selected_value,
             "selected_unit": graph.selected_unit, "review_reason_code": graph.review_reason_code,
             "human_approved": graph.human_approved, "current": graph.current,
+            "excluded": graph.excluded,
         })
     return sorted(groups, key=lambda g: ({"conflict": 0, "pending_confirmation": 1, "verified": 2}[g["fact_status"]],
                                         g.get("product_id") or "", g["field"], g["scope"] or ""))
@@ -172,9 +173,11 @@ def export_review(output_dir, *, session_id=None):
         status = group["fact_status"]
         shown_value = _value(group["selected_value"], group["field"]) if status == "verified" else alternatives
         unit = _unit(group["selected_unit"]) if status == "verified" else ""
-        reason = "" if status == "verified" else group["reason"]
-        overview.append([*context, status_labels[status], shown_value, unit, reason])
-        if status == "conflict":
+        reason = "本次不使用；可在处理入口恢复。" if group["excluded"] else "" if status == "verified" else group["reason"]
+        overview.append([*context, "本次不使用" if group["excluded"] else status_labels[status], shown_value, unit, reason])
+        if group["excluded"]:
+            pass  # Still present in overview/evidence; not an unresolved fact.
+        elif status == "conflict":
             conflicts.append([*context, source_values, group["source_count"], "请选择采用值，或补充说明。"])
             conflict_options.append(items)
         elif status == "pending_confirmation":

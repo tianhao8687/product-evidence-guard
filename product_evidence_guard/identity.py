@@ -235,6 +235,7 @@ def resolve_product_identities(
 def product_entities_from_candidates(
     candidates: Iterable[FactCandidate], *, dataset_name: str = "Dataset"
 ) -> list[ProductEntity]:
+    candidates = list(candidates)
     entities: dict[str, ProductEntity] = {}
     for candidate in candidates:
         if not candidate.product_id:
@@ -257,6 +258,20 @@ def product_entities_from_candidates(
             entity.label = candidate.product_sku
         if entity.model is None and candidate.product_model:
             entity.model = candidate.product_model
+    for candidate in candidates:
+        if candidate.extraction_method != "human_correction" or candidate.status != "confirmed" or not candidate.source_current:
+            continue
+        entity = entities.get(candidate.product_id)
+        if entity is None or candidate.field not in {"sku", "model", "variant"}:
+            continue
+        # A correction changes the displayed identity, not the original evidence
+        # or the stable product key used by existing decisions.
+        name = str(candidate.provenance.get("human_correction", {}).get("input_value") or candidate.normalized_value)
+        if candidate.field == "variant":
+            entity.variants = [name]
+        else:
+            setattr(entity, candidate.field, name)
+        entity.label = product_label(entity.sku, entity.model, " / ".join(entity.variants), dataset_name)
     for entity in entities.values():
         entity.variants.sort(key=normalize_text)
         entity.candidate_ids.sort()

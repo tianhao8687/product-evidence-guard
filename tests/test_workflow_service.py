@@ -60,12 +60,12 @@ class WorkflowServiceTests(unittest.TestCase):
                 self.request("/api/state", **arguments)
             self.assertEqual(rejected.exception.code, 403)
 
-    def test_decision_requires_reason_and_updates_review(self):
+    def test_decision_reason_is_optional_and_updates_review(self):
         self.review()
         candidate = json.loads((self.output / "product-facts.json").read_text(encoding="utf-8"))["candidates"][0]
         body = {"session_id": self.summary["session_id"], "candidate_id": candidate["candidate_id"], "action": "confirm", "reason": ""}
-        with self.assertRaises(HTTPError):
-            self.request("/api/decision", body=body)
+        with self.request("/api/decision", body=body) as response:
+            self.assertEqual(json.load(response)["decision"]["status"], "confirmed")
         body["reason"] = "人工已核对该测试说明书"
         with self.request("/api/decision", body=body) as response:
             self.assertEqual(json.load(response)["decision"]["status"], "confirmed")
@@ -80,6 +80,27 @@ class WorkflowServiceTests(unittest.TestCase):
         (self.source / "spec.txt").write_text("净重：999g", encoding="utf-8")
         with self.assertRaises(HTTPError):
             self.request("/api/preview?candidate=" + candidate["candidate_id"])
+
+    def test_conversation_review_action_can_edit_skip_and_undo(self):
+        def call(operation, **payload):
+            response = self.app.dispatch(build_request(operation, {"output_dir":str(self.output), **payload}))
+            self.assertTrue(response["ok"], response)
+            return response["result"]
+        grant = call("allow-review", recipient="WorkBuddy", fields=["net_weight"], reason="允许本次核对净重")
+        def summary():
+            return call("review-summary", recipient="WorkBuddy", review_id=grant["review_id"])
+        first = summary()
+        def act(s, group_key, action, **payload):
+            return call("review-action", summary_id=s["summary_id"], choice=s[group_key][0]["choices"][0]["choice"],
+                        recipient="WorkBuddy", action=action, **payload)
+        act(first, "groups", "edit", value="310g")
+        self.assertEqual(summary()["groups"][0]["selected_value"], 310)
+        skipped = act(summary(), "groups", "skip")
+        current = summary()
+        self.assertEqual(current["groups"], [])
+        self.assertEqual(len(current["excluded_groups"]), 1)
+        act(current, "excluded_groups", "undo", undo_token=skipped["undo_token"])
+        self.assertEqual(summary()["groups"][0]["selected_value"], 310)
 
     def test_background_job_deduplicates_active_output_and_persists_completion(self):
         started, release = threading.Event(), threading.Event()

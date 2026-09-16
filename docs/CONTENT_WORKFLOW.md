@@ -1,6 +1,30 @@
-# Qoder 商品内容闭环
+# 商品内容闭环（WorkBuddy / Qoder）
 
-**默认入口是 Qoder 对话。审核页仅在用户主动要求查看原始证据时使用，不是操作必经步骤。**
+**默认入口是当前宿主对话；也可提供“处理 / 修改参数”链接，供用户集中操作。页面不自动打开，不是必经步骤。**
+
+## 简单处理入口
+
+`review --output-dir "<输出目录>"` 返回本机页面。默认只展开冲突和待确认；每项可直接采用、修改或本次不使用。
+修改通常只填正确值（含单位），只有必要时才选择商品或口径。说明选填；页面支持撤销上一步。
+不使用的项目从待处理计数和导出中移除，原始记录仍保留在“全部与历史”和证据明细中。
+采用一个冲突值会不采用同组其他不同值，系统记录实际操作，不声称用户提供了额外证据。
+
+对话中使用当前获准摘要的选项即可，不让用户填写 ID：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 review-action --output-dir "<输出目录>" --summary-id "<summary_id>" --choice A2 --recipient WorkBuddy --action adopt
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 review-action --output-dir "<输出目录>" --summary-id "<summary_id>" --choice A2 --recipient WorkBuddy --action edit --value "310g"
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 review-action --output-dir "<输出目录>" --summary-id "<summary_id>" --choice A2 --recipient WorkBuddy --action skip
+```
+
+以上是独立示例，不要依次执行同一旧摘要。每步后重新获取 `review-summary`；撤销用新摘要中同一参数的选项及
+`--action undo --undo-token "<该次操作返回的 undo_token>"`。不使用的项目在摘要的 `excluded_groups` 中保留恢复选项。
+`edit` 可附 `--product-id`、`--scope`，仅接受工具返回的商品和支持的口径。不会修改输入文件。
+人工值单独记录，来源变化会使相关选择、人工修改和授权失效；撤销不会恢复已经失效的旧值。
+页面保留最近 20 步操作的撤销记录；另有完整审计记录，不代表可以越过后续不同操作任意回滚。
+
+`task.coverage` 单独报告未完成读取的文件/页/图片。页面显示重试入口，复用引擎有效缓存；
+“读取完成”不等于所有参数已被识别。未读完提示不增加第四种事实状态，也不阻止导出其他可用参数。
 
 ## 对话内的默认操作
 
@@ -22,7 +46,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 authorize 
 原始证据页不自动打开；需要查看时才调用 `review`。下文保留可选页面及兼容命令的详细说明。
 
 普通参数表使用 `export-table --mode verified`（含自动核验）；仅人工批准的正式参数使用
-`--mode human`，省略模式沿用原来的人工批准范围。自动核验不创建人工决定或云端授权。
+`--mode human`，省略模式默认全部已确认参数。`export-local` 同样支持这两个模式。自动核验不创建人工决定或云端授权。
 Excel 的五张表为核验总览、冲突、待确认事实、已确认事实、证据明细；总览每条事实一行。
 
 ### 陌生参数也能处理
@@ -95,8 +119,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 task --out
 用户主动查看原始证据时，`review --output-dir "<输出目录>"` 返回仅绑定 127.0.0.1 的临时地址。关闭服务后该地址失效。
 链接供用户直接打开，Qoder 不应通过模型浏览器、DOM 读取或截图将审核页中的原始证据带入云端上下文。
 页面支持按 Product/来源筛选、明确勾选后的批量确认/拒绝、冲突组显式处理、证据预览、
-授权字段、粘贴文案回检、导出 CSV 和交付件影响检查。普通“采用此值”不会自动拒绝
-同组其他候选；只有用户选择“采用并明确拒绝同组其余值”才执行该批量决定。
+授权字段、粘贴文案回检、导出 CSV 和交付件影响检查。事实卡上的“采用”同时不采用该组其他不同值；
+详情中的兼容单条确认/拒绝和批量记录操作只影响点名记录，不替用户额外选择。
 图片/PDF 显示对应原始图或页面；定位包含有效 bbox 时叠加证据框，只有近似坐标时
 提示结合整页核对，坐标缺失或非法时显示整页/整图而不伪造位置。文字与表格显示
 提取的证据原文及行/单元格位置。
@@ -158,10 +182,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 export-loc
 ```
 
 原因可为 `local_only`、`cloud_unavailable`、`quota_exceeded` 或 `generation_unverified`。
-结果为 `confirmed-parameters.csv` 和 `local-product-brief.md`，只包含当前有效的已确认值，不生成额外卖点、
+默认结果为 `verified-parameters.csv` 和 `local-product-brief.md`；`--mode human` 输出 `confirmed-parameters.csv`。
+只包含当前有效的已确认值，不生成额外卖点、
 不调用模型和网络。两份交付件都记录事实引用，来源变化后标记需要刷新。
 `task` 返回 `local_delivery_ready` 时交付本地文件，不继续反复触发云端请求。
-同一字段/口径存在互相矛盾的已确认值时，本地简报拒绝自动选择，需先明确采用哪一条。
+冲突字段不进入默认简报，不自动选择某个冲突值；其他可用字段可以先交付。仅人工模式仍拒绝矛盾的人工确认。
 
 ## 5. 交付件与更新影响
 

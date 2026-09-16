@@ -41,8 +41,8 @@ class ContentWorkflowTests(unittest.TestCase):
         path.write_text(text, encoding="utf-8")
         return workflow.check_content(self.output, content_file=str(path), bundle_id=self.bundle, recipient="Qoder")
 
-    def test_unconfirmed_and_empty_selection_cannot_be_authorized(self):
-        for ids in ([], [self.candidates[0]["candidate_id"]]):
+    def test_empty_or_unknown_selection_cannot_be_authorized(self):
+        for ids in ([], ["unknown-candidate"]):
             with self.assertRaises(ConfirmationRequestError):
                 workflow.create_handoff(self.output, candidate_ids=ids, recipient="Qoder", purpose="介绍")
 
@@ -185,7 +185,9 @@ class ContentWorkflowTests(unittest.TestCase):
                                action="confirm", reason="测试冲突确认不能直接交付")
         self.assertEqual(export_review(self.output)["confirmed_row_count"], 0)
         with self.assertRaises(ConfirmationRequestError):
-            workflow.export_table(self.output)
+            workflow.export_table(self.output, mode="human")
+        table = workflow.export_table(self.output)
+        self.assertNotIn("净重", Path(table["path"]).read_text(encoding="utf-8-sig"))
 
     def test_quantity_wrong_unit_is_not_accepted(self):
         facts = [{"fact_id": "quantity-fact", "field": "quantity", "value": 2, "unit": "count", "scope": None}]
@@ -206,7 +208,7 @@ class ContentWorkflowTests(unittest.TestCase):
 
     def test_local_delivery_needs_no_cloud_grant_and_tracks_source_updates(self):
         self.confirm()
-        result = workflow.export_local(self.output, reason="quota_exceeded")
+        result = workflow.export_local(self.output, reason="quota_exceeded", mode="human")
         self.assertFalse(result["network_sent"])
         self.assertFalse(result["model_called"])
         self.assertEqual(result["status"], "local_delivery_ready")
@@ -233,8 +235,10 @@ class ContentWorkflowTests(unittest.TestCase):
         apply_decision(self.output, session_id=summary["session_id"], candidate_id=other["candidate_id"],
                        action="confirm", reason="测试中显式确认另一条矛盾值")
         with self.assertRaises(ConfirmationRequestError):
-            workflow.export_local(self.output)
+            workflow.export_local(self.output, mode="human")
         self.assertFalse((self.output / "local-product-brief.md").exists())
+        result = workflow.export_local(self.output)
+        self.assertNotIn("净重", Path(result["artifacts"]["brief"]).read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

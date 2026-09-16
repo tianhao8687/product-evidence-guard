@@ -6,8 +6,8 @@ description: 本地、离线使用 OpenVINO 在 Intel AIPC 核验商品资料、
 
 # 本地商品事实核验
 
-在 Qoder 对话内完成核验、问题处理、内容回检和导出。正常参数直接使用，有疑问时才选择 A1/A2 等选项；
-文件路径和内部 ID 由 Skill 管理。只有用户要求看原图/原文时，才提供辅助证据页。
+在当前宿主（如 WorkBuddy 或 Qoder）对话内完成核验、问题处理、内容回检和导出。正常参数直接使用，有疑问时才选择 A1/A2 等选项；
+文件路径和内部 ID 由 Skill 管理。用户想集中修改、确认或查看原文时，提供一个“处理 / 修改参数”本地入口，不自动打开窗口。
 
 ## 处理边界
 
@@ -50,6 +50,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 task --out
 - `next_action=wait_for_analysis` 时继续等待，不使用旧摘要授权或交付。失败/中断可用 `resume --job-id "<job_id>"`，复用成功落盘的文件。
 - 完成后只说明冲突、待确认、已确认数量和下一步，底层证据数作为辅助信息。同一商品/参数/口径只展示一次，来源与证据按需展开；不要逐条铺开正常参数的候选。需要解释速度时使用 `performance`，区分本地分析耗时与完整命令耗时。
 - `no_candidates` 要求补充材料；`needs_attention` 先处理错误或来源失效；不要将空结果说成核验全部通过。
+- 同时说明 `coverage.message` 中未读完的资料；没有冲突不等于全部读完。已确认参数可以先用，不替未读部分背书。
 
 用户已允许展示本次所需参数时，记录或复用该范围，再获取选项：
 
@@ -62,6 +63,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 decide --o
 `--field` 可重复；只有明确允许全部字段时才用 `--all-fields`。仅对冲突或真正有疑问的参数展示选项；
 `next_action=review_complete` 表示无需重复确认，可按用户请求导出。已确认事实不要求逐项依据；
 人工决定记录用户的实际选择即可，不编造核验证明。正式生成授权仍需用户明确选定字段。
+用户说“采用 A2”“改成 310g”“这项先不用”时，优先用 `review-action` 的 `adopt`、`edit`、`skip`；
+`adopt` 代表采用该值并不采用同组其他不同值，先让用户看清选项。说明选填，不再索要证明材料。
+`edit --value "310g"` 记录人工修改，保留原始资料；必要时用工具返回的 `--product-id` 或 `--scope` 指定归属/含义。
+每次操作后重新获取摘要；需要撤销时使用该次返回的 `undo_token`，不能复用失效选项。完整例子见内容闭环指南。
 选项使用工具返回的值、单位、口径和来源别名；
 每个冲突、待确认选项后附上工具返回的 `source_url`，将它渲染成文字为“查看原文”的可点击链接；多来源分别保留链接，不自行拼接路径。
 原文链接是只供用户在本机打开的只读证据摘录，含页码、行号或单元格位置及可用的来源文件入口。
@@ -72,8 +77,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 decide --o
 
 ## 内容生成与交付
 
-用户已要求使用确认字段生成内容时，执行 `authorize` → `handoff`，让 Qoder 用获准字段生成草稿，
+用户已要求使用确认字段生成内容时，执行 `authorize` → `handoff`，让当前宿主用获准字段生成草稿，
 再用 `check-content` 回检。接收方、用途、字段范围均沿用用户授权，不额外上传原资料。
+自动确认参数也可以直接授权使用，无需再逐条人工确认；授权仅表示允许本次使用，不伪造人工核验记录。
+命令中的 `--recipient` 使用实际宿主名称，并在摘要、授权和回检中保持一致。
 命令及状态处理见 [内容闭环指南](docs/CONTENT_WORKFLOW.md#4-云端生成与本地回检)。
 
 - `covered_fields_match` 只表示已识别参数与依据一致，不保证所有营销表述正确。
@@ -83,7 +90,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 decide --o
   返回 CSV 和事实简报，不调用模型。`local_delivery_ready` 时交付文件，不再反复请求云端。
 - 来源或交付件变化后，用 `deliverables` 查看影响并重检/重导出；不自动修改已发布内容。
 
-用户要求查看原始证据时，调用 `review --output-dir "<输出目录>"`，将本地链接交给用户打开；
+用户想要集中处理/修改参数或查看原始证据时，调用 `review --output-dir "<输出目录>"`，将本地链接以“处理 / 修改参数”交给用户打开；
 不要用宿主的浏览器、DOM 或截图工具读取该页。
 
 需要离线审阅或 Excel 核验表时，调用 `export-review --output-dir "<输出目录>"`。
@@ -91,7 +98,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 decide --o
 该文件含来源和原文，仅交给用户本地查看；不要读取回宿主或自动上传。
 冲突和待确认表的每个选项都带“查看原文”超链接，一个事实组仍只占一行。
 导出目录中的 `source-links` 是链接使用的本机证据页，请保留；链接不是公网地址，换电脑需重新导出。
-Excel 备注不改变正式确认状态，参数选择仍通过对话 `decide` 完成。
+Excel 备注不改变正式确认状态，参数选择通过对话 `review-action`、兼容 `decide` 或本地处理入口完成。
 对话摘要已按口径分组并把未解决冲突排在前面；同一文件多处文字不算多个独立来源。
 `task.deliverable_updates` 提示核验表 `needs_refresh` 时重新导出；来源已改变则先重新分析。
 

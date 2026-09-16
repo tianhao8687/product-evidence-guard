@@ -202,6 +202,8 @@ def _load_confirmation_state(
                 )
             )
         data["session_id"] = session_id
+        for key in ("review_edits", "review_excluded", "review_history"):
+            data.pop(key, None)
         changed = True
     return data, events, changed
 
@@ -337,6 +339,14 @@ def _load_analysis_context(
             candidate_id = str(candidate.get("candidate_id", ""))
             if candidate_id:
                 snapshots[candidate_id] = _candidate_snapshot(candidate)
+    state, _, _ = _load_confirmation_state(output_dir, session_id)
+    hash_cache: dict[Path, str] = {}
+    for item in _review_candidates(list(snapshots.values()), state):
+        row = item.to_dict()
+        edit = state.get("review_edits", {}).get(item.candidate_id)
+        if edit and all(_source_validation_error(input_root, parent, hash_cache) is None
+                        for parent in edit["parents"].values()):
+            snapshots[item.candidate_id] = _candidate_snapshot(row)
     return input_root, snapshots
 
 
@@ -403,7 +413,12 @@ def _validate_active_decisions(
                 changed = True
 
         reason: str | None = None
-        if row is None:
+        parents = decision.get("review_parents", {})
+        if parents and any(key not in current or _candidate_snapshot(current[key]) != parent or
+                           (input_root is not None and _source_validation_error(input_root, parent, hash_cache) is not None)
+                           for key, parent in parents.items()):
+            reason = "本次选择涉及的资料已变化，请重新核对。"
+        elif row is None:
             reason = "源文件哈希或候选已变化，旧确认自动失效。"
         elif snapshot is None:
             reason = "旧确认缺少完整候选快照，无法安全导出。"
@@ -466,23 +481,29 @@ def _synchronize_analysis_outputs(
     product_facts: dict[str, Any],
     state: dict[str, Any],
 ) -> None:
-    candidates = _deserialize_candidates(product_facts)
+    candidates = _review_candidates(_candidate_rows(product_facts), state)
     decisions = state["decisions"]
     try:
-        source_root, _ = _load_analysis_context(output_dir, session_id=_session_id(product_facts))
+        source_root, analysis_snapshots = _load_analysis_context(output_dir, session_id=_session_id(product_facts))
     except ConfirmationError:
         source_root = None
+        analysis_snapshots = {}
     source_hashes: dict[Path, str] = {}
     for candidate in candidates:
         candidate.source_current = source_root is not None and _source_validation_error(
             source_root, candidate.to_dict(), source_hashes) is None
+        if candidate.extraction_method == "human_correction":
+            candidate.source_current &= analysis_snapshots.get(candidate.candidate_id) == _candidate_snapshot(candidate.to_dict())
         candidate.status = "pending"
+        candidate.excluded_from_review = False
         decision = decisions.get(candidate.candidate_id)
         if not isinstance(decision, dict) or decision.get("status") not in ACTIVE_STATUSES:
             continue
         snapshot = _valid_snapshot(decision)
         if snapshot is not None and _snapshot_matches_row(snapshot, candidate.to_dict()):
             candidate.status = str(decision["status"])
+        candidate.excluded_from_review = bool(candidate.source_current and candidate.status == "rejected" and
+            state.get("review_excluded", {}).get(candidate.candidate_id) == _snapshot_digest(_candidate_snapshot(candidate.to_dict())))
 
     counts = Counter(candidate.status for candidate in candidates)
     counts["stale"] = sum(
@@ -531,7 +552,7 @@ def _write_confirmed_facts(
     product_facts: dict[str, Any],
     state: dict[str, Any],
 ) -> Path:
-    rows = _candidate_rows(product_facts)
+    rows = [c.to_dict() for c in _review_candidates(_candidate_rows(product_facts), state)]
     decisions = state["decisions"]
     confirmed: list[dict[str, Any]] = []
     for row in rows:
@@ -849,6 +870,9 @@ def reconcile_confirmations(
         session_id,
         recover_session_mismatch=True,
     )
+    candidate_list = _review_candidates([c.to_dict() for c in candidate_list], state)
+    if isinstance(candidates, list):
+        candidates[:] = candidate_list
     candidate_rows = [item.to_dict() for item in candidate_list]
     validation_events, validation_changed = _validate_active_decisions(
         state,
@@ -875,8 +899,170 @@ def reconcile_confirmations(
             statuses[candidate_id] = status
     if changed:
         atomic_write_json(state_path, state)
+    for item in candidate_list:
+        item.excluded_from_review = bool(statuses.get(item.candidate_id) == "rejected" and
+            state.get("review_excluded", {}).get(item.candidate_id) == _snapshot_digest(_candidate_snapshot(item.to_dict())))
     _append_audit_events(output, events)
     return statuses
+
+
+def _review_candidates(rows: list[dict], state: dict) -> list[FactCandidate]:
+    """Rebuild user corrections from unchanged parser evidence, never overwrite it."""
+    originals = [row for row in rows if row.get("extraction_method") != "human_correction"]
+    base = {row["candidate_id"]: _candidate_snapshot(row) for row in originals}
+    result = [FactCandidate.from_dict(row) for row in originals]
+    for cid, edit in state.get("review_edits", {}).items():
+        parents = edit.get("parents", {})
+        if parents and all(base.get(key) == value for key, value in parents.items()):
+            row = edit.get("candidate", {})
+            if row.get("candidate_id") != cid or row.get("extraction_method") != "human_correction":
+                raise ConfirmationError("人工修改记录无效。")
+            result.append(FactCandidate.from_dict(row))
+    return result
+
+
+def _review_state(state: dict) -> dict:
+    return _json_clone({key: state.get(key, {}) for key in ("decisions", "review_edits", "review_excluded")})
+
+
+def review_undo_token(output: Path, session: str) -> str | None:
+    state, _, _ = _load_confirmation_state(output, session)
+    history = state.get("review_history", [])
+    if history and history[-1]["after"] == _snapshot_digest(_review_state(state)):
+        return history[-1]["transaction_id"]
+    return None
+
+
+def apply_review_action(output_dir: str | Path, *, session_id: str, action: str,
+                        group_id: str = "", expected_candidate_ids: list[str] | None = None,
+                        candidate_id: str | None = None, value: str | None = None,
+                        product_id: str | None = None, scope: str | None = None,
+                        reason: str = "", undo_token: str | None = None) -> dict:
+    """One explicit user gesture, validated as a whole, with one-step undo."""
+    from .field_registry import field_definition
+    from .normalization import normalize_value
+
+    if action not in {"adopt", "edit", "skip", "undo"}:
+        raise ConfirmationRequestError("请选择采用、修改、本次不使用或撤销。")
+    if not isinstance(reason, str) or len(reason) > 1000:
+        raise ConfirmationRequestError("补充说明最多 1000 字。")
+    output = Path(output_dir).expanduser().resolve()
+    export_confirmed(output, session_id=session_id)
+    product = _load_json_object(output / "product-facts.json")
+    state, _, _ = _load_confirmation_state(output, session_id)
+    before = _review_state(state)
+    root, snapshots = _load_analysis_context(output, session_id=session_id)
+    history = state.setdefault("review_history", [])
+    transaction = uuid.uuid4().hex
+    if action == "undo":
+        if not history or undo_token != review_undo_token(output, session_id):
+            raise ConfirmationRequestError("操作记录已经变化，无法撤销这一步。请刷新后重试。")
+        last = history[-1]
+        if group_id:
+            group = next((g for g in product["fact_groups"] if g["group_id"] == group_id), None)
+            if not group or group["field"] != last.get("field"):
+                raise ConfirmationRequestError("这一步不属于当前获准处理的参数。")
+        for cid, parent in last["parents"].items():
+            if snapshots.get(cid) != parent or _source_validation_error(root, parent, {}) is not None:
+                raise ConfirmationRequestError("来源已经变化，请重新分析；不能恢复旧值。")
+        state.update(last["before"])
+        history.pop()
+        event = {"action": "review_undo", "undoes": undo_token}
+    else:
+        group = next((g for g in product["fact_groups"] if g["group_id"] == group_id), None)
+        if not group or not expected_candidate_ids or set(expected_candidate_ids) != set(group["candidate_ids"]):
+            raise ConfirmationRequestError("参数或选项已经变化，请刷新后再处理。")
+        by_id = {c["candidate_id"]: c for c in product["candidates"]}
+        rows = [by_id[cid] for cid in group["candidate_ids"]]
+        parents = {}
+        for row in rows:
+            cid = row["candidate_id"]
+            snap = _candidate_snapshot(row)
+            if snapshots.get(cid) != snap or _source_validation_error(root, snap, {}) is not None:
+                raise ConfirmationRequestError("来源已经变化，请重新读取后再处理。")
+            edit = state.get("review_edits", {}).get(cid)
+            parents.update(edit["parents"] if edit else {cid: snap})
+        selected = by_id.get(candidate_id or "")
+        if action in {"adopt", "edit"} and (not selected or candidate_id not in group["candidate_ids"]):
+            raise ConfirmationRequestError("请先选择一个当前选项。")
+        if action == "adopt" and group.get("review_reason_code") in {"identity_ambiguous", "scope_unclear"}:
+            raise ConfirmationRequestError("请使用“修改”选择商品或口径，再保存。")
+        note = reason.strip() or {"adopt": "用户选择采用此值，并不采用本组其他不同值。",
+                                 "edit": "用户修改并采用；原始识别内容保留。",
+                                 "skip": "用户选择本次不使用此参数。"}[action]
+        def decide(row, status, exclude=False):
+            cid = row["candidate_id"]
+            snapshot = _candidate_snapshot(row)
+            state["decisions"][cid] = {"status": status, "field": row["field"], "scope": row.get("scope"),
+                "product_id": row.get("product_id"), "file_hash": row["file_hash"], "source_file": row["source_file"],
+                "timestamp": _utc_now(), "reason": note, "transaction_id": transaction,
+                "review_parents": parents,
+                "candidate_snapshot": snapshot, "candidate_snapshot_sha256": _snapshot_digest(snapshot)}
+            excluded = state.setdefault("review_excluded", {})
+            if exclude:
+                excluded[cid] = _snapshot_digest(snapshot)
+            else:
+                excluded.pop(cid, None)
+        if action == "edit":
+            if not isinstance(value, str) or not value.strip() or len(value) > 512:
+                raise ConfirmationRequestError("请输入正确值（含单位），最多 512 字。")
+            corrected = _json_clone(selected)
+            spec = field_definition(corrected["field"])
+            normalized = normalize_value(corrected["field"], value.strip())
+            corrected.update(candidate_id="manual_" + transaction, source_block_id=selected["source_block_id"] + ":manual:" + transaction,
+                normalized_value=normalized.value, normalized_unit=normalized.unit, notes=list(normalized.notes),
+                extraction_method="human_correction", mapping_confidence_source="human", mapping_confidence=1.0)
+            corrected["provenance"] = {**corrected.get("provenance", {}), "human_correction": {
+                "input_value": value.strip(), "original_candidate_id": candidate_id, "parent_ids": sorted(parents)}}
+            if scope is not None:
+                allowed = set(spec.allowed_scopes if spec else ()) | {str(corrected.get("scope") or ""), "product", "packaging"}
+                if not isinstance(scope, str) or scope not in allowed:
+                    raise ConfirmationRequestError("请选择这个参数支持的口径。")
+                corrected["scope"] = scope or None
+            if product_id is not None:
+                target = next((c for c in product["candidates"] if c.get("product_id") == product_id and
+                               c.get("product_identity_status") not in {"ambiguous", "unresolved"} and c.get("source_current", True)), None)
+                if target is None:
+                    raise ConfirmationRequestError("请选择列表中明确的商品。")
+                target_snapshot = _candidate_snapshot(target)
+                if snapshots.get(target["candidate_id"]) != target_snapshot or _source_validation_error(root, target_snapshot, {}) is not None:
+                    raise ConfirmationRequestError("商品资料已变化，请先重新读取。")
+                target_edit = state.get("review_edits", {}).get(target["candidate_id"])
+                parents.update(target_edit["parents"] if target_edit else {target["candidate_id"]: target_snapshot})
+                for key in ("product_id", "product_sku", "product_model", "product_variant"):
+                    corrected[key] = target.get(key)
+                corrected["product_identity_status"] = "human_assigned"
+            if corrected.get("product_identity_status") in {"ambiguous", "unresolved"}:
+                raise ConfirmationRequestError("请选择这条参数所属的商品。")
+            if not corrected.get("scope") and (group.get("review_reason_code") == "scope_unclear" or (spec and spec.scope_policy == "electrical")):
+                raise ConfirmationRequestError("请选择输入、输出或其他适用口径。")
+            state.setdefault("review_edits", {})[corrected["candidate_id"]] = {
+                "candidate": _candidate_snapshot(corrected), "parents": parents}
+            for row in rows:
+                decide(row, "rejected", exclude=True)
+            decide(corrected, "confirmed")
+        elif action == "skip":
+            for row in rows:
+                decide(row, "rejected", exclude=True)
+        else:
+            for row in rows:
+                same = row["normalized_unit"] == selected["normalized_unit"] and values_equal(row["normalized_value"], selected["normalized_value"])
+                decide(row, "confirmed" if same else "rejected")
+        event = {"action": "review_" + action, "group_id": group_id, "reason": note,
+                 "candidate_ids": group["candidate_ids"], "selected_candidate_id": candidate_id}
+        if action == "edit":
+            event["correction"] = state["review_edits"][corrected["candidate_id"]]
+        history.append({"transaction_id": transaction, "before": before, "parents": parents, "field": group["field"],
+                        "after": _snapshot_digest(_review_state(state))})
+        del history[:-20]
+    event.update(timestamp=_utc_now(), transaction_id=transaction, session_id=session_id, tool_version=__version__, phase="prepared")
+    _append_audit(output, event)
+    atomic_write_json(output / CONFIRMATION_STATE_NAME, state)
+    _append_audit(output, {"action": "review_commit", "transaction_id": transaction, "session_id": session_id, "timestamp": _utc_now()})
+    _synchronize_analysis_outputs(output, product_facts=product, state=state)
+    _write_confirmed_facts(output, product_facts=product, state=state)
+    return {"status": "saved", "action": action, "transaction_id": transaction,
+            "undo_token": review_undo_token(output, session_id), "network_sent": False}
 
 
 def export_confirmed(output_dir: str | Path, *, session_id: str) -> dict[str, Any]:
@@ -913,7 +1099,7 @@ def export_confirmed(output_dir: str | Path, *, session_id: str) -> dict[str, An
         validation_events, validation_changed = _validate_active_decisions(
             state,
             session_id=session_id,
-            candidate_rows=_candidate_rows(product_facts),
+            candidate_rows=[c.to_dict() for c in _review_candidates(_candidate_rows(product_facts), state)],
             allow_snapshot_upgrade=False,
             input_root=input_root,
             analysis_snapshots=analysis_snapshots,

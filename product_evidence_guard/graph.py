@@ -41,6 +41,7 @@ def refresh_fact_status(groups: Iterable[FactGroup], candidates: Iterable[FactCa
     blocked_ids = {cid for relation in relations if relation.severity == "block" for cid in relation.candidate_ids}
     for group in groups:
         items = [by_id[cid] for cid in group.candidate_ids if cid in by_id]
+        group.excluded = bool(items) and all(item.excluded_from_review for item in items)
         active = [item for item in items if item.status != "rejected"]
         valid = [item for item in active if item.source_current and item.status != "stale"]
         human = [item for item in valid if item.status == "confirmed"]
@@ -68,10 +69,11 @@ def refresh_fact_status(groups: Iterable[FactGroup], candidates: Iterable[FactCa
             code = "scope_unclear"
         elif blocked_ids.intersection(group.candidate_ids):
             code = "blocking_relation"
-        elif any(any(note.startswith("unparsed_") for note in item.notes) or
+        elif any((any(note.startswith("unparsed_") for note in item.notes) or
                  (spec and spec.value_type != "text" and item.normalized_unit is None) or
                  (item.status != "confirmed" and (item.recognition_confidence < 0.8 or
-                    (item.mapping_confidence_source != "deterministic" and item.mapping_confidence < 0.8)))
+                    (item.mapping_confidence_source != "deterministic" and item.mapping_confidence < 0.8))))
+                 and not (item.status == "confirmed" and item.extraction_method == "human_correction")
                  for item in valid):
             code = "unclear_value"
         elif _likely_version_update(valid) and not (human and _all_equal(valid)):

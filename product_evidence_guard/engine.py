@@ -2031,6 +2031,7 @@ def analyze_directory(
     )
     for candidate in candidates:
         candidate.status = confirmation_statuses.get(candidate.candidate_id, "pending")
+    candidates, groups, relations = build_graph(candidates)
     confirmation_counts = _confirmation_status_counts(output, candidates)
     scanned_pages_detected = sum(
         len(entry.get("scanned_pdf_pages", []))

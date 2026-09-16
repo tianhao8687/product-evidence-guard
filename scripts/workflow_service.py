@@ -12,6 +12,7 @@ from product_evidence_guard.confirmation import (
     ConfirmationRequestError,
     apply_batch_decisions,
     resolve_conflict_group,
+    apply_review_action,
 )
 from product_evidence_guard import workflow, conversation
 from product_evidence_guard.state import atomic_write_json, atomic_write_text
@@ -20,7 +21,7 @@ from product_evidence_guard.task_jobs import TaskJobs
 
 OPERATIONS = {"warmup", "residency", "review", "task", "job", "resume", "authorize", "handoff",
               "revoke", "check-content", "deliverables", "export-table", "export-local", "export-review"}
-OPERATIONS |= {"allow-review", "review-summary", "decide", "revoke-review"}
+OPERATIONS |= {"allow-review", "review-summary", "decide", "revoke-review", "review-action"}
 
 
 class WorkflowService:
@@ -150,7 +151,11 @@ class WorkflowService:
                 return conversation.review_summary(output, review_id=payload["review_id"], recipient=payload["recipient"], **kwargs)
             if operation == "decide":
                 return conversation.decide(output, summary_id=payload["summary_id"], choice=payload["choice"],
-                    recipient=payload["recipient"], action=payload["action"], reason=payload["reason"], **kwargs)
+                    recipient=payload["recipient"], action=payload["action"], reason=payload.get("reason", ""), **kwargs)
+            if operation == "review-action":
+                changes = {key: payload[key] for key in ("value", "product_id", "scope", "reason", "undo_token") if key in payload}
+                return conversation.review_action(output, summary_id=payload["summary_id"], choice=payload["choice"],
+                    recipient=payload["recipient"], action=payload["action"], **changes, **kwargs)
             if operation == "revoke-review":
                 return conversation.revoke_review(output, review_id=payload["review_id"], recipient=payload["recipient"], **kwargs)
             if operation == "authorize":
@@ -168,22 +173,27 @@ class WorkflowService:
                 return workflow.check_content(output, content_file=payload["content_file"],
                     bundle_id=payload["bundle_id"], recipient=payload["recipient"], **kwargs)
             if operation == "export-table":
-                return workflow.export_table(output, mode=payload.get("mode", "human"), **kwargs)
+                return workflow.export_table(output, mode=payload.get("mode", "verified"), **kwargs)
             if operation == "export-review":
                 from product_evidence_guard.review_workbook import export_review
                 return export_review(output, **kwargs)
             if operation == "export-local":
-                return workflow.export_local(output, reason=payload.get("reason", "local_only"), **kwargs)
+                return workflow.export_local(output, reason=payload.get("reason", "local_only"), mode=payload.get("mode", "verified"), **kwargs)
         raise ConfirmationRequestError("不支持的工作流操作。")
 
     def review_action(self, output, action, body):
+        if action == "fact-action":
+            with self.app._operation_lock:
+                allowed = {key: body[key] for key in ("session_id", "action", "group_id", "expected_candidate_ids",
+                           "candidate_id", "value", "product_id", "scope", "reason", "undo_token") if key in body}
+                return apply_review_action(output, **allowed)
         if action == "decision":
             operation = body.get("action")
             if operation not in {"confirm", "reject"}:
                 raise ConfirmationRequestError("请明确选择采用或拒绝。")
             response = self.app.dispatch(build_request(operation, {
                 "output_dir": str(output), "session_id": body["session_id"],
-                "candidate_id": body["candidate_id"], "reason": body["reason"]}))
+                "candidate_id": body["candidate_id"], "reason": body.get("reason") or ("用户选择采用此值。" if operation == "confirm" else "用户选择拒绝此值。")}))
             if not response["ok"]:
                 raise ConfirmationRequestError(response["error"]["message"])
             return response["result"]
@@ -192,7 +202,8 @@ class WorkflowService:
                 return apply_batch_decisions(
                     output,
                     session_id=body["session_id"],
-                    decisions=body.get("decisions", []),
+                    decisions=[{**d, "reason": d.get("reason") or "用户明确勾选并执行批量" + str(d.get("action", ""))}
+                               for d in body.get("decisions", [])],
                 ).to_dict()
         if action == "resolve-conflict":
             with self.app._operation_lock:
@@ -210,7 +221,7 @@ class WorkflowService:
         if action == "reanalyze":
             payload = self.requests.get(str(output))
             if not payload:
-                raise ConfirmationRequestError("请先在 Qoder 中运行一次新版分析，以保存当前模型与输入配置。")
+                raise ConfirmationRequestError("请先在当前宿主中运行一次分析，以保存本次模型与输入配置。")
             return self.jobs.submit(payload)
         if action == "check":
             text = body.get("text")

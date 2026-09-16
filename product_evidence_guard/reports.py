@@ -183,12 +183,14 @@ def write_product_facts(
     candidate_list = list(candidates)
     group_list, relation_list = list(groups), list(relations)
     refresh_fact_status(group_list, candidate_list, relation_list)
-    fact_counts = Counter(group.fact_status for group in group_list)
-    status = ("no_facts" if not group_list else "blocked" if fact_counts["conflict"]
+    included = [g for g in group_list if not g.excluded]
+    fact_counts = Counter(group.fact_status for group in included)
+    status = ("no_facts" if not included else "blocked" if fact_counts["conflict"]
               else "awaiting_review" if fact_counts["pending_confirmation"]
-              else "ready_to_export" if all(g.human_approved for g in group_list) else "verified")
+              else "ready_to_export" if all(g.human_approved for g in included) else "verified")
     run_summary["fact_status_counts"] = {key: fact_counts[key] for key in FACT_STATUS_LABELS}
-    run_summary["fact_count"] = len(group_list)
+    run_summary["fact_count"] = len(included)
+    run_summary["excluded_fact_count"] = len(group_list) - len(included)
     run_summary["blocking_conflict_count"] = fact_counts["conflict"]
     atomic_write_json(
         path,
@@ -229,6 +231,7 @@ def write_conflicts_markdown(
     relation_list = list(relations)
     refresh_fact_status(group_list, candidate_list, relation_list)
     by_id = {candidate.candidate_id: candidate for candidate in candidate_list}
+    group_list = [g for g in group_list if not g.excluded]
     status_counts = _confirmation_counts(candidate_list, run_summary)
     links = _review_links(path, candidate_list, group_list, input_root)
     lines = [
@@ -381,6 +384,7 @@ def write_html_report(
     relation_list = list(relations)
     refresh_fact_status(group_list, candidate_list, relation_list)
     by_id = {candidate.candidate_id: candidate for candidate in candidate_list}
+    group_list = [g for g in group_list if not g.excluded]
     status_counts = _confirmation_counts(candidate_list, run_summary)
     links = _review_links(path, candidate_list, group_list, input_root)
     severity_class = {"block": "danger", "review": "warn", "pass": "ok", "info": "info"}

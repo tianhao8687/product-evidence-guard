@@ -99,7 +99,9 @@ def review_summary(output_dir, *, review_id: str, recipient: str, session_id: st
     aliases = {name: f"来源{i + 1}" for i, name in enumerate(sorted(hashes))}
     mapping = {}
     from .review_workbook import group_candidates
-    groups = group_candidates(rows, hashes)
+    all_groups = group_candidates(rows, hashes)
+    groups = [g for g in all_groups if not g.get("excluded")]
+    excluded_groups = [g for g in all_groups if g.get("excluded")]
     from .source_links import write_source_links
     review_ids = {cid for g in groups if g["fact_status"] != "verified" for cid in g["candidate_ids"]}
     source_links = write_source_links(output, [c for c in rows if c["candidate_id"] in review_ids])
@@ -119,7 +121,7 @@ def review_summary(output_dir, *, review_id: str, recipient: str, session_id: st
                         product_id=c.get("product_id"))
         mapping[choice] = c["candidate_id"]
         choices_by_id[c["candidate_id"]] = item
-    for group in groups:
+    for group in all_groups:
         # Product labels can contain an unapproved SKU/model. The opaque
         # product_id is enough to keep groups separate in the host summary.
         group.pop("product_label", None)
@@ -129,7 +131,8 @@ def review_summary(output_dir, *, review_id: str, recipient: str, session_id: st
                              "choices": mapping, "created_at": workflow.now()}
     atomic_write_json(output / workflow.WORKFLOW_FILE, manifest)
     return {"summary_id": summary_id, "review_id": review_id, "session_id": session,
-            "groups": groups, "needs_reanalysis": needs_reanalysis,
+            "groups": groups, "excluded_groups": excluded_groups, "needs_reanalysis": needs_reanalysis,
+            "coverage": workflow.coverage_summary(product["run_summary"]),
             "next_action": ("reanalyze" if needs_reanalysis else "request_more_material" if not rows else
                             "ask_user_choice" if any(g["fact_status"] != "verified" for g in groups) else "review_complete"),
             "data_scope": "仅包含获准字段的标准值、单位、口径、状态、来源别名、类型和本机原文链接；不包含原文件名、正文或图片。原文链接只供用户本地打开，宿主不得读取或上传链接内容。"}
@@ -157,12 +160,24 @@ def resolve_choices(output_dir, *, summary_id: str, choices: list[str], recipien
 
 
 def decide(output_dir, *, summary_id: str, choice: str, recipient: str, action: str,
-           reason: str, session_id: str | None = None) -> dict:
+           reason: str = "", session_id: str | None = None) -> dict:
     session, selected = resolve_choices(output_dir, summary_id=summary_id, choices=[choice],
                                         recipient=recipient, session_id=session_id)
-    result = apply_decision(output_dir, session_id=session, candidate_id=selected[0], action=action, reason=reason)
+    result = apply_decision(output_dir, session_id=session, candidate_id=selected[0], action=action,
+                            reason=reason or ("用户选择采用此值。" if action == "confirm" else "用户选择拒绝此值。"))
     return {"session_id": session, "summary_id": summary_id, "choice": choice,
             "field": result.field, "status": result.status, "next_action": "continue_requested_workflow"}
+
+
+def review_action(output_dir, *, summary_id: str, choice: str, recipient: str,
+                  action: str, session_id: str | None = None, **changes) -> dict:
+    from .confirmation import apply_review_action
+    session, ids = resolve_choices(output_dir, summary_id=summary_id, choices=[choice],
+                                  recipient=recipient, session_id=session_id)
+    output, product, _ = workflow.context(output_dir, session)
+    group = next(g for g in product["facts"] if ids[0] in g["candidate_ids"])
+    return apply_review_action(output, session_id=session, action=action, group_id=group["group_id"],
+                              candidate_id=ids[0], expected_candidate_ids=group["candidate_ids"], **changes)
 
 
 def revoke_review(output_dir, *, review_id: str, recipient: str, session_id: str | None = None) -> dict:

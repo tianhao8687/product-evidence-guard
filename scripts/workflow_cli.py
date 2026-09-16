@@ -16,12 +16,12 @@ def add_commands(commands):
         parser = commands.add_parser(name)
         parser.add_argument("--job-id", required=True)
     for name in ("review", "task", "authorize", "handoff", "revoke", "check-content", "deliverables", "export-table", "export-local", "export-review",
-                 "allow-review", "review-summary", "decide", "revoke-review"):
+                 "allow-review", "review-summary", "decide", "revoke-review", "review-action"):
         parser = commands.add_parser(name)
         parser.add_argument("--output-dir", required=True)
         parser.add_argument("--session-id")
-        if name == "export-table":
-            parser.add_argument("--mode", choices=("human", "verified"), default="human",
+        if name in {"export-table", "export-local"}:
+            parser.add_argument("--mode", choices=("human", "verified"), default="verified",
                                 help="human 仅人工批准；verified 全部已确认参数（含自动核验）")
         if name == "authorize":
             selection = parser.add_mutually_exclusive_group(required=True)
@@ -39,7 +39,7 @@ def add_commands(commands):
         if name == "export-local":
             parser.add_argument("--reason", choices=("local_only", "cloud_unavailable", "quota_exceeded", "generation_unverified"),
                                 default="local_only", help="本地模板交付原因；不会调用模型或网络")
-        if name in {"allow-review", "review-summary", "decide", "revoke-review"}:
+        if name in {"allow-review", "review-summary", "decide", "revoke-review", "review-action"}:
             parser.add_argument("--recipient", required=True)
         if name == "allow-review":
             selection = parser.add_mutually_exclusive_group(required=True)
@@ -48,11 +48,16 @@ def add_commands(commands):
             parser.add_argument("--reason", required=True)
         if name in {"review-summary", "revoke-review"}:
             parser.add_argument("--review-id", required=True)
-        if name == "decide":
+        if name in {"decide", "review-action"}:
             parser.add_argument("--summary-id", required=True)
             parser.add_argument("--choice", required=True)
-            parser.add_argument("--action", choices=("confirm", "reject"), required=True)
-            parser.add_argument("--reason", required=True)
+            parser.add_argument("--action", choices=("confirm", "reject") if name == "decide" else ("adopt", "edit", "skip", "undo"), required=True)
+            parser.add_argument("--reason", default="")
+        if name == "review-action":
+            parser.add_argument("--value", help="修改后的完整值，含单位")
+            parser.add_argument("--product-id")
+            parser.add_argument("--scope")
+            parser.add_argument("--undo-token")
 
 
 def payload(args):
