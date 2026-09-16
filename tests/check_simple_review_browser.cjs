@@ -75,8 +75,15 @@ let browser;
   large.coverage={status:'partial',message:'本次更新未完成，下面保留的是上次结果。',can_retry:true};
   const bulk=await browser.newPage({viewport:{width:1440,height:1000}});
   bulk.on('pageerror',e=>errors.push(e.message));
-  await bulk.route('**/api/state',route=>route.fulfill({json:large}));
+  let releaseState;
+  const stateGate=new Promise(resolve=>{releaseState=resolve;});
+  await bulk.route('**/api/state',async route=>{await stateGate;await route.fulfill({json:large});});
   await bulk.goto(url);
+  // Navigation while the first (large) response is still loading must be safe.
+  await bulk.locator('.nav[data-view=handoff]').click();
+  await bulk.locator('.nav[data-view=review]').click();
+  releaseState();
+  await bulk.locator('#confirmed-count').filter({hasText:'6000'}).waitFor();
   await bulk.getByRole('button',{name:'已确认',exact:true}).click();
   assert.equal(await bulk.locator('.group').count(),50);
   assert.equal(await bulk.locator('.approved-row').count(),0);
@@ -88,7 +95,7 @@ let browser;
   assert.equal(await bulk.locator('.group').count(),50);
   await bulk.close();
   assert.deepEqual(errors,[]);
-  console.log('Headless review E2E passed: adopt, edit, undo, skip, authorize, content check, four widths, 6000-fact paging and failed-update notice.');
+  console.log('Headless review E2E passed: adopt, edit, undo, skip, authorize, content check, four widths, 6000-fact paging, loading-time navigation and failed-update notice.');
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(async()=>{
   if(browser)await browser.close();
   child.stdin.end('\n');
