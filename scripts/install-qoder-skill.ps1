@@ -55,6 +55,7 @@ $requiredRuntimeFiles = @(
     'product_evidence_guard/openvino_adapter.py',
     'product_evidence_guard/parsers.py',
     'product_evidence_guard/pdf_layout.py',
+    'product_evidence_guard/pdf_conditions.py',
     'product_evidence_guard/input_safety.py',
     'product_evidence_guard/readiness.py',
     'product_evidence_guard/preprocessing.py',

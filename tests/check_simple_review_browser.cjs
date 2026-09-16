@@ -127,6 +127,16 @@ let browser;
   assert.equal(await bulk.evaluate(()=>polling!==null),true);
   await bulk.evaluate(()=>{state.jobs=[];state.phase='verified';state.showing_previous_result=false;state.product.run_summary.reading_issues=[{file:'sample.pdf',code:'table_binding_unclear',locator:{page:1},message:'请补充清晰表格'}];render();});
   await bulk.getByRole('button',{name:'补充资料后重新读取',exact:true}).waitFor();
+  // Conditions remain collapsed and readable; preview requests a stored note
+  // index, never an arbitrary caller-supplied file path or PDF page.
+  await bulk.evaluate(()=>{const c=state.product.candidates[0];c.provenance={source_conditions:[{marker:'3',text:'Valid only under test profile Z',locator:{page:4}}]};c.normalized_value='300TB [条件: Valid only under test profile Z]';const g=state.product.facts[0];g.selected_value=c.normalized_value;g.verified_candidate_ids=[c.candidate_id];state.product.facts=[g];renderGroups();});
+  assert.match(await bulk.locator('.fact-value').textContent(),/含附注条件/);
+  assert.equal(await bulk.locator('.source-condition').isVisible(),false);
+  await bulk.locator('.fact-details > summary').click();
+  await bulk.route('**/api/preview?*',async route=>{assert.equal(new URL(route.request().url()).searchParams.get('condition'),'0');await route.fulfill({json:{text:'Stored note source',locator:{page:4}}});});
+  await bulk.getByRole('link',{name:'查看条件原文',exact:true}).click();
+  await bulk.locator('#evidence-content').filter({hasText:'Stored note source'}).waitFor();
+  await bulk.locator('#evidence-location').filter({hasText:'页码 4'}).waitFor();
   await bulk.close();
   assert.deepEqual(errors,[]);
   console.log('Headless review E2E passed: adopt, edit, undo, skip, authorize, content check, four widths, 6000-fact paging, loading-time navigation and failed-update notice.');

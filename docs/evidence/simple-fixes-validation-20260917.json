@@ -1,0 +1,8788 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-09-16T21:57:59.307949+00:00",
+  "protocol": "Exposed regression of the same 20 synthetic scenarios in 3 correlated formats. Not a new blind test or production accuracy estimate. All outputs scored.",
+  "fixture_sha256": "7cdc0262b70875b6d2d392d4044a347e22842e66ebf7a6c5f9a96063d71b48e0",
+  "baseline_sha256": "2d947c9df1b6112815d84ea9279020d43d66166e47b3bc3ea914ff771ac88978",
+  "code_sha256": "02c158e7af759632829f32afa4f377bece6347665ae6f7b709d9246d947e4dc2",
+  "raw_report_sha256": "9e0554d36762b59b3d2997c64c0c56997646a72def28eec2a6509ac8bd6eaab1",
+  "audit_script_sha256": "2c4f766a3c9567a804dfa1ac384f600ae0ca8d6af1894fe4eeffeb3a3c35e20c",
+  "execution": "Existing native engine; no Docling, OCR, VLM or remote inference. 2 workers, BelowNormal, 4 logical CPUs.",
+  "wall_seconds": 15.8336011999927,
+  "baseline_counts": {
+    "packages": 60,
+    "execution_errors": 0,
+    "passed": 55,
+    "expected_business_facts": 219,
+    "predicted_business_facts": 213,
+    "auto_confirmed": 201,
+    "wrong_auto_confirmed": 0,
+    "missing_fact_keys": 6,
+    "missed_conflicts": 0,
+    "false_conflicts": 0,
+    "review_items": 12,
+    "unnecessary_review_items": 9,
+    "correct_business_facts": 204,
+    "business_fact_correctness": 0.9315068493150684,
+    "auto_confirm_precision": 1.0,
+    "expected_auto_confirmable_facts": 216,
+    "auto_confirm_coverage": 0.9305555555555556,
+    "package_pass_rate": 0.9166666666666666
+  },
+  "raw_original_gold_counts": {
+    "packages": 60,
+    "execution_errors": 0,
+    "passed": 51,
+    "expected_business_facts": 219,
+    "predicted_business_facts": 219,
+    "auto_confirmed": 216,
+    "wrong_auto_confirmed": 9,
+    "missing_fact_keys": 9,
+    "missed_conflicts": 0,
+    "false_conflicts": 0,
+    "review_items": 3,
+    "unnecessary_review_items": 0
+  },
+  "oracle_errata": [
+    {
+      "case": "s14_txt",
+      "field": "dimensions",
+      "original_scope": null,
+      "correct_scope": "product",
+      "source_label": "产品尺寸",
+      "reason": "The source explicitly says product dimensions. The frozen oracle omitted the product scope. Values, units, product ownership and required status are unchanged. Adjudicated after first prediction; not a new blind result."
+    },
+    {
+      "case": "s14_pdf_lines",
+      "field": "dimensions",
+      "original_scope": null,
+      "correct_scope": "product",
+      "source_label": "产品尺寸",
+      "reason": "The source explicitly says product dimensions. The frozen oracle omitted the product scope. Values, units, product ownership and required status are unchanged. Adjudicated after first prediction; not a new blind result."
+    },
+    {
+      "case": "s14_pdf_table",
+      "field": "dimensions",
+      "original_scope": null,
+      "correct_scope": "product",
+      "source_label": "产品尺寸",
+      "reason": "The source explicitly says product dimensions. The frozen oracle omitted the product scope. Values, units, product ownership and required status are unchanged. Adjudicated after first prediction; not a new blind result."
+    },
+    {
+      "case": "s16_txt",
+      "field": "dimensions",
+      "original_scope": null,
+      "correct_scope": "product",
+      "source_label": "产品尺寸",
+      "reason": "The source explicitly says product dimensions. The frozen oracle omitted the product scope. Values, units, product ownership and required status are unchanged. Adjudicated after first prediction; not a new blind result."
+    },
+    {
+      "case": "s16_pdf_lines",
+      "field": "dimensions",
+      "original_scope": null,
+      "correct_scope": "product",
+      "source_label": "产品尺寸",
+      "reason": "The source explicitly says product dimensions. The frozen oracle omitted the product scope. Values, units, product ownership and required status are unchanged. Adjudicated after first prediction; not a new blind result."
+    },
+    {
+      "case": "s16_pdf_table",
+      "field": "dimensions",
+      "original_scope": null,
+      "correct_scope": "product",
+      "source_label": "产品尺寸",
+      "reason": "The source explicitly says product dimensions. The frozen oracle omitted the product scope. Values, units, product ownership and required status are unchanged. Adjudicated after first prediction; not a new blind result."
+    },
+    {
+      "case": "s18_txt",
+      "field": "dimensions",
+      "original_scope": null,
+      "correct_scope": "product",
+      "source_label": "产品尺寸",
+      "reason": "The source explicitly says product dimensions. The frozen oracle omitted the product scope. Values, units, product ownership and required status are unchanged. Adjudicated after first prediction; not a new blind result."
+    },
+    {
+      "case": "s18_pdf_lines",
+      "field": "dimensions",
+      "original_scope": null,
+      "correct_scope": "product",
+      "source_label": "产品尺寸",
+      "reason": "The source explicitly says product dimensions. The frozen oracle omitted the product scope. Values, units, product ownership and required status are unchanged. Adjudicated after first prediction; not a new blind result."
+    },
+    {
+      "case": "s18_pdf_table",
+      "field": "dimensions",
+      "original_scope": null,
+      "correct_scope": "product",
+      "source_label": "产品尺寸",
+      "reason": "The source explicitly says product dimensions. The frozen oracle omitted the product scope. Values, units, product ownership and required status are unchanged. Adjudicated after first prediction; not a new blind result."
+    }
+  ],
+  "new_oracle_changes": [],
+  "counts": {
+    "packages": 60,
+    "execution_errors": 0,
+    "passed": 60,
+    "expected_business_facts": 219,
+    "predicted_business_facts": 219,
+    "auto_confirmed": 216,
+    "wrong_auto_confirmed": 0,
+    "missing_fact_keys": 0,
+    "missed_conflicts": 0,
+    "false_conflicts": 0,
+    "review_items": 3,
+    "unnecessary_review_items": 0,
+    "correct_business_facts": 219,
+    "business_fact_correctness": 1.0,
+    "package_pass_rate": 1.0
+  },
+  "by_format": {
+    "txt": {
+      "packages": 20,
+      "execution_errors": 0,
+      "passed": 20,
+      "expected_business_facts": 73,
+      "predicted_business_facts": 73,
+      "auto_confirmed": 72,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 1,
+      "unnecessary_review_items": 0
+    },
+    "pdf_lines": {
+      "packages": 20,
+      "execution_errors": 0,
+      "passed": 20,
+      "expected_business_facts": 73,
+      "predicted_business_facts": 73,
+      "auto_confirmed": 72,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 1,
+      "unnecessary_review_items": 0
+    },
+    "pdf_table": {
+      "packages": 20,
+      "execution_errors": 0,
+      "passed": 20,
+      "expected_business_facts": 73,
+      "predicted_business_facts": 73,
+      "auto_confirmed": 72,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 1,
+      "unnecessary_review_items": 0
+    }
+  },
+  "cases": [
+    {
+      "id": "s01_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S01",
+          "capacity_volume",
+          null,
+          "verified",
+          [
+            [
+              420,
+              "mL"
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "蓝色",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "304不锈钢",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              275,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s01",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.4402850999904331,
+      "domain": "日用品",
+      "title": "单来源水杯",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S01",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s01",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              275,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "capacity_volume",
+          null,
+          "verified",
+          [
+            [
+              420,
+              "mL"
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "304不锈钢",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "蓝色",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s01_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S01",
+          "capacity_volume",
+          null,
+          "verified",
+          [
+            [
+              420,
+              "mL"
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "蓝色",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "304不锈钢",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              275,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s01",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 1.0638761000009254,
+      "domain": "日用品",
+      "title": "单来源水杯",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S01",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s01",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              275,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "capacity_volume",
+          null,
+          "verified",
+          [
+            [
+              420,
+              "mL"
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "304不锈钢",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "蓝色",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s01_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S01",
+          "capacity_volume",
+          null,
+          "verified",
+          [
+            [
+              420,
+              "mL"
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "蓝色",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "304不锈钢",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              275,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s01",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.6100049999949988,
+      "domain": "日用品",
+      "title": "单来源水杯",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S01",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s01",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              275,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "capacity_volume",
+          null,
+          "verified",
+          [
+            [
+              420,
+              "mL"
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "304不锈钢",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "蓝色",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s02_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 3,
+      "predicted_business_facts": 3,
+      "auto_confirmed": 3,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S02",
+          "gross_weight",
+          "gross",
+          "verified",
+          [
+            [
+              1600,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              1350,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              6,
+              "count"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s02",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.35511989999213256,
+      "domain": "包装",
+      "title": "净重与毛重不能冲突",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S02",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s02",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              1350,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "gross_weight",
+          "gross",
+          "verified",
+          [
+            [
+              1600,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              6,
+              "count"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 3,
+      "baseline_passed": true
+    },
+    {
+      "id": "s02_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 3,
+      "predicted_business_facts": 3,
+      "auto_confirmed": 3,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S02",
+          "gross_weight",
+          "gross",
+          "verified",
+          [
+            [
+              1600,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              1350,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              6,
+              "count"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s02",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5345582000154536,
+      "domain": "包装",
+      "title": "净重与毛重不能冲突",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S02",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s02",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              1350,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "gross_weight",
+          "gross",
+          "verified",
+          [
+            [
+              1600,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              6,
+              "count"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 3,
+      "baseline_passed": true
+    },
+    {
+      "id": "s02_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 3,
+      "predicted_business_facts": 3,
+      "auto_confirmed": 3,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S02",
+          "gross_weight",
+          "gross",
+          "verified",
+          [
+            [
+              1600,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              1350,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              6,
+              "count"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s02",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5746220999862999,
+      "domain": "包装",
+      "title": "净重与毛重不能冲突",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S02",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s02",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              1350,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "gross_weight",
+          "gross",
+          "verified",
+          [
+            [
+              1600,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              6,
+              "count"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 3,
+      "baseline_passed": true
+    },
+    {
+      "id": "s03_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S03",
+          "length",
+          null,
+          "verified",
+          [
+            [
+              1000,
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              10,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s03",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              5,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.4057399000157602,
+      "domain": "电源",
+      "title": "输入与输出分开",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S03",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s03",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              5,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              10,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "length",
+          null,
+          "verified",
+          [
+            [
+              1000,
+              "mm"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s03_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S03",
+          "length",
+          null,
+          "verified",
+          [
+            [
+              1000,
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              10,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s03",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              5,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5712293999968097,
+      "domain": "电源",
+      "title": "输入与输出分开",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S03",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s03",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              5,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              10,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "length",
+          null,
+          "verified",
+          [
+            [
+              1000,
+              "mm"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s03_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S03",
+          "length",
+          null,
+          "verified",
+          [
+            [
+              1000,
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              10,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s03",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              5,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5783405000111088,
+      "domain": "电源",
+      "title": "输入与输出分开",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S03",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s03",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              5,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              10,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "length",
+          null,
+          "verified",
+          [
+            [
+              1000,
+              "mm"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s04_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S04",
+          "capacity_charge",
+          null,
+          "verified",
+          [
+            [
+              2600,
+              "mAh"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "charging_time",
+          null,
+          "verified",
+          [
+            [
+              5400,
+              "s"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "current",
+          "rating:max",
+          "verified",
+          [
+            [
+              1.2,
+              "A"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s04",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              3.7,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.38848379999399185,
+      "domain": "电池",
+      "title": "清晰带单位参数",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S04",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s04",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              3.7,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "capacity_charge",
+          null,
+          "verified",
+          [
+            [
+              2600,
+              "mAh"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "charging_time",
+          null,
+          "verified",
+          [
+            [
+              5400,
+              "s"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "current",
+          "rating:max",
+          "verified",
+          [
+            [
+              1.2,
+              "A"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s04_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S04",
+          "capacity_charge",
+          null,
+          "verified",
+          [
+            [
+              2600,
+              "mAh"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "charging_time",
+          null,
+          "verified",
+          [
+            [
+              5400,
+              "s"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "current",
+          "rating:max",
+          "verified",
+          [
+            [
+              1.2,
+              "A"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s04",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              3.7,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5717719000240322,
+      "domain": "电池",
+      "title": "清晰带单位参数",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S04",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s04",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              3.7,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "capacity_charge",
+          null,
+          "verified",
+          [
+            [
+              2600,
+              "mAh"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "charging_time",
+          null,
+          "verified",
+          [
+            [
+              5400,
+              "s"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "current",
+          "rating:max",
+          "verified",
+          [
+            [
+              1.2,
+              "A"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s04_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S04",
+          "capacity_charge",
+          null,
+          "verified",
+          [
+            [
+              2600,
+              "mAh"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "charging_time",
+          null,
+          "verified",
+          [
+            [
+              5400,
+              "s"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "current",
+          "rating:max",
+          "verified",
+          [
+            [
+              1.2,
+              "A"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s04",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              3.7,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5796131000097375,
+      "domain": "电池",
+      "title": "清晰带单位参数",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S04",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s04",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              3.7,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "capacity_charge",
+          null,
+          "verified",
+          [
+            [
+              2600,
+              "mAh"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "charging_time",
+          null,
+          "verified",
+          [
+            [
+              5400,
+              "s"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "current",
+          "rating:max",
+          "verified",
+          [
+            [
+              1.2,
+              "A"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s05_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S05",
+          "custom:克重",
+          null,
+          "verified",
+          [
+            [
+              "180g/m2",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:洗涤方式",
+          null,
+          "verified",
+          [
+            [
+              "手洗",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:面料",
+          null,
+          "verified",
+          [
+            [
+              "纯棉",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              320,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s05",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.39233709999825805,
+      "domain": "纺织",
+      "title": "未预置的文字字段",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S05",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s05",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:面料",
+          null,
+          "verified",
+          [
+            [
+              "纯棉",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:克重",
+          null,
+          "verified",
+          [
+            [
+              "180g/m2",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:洗涤方式",
+          null,
+          "verified",
+          [
+            [
+              "手洗",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              320,
+              "g"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s05_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S05",
+          "custom:克重",
+          null,
+          "verified",
+          [
+            [
+              "180g/m2",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:洗涤方式",
+          null,
+          "verified",
+          [
+            [
+              "手洗",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:面料",
+          null,
+          "verified",
+          [
+            [
+              "纯棉",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              320,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s05",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5723715000203811,
+      "domain": "纺织",
+      "title": "未预置的文字字段",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S05",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s05",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:面料",
+          null,
+          "verified",
+          [
+            [
+              "纯棉",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:克重",
+          null,
+          "verified",
+          [
+            [
+              "180g/m2",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:洗涤方式",
+          null,
+          "verified",
+          [
+            [
+              "手洗",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              320,
+              "g"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s05_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S05",
+          "custom:克重",
+          null,
+          "verified",
+          [
+            [
+              "180g/m2",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:洗涤方式",
+          null,
+          "verified",
+          [
+            [
+              "手洗",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:面料",
+          null,
+          "verified",
+          [
+            [
+              "纯棉",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              320,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s05",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5665824000025168,
+      "domain": "纺织",
+      "title": "未预置的文字字段",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S05",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s05",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:面料",
+          null,
+          "verified",
+          [
+            [
+              "纯棉",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:克重",
+          null,
+          "verified",
+          [
+            [
+              "180g/m2",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:洗涤方式",
+          null,
+          "verified",
+          [
+            [
+              "手洗",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              320,
+              "g"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s06_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S06",
+          "custom:装订方式",
+          null,
+          "verified",
+          [
+            [
+              "平装",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:语言",
+          null,
+          "verified",
+          [
+            [
+              "简体中文",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:页数",
+          null,
+          "verified",
+          [
+            [
+              "256页",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              410,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s06",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.3703699999896344,
+      "domain": "图书",
+      "title": "普通图书参数",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S06",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s06",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:页数",
+          null,
+          "verified",
+          [
+            [
+              "256页",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:装订方式",
+          null,
+          "verified",
+          [
+            [
+              "平装",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:语言",
+          null,
+          "verified",
+          [
+            [
+              "简体中文",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              410,
+              "g"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s06_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S06",
+          "custom:装订方式",
+          null,
+          "verified",
+          [
+            [
+              "平装",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:语言",
+          null,
+          "verified",
+          [
+            [
+              "简体中文",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:页数",
+          null,
+          "verified",
+          [
+            [
+              "256页",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              410,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s06",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5666461999935564,
+      "domain": "图书",
+      "title": "普通图书参数",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S06",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s06",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:页数",
+          null,
+          "verified",
+          [
+            [
+              "256页",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:装订方式",
+          null,
+          "verified",
+          [
+            [
+              "平装",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:语言",
+          null,
+          "verified",
+          [
+            [
+              "简体中文",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              410,
+              "g"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s06_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S06",
+          "custom:装订方式",
+          null,
+          "verified",
+          [
+            [
+              "平装",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:语言",
+          null,
+          "verified",
+          [
+            [
+              "简体中文",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:页数",
+          null,
+          "verified",
+          [
+            [
+              "256页",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              410,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s06",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5765330999856815,
+      "domain": "图书",
+      "title": "普通图书参数",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S06",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s06",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:页数",
+          null,
+          "verified",
+          [
+            [
+              "256页",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:装订方式",
+          null,
+          "verified",
+          [
+            [
+              "平装",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:语言",
+          null,
+          "verified",
+          [
+            [
+              "简体中文",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              410,
+              "g"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s07_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S07",
+          "custom:转速",
+          null,
+          "verified",
+          [
+            [
+              "1800rpm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "铝合金",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              850,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s07",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "torque",
+          "rating:max",
+          "verified",
+          [
+            [
+              18,
+              "N·m"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.3900908000068739,
+      "domain": "工具",
+      "title": "数值与开放字段",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S07",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s07",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "torque",
+          "rating:max",
+          "verified",
+          [
+            [
+              18,
+              "N·m"
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "custom:转速",
+          null,
+          "verified",
+          [
+            [
+              "1800rpm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              850,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "铝合金",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s07_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S07",
+          "custom:转速",
+          null,
+          "verified",
+          [
+            [
+              "1800rpm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "铝合金",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              850,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s07",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "torque",
+          "rating:max",
+          "verified",
+          [
+            [
+              18,
+              "N·m"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5904708999732975,
+      "domain": "工具",
+      "title": "数值与开放字段",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S07",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s07",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "torque",
+          "rating:max",
+          "verified",
+          [
+            [
+              18,
+              "N·m"
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "custom:转速",
+          null,
+          "verified",
+          [
+            [
+              "1800rpm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              850,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "铝合金",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s07_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S07",
+          "custom:转速",
+          null,
+          "verified",
+          [
+            [
+              "1800rpm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "铝合金",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              850,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s07",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "torque",
+          "rating:max",
+          "verified",
+          [
+            [
+              18,
+              "N·m"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5700792999996338,
+      "domain": "工具",
+      "title": "数值与开放字段",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S07",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s07",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "torque",
+          "rating:max",
+          "verified",
+          [
+            [
+              18,
+              "N·m"
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "custom:转速",
+          null,
+          "verified",
+          [
+            [
+              "1800rpm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              850,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "铝合金",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s08_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S08",
+          "custom:光通量",
+          null,
+          "verified",
+          [
+            [
+              "760lm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:显色指数",
+          null,
+          "verified",
+          [
+            [
+              "90",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:色温",
+          null,
+          "verified",
+          [
+            [
+              "4000K",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              8,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s08",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.39441680000163615,
+      "domain": "照明",
+      "title": "灯具基础参数",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S08",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s08",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              8,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:光通量",
+          null,
+          "verified",
+          [
+            [
+              "760lm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:色温",
+          null,
+          "verified",
+          [
+            [
+              "4000K",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:显色指数",
+          null,
+          "verified",
+          [
+            [
+              "90",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s08_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S08",
+          "custom:光通量",
+          null,
+          "verified",
+          [
+            [
+              "760lm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:显色指数",
+          null,
+          "verified",
+          [
+            [
+              "90",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:色温",
+          null,
+          "verified",
+          [
+            [
+              "4000K",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              8,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s08",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5791814999829512,
+      "domain": "照明",
+      "title": "灯具基础参数",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S08",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s08",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              8,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:光通量",
+          null,
+          "verified",
+          [
+            [
+              "760lm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:色温",
+          null,
+          "verified",
+          [
+            [
+              "4000K",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:显色指数",
+          null,
+          "verified",
+          [
+            [
+              "90",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s08_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S08",
+          "custom:光通量",
+          null,
+          "verified",
+          [
+            [
+              "760lm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:显色指数",
+          null,
+          "verified",
+          [
+            [
+              "90",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:色温",
+          null,
+          "verified",
+          [
+            [
+              "4000K",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              8,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s08",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.6053965000028256,
+      "domain": "照明",
+      "title": "灯具基础参数",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S08",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s08",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              8,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:光通量",
+          null,
+          "verified",
+          [
+            [
+              "760lm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:色温",
+          null,
+          "verified",
+          [
+            [
+              "4000K",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:显色指数",
+          null,
+          "verified",
+          [
+            [
+              "90",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s09_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S09",
+          "flow_rate",
+          "rating:rated",
+          "verified",
+          [
+            [
+              6,
+              "L/min"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "g1/2",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "pressure",
+          "operating",
+          "verified",
+          [
+            [
+              350000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "pressure",
+          "rating:max",
+          "verified",
+          [
+            [
+              600000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s09",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.3885651000018697,
+      "domain": "水处理",
+      "title": "压力口径与流量换算",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S09",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s09",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "pressure",
+          "operating",
+          "verified",
+          [
+            [
+              350000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "pressure",
+          "rating:max",
+          "verified",
+          [
+            [
+              600000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "flow_rate",
+          "rating:rated",
+          "verified",
+          [
+            [
+              6,
+              "L/min"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "g1/2",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s09_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S09",
+          "flow_rate",
+          "rating:rated",
+          "verified",
+          [
+            [
+              6,
+              "L/min"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "g1/2",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "pressure",
+          "operating",
+          "verified",
+          [
+            [
+              350000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "pressure",
+          "rating:max",
+          "verified",
+          [
+            [
+              600000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s09",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5651272999821231,
+      "domain": "水处理",
+      "title": "压力口径与流量换算",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S09",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s09",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "pressure",
+          "operating",
+          "verified",
+          [
+            [
+              350000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "pressure",
+          "rating:max",
+          "verified",
+          [
+            [
+              600000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "flow_rate",
+          "rating:rated",
+          "verified",
+          [
+            [
+              6,
+              "L/min"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "g1/2",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s09_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S09",
+          "flow_rate",
+          "rating:rated",
+          "verified",
+          [
+            [
+              6,
+              "L/min"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "g1/2",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "pressure",
+          "operating",
+          "verified",
+          [
+            [
+              350000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "pressure",
+          "rating:max",
+          "verified",
+          [
+            [
+              600000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s09",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5797184999973979,
+      "domain": "水处理",
+      "title": "压力口径与流量换算",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S09",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s09",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "pressure",
+          "operating",
+          "verified",
+          [
+            [
+              350000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "pressure",
+          "rating:max",
+          "verified",
+          [
+            [
+              600000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "flow_rate",
+          "rating:rated",
+          "verified",
+          [
+            [
+              6,
+              "L/min"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "g1/2",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s10_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S10",
+          "ip_rating",
+          null,
+          "verified",
+          [
+            [
+              "ip65",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s10",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                -15,
+                55
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -30,
+                75
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.4007708000135608,
+      "domain": "传感器",
+      "title": "工作与储存温度",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S10",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s10",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                -15,
+                55
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -30,
+                75
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "ip_rating",
+          null,
+          "verified",
+          [
+            [
+              "ip65",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s10_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S10",
+          "ip_rating",
+          null,
+          "verified",
+          [
+            [
+              "ip65",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s10",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                -15,
+                55
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -30,
+                75
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.6012103999964893,
+      "domain": "传感器",
+      "title": "工作与储存温度",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S10",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s10",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                -15,
+                55
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -30,
+                75
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "ip_rating",
+          null,
+          "verified",
+          [
+            [
+              "ip65",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s10_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S10",
+          "ip_rating",
+          null,
+          "verified",
+          [
+            [
+              "ip65",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s10",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                -15,
+                55
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -30,
+                75
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5864089999813586,
+      "domain": "传感器",
+      "title": "工作与储存温度",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S10",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s10",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                -15,
+                55
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -30,
+                75
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "ip_rating",
+          null,
+          "verified",
+          [
+            [
+              "ip65",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s11_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S11",
+          "custom:gpio",
+          null,
+          "verified",
+          [
+            [
+              "21个",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:rom",
+          null,
+          "verified",
+          [
+            [
+              "384kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:sram",
+          null,
+          "verified",
+          [
+            [
+              "512kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "protocol",
+          null,
+          "verified",
+          [
+            [
+              "i2c",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s11",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.3666162999870721,
+      "domain": "电子模块",
+      "title": "显式列出的内存",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S11",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s11",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:rom",
+          null,
+          "verified",
+          [
+            [
+              "384kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:sram",
+          null,
+          "verified",
+          [
+            [
+              "512kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:gpio",
+          null,
+          "verified",
+          [
+            [
+              "21个",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "protocol",
+          null,
+          "verified",
+          [
+            [
+              "i2c",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s11_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S11",
+          "custom:gpio",
+          null,
+          "verified",
+          [
+            [
+              "21个",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:rom",
+          null,
+          "verified",
+          [
+            [
+              "384kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:sram",
+          null,
+          "verified",
+          [
+            [
+              "512kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "protocol",
+          null,
+          "verified",
+          [
+            [
+              "i2c",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s11",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5474751000001561,
+      "domain": "电子模块",
+      "title": "显式列出的内存",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S11",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s11",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:rom",
+          null,
+          "verified",
+          [
+            [
+              "384kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:sram",
+          null,
+          "verified",
+          [
+            [
+              "512kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:gpio",
+          null,
+          "verified",
+          [
+            [
+              "21个",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "protocol",
+          null,
+          "verified",
+          [
+            [
+              "i2c",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s11_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S11",
+          "custom:gpio",
+          null,
+          "verified",
+          [
+            [
+              "21个",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:rom",
+          null,
+          "verified",
+          [
+            [
+              "384kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:sram",
+          null,
+          "verified",
+          [
+            [
+              "512kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "protocol",
+          null,
+          "verified",
+          [
+            [
+              "i2c",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s11",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5492067000013776,
+      "domain": "电子模块",
+      "title": "显式列出的内存",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S11",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s11",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:rom",
+          null,
+          "verified",
+          [
+            [
+              "384kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:sram",
+          null,
+          "verified",
+          [
+            [
+              "512kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:gpio",
+          null,
+          "verified",
+          [
+            [
+              "21个",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "protocol",
+          null,
+          "verified",
+          [
+            [
+              "i2c",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s12_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S12",
+          "custom:保修期",
+          null,
+          "verified",
+          [
+            [
+              "3年",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "custom:最大读速",
+          null,
+          "verified",
+          [
+            [
+              "400MB/s",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "usb-c",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              95,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s12",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.37009159999433905,
+      "domain": "存储",
+      "title": "存储设备基础参数",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S12",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s12",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "usb-c",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "custom:最大读速",
+          null,
+          "verified",
+          [
+            [
+              "400MB/s",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "custom:保修期",
+          null,
+          "verified",
+          [
+            [
+              "3年",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              95,
+              "g"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s12_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S12",
+          "custom:保修期",
+          null,
+          "verified",
+          [
+            [
+              "3年",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "custom:最大读速",
+          null,
+          "verified",
+          [
+            [
+              "400MB/s",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "usb-c",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              95,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s12",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.545535800018115,
+      "domain": "存储",
+      "title": "存储设备基础参数",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S12",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s12",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "usb-c",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "custom:最大读速",
+          null,
+          "verified",
+          [
+            [
+              "400MB/s",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "custom:保修期",
+          null,
+          "verified",
+          [
+            [
+              "3年",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              95,
+              "g"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s12_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S12",
+          "custom:保修期",
+          null,
+          "verified",
+          [
+            [
+              "3年",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "custom:最大读速",
+          null,
+          "verified",
+          [
+            [
+              "400MB/s",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "usb-c",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              95,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s12",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5602275999845006,
+      "domain": "存储",
+      "title": "存储设备基础参数",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S12",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s12",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "usb-c",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "custom:最大读速",
+          null,
+          "verified",
+          [
+            [
+              "400MB/s",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "custom:保修期",
+          null,
+          "verified",
+          [
+            [
+              "3年",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              95,
+              "g"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s13_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S13",
+          "custom:保质期",
+          null,
+          "verified",
+          [
+            [
+              "18个月",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "custom:成分",
+          null,
+          "verified",
+          [
+            [
+              "纯净水",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              600,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              12,
+              "count"
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s13",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.37328709999565035,
+      "domain": "食品",
+      "title": "包装与保质期",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S13",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s13",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              12,
+              "count"
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              600,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "custom:成分",
+          null,
+          "verified",
+          [
+            [
+              "纯净水",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "custom:保质期",
+          null,
+          "verified",
+          [
+            [
+              "18个月",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s13_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S13",
+          "custom:保质期",
+          null,
+          "verified",
+          [
+            [
+              "18个月",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "custom:成分",
+          null,
+          "verified",
+          [
+            [
+              "纯净水",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              600,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              12,
+              "count"
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s13",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5646399999968708,
+      "domain": "食品",
+      "title": "包装与保质期",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S13",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s13",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              12,
+              "count"
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              600,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "custom:成分",
+          null,
+          "verified",
+          [
+            [
+              "纯净水",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "custom:保质期",
+          null,
+          "verified",
+          [
+            [
+              "18个月",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s13_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S13",
+          "custom:保质期",
+          null,
+          "verified",
+          [
+            [
+              "18个月",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "custom:成分",
+          null,
+          "verified",
+          [
+            [
+              "纯净水",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              600,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              12,
+              "count"
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s13",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.560823400010122,
+      "domain": "食品",
+      "title": "包装与保质期",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S13",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s13",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              12,
+              "count"
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              600,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "custom:成分",
+          null,
+          "verified",
+          [
+            [
+              "纯净水",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "custom:保质期",
+          null,
+          "verified",
+          [
+            [
+              "18个月",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s14_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S14",
+          "custom:安装方式",
+          null,
+          "verified",
+          [
+            [
+              "螺丝固定",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "custom:承重上限",
+          null,
+          "verified",
+          [
+            [
+              "50kg",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                800,
+                500,
+                400
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "木材",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s14",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.3819818000192754,
+      "domain": "家具",
+      "title": "尺寸单位换算",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S14",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s14",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                800,
+                500,
+                400
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "木材",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "custom:承重上限",
+          null,
+          "verified",
+          [
+            [
+              "50kg",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "custom:安装方式",
+          null,
+          "verified",
+          [
+            [
+              "螺丝固定",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s14_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S14",
+          "custom:安装方式",
+          null,
+          "verified",
+          [
+            [
+              "螺丝固定",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "custom:承重上限",
+          null,
+          "verified",
+          [
+            [
+              "50kg",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                800,
+                500,
+                400
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "木材",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s14",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5513097000075504,
+      "domain": "家具",
+      "title": "尺寸单位换算",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S14",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s14",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                800,
+                500,
+                400
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "木材",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "custom:承重上限",
+          null,
+          "verified",
+          [
+            [
+              "50kg",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "custom:安装方式",
+          null,
+          "verified",
+          [
+            [
+              "螺丝固定",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s14_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S14",
+          "custom:安装方式",
+          null,
+          "verified",
+          [
+            [
+              "螺丝固定",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "custom:承重上限",
+          null,
+          "verified",
+          [
+            [
+              "50kg",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                800,
+                500,
+                400
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "木材",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s14",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5549327000044286,
+      "domain": "家具",
+      "title": "尺寸单位换算",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S14",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s14",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                800,
+                500,
+                400
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "木材",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "custom:承重上限",
+          null,
+          "verified",
+          [
+            [
+              "50kg",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "custom:安装方式",
+          null,
+          "verified",
+          [
+            [
+              "螺丝固定",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s15_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S15",
+          "custom:光斑直径",
+          null,
+          "verified",
+          [
+            [
+              "12mm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:光束角",
+          null,
+          "verified",
+          [
+            [
+              "60度",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:灯珠数量",
+          null,
+          "verified",
+          [
+            [
+              "24颗",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              190,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s15",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.3786538999993354,
+      "domain": "照明",
+      "title": "更多未预置字段",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S15",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s15",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:光斑直径",
+          null,
+          "verified",
+          [
+            [
+              "12mm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:灯珠数量",
+          null,
+          "verified",
+          [
+            [
+              "24颗",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:光束角",
+          null,
+          "verified",
+          [
+            [
+              "60度",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              190,
+              "g"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s15_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S15",
+          "custom:光斑直径",
+          null,
+          "verified",
+          [
+            [
+              "12mm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:光束角",
+          null,
+          "verified",
+          [
+            [
+              "60度",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:灯珠数量",
+          null,
+          "verified",
+          [
+            [
+              "24颗",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              190,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s15",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.585707199992612,
+      "domain": "照明",
+      "title": "更多未预置字段",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S15",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s15",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:光斑直径",
+          null,
+          "verified",
+          [
+            [
+              "12mm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:灯珠数量",
+          null,
+          "verified",
+          [
+            [
+              "24颗",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:光束角",
+          null,
+          "verified",
+          [
+            [
+              "60度",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              190,
+              "g"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s15_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 4,
+      "predicted_business_facts": 4,
+      "auto_confirmed": 4,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S15",
+          "custom:光斑直径",
+          null,
+          "verified",
+          [
+            [
+              "12mm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:光束角",
+          null,
+          "verified",
+          [
+            [
+              "60度",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:灯珠数量",
+          null,
+          "verified",
+          [
+            [
+              "24颗",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              190,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s15",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5824792000057641,
+      "domain": "照明",
+      "title": "更多未预置字段",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S15",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s15",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:光斑直径",
+          null,
+          "verified",
+          [
+            [
+              "12mm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:灯珠数量",
+          null,
+          "verified",
+          [
+            [
+              "24颗",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:光束角",
+          null,
+          "verified",
+          [
+            [
+              "60度",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              190,
+              "g"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 4,
+      "baseline_passed": true
+    },
+    {
+      "id": "s16_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 3,
+      "predicted_business_facts": 3,
+      "auto_confirmed": 2,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 1,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S16",
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "白色",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                160,
+                90,
+                35
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "net_weight",
+          "net",
+          "conflict",
+          [
+            [
+              560,
+              "g"
+            ],
+            [
+              585,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s16",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.4247997999773361,
+      "domain": "日用品",
+      "title": "两个来源一个真实冲突",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S16",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s16",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "net_weight",
+          "net",
+          "conflict",
+          [
+            [
+              560,
+              "g"
+            ],
+            [
+              585,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                160,
+                90,
+                35
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "白色",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 3,
+      "baseline_passed": true
+    },
+    {
+      "id": "s16_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 3,
+      "predicted_business_facts": 3,
+      "auto_confirmed": 2,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 1,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S16",
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "白色",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                160,
+                90,
+                35
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "net_weight",
+          "net",
+          "conflict",
+          [
+            [
+              560,
+              "g"
+            ],
+            [
+              585,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s16",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.619688100006897,
+      "domain": "日用品",
+      "title": "两个来源一个真实冲突",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S16",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s16",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "net_weight",
+          "net",
+          "conflict",
+          [
+            [
+              560,
+              "g"
+            ],
+            [
+              585,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                160,
+                90,
+                35
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "白色",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 3,
+      "baseline_passed": true
+    },
+    {
+      "id": "s16_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 3,
+      "predicted_business_facts": 3,
+      "auto_confirmed": 2,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 1,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S16",
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "白色",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                160,
+                90,
+                35
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "net_weight",
+          "net",
+          "conflict",
+          [
+            [
+              560,
+              "g"
+            ],
+            [
+              585,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s16",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.6422047000087332,
+      "domain": "日用品",
+      "title": "两个来源一个真实冲突",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S16",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s16",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "net_weight",
+          "net",
+          "conflict",
+          [
+            [
+              560,
+              "g"
+            ],
+            [
+              585,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                160,
+                90,
+                35
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "白色",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 3,
+      "baseline_passed": true
+    },
+    {
+      "id": "s17_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 2,
+      "predicted_business_facts": 2,
+      "auto_confirmed": 2,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S17",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s17",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S17",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                0,
+                45
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S17",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -20,
+                70
+              ],
+              "°C"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.37984840001445264,
+      "domain": "传感器",
+      "title": "不同口径不同数值不算冲突",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S17",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s17",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S17",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                0,
+                45
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S17",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -20,
+                70
+              ],
+              "°C"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 2,
+      "baseline_passed": true
+    },
+    {
+      "id": "s17_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 2,
+      "predicted_business_facts": 2,
+      "auto_confirmed": 2,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S17",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s17",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S17",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                0,
+                45
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S17",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -20,
+                70
+              ],
+              "°C"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5976790999993682,
+      "domain": "传感器",
+      "title": "不同口径不同数值不算冲突",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S17",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s17",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S17",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                0,
+                45
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S17",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -20,
+                70
+              ],
+              "°C"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 2,
+      "baseline_passed": true
+    },
+    {
+      "id": "s17_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 2,
+      "predicted_business_facts": 2,
+      "auto_confirmed": 2,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S17",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s17",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S17",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                0,
+                45
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S17",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -20,
+                70
+              ],
+              "°C"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5951841000060085,
+      "domain": "传感器",
+      "title": "不同口径不同数值不算冲突",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S17",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s17",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S17",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                0,
+                45
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S17",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -20,
+                70
+              ],
+              "°C"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 2,
+      "baseline_passed": true
+    },
+    {
+      "id": "s18_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 3,
+      "predicted_business_facts": 3,
+      "auto_confirmed": 3,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S18",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                120,
+                80,
+                30
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              450,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s18",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.3759931999957189,
+      "domain": "电源",
+      "title": "多来源单位不同但值相同",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S18",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s18",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              450,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                120,
+                80,
+                30
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 3,
+      "baseline_passed": true
+    },
+    {
+      "id": "s18_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 3,
+      "predicted_business_facts": 3,
+      "auto_confirmed": 3,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S18",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                120,
+                80,
+                30
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              450,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s18",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5849767999898177,
+      "domain": "电源",
+      "title": "多来源单位不同但值相同",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S18",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s18",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              450,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                120,
+                80,
+                30
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 3,
+      "baseline_passed": true
+    },
+    {
+      "id": "s18_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 3,
+      "predicted_business_facts": 3,
+      "auto_confirmed": 3,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S18",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                120,
+                80,
+                30
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              450,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s18",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.603259600000456,
+      "domain": "电源",
+      "title": "多来源单位不同但值相同",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S18",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s18",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              450,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                120,
+                80,
+                30
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 3,
+      "baseline_passed": true
+    },
+    {
+      "id": "s19_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 3,
+      "predicted_business_facts": 3,
+      "auto_confirmed": 3,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S19",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              80,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              6,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s19",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "voltage",
+          "rating:nominal",
+          "verified",
+          [
+            [
+              3,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.3709380000072997,
+      "domain": "电池",
+      "title": "英文完整单位写法",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S19",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s19",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "voltage",
+          "rating:nominal",
+          "verified",
+          [
+            [
+              3,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              80,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              6,
+              "W"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 3,
+      "baseline_passed": false
+    },
+    {
+      "id": "s19_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 3,
+      "predicted_business_facts": 3,
+      "auto_confirmed": 3,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S19",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              80,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              6,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s19",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "voltage",
+          "rating:nominal",
+          "verified",
+          [
+            [
+              3,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5504585999879055,
+      "domain": "电池",
+      "title": "英文完整单位写法",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S19",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s19",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "voltage",
+          "rating:nominal",
+          "verified",
+          [
+            [
+              3,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              80,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              6,
+              "W"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 3,
+      "baseline_passed": false
+    },
+    {
+      "id": "s19_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 3,
+      "predicted_business_facts": 3,
+      "auto_confirmed": 3,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S19",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              80,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              6,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s19",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "voltage",
+          "rating:nominal",
+          "verified",
+          [
+            [
+              3,
+              "V"
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5481058999721427,
+      "domain": "电池",
+      "title": "英文完整单位写法",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S19",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s19",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "voltage",
+          "rating:nominal",
+          "verified",
+          [
+            [
+              3,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              80,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              6,
+              "W"
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 3,
+      "baseline_passed": false
+    },
+    {
+      "id": "s20_txt",
+      "family": "txt",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 3,
+      "predicted_business_facts": 3,
+      "auto_confirmed": 3,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S20",
+          "custom:gpio",
+          null,
+          "verified",
+          [
+            [
+              "21",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:rom",
+          null,
+          "verified",
+          [
+            [
+              "384kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:sram",
+          null,
+          "verified",
+          [
+            [
+              "512kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s20",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.36659180000424385,
+      "domain": "电子模块",
+      "title": "数值在前的简单项目列表",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S20",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s20",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:rom",
+          null,
+          "verified",
+          [
+            [
+              "384kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:sram",
+          null,
+          "verified",
+          [
+            [
+              "512kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:gpio",
+          null,
+          "verified",
+          [
+            [
+              "21",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 3,
+      "baseline_passed": false
+    },
+    {
+      "id": "s20_pdf_lines",
+      "family": "pdf_lines",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 3,
+      "predicted_business_facts": 3,
+      "auto_confirmed": 3,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S20",
+          "custom:gpio",
+          null,
+          "verified",
+          [
+            [
+              "21",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:rom",
+          null,
+          "verified",
+          [
+            [
+              "384kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:sram",
+          null,
+          "verified",
+          [
+            [
+              "512kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s20",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5629125999985263,
+      "domain": "电子模块",
+      "title": "数值在前的简单项目列表",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S20",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s20",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:rom",
+          null,
+          "verified",
+          [
+            [
+              "384kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:sram",
+          null,
+          "verified",
+          [
+            [
+              "512kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:gpio",
+          null,
+          "verified",
+          [
+            [
+              "21",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 3,
+      "baseline_passed": false
+    },
+    {
+      "id": "s20_pdf_table",
+      "family": "pdf_table",
+      "passed": true,
+      "missing": [],
+      "unexpected": [],
+      "expected_business_facts": 3,
+      "predicted_business_facts": 3,
+      "auto_confirmed": 3,
+      "wrong_auto_confirmed": 0,
+      "missing_fact_keys": 0,
+      "missed_conflicts": 0,
+      "false_conflicts": 0,
+      "review_items": 0,
+      "unnecessary_review_items": 0,
+      "actual": [
+        [
+          "EASY-S20",
+          "custom:gpio",
+          null,
+          "verified",
+          [
+            [
+              "21",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:rom",
+          null,
+          "verified",
+          [
+            [
+              "384kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:sram",
+          null,
+          "verified",
+          [
+            [
+              "512kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s20",
+              null
+            ]
+          ]
+        ]
+      ],
+      "integrity_errors": [],
+      "parse_errors": [],
+      "elapsed_seconds": 0.5385037999949418,
+      "domain": "电子模块",
+      "title": "数值在前的简单项目列表",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "expected_after_prior_errata": [
+        [
+          "EASY-S20",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s20",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:rom",
+          null,
+          "verified",
+          [
+            [
+              "384kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:sram",
+          null,
+          "verified",
+          [
+            [
+              "512kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:gpio",
+          null,
+          "verified",
+          [
+            [
+              "21",
+              null
+            ]
+          ]
+        ]
+      ],
+      "correct_business_facts": 3,
+      "baseline_passed": true
+    }
+  ]
+}

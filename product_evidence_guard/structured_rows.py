@@ -22,6 +22,7 @@ class StructuredCell:
     row_id: str
     identity: dict[str, str]
     parent_labels: tuple[str, ...] = ()
+    whole_parameter_row: bool = False
 
 
 _VARIANT_HEADERS = {
@@ -257,7 +258,106 @@ def bind_model_matrix(rows: Sequence[tuple[int, Sequence[tuple[Any, Any]]]], *,
 def bind_table(rows: Sequence[tuple[int, Sequence[tuple[Any, Any]]]], *,
                table_id: str) -> list[StructuredCell] | None:
     """Shared orientation dispatch; keep the original row binder reusable."""
+    if table_role(rows) == "reference":
+        return []
+    parameters = bind_parameter_matrix(rows, table_id=table_id)
+    if parameters is not None:
+        return parameters
     matrix = bind_model_matrix(rows, table_id=table_id)
     if matrix is not None:
         return matrix
     return bind_structured_rows(rows, table_id=table_id)
+
+
+def _heading(value):
+    return re.sub(r"\s+", " ", str(value or "")).strip().casefold().rstrip(".")
+
+
+_PARAMETER_HEADERS = {"parameter", "parameters", "characteristic", "characteristics", "item", "参数", "特性", "项目"}
+_VALUE_HEADERS = {"value", "values", "min", "typ", "max", "minimum", "typical", "maximum", "数值", "值", "最小", "典型", "最大"}
+
+
+def parameter_header_columns(values):
+    """Recognize structural column roles, independent of product vocabulary."""
+    names = [_heading(value) for value in values]
+    labels = [i for i, name in enumerate(names) if name in _PARAMETER_HEADERS]
+    values = [i for i, name in enumerate(names) if name in _VALUE_HEADERS or name.endswith(" type")]
+    return (names, labels, values) if labels and values else None
+
+
+def table_role(rows):
+    """Recognize document/reference tables by their *combined* header roles.
+
+    These are not a whitelist of product parameters: unfamiliar specifications
+    remain supported. A history/date table or a pin/name list is not one
+    product with many competing dates or pin numbers.
+    """
+    for _, cells in rows[:3]:
+        headers = {_heading(value) for _, value in cells}
+        if (headers & {"date", "日期"} and headers & {"version", "revision", "版本", "changes", "变更"}) or (
+            headers & {"pin", "pin no", "pin number", "引脚", "引脚编号"} and
+            headers & {"name", "symbol", "function", "assignment", "signal", "名称", "功能", "信号", "description"}) or (
+            headers & {"reference", "参考资料"} and headers & {"link", "链接"}):
+            return "reference"
+    return "parameters"
+
+
+def bind_parameter_matrix(rows, *, table_id):
+    """Parameter/condition/unit tables are row-oriented, not product records.
+
+    Carry the entire row, including every min/typ/max value and condition.
+    Only actual merged geometry may repeat labels or units across subrows.
+    No field names or product models are needed to recognize this structure.
+    """
+    qualifiers = {"condition", "conditions", "test condition", "test conditions", "classification", "comments", "测试条件", "条件", "分类"}
+    units = {"unit", "units", "单位"}
+    header = None
+    for position, (_, cells) in enumerate(rows[:6]):
+        roles = parameter_header_columns([value for _, value in cells])
+        if roles:
+            names, labels, values = roles
+            header = (position, names, labels, values)
+            break
+    if header is None:
+        return None
+    position, names, label_cols, value_cols = header
+    result = []
+    for rn, cells in rows[position + 1:]:
+        if len(cells) != len(names):
+            continue
+        # Several measurements stacked in one physical cell need an inner
+        # row binder. Flattening them loses which condition owns each value.
+        if any(sum(bool(re.search(r"\d", line)) for line in str(cells[i][1] or "").splitlines()) > 1
+               for i in value_cols):
+            continue
+        label_parts = list(dict.fromkeys(re.sub(r"\s+", " ", str(cells[i][1] or "")).strip() for i in label_cols))
+        label = " ".join(p for p in label_parts if p)
+        spec = field_for_label(split_label_unit(label)[0])
+        if not spec or _heading(label) in _PARAMETER_HEADERS:
+            continue
+        unit = " ".join(dict.fromkeys(re.sub(r"\s+", "", str(cells[i][1] or "")) for i, name in enumerate(names) if name in units)).strip()
+        conditions = [re.sub(r"\s+", " ", str(cells[i][1] or "")).strip() for i, name in enumerate(names) if name in qualifiers]
+        conditions = [s for s in conditions if s and s not in {"-", "—"}]
+        values = []
+        locations = []
+        for i in value_cols:
+            value = re.sub(r"\s+", " ", str(cells[i][1] or "")).strip()
+            if not value or value in {"-", "—"}:
+                continue
+            prefix = names[i] + ": " if len(value_cols) > 1 or names[i] not in {"value", "values", "值", "数值"} else ""
+            values.append(prefix + value + (" " + unit if unit and unit not in {"-", "—"} else ""))
+            locations.append(cells[i][0])
+        if not values:
+            continue
+        value = "; ".join(values)
+        if conditions:
+            value += " (" + "; ".join(conditions) + ")"
+        if len(value) > 512:
+            continue
+        # Physical PDF box includes the complete parameter+condition row, so
+        # footnote markers and preview cannot lose the label-side evidence.
+        boxes = [loc for loc, _ in cells if isinstance(loc, (list, tuple)) and len(loc) == 4]
+        location = (min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes), max(b[3] for b in boxes)) if boxes else locations[0]
+        row_id = hashlib.sha256(json.dumps([table_id, rn], ensure_ascii=False).encode()).hexdigest()[:20]
+        result.append(StructuredCell(rn, location, label, spec.name, value, row_id, {}, tuple(conditions), True))
+    return result

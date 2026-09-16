@@ -8,6 +8,9 @@ samples/generated-benchmark/** -text
 # Pre-run oracle and recorded audit hashes refer to the exact frozen bytes.
 docs/evidence/new-originals-gold-20260916.json -text whitespace=cr-at-eol
 docs/evidence/new-originals-accuracy-20260916.json -text whitespace=cr-at-eol
+docs/evidence/simple-accuracy-gold-20260916.json -text whitespace=cr-at-eol
+docs/evidence/simple-accuracy-validation-20260916.json -text whitespace=cr-at-eol
+docs/evidence/simple-fixes-validation-20260917.json -text whitespace=cr-at-eol
 
 # These are byte-for-byte copies from the installed wheel.  Preserve upstream
 # line endings so the recorded RECORD/SHA-256 identities survive checkout.

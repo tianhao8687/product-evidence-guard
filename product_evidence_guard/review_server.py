@@ -109,7 +109,8 @@ class ReviewServer:
                         data = owner.extension.snapshot(output, detailed=True)
                     elif url.path == "/api/preview":
                         with owner.extension.app._operation_lock:
-                            data, mime, precision = owner.preview(output, query.get("candidate", [""])[0])
+                            data, mime, precision = owner.preview(output, query.get("candidate", [""])[0],
+                                                                 condition=query.get("condition", [None])[0])
                         return self._send(200, data, mime, {"X-PEG-Evidence-Position": precision})
                     elif url.path == "/api/artifact":
                         with owner.extension.app._operation_lock:
@@ -175,11 +176,17 @@ class ReviewServer:
             self.sessions.clear()
 
     @staticmethod
-    def preview(output: Path, candidate_id: str):
+    def preview(output: Path, candidate_id: str, *, condition=None):
         _, product, _ = workflow.context(output)
         candidate = next((c for c in product["candidates"] if c["candidate_id"] == candidate_id), None)
         if candidate is None:
             raise ConfirmationRequestError("该证据已经变化，请刷新审核页。")
+        if condition is not None:
+            notes = candidate.get("provenance", {}).get("source_conditions", [])
+            if not str(condition).isdigit() or not 0 <= int(condition) < len(notes):
+                raise ConfirmationRequestError("该附注不存在，请刷新审核页。")
+            note = notes[int(condition)]
+            candidate = {**candidate, "locator": note["locator"], "raw_text": note["text"]}
         state = _load_json_object(output / "analysis-state.json")
         root = Path(state["input_root"]).resolve()
         source = root / candidate["source_file"]

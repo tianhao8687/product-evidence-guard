@@ -7,7 +7,7 @@ import re
 from collections import defaultdict
 
 from .field_registry import field_for_label, split_label_unit
-from .structured_rows import bind_table, header_field
+from .structured_rows import bind_table, header_field, parameter_header_columns, table_role
 
 MAX_PAGE_CHARACTERS = 100_000
 MAX_PAGE_EDGES = 12_000
@@ -16,7 +16,12 @@ MAX_PAGE_EDGES = 12_000
 def _lines(words: list[dict]) -> list[list[dict]]:
     lines: list[list[dict]] = []
     for word in sorted(words, key=lambda w: (w["top"], w["x0"])):
-        if lines and abs(word["top"] - lines[-1][0]["top"]) <= 3:
+        # Sub/superscripts overlap the body line but have a different top.
+        # Compare with the tallest glyph, not the previous small marker.
+        anchor = max(lines[-1], key=lambda w: w["bottom"] - w["top"]) if lines else None
+        overlap = min(word["bottom"], anchor["bottom"]) - max(word["top"], anchor["top"]) if anchor else 0
+        height = min(word["bottom"] - word["top"], anchor["bottom"] - anchor["top"]) if anchor else 1
+        if anchor and (abs(word["top"] - anchor["top"]) <= 3 or overlap >= .6 * height):
             lines[-1].append(word)
         else:
             lines.append([word])
@@ -24,7 +29,16 @@ def _lines(words: list[dict]) -> list[list[dict]]:
 
 
 def _text(words: list[dict]) -> str:
-    return " ".join(w["text"] for w in words).strip()
+    result = ""
+    previous = None
+    for word in words:
+        # Rejoin adjoining font runs (formulas, raised markers, punctuation),
+        # but retain spaces between ordinary words and across wrapped lines.
+        joined = (previous and abs(word["top"] - previous["top"]) < 8
+                  and -.5 <= word["x0"] - previous["x1"] < .6)
+        result += ("" if not result or joined else " ") + word["text"]
+        previous = word
+    return result.strip()
 
 
 def _bbox(words: list[dict]) -> tuple[float, float, float, float]:
@@ -50,6 +64,17 @@ def _orthogonal_edges(edges):
     """
     horizontal, vertical = [], []
     for original in edges:
+        # Rectangles used for white cell backgrounds/clipping are not printed
+        # borders. Counting all their edges splits one real table into dozens
+        # of fake two-column fragments. Thin painted bars are genuine rules.
+        if original.get("object_type") == "rect_edge" and not original.get("stroke"):
+            points = original.get("pts", [])
+            color = original.get("non_stroking_color")
+            if color in (1, (1, 1, 1), (0, 0, 0, 0)):
+                continue
+            if points and min(max(p[0] for p in points) - min(p[0] for p in points),
+                              max(p[1] for p in points) - min(p[1] for p in points)) > 1.5:
+                continue
         edge = dict(original)
         width, height = edge["x1"] - edge["x0"], edge["bottom"] - edge["top"]
         if width >= 4 and height <= .5:
@@ -72,6 +97,10 @@ def _chunks(line):
     return result
 
 
+def _label_text(words):
+    return re.sub(r"^\s*[-*•●▪◦–]\s*", "", _text(words)).rstrip(":：")
+
+
 def _aligned_pairs(lines):
     """Find repeated two-column key/value regions, even beside body text.
 
@@ -85,7 +114,7 @@ def _aligned_pairs(lines):
         if len(chunks) < 2:
             continue
         left, right = chunks[-2:]
-        label, value = _text(left), _text(right)
+        label, value = _label_text(left), _text(right)
         if not field_for_label(split_label_unit(label)[0]) or len(label.split()) > 8 or len(value) > 512:
             continue
         key = (round(left[0]["x0"] / 3), round(right[0]["x0"] / 3))
@@ -115,14 +144,39 @@ def _wrapped_pairs(lines):
     pairs = _aligned_pairs(lines)
     for index, line in enumerate(lines):
         chunks = _chunks(line)
-        for chunk in reversed(chunks):
+        for chunk_index in reversed(range(len(chunks))):
+            chunk = chunks[chunk_index]
             for split, word in enumerate(chunk):
                 if not word["text"].endswith((":", "：")):
                     continue
                 left = chunk[:split + 1]
-                label = _text(left).rstrip(":：")
-                right = [w for w in line if w["x0"] >= word["x1"] and w not in left]
-                if right and field_for_label(split_label_unit(label)[0]) and len(label.split()) <= 8:
+                label = _label_text(left)
+                # Inline values stop at their own text region. Taking every
+                # word to the right crosses the gutter into the next column.
+                right = chunk[split + 1:]
+                if not right and chunk_index + 1 < len(chunks):
+                    right = chunks[chunk_index + 1]
+                    # A neighboring prose/list column is not the missing
+                    # value of a standalone section heading ending in ':'.
+                    if (index not in pairs and
+                            (re.match(r"^[-*•●▪◦–]\s*[^\s\d]", _text(right)) or
+                             not re.search(r"[\w\d]", _text(right)))):
+                        right = []
+                # A colon halfway through a flowing paragraph is punctuation,
+                # not evidence of a label/value column. Keep the text available
+                # for semantic extraction without auto-approving a fragment.
+                prose = False
+                if right and right[0]["x0"] - word["x1"] < 6:
+                    for neighbor_index in (index - 1, index + 1):
+                        if not 0 <= neighbor_index < len(lines) or neighbor_index in pairs:
+                            continue
+                        neighbor = lines[neighbor_index]
+                        if (abs(neighbor[0]["x0"] - left[0]["x0"]) < 3
+                                and abs(neighbor[0]["top"] - left[0]["top"]) < 2 * (word["bottom"] - word["top"])
+                                and (neighbor_index > index or len(_text(neighbor)) > 70)
+                                and not re.search(r"[:：]", _text(neighbor))):
+                            prose = True
+                if right and not prose and field_for_label(split_label_unit(label)[0]) and len(label.split()) <= 8:
                     pairs[index] = (left, right)
                     break
             if index in pairs:
@@ -157,16 +211,73 @@ def _cell_text(value):
     return re.sub(r"\s+", " ", str(value or "")).strip()
 
 
+def _horizontal_pairs(words, horizontal, consumed):
+    """Bind borderless columns from repeated, adjoining printed rule spans.
+
+    The shared endpoints provide a physical label/value boundary. Independent
+    page columns stay independent; no global gap threshold or vendor template.
+    Entire value regions are retained, including nested condition/value rows.
+    """
+    spans = defaultdict(list)
+    for edge in horizontal:
+        if edge["x1"] - edge["x0"] >= 30:
+            spans[(round(edge["x0"], 1), round(edge["x1"], 1))].append(edge["top"])
+    spans = {span: ys for span, ys in spans.items() if len(ys) >= 3}
+    pairs = []
+    for (x0, middle), ys in spans.items():
+        for (other, x1), right_ys in spans.items():
+            if abs(middle - other) > .5:
+                continue
+            boundaries = sorted({round(y, 2) for y in ys if any(abs(y - r) < .5 for r in right_ys)})
+            if len(boundaries) < 3:
+                continue
+            # A third adjoining span proves this is a matrix, not a pair.
+            if any((abs(end - x0) < .6 or abs(start - x1) < .6) and
+                   sum(any(abs(y - b) < .6 for y in other_ys) for b in boundaries) >= 3
+                   for (start, end), other_ys in spans.items() if (start, end) not in {(x0, middle), (other, x1)}):
+                continue
+            heading_words = [w for w in words if x0 - .5 <= w["x0"] and w["x1"] <= x1 + .5 and
+                             boundaries[0] - 18 <= w["top"] and w["bottom"] <= boundaries[0]]
+            headings = _lines(heading_words)
+            section = _text(headings[-1]) if headings else ""
+            if len(section) > 64 or re.search(r"\d", section):
+                section = ""
+            for top, bottom in zip(boundaries, boundaries[1:]):
+                box = (x0, top, x1, bottom)
+                if any(min(b[2], x1) - max(b[0], x0) > 1 and min(b[3], bottom) - max(b[1], top) > 1 for b in consumed):
+                    continue
+                region = [w for w in words if _inside(w, box)]
+                region_lines = _lines(region)
+                if not region:
+                    continue
+                if any(w["x0"] < middle - 1 and w["x1"] > middle + 1 for w in region):
+                    if len(region_lines) == 1 and len(_text(region)) <= 64 and not re.search(r"\d", _text(region)):
+                        section = _text(region)
+                    continue  # heading/prose across the inferred boundary
+                left = [w for w in region if (w["x0"] + w["x1"]) / 2 < middle]
+                right = [w for w in region if w not in left]
+                if not left or not right:
+                    if len(region_lines) == 1 and len(_text(region)) <= 64 and not re.search(r"\d", _text(region)):
+                        section = _text(region)
+                    continue
+                label = " ".join(_text(line) for line in _lines(left))
+                value = " ".join(_text(line) for line in _lines(right))
+                if field_for_label(split_label_unit(label)[0]) and len(value) <= 512:
+                    pairs.append((label, value, box, left, right, section))
+    return pairs
+
+
 def read_layout_page(page, number: int) -> tuple[list[dict], list[dict]]:
     """Return text/locator/provenance records and grouped reading issues."""
     if len(page.chars) > MAX_PAGE_CHARACTERS:
         return [], [{"code": "page_text_limit", "locator": {"page": number},
                      "message": "本页文字结构超过安全上限，其余页面继续读取；请拆分或简化本页。"}]
     clean = page.dedupe_chars()
-    words = clean.extract_words(x_tolerance=2, y_tolerance=3)
+    words = clean.extract_words(x_tolerance=2, y_tolerance=3, extra_attrs=["size"])
     records: list[dict] = []
     issues: list[dict] = []
     consumed: list[tuple] = []
+    horizontal = []
     if len(page.edges) > MAX_PAGE_EDGES:
         tables = []
         issues.append({"code": "page_geometry_limit", "locator": {"page": number},
@@ -174,7 +285,8 @@ def read_layout_page(page, number: int) -> tuple[list[dict], list[dict]]:
     else:
         horizontal, vertical = _orthogonal_edges(clean.edges)
         tables = clean.find_tables({"horizontal_strategy": "explicit", "vertical_strategy": "explicit",
-            "explicit_horizontal_lines": horizontal, "explicit_vertical_lines": vertical}) if len(horizontal) >= 2 and len(vertical) >= 2 else []
+            "explicit_horizontal_lines": horizontal, "explicit_vertical_lines": vertical,
+            "join_tolerance": 4}) if len(horizontal) >= 2 and len(vertical) >= 2 else []
     for index, table in enumerate(tables):
         raw = table.extract(x_tolerance=2, y_tolerance=3)
         # Reject diagrams with no meaningful parameter labels.
@@ -182,26 +294,34 @@ def read_layout_page(page, number: int) -> tuple[list[dict], list[dict]]:
             continue
         table_id = f"pdf:{number}:{index}"
         rows = [(i, [(box, value) for box, value in zip(table.rows[i].cells, row)]) for i, row in enumerate(raw)]
-        # Some PDFs draw the MODEL row just outside the detected grid. Bind
-        # only the explicit label and values inside exact existing columns.
+        if table_role(rows) == "reference":
+            consumed.append(table.bbox)
+            continue
+        # Shaded headers sometimes have no printed top border. Bind a nearby
+        # structural header only inside the grid's exact existing columns.
         outside_header = None
+        boundaries = sorted({box[0] for box in table.cells} | {table.bbox[2]})
         if raw and len(raw[0]) >= 3 and header_field(raw[0][0]) not in {"model", "sku", "variant"}:
-            above = [w for w in words if table.bbox[1] - 24 <= w["top"] and w["bottom"] <= table.bbox[1]]
-            for line in _lines(above):
-                if header_field(line[0]["text"]) not in {"model", "sku"}:
-                    continue
-                values = [line[0]["text"]]
-                boxes = [table.rows[0].cells[0]]
-                for box in table.rows[0].cells[1:]:
-                    matched = [w for w in line[1:] if box and box[0] <= (w["x0"] + w["x1"]) / 2 <= box[2]]
+            above = [w for w in words if table.bbox[1] - 24 <= w["top"] and w["bottom"] <= table.bbox[1]
+                     and table.bbox[0] <= (w["x0"] + w["x1"]) / 2 <= table.bbox[2]]
+            for line in reversed(_lines(above)):
+                values, boxes = [], []
+                for left, right in zip(boundaries, boundaries[1:]):
+                    matched = [w for w in line if left <= (w["x0"] + w["x1"]) / 2 < right]
                     values.append(_text(matched))
                     boxes.append(_bbox(matched) if matched else None)
-                if all(values):
+                if len(values) != len(raw[0]):
+                    continue
+                model_header = header_field(values[0]) in {"model", "sku"} and all(values)
+                reference_header = table_role([(0, list(zip(boxes, values)))]) == "reference"
+                if model_header or parameter_header_columns(values) or reference_header:
                     rows.insert(0, (-1, list(zip(boxes, values))))
                     outside_header = _bbox(line)
                     break
+        if table_role(rows) == "reference":
+            consumed.extend([table.bbox] + ([outside_header] if outside_header else []))
+            continue
         # Expand only actual merged geometry, never carry a previous value.
-        boundaries = sorted({box[0] for box in table.cells} | {table.bbox[2]})
         centers = [(left + right) / 2 for left, right in zip(boundaries, boundaries[1:])]
         row_boundaries = sorted({box[1] for box in table.cells} | {table.bbox[3]})
         row_bottoms = dict(zip(row_boundaries, row_boundaries[1:]))
@@ -224,14 +344,23 @@ def read_layout_page(page, number: int) -> tuple[list[dict], list[dict]]:
                 resolved.append((box, value))
             expanded.append((rn, resolved))
         structured = bind_table(expanded, table_id=table_id)
+        if structured and any(not cell.identity and not cell.whole_parameter_row for cell in structured):
+            # A column-oriented list needs a product/record owner. Otherwise
+            # "Substance | Maximum limit" becomes many conflicting product
+            # limits. Keep the original table as ONE reading issue instead.
+            # Explicit parameter rows and MODEL/SKU matrices remain supported.
+            structured = []
         # Vertical key/value tables use the identical explicit label contract.
         if structured is None and all(len(row) == 2 for _, row in expanded):
             for rn, cells in expanded:
+                if cells[0][0] == cells[1][0]:
+                    continue  # one merged heading is not its own value
                 label, value = (_cell_text(v) for _, v in cells)
                 if field_for_label(split_label_unit(label)[0]) and value:
                     box = cells[1][0] or table.bbox
                     records.append({"text": f"{label}: {value}", "locator": _locator(page, number, box, table=index, row=rn),
-                                    "provenance": {"table_id": table_id}})
+                                    "provenance": {"table_id": table_id, "atomic_parameter": True,
+                                        "label_bbox": cells[0][0], "value_bbox": box}})
             consumed.append(table.bbox)
             continue
         consumed.append(table.bbox)
@@ -239,7 +368,7 @@ def read_layout_page(page, number: int) -> tuple[list[dict], list[dict]]:
             consumed.append(outside_header)
         bound_rows = set()
         for cell in structured or []:
-            if not cell.location or "\ufffd" in cell.value or "\ufffd" in cell.header:
+            if not cell.location or re.search(r"[\ufffd\ue000-\uf8ff]", cell.value + cell.header):
                 continue
             bound_rows.add(cell.row_number)
             # Side labels are only applicable inside their drawn vertical span.
@@ -253,18 +382,13 @@ def read_layout_page(page, number: int) -> tuple[list[dict], list[dict]]:
                 lower = min((v for v in edges if v >= line[0]["bottom"]), default=-1)
                 if upper >= 0 and upper <= y <= lower and len(_text(line)) <= 64:
                     parents.append(_text(line))
-            nested = re.fullmatch(r"\s*([^:：\n]{1,64})\s*[:：]\s*(.+)", cell.value, re.S)
-            nested_spec = field_for_label(nested[1]) if nested else None
-            if nested_spec and nested_spec.name != cell.field:
-                parents.append(cell.header)
-                text = _cell_text(cell.value)
-            else:
-                text = f"{_cell_text(cell.header)}: {_cell_text(cell.value)}"
+            text = f"{_cell_text(cell.header)}: {_cell_text(cell.value)}"
             records.append({"text": text,
                             "locator": _locator(page, number, cell.location, table=index, row=cell.row_number),
-                            "provenance": {"table_id": table_id, "parent_labels": list(dict.fromkeys(parents)),
+                            "provenance": {"table_id": table_id, "atomic_parameter": True, "parent_labels": list(dict.fromkeys(parents)),
+                                ("condition_bbox" if cell.whole_parameter_row else "value_bbox"): cell.location,
                                 "structured_row": {"row_id": cell.row_id, "identity": cell.identity,
-                                                   "field": nested_spec.name if nested_spec else cell.field}}})
+                                                   "field": cell.field}}})
         missing = [rn for rn, cells in expanded if rn >= 0 and rn not in bound_rows and
                    any(re.search(r"\d", str(value or "")) for _, value in cells[1:]) and
                    header_field(cells[0][1]) not in {"model", "sku", "variant"}]
@@ -273,6 +397,12 @@ def read_layout_page(page, number: int) -> tuple[list[dict], list[dict]]:
                            "message": "这张表部分行列或适用条件未能可靠对应，请核对原表或提供表格文件。", "unbound_rows": missing})
     # Preserve line geometry outside grids. Widely separated multi-value rows
     # are not flattened (that was the source of cross-product false facts).
+    for label, value, box, left, right, section in _horizontal_pairs(words, horizontal, consumed):
+        records.append({"text": f"{label}: {value}", "locator": _locator(page, number, box),
+                        "provenance": {"layout_binding": "horizontal_rule_pair", "atomic_parameter": True,
+                                       "label_bbox": _bbox(left), "value_bbox": _bbox(right),
+                                       "parent_labels": [section] if section else []}})
+        consumed.append(box)
     remainder = [w for w in words if not any(_inside(w, box) for box in consumed)]
     uncertain = []
     lines = _lines(remainder)
@@ -284,8 +414,9 @@ def read_layout_page(page, number: int) -> tuple[list[dict], list[dict]]:
             if len(_text(right)) > 512:
                 uncertain.append(line_number)
             else:
-                records.append({"text": f"{_text(left).rstrip(':：')}: {_text(right)}", "locator": _locator(page, number, _bbox(left + right), text_block=line_number),
-                                "provenance": {"layout_binding": "wrapped_aligned_pair"}})
+                records.append({"text": f"{_label_text(left)}: {_text(right)}", "locator": _locator(page, number, _bbox(left + right), text_block=line_number),
+                                "provenance": {"layout_binding": "wrapped_aligned_pair", "atomic_parameter": True,
+                                               "label_bbox": _bbox(left), "value_bbox": _bbox(right)}})
         line = [word for word in line if id(word) not in bound_words]
         if not line:
             continue
@@ -304,8 +435,53 @@ def read_layout_page(page, number: int) -> tuple[list[dict], list[dict]]:
             uncertain.append(line_number)
             continue
         if text:
-            records.append({"text": text, "locator": _locator(page, number, _bbox(line), text_block=line_number), "provenance": {}})
+            records.append({"text": text, "locator": _locator(page, number, _bbox(line), text_block=line_number),
+                            "provenance": {"layout_binding": "unbound_text"}})
+    from .pdf_conditions import raised_reference_words
+    for record in records:
+        meta = record["provenance"]
+        if not meta.get("atomic_parameter"):
+            continue
+        boxes = [meta[key] for key in ("label_bbox", "value_bbox", "condition_bbox") if meta.get(key)]
+        ref_words = raised_reference_words([w for w in words if any(_inside(w, box) for box in boxes)])
+        label = record["text"].partition(":")[0]
+        explicit_refs = re.findall(r"\*(\d{1,2})\b", label)
+        if ref_words or explicit_refs:
+            meta["condition_refs"] = list(dict.fromkeys([w["text"].strip("*)") for w in ref_words] + explicit_refs))
+            label, colon, value = record["text"].partition(":")
+            for key, old in (("label_bbox", label), ("value_bbox", value)):
+                if meta.get(key):
+                    region = [w for w in words if _inside(w, meta[key]) and w not in ref_words]
+                    updated = " ".join(_text(line) for line in _lines(region))
+                    if key == "label_bbox":
+                        label = re.sub(r"^\s*[-*•●▪◦–]\s*", "", updated).rstrip(":：")
+                    else:
+                        value = " " + updated
+            for marker in meta["condition_refs"]:
+                label = re.sub(r"\s*\*?" + re.escape(marker) + r"\)?$", "", label)
+            record["text"] = label + colon + value
     if uncertain:
         issues.append({"code": "unruled_table_unclear", "locator": {"page": number},
                        "message": "本页有未能可靠绑定的多列表格，请补充 CSV/XLSX 或核对原件。", "unbound_rows": uncertain})
     return records, issues
+
+
+def without_running_margins(blocks):
+    """Repeated page-margin labels are document furniture, not parameters.
+
+    Preserve explicit known product identity labels. Only geometry-bound
+    custom labels repeated on distinct pages at the same margin are removed.
+    """
+    groups = defaultdict(list)
+    for block in blocks:
+        meta = block.provenance
+        box = block.locator.get("bbox_1000", [])
+        if (meta.get("layout_binding") != "wrapped_aligned_pair" or len(box) != 4
+                or not (box[3] < 70 or box[1] > 930)):
+            continue
+        label = block.text.partition(":")[0]
+        if field_for_label(label, known_only=True):
+            continue
+        groups[(label.casefold(), round(box[0] / 5), round(box[1] / 5))].append(block)
+    remove = {id(b) for values in groups.values() if len({b.locator.get("page") for b in values}) >= 2 for b in values}
+    return [block for block in blocks if id(block) not in remove]

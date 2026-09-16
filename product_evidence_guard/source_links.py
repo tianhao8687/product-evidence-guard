@@ -61,6 +61,12 @@ def write_source_links(output: Path, candidates, *, input_root=None) -> dict[str
                              if locator.get(key) is not None) or "见来源文件；未提供精确位置"
         original = (f'<a href="{escape(source_uri, quote=True)}">打开来源文件</a>' if current else
                     '<p class="warning">来源已变化、不可用或尚未验证，请重新分析后核对。</p>')
+        conditions = ""
+        for note in (c.get("provenance") or {}).get("source_conditions", []):
+            note_page = (note.get("locator") or {}).get("page")
+            if current and Path(name).suffix.lower() == ".pdf" and type(note_page) is int and note_page > 0:
+                uri = sources[name][0] + f"#page={note_page}"
+                conditions += f'<p><a href="{escape(uri, quote=True)}">查看附注 {escape(str(note.get("marker", "")))} 原文（第 {note_page} 页）</a></p>'
         html = ('<!doctype html><html lang="zh-CN"><meta charset="utf-8">'
                 '<meta name="referrer" content="no-referrer">'
                 '<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'; base-uri \'none\'">'
@@ -68,7 +74,7 @@ def write_source_links(output: Path, candidates, *, input_root=None) -> dict[str
                 'font:16px/1.7 system-ui,sans-serif;color:#183d4d}pre{white-space:pre-wrap;overflow-wrap:anywhere;'
                 'background:#f1f5f6;padding:20px}a{color:#006b68}.warning{color:#a83031}</style>'
                 f'<h1>查看原文</h1><p>{escape(name)}</p><p>{escape(position)}</p>'
-                f'<pre>{escape(str(c.get("raw_text", "")))}</pre>{original}'
+                f'<pre>{escape(str(c.get("raw_text", "")))}</pre>{original}{conditions}'
                 '<p>这是分析时的证据摘录，不代表人工批准。图片或扫描件的摘录可能存在识别误差，'
                 '请打开来源文件核对。来源变更后请重新分析；链接仅在本机可用。</p></html>')
         opaque_id = hashlib.sha256(str(c["candidate_id"]).encode("utf-8")).hexdigest()[:32]

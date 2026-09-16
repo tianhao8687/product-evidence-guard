@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
   "unit_families": {
-    "mass": {"base_unit": "g", "units": {"mg": 0.001, "g": 1, "克": 1, "kg": 1000, "千克": 1000, "公斤": 1000, "lb": 453.59237, "lbs": 453.59237, "磅": 453.59237, "oz": 28.349523125, "ounce": 28.349523125, "ounces": 28.349523125, "盎司": 28.349523125}},
-    "length": {"base_unit": "mm", "units": {"mm": 1, "毫米": 1, "cm": 10, "厘米": 10, "m": 1000, "米": 1000, "in": 25.4, "inch": 25.4, "英寸": 25.4}},
-    "current": {"base_unit": "A", "units": {"uA": 0.000001, "µA": 0.000001, "μA": 0.000001, "ua": 0.000001, "µa": 0.000001, "μa": 0.000001, "微安": 0.000001, "mA": 0.001, "ma": 0.001, "A": 1, "a": 1, "MA": 1000000, "安": 1, "安培": 1}},
-    "voltage": {"base_unit": "V", "units": {"mV": 0.001, "mv": 0.001, "V": 1, "v": 1, "kV": 1000, "kv": 1000, "MV": 1000000, "伏": 1, "伏特": 1}},
-    "power": {"base_unit": "W", "units": {"mW": 0.001, "mw": 0.001, "W": 1, "w": 1, "瓦": 1, "kW": 1000, "kw": 1000, "千瓦": 1000, "MW": 1000000, "兆瓦": 1000000}},
-    "capacity_volume": {"base_unit": "mL", "units": {"mL": 1, "ml": 1, "毫升": 1, "L": 1000, "l": 1000, "升": 1000}},
+    "mass": {"base_unit": "g", "units": {"mg": 0.001, "g": 1, "克": 1, "kg": 1000, "千克": 1000, "公斤": 1000, "lb": 453.59237, "lbs": 453.59237, "磅": 453.59237, "oz": 28.349523125, "盎司": 28.349523125}, "word_aliases": {"milligram": "mg", "milligrams": "mg", "gram": "g", "grams": "g", "kilogram": "kg", "kilograms": "kg", "pound": "lb", "pounds": "lb", "ounce": "oz", "ounces": "oz"}},
+    "length": {"base_unit": "mm", "units": {"mm": 1, "毫米": 1, "cm": 10, "厘米": 10, "m": 1000, "米": 1000, "in": 25.4, "英寸": 25.4}, "word_aliases": {"millimeter": "mm", "millimeters": "mm", "millimetre": "mm", "millimetres": "mm", "centimeter": "cm", "centimeters": "cm", "centimetre": "cm", "centimetres": "cm", "meter": "m", "meters": "m", "metre": "m", "metres": "m", "inch": "in", "inches": "in"}},
+    "current": {"base_unit": "A", "units": {"uA": 0.000001, "µA": 0.000001, "μA": 0.000001, "ua": 0.000001, "µa": 0.000001, "μa": 0.000001, "微安": 0.000001, "mA": 0.001, "ma": 0.001, "A": 1, "a": 1, "MA": 1000000, "安": 1, "安培": 1}, "word_aliases": {"microampere": "uA", "microamperes": "uA", "milliampere": "mA", "milliamperes": "mA", "ampere": "A", "amperes": "A", "amp": "A", "amps": "A", "megaampere": "MA", "megaamperes": "MA"}},
+    "voltage": {"base_unit": "V", "units": {"mV": 0.001, "mv": 0.001, "V": 1, "v": 1, "kV": 1000, "kv": 1000, "MV": 1000000, "伏": 1, "伏特": 1}, "word_aliases": {"millivolt": "mV", "millivolts": "mV", "volt": "V", "volts": "V", "kilovolt": "kV", "kilovolts": "kV", "megavolt": "MV", "megavolts": "MV"}},
+    "power": {"base_unit": "W", "units": {"mW": 0.001, "mw": 0.001, "W": 1, "w": 1, "瓦": 1, "kW": 1000, "kw": 1000, "千瓦": 1000, "MW": 1000000, "兆瓦": 1000000}, "word_aliases": {"milliwatt": "mW", "milliwatts": "mW", "watt": "W", "watts": "W", "kilowatt": "kW", "kilowatts": "kW", "megawatt": "MW", "megawatts": "MW"}},
+    "capacity_volume": {"base_unit": "mL", "units": {"mL": 1, "ml": 1, "毫升": 1, "L": 1000, "l": 1000, "升": 1000}, "word_aliases": {"milliliter": "mL", "milliliters": "mL", "millilitre": "mL", "millilitres": "mL", "liter": "L", "liters": "L", "litre": "L", "litres": "L"}},
     "capacity_charge": {"base_unit": "mAh", "units": {"mAh": 1, "mah": 1, "毫安时": 1, "Ah": 1000, "ah": 1000, "安时": 1000}},
     "frequency": {"base_unit": "Hz", "units": {"mHz": 0.001, "Hz": 1, "hz": 1, "赫兹": 1, "kHz": 1000, "khz": 1000, "千赫兹": 1000, "MHz": 1000000, "兆赫兹": 1000000, "GHz": 1000000000}},
     "torque": {"base_unit": "N·m", "units": {"N·m": 1, "N.m": 1, "Nm": 1, "牛米": 1, "kgf·cm": 0.0980665}},
     "pressure": {"base_unit": "Pa", "units": {"Pa": 1, "pa": 1, "帕": 1, "mPa": 0.001, "kPa": 1000, "kpa": 1000, "千帕": 1000, "MPa": 1000000, "兆帕": 1000000, "bar": 100000, "psi": 6894.757293168}},
     "flow_rate": {"base_unit": "L/min", "units": {"L/min": 1, "l/min": 1, "lpm": 1, "升/分钟": 1, "mL/min": 0.001, "ml/min": 0.001, "毫升/分钟": 0.001, "m3/h": 16.6666666667, "m³/h": 16.6666666667}},
     "temperature": {"base_unit": "°C", "units": {"°C": 1, "°c": 1, "℃": 1, "C": 1, "c": 1, "°F": {"scale": 0.5555555555555556, "offset": -17.77777777777778}, "°f": {"scale": 0.5555555555555556, "offset": -17.77777777777778}, "℉": {"scale": 0.5555555555555556, "offset": -17.77777777777778}}},
-    "duration": {"base_unit": "s", "units": {"ms": 0.001, "毫秒": 0.001, "s": 1, "sec": 1, "秒": 1, "min": 60, "分钟": 60, "h": 3600, "hr": 3600, "hour": 3600, "小时": 3600}}
+    "duration": {"base_unit": "s", "units": {"ms": 0.001, "毫秒": 0.001, "s": 1, "sec": 1, "秒": 1, "min": 60, "分钟": 60, "h": 3600, "hr": 3600, "小时": 3600}, "word_aliases": {"millisecond": "ms", "milliseconds": "ms", "second": "s", "seconds": "s", "minute": "min", "minutes": "min", "hour": "h", "hours": "h"}}
   },
   "fields": [
     {"name": "sku", "label": "SKU", "aliases": ["sku", "sku id", "货号", "商品编码"], "value_type": "text", "category": "identity", "mapping_confidence": 0.99, "extraction_constraints": {"max_length": 96, "max_words": 6}},

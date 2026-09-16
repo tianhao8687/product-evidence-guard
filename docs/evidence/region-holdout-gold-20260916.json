@@ -1,0 +1,653 @@
+{
+  "schema_version": 1,
+  "frozen_at": "2026-09-16T13:53:48.136172+00:00",
+  "protocol": "10 complete official originals, 80 pre-registered semantic checkpoints visually annotated before prediction. All pages passed to the engine unchanged. Checkpoint slice, not exhaustive recall or independent human certification. Holdout predictions will not be used to revise this gold.",
+  "case_selection": "Different products/documents than prior five; same-brand layout transfer included deliberately. Nine engineering product categories, not ten independent domains. No failed prediction may be removed.",
+  "source_access_notes": [
+    "Arduino first URL returned403; official docs.arduino.cc alias succeeded. Samsung first download transport failed; same official URL succeeded with curl. No selected case was replaced."
+  ],
+  "sources": [
+    {
+      "case": "nano",
+      "domain": "开发板",
+      "title": "Arduino Nano ESP32",
+      "url": "https://docs.arduino.cc/resources/datasheets/ABX00083-datasheet.pdf",
+      "sha256": "0ef52ae82ec6d16f9b1fca36d0ad64a1d377685e992f36a28c4c015be6eb6f01",
+      "pages": 41
+    },
+    {
+      "case": "mosfet",
+      "domain": "MOSFET",
+      "title": "Nexperia 2N7002",
+      "url": "https://assets.nexperia.com/documents/data-sheet/2N7002.pdf",
+      "sha256": "cc9c275457670c3cbbf2e56f5a75c800d3b5f0b396fabc798cf18cb639646475",
+      "pages": 13
+    },
+    {
+      "case": "coin",
+      "domain": "电池",
+      "title": "Energizer CR2032 EU",
+      "url": "https://data.energizer.com/pdfs/cr2032_eu.pdf",
+      "sha256": "378d7dc81bd34b843d744c66db9eb46fdeb6f3b997692675246ad8203e44961d",
+      "pages": 1
+    },
+    {
+      "case": "switch",
+      "domain": "网络设备",
+      "title": "NETGEAR GS105 2003 revision",
+      "url": "https://www.downloads.netgear.com/files/GDC/GS105/GS105_datasheet_04Sept03.pdf",
+      "sha256": "9d84ac422f2530fe05cdd81a2cb49df4c6ebaee3ea135f8637513a2154637c16",
+      "pages": 2
+    },
+    {
+      "case": "camera",
+      "domain": "摄像头",
+      "title": "Logitech C920-C",
+      "url": "https://www.logitech.com/assets/52363/logitech-webcam-c920c-datasheetweb.pdf",
+      "sha256": "be60bb43679c4eead65a1b1dbd7faefee94ac8a912e1afb4da47fbebb3990c3a",
+      "pages": 2
+    },
+    {
+      "case": "diode",
+      "domain": "二极管",
+      "title": "Vishay 1N4148",
+      "url": "https://www.vishay.com/docs/81857/1n4148.pdf",
+      "sha256": "aefe85400a427ed886a4e1c88205ceabb9f9b38044b29c6acee4bb00146a44b7",
+      "pages": 4
+    },
+    {
+      "case": "sensor",
+      "domain": "传感器",
+      "title": "Sensirion SHT4x v7.3",
+      "url": "https://sensirion.com/resource/datasheet/sht4x",
+      "sha256": "8db4a43f17149b76811cfb504caaeca4ef844ddc710cb9b45905c51c7ddfe3c2",
+      "pages": 25
+    },
+    {
+      "case": "relay",
+      "domain": "继电器",
+      "title": "OMRON G5LE",
+      "url": "https://omronfs.omron.com/en_US/ecb/products/pdf/en-g5le.pdf",
+      "sha256": "faf3b16409722ace13979dec61565d44942894d59509fdaa68a408ed2eba1827",
+      "pages": 4
+    },
+    {
+      "case": "card",
+      "domain": "存储卡",
+      "title": "Kingston SDCS2",
+      "url": "https://www.kingston.com/datasheets/SDCS2_en.pdf",
+      "sha256": "0443b7d79a3ec0e77628ab2f697a0e87798657ad00240540a19914645502bdd2",
+      "pages": 4
+    },
+    {
+      "case": "ssd",
+      "domain": "固态硬盘",
+      "title": "Samsung 990 PRO revision 1.0",
+      "url": "https://download.semiconductor.samsung.com/resources/data-sheet/Samsung_NVMe_SSD_990_PRO_Datasheet_Rev.1.0_10129514072296.pdf",
+      "sha256": "a5df20456b7e9829757569d914c0f9de986ccdcb8fcc4b367f3add8524206c21",
+      "pages": 5
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "nano-01",
+      "case": "nano",
+      "page": 2,
+      "parameter": "CPU频率",
+      "expected": "Xtensa双核 LX7，最高240MHz"
+    },
+    {
+      "id": "nano-02",
+      "case": "nano",
+      "page": 2,
+      "parameter": "ROM",
+      "expected": "384 kB"
+    },
+    {
+      "id": "nano-03",
+      "case": "nano",
+      "page": 2,
+      "parameter": "SRAM",
+      "expected": "512 kB"
+    },
+    {
+      "id": "nano-04",
+      "case": "nano",
+      "page": 2,
+      "parameter": "RTC SRAM",
+      "expected": "低功耗模式16 kB"
+    },
+    {
+      "id": "nano-05",
+      "case": "nano",
+      "page": 2,
+      "parameter": "工作电压",
+      "expected": "3.3 V"
+    },
+    {
+      "id": "nano-06",
+      "case": "nano",
+      "page": 2,
+      "parameter": "USB供电",
+      "expected": "VBUS 5 V，USB-C接口"
+    },
+    {
+      "id": "nano-07",
+      "case": "nano",
+      "page": 2,
+      "parameter": "VIN电压范围",
+      "expected": "6–21 V"
+    },
+    {
+      "id": "nano-08",
+      "case": "nano",
+      "page": 2,
+      "parameter": "数字引脚",
+      "expected": "14个，算上模拟引脚共21个"
+    },
+    {
+      "id": "mosfet-01",
+      "case": "mosfet",
+      "page": 1,
+      "parameter": "漏源电压上限",
+      "expected": "60 V；25°C ≤ Tj ≤ 150°C"
+    },
+    {
+      "id": "mosfet-02",
+      "case": "mosfet",
+      "page": 1,
+      "parameter": "漏极电流上限",
+      "expected": "300 mA；VGS=10V、Tsp=25°C；适用图1和3"
+    },
+    {
+      "id": "mosfet-03",
+      "case": "mosfet",
+      "page": 1,
+      "parameter": "总耗散功率上限",
+      "expected": "0.83 W；Tsp=25°C，适用图2"
+    },
+    {
+      "id": "mosfet-04",
+      "case": "mosfet",
+      "page": 1,
+      "parameter": "导通电阻典型值",
+      "expected": "2.8 Ω；VGS=10V、ID=500mA、Tj=25°C；适用图6和8"
+    },
+    {
+      "id": "mosfet-05",
+      "case": "mosfet",
+      "page": 1,
+      "parameter": "导通电阻最大值",
+      "expected": "5.3 Ω；VGS=10V、ID=500mA、Tj=25°C；适用图6和8"
+    },
+    {
+      "id": "mosfet-06",
+      "case": "mosfet",
+      "page": 1,
+      "parameter": "封装",
+      "expected": "SOT23 (TO-236AB)"
+    },
+    {
+      "id": "mosfet-07",
+      "case": "mosfet",
+      "page": 1,
+      "parameter": "栅极引脚",
+      "expected": "引脚1=gate"
+    },
+    {
+      "id": "mosfet-08",
+      "case": "mosfet",
+      "page": 1,
+      "parameter": "源漏引脚",
+      "expected": "引脚2=source、引脚3=drain"
+    },
+    {
+      "id": "coin-01",
+      "case": "coin",
+      "page": 1,
+      "parameter": "标称电压",
+      "expected": "3.0 V"
+    },
+    {
+      "id": "coin-02",
+      "case": "coin",
+      "page": 1,
+      "parameter": "典型容量",
+      "expected": "235mAh；截止2.0V、15kΩ、21°C"
+    },
+    {
+      "id": "coin-03",
+      "case": "coin",
+      "page": 1,
+      "parameter": "典型重量",
+      "expected": "3.0g / 0.10oz"
+    },
+    {
+      "id": "coin-04",
+      "case": "coin",
+      "page": 1,
+      "parameter": "化学体系",
+      "expected": "锂/二氧化锰，Li/MnO2，不能丢掉下标2"
+    },
+    {
+      "id": "coin-05",
+      "case": "coin",
+      "page": 1,
+      "parameter": "最大反向充电电流",
+      "expected": "1 microampere"
+    },
+    {
+      "id": "coin-06",
+      "case": "coin",
+      "page": 1,
+      "parameter": "能量密度",
+      "expected": "198mWh/g 和 653mWh/cc"
+    },
+    {
+      "id": "coin-07",
+      "case": "coin",
+      "page": 1,
+      "parameter": "工作温度",
+      "expected": "-30°C 到60°C"
+    },
+    {
+      "id": "coin-08",
+      "case": "coin",
+      "page": 1,
+      "parameter": "自放电",
+      "expected": "约1%/年"
+    },
+    {
+      "id": "switch-01",
+      "case": "switch",
+      "page": 2,
+      "parameter": "端口",
+      "expected": "5个自动速率检测UTP端口"
+    },
+    {
+      "id": "switch-02",
+      "case": "switch",
+      "page": 2,
+      "parameter": "带宽",
+      "expected": "10Gbps，非阻塞"
+    },
+    {
+      "id": "switch-03",
+      "case": "switch",
+      "page": 2,
+      "parameter": "重量",
+      "expected": "0.49kg / 1.08lb"
+    },
+    {
+      "id": "switch-04",
+      "case": "switch",
+      "page": 2,
+      "parameter": "尺寸",
+      "expected": "158×105×25mm，宽×深×高"
+    },
+    {
+      "id": "switch-05",
+      "case": "switch",
+      "page": 2,
+      "parameter": "工作温度",
+      "expected": "0–40°C"
+    },
+    {
+      "id": "switch-06",
+      "case": "switch",
+      "page": 2,
+      "parameter": "储存温度",
+      "expected": "-20–70°C"
+    },
+    {
+      "id": "switch-07",
+      "case": "switch",
+      "page": 2,
+      "parameter": "电源",
+      "expected": "14.4W；12VAC、1.2A"
+    },
+    {
+      "id": "switch-08",
+      "case": "switch",
+      "page": 2,
+      "parameter": "包缓存",
+      "expected": "256K片上包缓存"
+    },
+    {
+      "id": "camera-01",
+      "case": "camera",
+      "page": 2,
+      "parameter": "不含夹具宽",
+      "expected": "126mm / 5英寸；without clip"
+    },
+    {
+      "id": "camera-02",
+      "case": "camera",
+      "page": 2,
+      "parameter": "不含夹具高",
+      "expected": "29mm / 1.2英寸；without clip"
+    },
+    {
+      "id": "camera-03",
+      "case": "camera",
+      "page": 2,
+      "parameter": "不含夹具深",
+      "expected": "32mm / 1.3英寸；without clip"
+    },
+    {
+      "id": "camera-04",
+      "case": "camera",
+      "page": 2,
+      "parameter": "含夹具高",
+      "expected": "73mm / 2.9英寸；with clip"
+    },
+    {
+      "id": "camera-05",
+      "case": "camera",
+      "page": 2,
+      "parameter": "含夹具深",
+      "expected": "45mm / 1.8英寸；with clip"
+    },
+    {
+      "id": "camera-06",
+      "case": "camera",
+      "page": 2,
+      "parameter": "重量",
+      "expected": "170g / 6.0oz"
+    },
+    {
+      "id": "camera-07",
+      "case": "camera",
+      "page": 2,
+      "parameter": "保修",
+      "expected": "3年有限硬件保修"
+    },
+    {
+      "id": "camera-08",
+      "case": "camera",
+      "page": 2,
+      "parameter": "视频",
+      "expected": "1080p、最高30fps；支持模式取决于应用/客户端"
+    },
+    {
+      "id": "diode-01",
+      "case": "diode",
+      "page": 1,
+      "parameter": "外壳",
+      "expected": "DO-35 (DO-204AH)"
+    },
+    {
+      "id": "diode-02",
+      "case": "diode",
+      "page": 1,
+      "parameter": "重量",
+      "expected": "约105mg"
+    },
+    {
+      "id": "diode-03",
+      "case": "diode",
+      "page": 1,
+      "parameter": "阴极色环",
+      "expected": "黑色"
+    },
+    {
+      "id": "diode-04",
+      "case": "diode",
+      "page": 1,
+      "parameter": "重复峰值反向电压",
+      "expected": "绝对最大100V；Tamb=25°C"
+    },
+    {
+      "id": "diode-05",
+      "case": "diode",
+      "page": 1,
+      "parameter": "反向电压",
+      "expected": "绝对最大75V；Tamb=25°C"
+    },
+    {
+      "id": "diode-06",
+      "case": "diode",
+      "page": 1,
+      "parameter": "正向连续电流",
+      "expected": "绝对最大300mA；Tamb=25°C"
+    },
+    {
+      "id": "diode-07",
+      "case": "diode",
+      "page": 1,
+      "parameter": "储存温度",
+      "expected": "-65到150°C"
+    },
+    {
+      "id": "diode-08",
+      "case": "diode",
+      "page": 1,
+      "parameter": "耗散功率",
+      "expected": "引线4mm，TL=45°C时440mW；TL≤25°C时500mW，不能当作冲突"
+    },
+    {
+      "id": "sensor-01",
+      "case": "sensor",
+      "page": 9,
+      "parameter": "电源电压范围",
+      "expected": "1.08–3.6V"
+    },
+    {
+      "id": "sensor-02",
+      "case": "sensor",
+      "page": 9,
+      "parameter": "典型电源电压",
+      "expected": "3.3V"
+    },
+    {
+      "id": "sensor-03",
+      "case": "sensor",
+      "page": 9,
+      "parameter": "空闲典型电流",
+      "expected": "heater off、25°C、0.08µA"
+    },
+    {
+      "id": "sensor-04",
+      "case": "sensor",
+      "page": 9,
+      "parameter": "空闲最大电流",
+      "expected": "heater off、25°C时1.0µA、125°C时3.4µA"
+    },
+    {
+      "id": "sensor-05",
+      "case": "sensor",
+      "page": 9,
+      "parameter": "测量典型电流",
+      "expected": "heater off、测量期间320µA"
+    },
+    {
+      "id": "sensor-06",
+      "case": "sensor",
+      "page": 9,
+      "parameter": "测量最大电流",
+      "expected": "heater off、测量期间500µA"
+    },
+    {
+      "id": "sensor-07",
+      "case": "sensor",
+      "page": 9,
+      "parameter": "200mW加热档电流",
+      "expected": "heater on、标称200mW档，典型60mA、最大100mA"
+    },
+    {
+      "id": "sensor-08",
+      "case": "sensor",
+      "page": 9,
+      "parameter": "20mW加热档电流",
+      "expected": "heater on、标称20mW档，典型6mA、最大10mA"
+    },
+    {
+      "id": "relay-01",
+      "case": "relay",
+      "page": 2,
+      "parameter": "接触电阻",
+      "expected": "最大100mΩ；测量5VDC、1A"
+    },
+    {
+      "id": "relay-02",
+      "case": "relay",
+      "page": 2,
+      "parameter": "动作时间",
+      "expected": "最大10ms"
+    },
+    {
+      "id": "relay-03",
+      "case": "relay",
+      "page": 2,
+      "parameter": "释放时间",
+      "expected": "最大5ms"
+    },
+    {
+      "id": "relay-04",
+      "case": "relay",
+      "page": 2,
+      "parameter": "绝缘电阻",
+      "expected": "最小100MΩ；使用500VDC兆欧表，测点与耐压测量相同"
+    },
+    {
+      "id": "relay-05",
+      "case": "relay",
+      "page": 2,
+      "parameter": "环境工作温度",
+      "expected": "-25到85°C，不结冰不凝露"
+    },
+    {
+      "id": "relay-06",
+      "case": "relay",
+      "page": 2,
+      "parameter": "重量",
+      "expected": "约12g"
+    },
+    {
+      "id": "relay-07",
+      "case": "relay",
+      "page": 2,
+      "parameter": "线圈与接点间耐压",
+      "expected": "2000VAC、50/60Hz、1分钟"
+    },
+    {
+      "id": "relay-08",
+      "case": "relay",
+      "page": 2,
+      "parameter": "同极接点间耐压",
+      "expected": "750VAC、50/60Hz、1分钟"
+    },
+    {
+      "id": "card-01",
+      "case": "card",
+      "page": 2,
+      "parameter": "容量",
+      "expected": "64/128/256/512GB；格式化等占用空间，实际可用量较小"
+    },
+    {
+      "id": "card-02",
+      "case": "card",
+      "page": 2,
+      "parameter": "性能",
+      "expected": "64–128GB读100MB/s、U1 V10；256–512GB读/写100/85MB/s、U3 V30；速度随主机软硬件和使用情况变化"
+    },
+    {
+      "id": "card-03",
+      "case": "card",
+      "page": 2,
+      "parameter": "卡尺寸",
+      "expected": "microSDHC卡11×15×1mm"
+    },
+    {
+      "id": "card-04",
+      "case": "card",
+      "page": 2,
+      "parameter": "适配器尺寸",
+      "expected": "SD适配器24×32×2.1mm"
+    },
+    {
+      "id": "card-05",
+      "case": "card",
+      "page": 2,
+      "parameter": "文件系统",
+      "expected": "exFAT（64–512GB）"
+    },
+    {
+      "id": "card-06",
+      "case": "card",
+      "page": 2,
+      "parameter": "工作温度",
+      "expected": "-25–85°C"
+    },
+    {
+      "id": "card-07",
+      "case": "card",
+      "page": 2,
+      "parameter": "储存温度",
+      "expected": "-40–85°C"
+    },
+    {
+      "id": "card-08",
+      "case": "card",
+      "page": 2,
+      "parameter": "电压",
+      "expected": "3.3V"
+    },
+    {
+      "id": "ssd-01",
+      "case": "ssd",
+      "page": 3,
+      "parameter": "接口",
+      "expected": "PCIe Gen4.0 x4，NVMe2.0"
+    },
+    {
+      "id": "ssd-02",
+      "case": "ssd",
+      "page": 3,
+      "parameter": "尺寸",
+      "expected": "最大80×22×2.3mm，每个轴都是上限"
+    },
+    {
+      "id": "ssd-03",
+      "case": "ssd",
+      "page": 3,
+      "parameter": "DRAM缓存",
+      "expected": "1TB版1GB LPDDR4；2TB版2GB LPDDR4"
+    },
+    {
+      "id": "ssd-04",
+      "case": "ssd",
+      "page": 3,
+      "parameter": "空闲功耗",
+      "expected": "APST on，1TB最高50mW、2TB最高55mW；IOmeter1.1.0及脚注5指定测试平台"
+    },
+    {
+      "id": "ssd-05",
+      "case": "ssd",
+      "page": 3,
+      "parameter": "工作温度",
+      "expected": "0–70°C，SMART测量，建议适当气流"
+    },
+    {
+      "id": "ssd-06",
+      "case": "ssd",
+      "page": 3,
+      "parameter": "非工作温度",
+      "expected": "-40–85°C"
+    },
+    {
+      "id": "ssd-07",
+      "case": "ssd",
+      "page": 3,
+      "parameter": "保修耐久",
+      "expected": "1TB 600TBW、2TB 1200TBW；5年或TBW先到为止、JESD218测试"
+    },
+    {
+      "id": "ssd-08",
+      "case": "ssd",
+      "page": 3,
+      "parameter": "MTBF",
+      "expected": "150万小时"
+    }
+  ]
+}

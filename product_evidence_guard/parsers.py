@@ -760,6 +760,7 @@ def parse_pdf_document(path: Path, relative_path: str, file_hash: str) -> PdfPar
             reading_issues.append({"code": "layout_reader_missing", "message": "未安装 PDF 结构读取组件，暂不能完整核对原表。", "locator": {}})
         else:
             layout = stack.enter_context(pdfplumber.open(path))
+        condition_notes = []
         for page_number, page in enumerate(reader.pages, start=1):
             text = (page.extract_text() or "").strip()
             if not text:
@@ -768,7 +769,9 @@ def parse_pdf_document(path: Path, relative_path: str, file_hash: str) -> PdfPar
                 continue
             if layout:
                 from .pdf_layout import read_layout_page
+                from .pdf_conditions import collect_condition_notes
                 records, page_issues = read_layout_page(layout.pages[page_number - 1], page_number)
+                condition_notes.extend(collect_condition_notes(layout.pages[page_number - 1], page_number))
                 reading_issues.extend(page_issues)
                 for record in records:
                     block = _make_block(relative_path=relative_path, source_kind="pdf_text", file_hash=file_hash,
@@ -794,6 +797,10 @@ def parse_pdf_document(path: Path, relative_path: str, file_hash: str) -> PdfPar
                 else:
                     reading_issues.append({"code": "visual_page_limit", "locator": {"page": page_number},
                                            "message": "图形页面超过单次处理上限，请拆分资料。"})
+        from .pdf_conditions import attach_condition_notes
+        from .pdf_layout import without_running_margins
+        blocks = without_running_margins(blocks)
+        attach_condition_notes(blocks, condition_notes)
     return PdfParseResult(
         blocks=tuple(blocks),
         scanned_page_numbers=tuple(scanned_page_numbers),

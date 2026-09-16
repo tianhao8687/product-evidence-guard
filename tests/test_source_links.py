@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import io
 from html import escape
 import json
 from pathlib import Path
@@ -8,11 +9,14 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 from urllib.parse import urlsplit
 from urllib.request import url2pathname
 
 from product_evidence_guard import conversation, review_assets, workflow
 from product_evidence_guard.engine import analyze_directory
+from product_evidence_guard.confirmation import ConfirmationRequestError
+from product_evidence_guard.review_server import ReviewServer
 from product_evidence_guard.review_workbook import export_review
 from product_evidence_guard.source_links import write_source_links
 from tests.test_fact_status import candidate
@@ -110,6 +114,44 @@ class SourceLinkTests(unittest.TestCase):
         self.assertIn("&lt;script&gt;", html)
         self.assertNotIn("<script>", html)
 
+    def test_cross_page_condition_link_uses_validated_same_file(self):
+        source = self.source / "notes.pdf"
+        source.write_bytes(b"synthetic-file-for-link-test")
+        c = candidate(source_file=source.name, locator={"page": 2},
+                      file_hash=hashlib.sha256(source.read_bytes()).hexdigest())
+        c.provenance["source_conditions"] = [{"marker": "3<script>", "text": "Condition", "locator": {"page": 4}}]
+        url = write_source_links(self.output, [c], input_root=self.source)[c.candidate_id]
+        html = local_path(url).read_text("utf-8")
+        self.assertIn(source.as_uri() + "#page=4", html)
+        self.assertIn("查看附注 3&lt;script&gt;", html)
+        self.assertNotIn("<script>", html)
+        source.write_bytes(b"changed")
+        url = write_source_links(self.output, [c], input_root=self.source)[c.candidate_id]
+        self.assertNotIn("#page=4", local_path(url).read_text("utf-8"))
+
+    def test_condition_preview_uses_stored_page_and_rechecks_source(self):
+        from pypdf import PdfWriter
+        from PIL import Image
+        source = self.source / "notes.pdf"
+        writer = PdfWriter()
+        writer.add_blank_page(width=300, height=600)
+        writer.add_blank_page(width=600, height=300)
+        writer.write(source)
+        c = {"candidate_id": "note-test", "source_file": source.name,
+             "file_hash": hashlib.sha256(source.read_bytes()).hexdigest(), "locator": {"page": 1},
+             "provenance": {"source_conditions": [{"marker": "1", "text": "Condition", "locator": {"page": 2}}]}}
+        with patch("product_evidence_guard.review_server.workflow.context", return_value=(None, {"candidates": [c]}, None)):
+            data, mime, _ = ReviewServer.preview(self.output, "note-test", condition="0")
+            self.assertEqual(mime, "image/jpeg")
+            with Image.open(io.BytesIO(data)) as image:
+                self.assertGreater(image.width, image.height)
+            for bad_index in ("-1", "1", "../2", "1e3"):
+                with self.assertRaises(ConfirmationRequestError):
+                    ReviewServer.preview(self.output, "note-test", condition=bad_index)
+            source.write_bytes(b"changed")
+            with self.assertRaises(ConfirmationRequestError):
+                ReviewServer.preview(self.output, "note-test", condition="0")
+
     def test_unsafe_source_paths_and_executables_never_become_links(self):
         for name in ("../outside.txt", "C:\\outside.txt", "\\\\server\\share\\x.txt", "bad.exe"):
             with self.subTest(name=name):
@@ -131,8 +173,8 @@ class SourceLinkTests(unittest.TestCase):
     def test_live_review_exposes_source_links_for_both_states_and_all_sources(self):
         self.assertIn("if(g.fact_status!=='verified'){const actions", review_assets.JS)
         self.assertIn("sources.forEach((s,i)=>", review_assets.JS)
-        self.assertIn("function sourceLink(c,text='查看原文')", review_assets.JS)
-        self.assertIn("preview(c).catch", review_assets.JS)
+        self.assertIn("function sourceLink(c,text='查看原文',condition=null)", review_assets.JS)
+        self.assertIn("preview(c,condition).catch", review_assets.JS)
 
     @unittest.skipUnless(shutil.which("node"), "Node is unavailable for the renderer test")
     def test_live_option_renderer(self):

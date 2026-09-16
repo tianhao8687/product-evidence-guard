@@ -1,0 +1,3115 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-09-16T14:33:28.416904+00:00",
+  "base_commit": "9e6a708",
+  "code_sha256": "16b8ec711b950359a345b1d432bbc157c01169bb16f52b66c620d954afaffdb2",
+  "annotation": "Agent source-visual checkpoint adjudication. Not independent human signoff.",
+  "scope": "Coverage of pre-registered semantic checkpoints by complete automatically adopted results; NOT full-output precision, full-document recall, or production accuracy.",
+  "limits": [
+    "Originals are engineering-heavy, not ten independent business domains.",
+    "The first new-original run followed early development on five exposed originals; no previous predictions existed for these ten documents.",
+    "All later new-original runs are exposed regressions; original gold and first predictions remain unchanged.",
+    "No hard case is removed, no gold is edited, and no pending/unread fact is counted as correct.",
+    "Full-output precision has NOT been fully re-annotated this round; remaining false positives/conflicts are explicitly documented.",
+    "An independent human reviewer is still required before formal production acceptance."
+  ],
+  "sources": [
+    {
+      "case": "nano",
+      "domain": "开发板",
+      "title": "Arduino Nano ESP32",
+      "url": "https://docs.arduino.cc/resources/datasheets/ABX00083-datasheet.pdf",
+      "sha256": "0ef52ae82ec6d16f9b1fca36d0ad64a1d377685e992f36a28c4c015be6eb6f01",
+      "pages": 41
+    },
+    {
+      "case": "mosfet",
+      "domain": "MOSFET",
+      "title": "Nexperia 2N7002",
+      "url": "https://assets.nexperia.com/documents/data-sheet/2N7002.pdf",
+      "sha256": "cc9c275457670c3cbbf2e56f5a75c800d3b5f0b396fabc798cf18cb639646475",
+      "pages": 13
+    },
+    {
+      "case": "coin",
+      "domain": "电池",
+      "title": "Energizer CR2032 EU",
+      "url": "https://data.energizer.com/pdfs/cr2032_eu.pdf",
+      "sha256": "378d7dc81bd34b843d744c66db9eb46fdeb6f3b997692675246ad8203e44961d",
+      "pages": 1
+    },
+    {
+      "case": "switch",
+      "domain": "网络设备",
+      "title": "NETGEAR GS105 2003 revision",
+      "url": "https://www.downloads.netgear.com/files/GDC/GS105/GS105_datasheet_04Sept03.pdf",
+      "sha256": "9d84ac422f2530fe05cdd81a2cb49df4c6ebaee3ea135f8637513a2154637c16",
+      "pages": 2
+    },
+    {
+      "case": "camera",
+      "domain": "摄像头",
+      "title": "Logitech C920-C",
+      "url": "https://www.logitech.com/assets/52363/logitech-webcam-c920c-datasheetweb.pdf",
+      "sha256": "be60bb43679c4eead65a1b1dbd7faefee94ac8a912e1afb4da47fbebb3990c3a",
+      "pages": 2
+    },
+    {
+      "case": "diode",
+      "domain": "二极管",
+      "title": "Vishay 1N4148",
+      "url": "https://www.vishay.com/docs/81857/1n4148.pdf",
+      "sha256": "aefe85400a427ed886a4e1c88205ceabb9f9b38044b29c6acee4bb00146a44b7",
+      "pages": 4
+    },
+    {
+      "case": "sensor",
+      "domain": "传感器",
+      "title": "Sensirion SHT4x v7.3",
+      "url": "https://sensirion.com/resource/datasheet/sht4x",
+      "sha256": "8db4a43f17149b76811cfb504caaeca4ef844ddc710cb9b45905c51c7ddfe3c2",
+      "pages": 25
+    },
+    {
+      "case": "relay",
+      "domain": "继电器",
+      "title": "OMRON G5LE",
+      "url": "https://omronfs.omron.com/en_US/ecb/products/pdf/en-g5le.pdf",
+      "sha256": "faf3b16409722ace13979dec61565d44942894d59509fdaa68a408ed2eba1827",
+      "pages": 4
+    },
+    {
+      "case": "card",
+      "domain": "存储卡",
+      "title": "Kingston SDCS2",
+      "url": "https://www.kingston.com/datasheets/SDCS2_en.pdf",
+      "sha256": "0443b7d79a3ec0e77628ab2f697a0e87798657ad00240540a19914645502bdd2",
+      "pages": 4
+    },
+    {
+      "case": "ssd",
+      "domain": "固态硬盘",
+      "title": "Samsung 990 PRO revision 1.0",
+      "url": "https://download.semiconductor.samsung.com/resources/data-sheet/Samsung_NVMe_SSD_990_PRO_Datasheet_Rev.1.0_10129514072296.pdf",
+      "sha256": "a5df20456b7e9829757569d914c0f9de986ccdcb8fcc4b367f3add8524206c21",
+      "pages": 5
+    }
+  ],
+  "runs": [
+    {
+      "kind": "exposed_five_originals",
+      "gold_sha256": "7692e56cbbdc4ab6194fed2a108d61663a35d8c2606ccfe0cfb3b5ef82bdb22a",
+      "runner_sha256": "8ac63852a4ab40c0dfa3c6078edcb0bef5d2e020071deab67ff27303735b9a79",
+      "code_sha256": null,
+      "source_count": 5,
+      "counts": {
+        "verified": 208,
+        "pending_confirmation": 4
+      },
+      "covered_checkpoints": 102,
+      "checkpoint_count": 116,
+      "checkpoint_coverage": 0.87931,
+      "seconds": 11.85,
+      "cases": [
+        {
+          "case": "energizer",
+          "prediction_sha256": "aa9e2ace853871aa68540fb00425d4f572b3aed600b8af21e19859fe2110891c",
+          "seconds": 0.88,
+          "counts": {
+            "verified": 10,
+            "pending_confirmation": 1
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 2,
+          "covered_checkpoints": 10,
+          "checkpoint_count": 11,
+          "judgments": [
+            {
+              "checkpoint_id": "energizer-01",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_c338cf42201de276b390"
+              ],
+              "adopted_signatures": [
+                "e77fafb7041888c2050a179d944ee412f3c39f123083cbcf2aa981a8959811c5"
+              ]
+            },
+            {
+              "checkpoint_id": "energizer-02",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_164244897dcb4365a313"
+              ],
+              "adopted_signatures": [
+                "517884a304415dab050d3d15bd747dc5ba7d60cacd8ab5d5674b8ac870d5655b"
+              ]
+            },
+            {
+              "checkpoint_id": "energizer-03",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_cdbbc0c3410444597521"
+              ],
+              "adopted_signatures": [
+                "972385979a0b6c9b1b861c887a509c322913bdc2814273524618c10d21f39cd4"
+              ]
+            },
+            {
+              "checkpoint_id": "energizer-04",
+              "covered": false,
+              "reason": "Unbound, pending, or incomplete adopted value/condition; evidence-only presence is not credited.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "energizer-05",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_da64af2eeccf4a2971cd"
+              ],
+              "adopted_signatures": [
+                "951e6409a4f9aaa733e23e501e8b96cfcdccf4e1cb3534284935f730ebc780f6"
+              ]
+            },
+            {
+              "checkpoint_id": "energizer-06",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_ff5679d14a5534376ff6"
+              ],
+              "adopted_signatures": [
+                "37dee4f6bee101aa64c7aba03adc06114f1c6cd2be1fa5aa7815962757dbda3c"
+              ]
+            },
+            {
+              "checkpoint_id": "energizer-07",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_95eeff334ef9adc51f9b"
+              ],
+              "adopted_signatures": [
+                "db4f429c0dbac8d0750fce414887f6f86554cc090db7ffba9c13fac72bfa5bac"
+              ]
+            },
+            {
+              "checkpoint_id": "energizer-08",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_7b1ca2335db832c9c103"
+              ],
+              "adopted_signatures": [
+                "b01fe6a90d8352edabee92e2be7232b7cbd07202cbb34a0fe96dc017f6a854e2"
+              ]
+            },
+            {
+              "checkpoint_id": "energizer-09",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_5b874460499db84f955f"
+              ],
+              "adopted_signatures": [
+                "5f1ad50e13b23860f5f8a905d9f7fbaf7fd272c183933bf35d74862118a42a86"
+              ]
+            },
+            {
+              "checkpoint_id": "energizer-10",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_60a81aa3157a64038ce5"
+              ],
+              "adopted_signatures": [
+                "ff7cab9b7048f0ab5428042566886a9ca5ea290ebec5c57c9d53804ad3ee041a"
+              ]
+            },
+            {
+              "checkpoint_id": "energizer-11",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_fcbac8197a932710a438"
+              ],
+              "adopted_signatures": [
+                "435a9ff4cb491e8adf56b53ab4576e0e718e2e2e9d20fd07ebde2cf1dde78786"
+              ]
+            }
+          ]
+        },
+        {
+          "case": "hdr",
+          "prediction_sha256": "9efcf3c4088f69062a0597889763c406f14fb9215ed33ed872172129731394f6",
+          "seconds": 6.366,
+          "counts": {
+            "verified": 130
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 6,
+          "covered_checkpoints": 35,
+          "checkpoint_count": 40,
+          "judgments": [
+            {
+              "checkpoint_id": "hdr-01",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_27e71eeadbb2cdf27bf4"
+              ],
+              "adopted_signatures": [
+                "3e60f95af247f5d968b498f401b06dca4c6b920e08b3be3a5e8f2faf9e59378b"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-02",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_945e821c9bdce78c7e42"
+              ],
+              "adopted_signatures": [
+                "ab4f544cb6e12514ae7b405ba98e8d6d6757115c700bbbc3bcb81d8605dd900d"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-03",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_2a604c17db9c966a00b8"
+              ],
+              "adopted_signatures": [
+                "f287ee5ccbdaccc9162fc26de176e495bf18adae47bb8019bcee6dc77be21293"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-04",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_b455bc35cc4c88376485"
+              ],
+              "adopted_signatures": [
+                "03b897c9b5599d9cd735212c30dff79ef6228aef9de0f099c32ef46b8769b220"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-05",
+              "covered": false,
+              "reason": "Unbound, pending, or incomplete adopted value/condition; evidence-only presence is not credited.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "hdr-06",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_c64195b3171be1ad4349"
+              ],
+              "adopted_signatures": [
+                "99a04b8268bbedf03370ab7d4fe9f07d27b3250fbac7c6108763d3423c5e743c"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-07",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_82bb3d30d149ed7faf60"
+              ],
+              "adopted_signatures": [
+                "70dcc6d1c1f094c8367d2d842fccb20211098aee2411c351684f7ba198ec8098"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-08",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_e749c431e9b1aed4cb7b"
+              ],
+              "adopted_signatures": [
+                "c5d1a212a8c49c1e8b33227d292ac162426a37ff43448ab10447c974a68d2188"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-09",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_fabf2d6a64763cd01302"
+              ],
+              "adopted_signatures": [
+                "513ff8a83976c7ec7c9ec148e60cb81806379e8df302926fe3524bc685a68e92"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-10",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_bd61ca42d76a261e1b1d"
+              ],
+              "adopted_signatures": [
+                "305966587189f4c371c965692fea97ca50c426e29601c2cbf2fe6092159e0980"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-11",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_5ad68857c901680b1185"
+              ],
+              "adopted_signatures": [
+                "c3bade18ec75953e7698d041cf6eb25715c4f96944d095007eef510aaaa2d92c"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-12",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_62bc2f0c012dbabe57b0"
+              ],
+              "adopted_signatures": [
+                "bfb58281e290e64b2d4d95d75d8d110291f35c38fd9b76c0a15ddd0ff24a6de7"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-13",
+              "covered": false,
+              "reason": "Unbound, pending, or incomplete adopted value/condition; evidence-only presence is not credited.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "hdr-14",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_c380ae34e68553dbb1a3"
+              ],
+              "adopted_signatures": [
+                "9ad471473648b2b019d02e38a71ab228c080d3da538bb9b309adf13fda16a908"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-15",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_a11ddd8e04749057a7ba"
+              ],
+              "adopted_signatures": [
+                "a128e9c9ccadf0391190b08371879dcfbc7c91e71f104f1413dce46e5405eb3f"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-16",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_394e0a66608582e10b3f"
+              ],
+              "adopted_signatures": [
+                "e736cbc35d811fbb8b21d5614964944ff3b0014422dc9f604c4068b53a4d9fd7"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-17",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_4615b8a5a95398227696"
+              ],
+              "adopted_signatures": [
+                "74b68fba228838b20dabf5e6b390bef08b6d872e818d118f5599ffcaec708a94"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-18",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_1da5af4e24ef33e8e875"
+              ],
+              "adopted_signatures": [
+                "70c457c3bc8923d67420a47b7dcbc91d1677a4d9b2fe68eb068f46cd37be8434"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-19",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_003348743fdd7bafd0dc"
+              ],
+              "adopted_signatures": [
+                "97e172d6ce921d4dceff0cdf6f201f245a1230d751b5883113f669644f106a19"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-20",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_67d309d5d7dc88335a6e"
+              ],
+              "adopted_signatures": [
+                "6ba469dd6b1f4bf57bc9a0a0b455d22b69fccd11afdb07acd1f8495fb7156af3"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-21",
+              "covered": false,
+              "reason": "Unbound, pending, or incomplete adopted value/condition; evidence-only presence is not credited.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "hdr-22",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_280841398ea53d74d303"
+              ],
+              "adopted_signatures": [
+                "e1b658053c365d132fb1fa37d3f01c498dff2126b5dabf6dea77a335533b0463"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-23",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_2c7a8da75f7ae5728aca"
+              ],
+              "adopted_signatures": [
+                "e1de526509afc71e61e7b7b50848cf58ada13470bbd63e5c499f688b172fc14c"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-24",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_738383aa11f6b3f2a073"
+              ],
+              "adopted_signatures": [
+                "3979ee1ca60204a32fbe5d6000e06712ec703e32cf9e01bc3f3f22e08eb9a290"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-25",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_3ff228916be65adbd292"
+              ],
+              "adopted_signatures": [
+                "0abacd50a36161a80f3915233d43effbb5374021afd4eadd95354aa7a3b1eb5f"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-26",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_c50856bb088c0c95dea8"
+              ],
+              "adopted_signatures": [
+                "9aef21178300b542116509b008c4a9a2e16a43946d8da3073269483b6383e3e0"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-27",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_9a785f39d446c1c4e991"
+              ],
+              "adopted_signatures": [
+                "c8fd577d209a09e8dcfe16b2696fda7d0261b82481b831b6df222ecbc46576fc"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-28",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_9425255a652118e21a18"
+              ],
+              "adopted_signatures": [
+                "6ff3ab0165029ce091383fca5e054856b7875f7e8c3fee2c34a2025e3f43c8fb"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-29",
+              "covered": false,
+              "reason": "Unbound, pending, or incomplete adopted value/condition; evidence-only presence is not credited.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "hdr-30",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_6511e8c3dc6cc7a04b9f"
+              ],
+              "adopted_signatures": [
+                "31a1c2cc365151ffa0fbb11c80f1aac5d98069a7ddb519bf2cca65dd3f541fae"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-31",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_ef355c84cbc3bf72dc5c"
+              ],
+              "adopted_signatures": [
+                "20f63a08cb4ef55a4c9f1bef33e800964739cecd8c6e855d5db676d52a496f4b"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-32",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_1028944ab58945ab6bdc"
+              ],
+              "adopted_signatures": [
+                "6cc7a30575eec62e1e0de34cba96d4f51e27d9a1c0ac0ca911aec421fee1479d"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-33",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_a124a3c143bae85a1362"
+              ],
+              "adopted_signatures": [
+                "1cffec664b9cbefee296f7a1393967dcbafaa774992e7db8424a5affd3e821b3"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-34",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_76359c639a9de57c109b"
+              ],
+              "adopted_signatures": [
+                "dcb95fc9b4b0dc72d296ea5bcf68452c354f3e3de790afb5bd2a1605db60897d"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-35",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_8f7e14dc51e70d1b1c91"
+              ],
+              "adopted_signatures": [
+                "008ec829dba2071cc8a58dededda233631b3bbf6bc5f1232bf57ae63f86b8533"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-36",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_39f38afaa2b27a3afa2a"
+              ],
+              "adopted_signatures": [
+                "92d2be432af3569ad8324f4622caac2e3cd41850e3d1df79129f9b2ffe392b98"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-37",
+              "covered": false,
+              "reason": "Unbound, pending, or incomplete adopted value/condition; evidence-only presence is not credited.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "hdr-38",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_acb5f88eb3b35cb5aca5"
+              ],
+              "adopted_signatures": [
+                "91247a7ff3496176d71539ee1c103334880c643a1895f5fdcc3326ff14fa0fbb"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-39",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_fd2d24d6a6be450de1c1"
+              ],
+              "adopted_signatures": [
+                "f88fddb3012ce784be39379580699466b70ee4698337cbe9d002b1a9cc26b4b6"
+              ]
+            },
+            {
+              "checkpoint_id": "hdr-40",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_95bb95ea3ae711b47997"
+              ],
+              "adopted_signatures": [
+                "413f4172cc600f93578df814a366a790f9c48019f3e8b9aca45115c09af28304"
+              ]
+            }
+          ]
+        },
+        {
+          "case": "kingston",
+          "prediction_sha256": "5fe71b31ed22d545fda87a5b5c5da534bcbda4fd02de15b53f985a51c5e60a63",
+          "seconds": 1.211,
+          "counts": {
+            "verified": 13,
+            "pending_confirmation": 2
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 3,
+          "covered_checkpoints": 20,
+          "checkpoint_count": 24,
+          "judgments": [
+            {
+              "checkpoint_id": "kingston-01",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_1fc621a39248251b5b0b"
+              ],
+              "adopted_signatures": [
+                "c3ae896a2028664238b24afe255461ad913f4b2d08740f1e16ae43347e2bcbb0"
+              ]
+            },
+            {
+              "checkpoint_id": "kingston-02",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_4574562b5ebd51703a72"
+              ],
+              "adopted_signatures": [
+                "d9eb6534228e49fd757878b71a2667a1a150853c0e573b3f9a077ca104d81f54"
+              ]
+            },
+            {
+              "checkpoint_id": "kingston-03",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_d58aa59faba6b6a8dcc5"
+              ],
+              "adopted_signatures": [
+                "46196608bd2d97b706c9d8cf95ead745fe8e6a475a2c7c5010ea12e9676bc394"
+              ]
+            },
+            {
+              "checkpoint_id": "kingston-04",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_302b24ab8c8a8633d2b3"
+              ],
+              "adopted_signatures": [
+                "4ce83aafd1c6444aaf49a79ab74925ad20ea18360c9cb6101de853052554c45f"
+              ]
+            },
+            {
+              "checkpoint_id": "kingston-05",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_5498c579d4edac167b81"
+              ],
+              "adopted_signatures": [
+                "c577fdb7f6e41c7b4774c7deaf0b4b21a95bf69ea2d43be9eb269b7ea1541ff2"
+              ]
+            },
+            {
+              "checkpoint_id": "kingston-06",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_0f8fc3be902c89128c62"
+              ],
+              "adopted_signatures": [
+                "66c038f3452bab62d650bef8c845feee62a947797fd09f209489b9bc29607b92"
+              ]
+            },
+            {
+              "checkpoint_id": "kingston-07",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_962213092936230403f7"
+              ],
+              "adopted_signatures": [
+                "a5ecf2c21b6136d2a6cacb3c62af87eb07d70eae4e89cdd3362ff01da31dd75a"
+              ]
+            },
+            {
+              "checkpoint_id": "kingston-08",
+              "covered": false,
+              "reason": "Unbound, pending, or incomplete adopted value/condition; evidence-only presence is not credited.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "kingston-09",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_2e77eebe70cc7f379cbd"
+              ],
+              "adopted_signatures": [
+                "e8f6815e717936028af933e6a8609e7c979f2fa52c44d6323c99c33ed6e7faf5"
+              ]
+            },
+            {
+              "checkpoint_id": "kingston-10",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_ced41e8f98ddcb9419b4"
+              ],
+              "adopted_signatures": [
+                "cfadaaa3cd04bccf21ad0b01e9f6a62c46335cc56755bcd8ff8c2cc9a398a1d7"
+              ]
+            },
+            {
+              "checkpoint_id": "kingston-11",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_86547ab67918517fb5ec"
+              ],
+              "adopted_signatures": [
+                "be5fecbf86752e5e89c606a35c7edc9b24863d2b0f12ab46a93847c2fefd2115"
+              ]
+            },
+            {
+              "checkpoint_id": "kingston-12",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_f2f2fd242a8ceb7d1050"
+              ],
+              "adopted_signatures": [
+                "6fadff41f1e29ebdd7681fe3e5bc9991b8058bc99ad6ff54d3564bab03bc3fd0"
+              ]
+            },
+            {
+              "checkpoint_id": "kingston-13",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_f1359f7f0fcc1a6ac389"
+              ],
+              "adopted_signatures": [
+                "6f7a541b85f3c8c627b91157d60f04862fe1c657363ba75fb64acc839e722ab3"
+              ]
+            },
+            {
+              "checkpoint_id": "kingston-14",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_f1359f7f0fcc1a6ac389"
+              ],
+              "adopted_signatures": [
+                "6f7a541b85f3c8c627b91157d60f04862fe1c657363ba75fb64acc839e722ab3"
+              ]
+            },
+            {
+              "checkpoint_id": "kingston-15",
+              "covered": false,
+              "reason": "Unbound, pending, or incomplete adopted value/condition; evidence-only presence is not credited.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "kingston-16",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_05b0adc1031b0faee55f"
+              ],
+              "adopted_signatures": [
+                "8d82645648b9dc38ef583aac93611eed6f046162b61133e62a1ff4e718ca8f3c"
+              ]
+            },
+            {
+              "checkpoint_id": "kingston-17",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_f1359f7f0fcc1a6ac389"
+              ],
+              "adopted_signatures": [
+                "6f7a541b85f3c8c627b91157d60f04862fe1c657363ba75fb64acc839e722ab3"
+              ]
+            },
+            {
+              "checkpoint_id": "kingston-18",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_f1359f7f0fcc1a6ac389"
+              ],
+              "adopted_signatures": [
+                "6f7a541b85f3c8c627b91157d60f04862fe1c657363ba75fb64acc839e722ab3"
+              ]
+            },
+            {
+              "checkpoint_id": "kingston-19",
+              "covered": false,
+              "reason": "Unbound, pending, or incomplete adopted value/condition; evidence-only presence is not credited.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "kingston-20",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_05b0adc1031b0faee55f"
+              ],
+              "adopted_signatures": [
+                "8d82645648b9dc38ef583aac93611eed6f046162b61133e62a1ff4e718ca8f3c"
+              ]
+            },
+            {
+              "checkpoint_id": "kingston-21",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_f1359f7f0fcc1a6ac389"
+              ],
+              "adopted_signatures": [
+                "6f7a541b85f3c8c627b91157d60f04862fe1c657363ba75fb64acc839e722ab3"
+              ]
+            },
+            {
+              "checkpoint_id": "kingston-22",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_f1359f7f0fcc1a6ac389"
+              ],
+              "adopted_signatures": [
+                "6f7a541b85f3c8c627b91157d60f04862fe1c657363ba75fb64acc839e722ab3"
+              ]
+            },
+            {
+              "checkpoint_id": "kingston-23",
+              "covered": false,
+              "reason": "Unbound, pending, or incomplete adopted value/condition; evidence-only presence is not credited.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "kingston-24",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_05b0adc1031b0faee55f"
+              ],
+              "adopted_signatures": [
+                "8d82645648b9dc38ef583aac93611eed6f046162b61133e62a1ff4e718ca8f3c"
+              ]
+            }
+          ]
+        },
+        {
+          "case": "pico",
+          "prediction_sha256": "d58dce6b1c9c5f8a5ec209e8daa1345c1f5ea870ce1e72ec93c8ec29a9bd2f0c",
+          "seconds": 1.604,
+          "counts": {
+            "verified": 12
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 4,
+          "covered_checkpoints": 15,
+          "checkpoint_count": 15,
+          "judgments": [
+            {
+              "checkpoint_id": "pico-01",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_0502f103fb8a73b95674"
+              ],
+              "adopted_signatures": [
+                "3e12325272e2fce777ffb51fc94dbae8d780326653eb40875963c777e7dcfcd5"
+              ]
+            },
+            {
+              "checkpoint_id": "pico-02",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_d5cf766374562596bc2f"
+              ],
+              "adopted_signatures": [
+                "eb153b8a4525fdc57c269096c9fc21103109362e1f5590108f20a863c2560cb4"
+              ]
+            },
+            {
+              "checkpoint_id": "pico-03",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_15eb96c63883ed1240ec"
+              ],
+              "adopted_signatures": [
+                "132c84e14b695c7f158a390ac57bf822880d66d3ca67bb7de1e03f4d075d0be9"
+              ]
+            },
+            {
+              "checkpoint_id": "pico-04",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_422d3d8022ea38df24a8"
+              ],
+              "adopted_signatures": [
+                "3d4ce3c370fa4ff8bfd83f80fdb9f53419ea47d58af5783649df2d4e57832177"
+              ]
+            },
+            {
+              "checkpoint_id": "pico-05",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_cf220b4340f8ec1500ae"
+              ],
+              "adopted_signatures": [
+                "be7c4c43f152a9b7edff27ef2d8bed686746afa50f4734f1d0f42450b57db1c7"
+              ]
+            },
+            {
+              "checkpoint_id": "pico-06",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_b005c4022c4fd5dccf1e"
+              ],
+              "adopted_signatures": [
+                "7ca4e7284e501fd6df4780910e52d8c4b815d1c57e413bcafa85424f2f6de2db"
+              ]
+            },
+            {
+              "checkpoint_id": "pico-07",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_b005c4022c4fd5dccf1e"
+              ],
+              "adopted_signatures": [
+                "7ca4e7284e501fd6df4780910e52d8c4b815d1c57e413bcafa85424f2f6de2db"
+              ]
+            },
+            {
+              "checkpoint_id": "pico-08",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_b005c4022c4fd5dccf1e"
+              ],
+              "adopted_signatures": [
+                "7ca4e7284e501fd6df4780910e52d8c4b815d1c57e413bcafa85424f2f6de2db"
+              ]
+            },
+            {
+              "checkpoint_id": "pico-09",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_b005c4022c4fd5dccf1e"
+              ],
+              "adopted_signatures": [
+                "7ca4e7284e501fd6df4780910e52d8c4b815d1c57e413bcafa85424f2f6de2db"
+              ]
+            },
+            {
+              "checkpoint_id": "pico-10",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_b005c4022c4fd5dccf1e"
+              ],
+              "adopted_signatures": [
+                "7ca4e7284e501fd6df4780910e52d8c4b815d1c57e413bcafa85424f2f6de2db"
+              ]
+            },
+            {
+              "checkpoint_id": "pico-11",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_b005c4022c4fd5dccf1e"
+              ],
+              "adopted_signatures": [
+                "7ca4e7284e501fd6df4780910e52d8c4b815d1c57e413bcafa85424f2f6de2db"
+              ]
+            },
+            {
+              "checkpoint_id": "pico-12",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_86d9cba9d70659f46d7c"
+              ],
+              "adopted_signatures": [
+                "742e708e098fc8d002439288bfbe063b9f16c923800cd5168667e3a93c911322"
+              ]
+            },
+            {
+              "checkpoint_id": "pico-13",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_9ddb6bc6ad798fd6827f"
+              ],
+              "adopted_signatures": [
+                "b7db6760c7befb6c0294d092c273123c2ffe5966539a0b92954e8ea14d77790e"
+              ]
+            },
+            {
+              "checkpoint_id": "pico-14",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_3d98246cfcfcebaae0c1"
+              ],
+              "adopted_signatures": [
+                "7319b4cb0a227fd9d0bc375c918970d61166069100af06c6edd25d005de4a29e"
+              ]
+            },
+            {
+              "checkpoint_id": "pico-15",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_233b985a774af4b38a4f"
+              ],
+              "adopted_signatures": [
+                "6e8a8642150cb929b45d20cde26164508d3cf87f2bc4ff6f669918c9ac00c107"
+              ]
+            }
+          ]
+        },
+        {
+          "case": "ublox",
+          "prediction_sha256": "89f3390b844d2b56d585aa7250f682e9a002ea185a1e95ce5fd2901ae5d43443",
+          "seconds": 1.789,
+          "counts": {
+            "verified": 43,
+            "pending_confirmation": 1
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 2,
+          "covered_checkpoints": 22,
+          "checkpoint_count": 26,
+          "judgments": [
+            {
+              "checkpoint_id": "ublox-01",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_46774d278910e2267373"
+              ],
+              "adopted_signatures": [
+                "4dda3b17fc7f472ef7cd0c1fea7dab42e096698f000eb9c65c4565f06935446e"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-02",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_46774d278910e2267373"
+              ],
+              "adopted_signatures": [
+                "4dda3b17fc7f472ef7cd0c1fea7dab42e096698f000eb9c65c4565f06935446e"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-03",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_6ac569fc8f0db7b5f1d1"
+              ],
+              "adopted_signatures": [
+                "bcff25c242161d1a7b0f010d3d3a77babf557b1896dec4dedadcb749b5a8f869"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-04",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_0c099411387fab5fbcf1"
+              ],
+              "adopted_signatures": [
+                "ae8ccc2361ca4e5bd446e105bae203c14a1923a4577bb42d4fa0fd2dcda19a3a"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-05",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_0c099411387fab5fbcf1"
+              ],
+              "adopted_signatures": [
+                "ae8ccc2361ca4e5bd446e105bae203c14a1923a4577bb42d4fa0fd2dcda19a3a"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-06",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_0c099411387fab5fbcf1"
+              ],
+              "adopted_signatures": [
+                "ae8ccc2361ca4e5bd446e105bae203c14a1923a4577bb42d4fa0fd2dcda19a3a"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-07",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_3b8853f70827cbadbd7b"
+              ],
+              "adopted_signatures": [
+                "7ede0ca369500af91bbaa3fa538a8595339a0ee771237b685603df518da044bc"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-08",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_3b8853f70827cbadbd7b"
+              ],
+              "adopted_signatures": [
+                "7ede0ca369500af91bbaa3fa538a8595339a0ee771237b685603df518da044bc"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-09",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_3b8853f70827cbadbd7b"
+              ],
+              "adopted_signatures": [
+                "7ede0ca369500af91bbaa3fa538a8595339a0ee771237b685603df518da044bc"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-10",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_3b8853f70827cbadbd7b"
+              ],
+              "adopted_signatures": [
+                "7ede0ca369500af91bbaa3fa538a8595339a0ee771237b685603df518da044bc"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-11",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_d9a420f8b30dc2693966"
+              ],
+              "adopted_signatures": [
+                "48ce7ad260aad7d15b4b8422dfd151f9964feec2bdcdc03e4128d5f4b3475dbf"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-12",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_d9a420f8b30dc2693966"
+              ],
+              "adopted_signatures": [
+                "48ce7ad260aad7d15b4b8422dfd151f9964feec2bdcdc03e4128d5f4b3475dbf"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-13",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_d9a420f8b30dc2693966"
+              ],
+              "adopted_signatures": [
+                "48ce7ad260aad7d15b4b8422dfd151f9964feec2bdcdc03e4128d5f4b3475dbf"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-14",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_d9a420f8b30dc2693966"
+              ],
+              "adopted_signatures": [
+                "48ce7ad260aad7d15b4b8422dfd151f9964feec2bdcdc03e4128d5f4b3475dbf"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-15",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_d9a420f8b30dc2693966"
+              ],
+              "adopted_signatures": [
+                "48ce7ad260aad7d15b4b8422dfd151f9964feec2bdcdc03e4128d5f4b3475dbf"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-16",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_648b91d020ae8f470fe3"
+              ],
+              "adopted_signatures": [
+                "e3785366dc5a166de24e6390a3289cc1ee28b24bafc10bda7cf05c7028a2c7f5"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-17",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_3a012ceac6a5c709efd6"
+              ],
+              "adopted_signatures": [
+                "a47e76af60a6127741d8df24601eaa3c4df896351f5536af13263ec476455a05"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-18",
+              "covered": false,
+              "reason": "Unbound, pending, or incomplete adopted value/condition; evidence-only presence is not credited.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "ublox-19",
+              "covered": false,
+              "reason": "Unbound, pending, or incomplete adopted value/condition; evidence-only presence is not credited.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "ublox-20",
+              "covered": false,
+              "reason": "Unbound, pending, or incomplete adopted value/condition; evidence-only presence is not credited.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "ublox-21",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_3b6efe590176e6c32a2c"
+              ],
+              "adopted_signatures": [
+                "262e2240f1a080c94ec023947b1c436bfcbe359e041472ba9738b3d538e21672"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-22",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_ad703edbc744cfadf7bf"
+              ],
+              "adopted_signatures": [
+                "564997f52ea837fbf72fa198a2956cc15da84a2e06fb3897ed90af316012f1e1"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-23",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_080531bc8df2d69342de"
+              ],
+              "adopted_signatures": [
+                "4b92eff13a271b27c22557a1d461c9978663a9fc81eb1ea8d912dfd7f084c250"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-24",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_080531bc8df2d69342de"
+              ],
+              "adopted_signatures": [
+                "4b92eff13a271b27c22557a1d461c9978663a9fc81eb1ea8d912dfd7f084c250"
+              ]
+            },
+            {
+              "checkpoint_id": "ublox-25",
+              "covered": false,
+              "reason": "Unbound, pending, or incomplete adopted value/condition; evidence-only presence is not credited.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "ublox-26",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_580daf22f08f6f30b5f1"
+              ],
+              "adopted_signatures": [
+                "81dd80d1c50ad6f5f82812b3df000897124c2b8c5b3dc27c3a0c18da32042546"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "first_unseen_originals_checkpoint_test",
+      "gold_sha256": "5fec40db4f431bd38093776bb054116b3c48c24d2337e258ac001e960d469eaa",
+      "runner_sha256": "9ed78c27d404df4f90d7602ebb52a74f89a94ab9c9edd5c9196e770fc1a4c1dc",
+      "code_sha256": "7d9361606508e906a29bec3f5b55f810a9a2bfc3f1eb17346fca05e9db683c37",
+      "source_count": 10,
+      "counts": {
+        "verified": 162,
+        "conflict": 44,
+        "pending_confirmation": 34
+      },
+      "covered_checkpoints": 17,
+      "checkpoint_count": 80,
+      "checkpoint_coverage": 0.2125,
+      "seconds": 42.147,
+      "cases": [
+        {
+          "case": "nano",
+          "prediction_sha256": "cdbb2c0de5936a57da33939fd16bd9bdf14750a7889d595510c949abfd0efcb5",
+          "seconds": 10.484,
+          "counts": {
+            "verified": 40,
+            "conflict": 24
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 50,
+          "covered_checkpoints": 0,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "nano-01",
+              "covered": false,
+              "reason": "No complete adopted fact for the registered feature/bullet checkpoints; section/language binding remains unresolved.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "nano-02",
+              "covered": false,
+              "reason": "No complete adopted fact for the registered feature/bullet checkpoints; section/language binding remains unresolved.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "nano-03",
+              "covered": false,
+              "reason": "No complete adopted fact for the registered feature/bullet checkpoints; section/language binding remains unresolved.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "nano-04",
+              "covered": false,
+              "reason": "No complete adopted fact for the registered feature/bullet checkpoints; section/language binding remains unresolved.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "nano-05",
+              "covered": false,
+              "reason": "No complete adopted fact for the registered feature/bullet checkpoints; section/language binding remains unresolved.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "nano-06",
+              "covered": false,
+              "reason": "No complete adopted fact for the registered feature/bullet checkpoints; section/language binding remains unresolved.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "nano-07",
+              "covered": false,
+              "reason": "No complete adopted fact for the registered feature/bullet checkpoints; section/language binding remains unresolved.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "nano-08",
+              "covered": false,
+              "reason": "No complete adopted fact for the registered feature/bullet checkpoints; section/language binding remains unresolved.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            }
+          ]
+        },
+        {
+          "case": "mosfet",
+          "prediction_sha256": "29fd296aed74b35d3ff088f52b57b608b3d554fd363a5e5469d13951ba573baf",
+          "seconds": 5.229,
+          "counts": {
+            "verified": 3,
+            "conflict": 1
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 16,
+          "covered_checkpoints": 0,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "mosfet-01",
+              "covered": false,
+              "reason": "Borderless multi-column specification rows and reference pin mappings were not reliably adopted.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "mosfet-02",
+              "covered": false,
+              "reason": "Borderless multi-column specification rows and reference pin mappings were not reliably adopted.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "mosfet-03",
+              "covered": false,
+              "reason": "Borderless multi-column specification rows and reference pin mappings were not reliably adopted.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "mosfet-04",
+              "covered": false,
+              "reason": "Borderless multi-column specification rows and reference pin mappings were not reliably adopted.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "mosfet-05",
+              "covered": false,
+              "reason": "Borderless multi-column specification rows and reference pin mappings were not reliably adopted.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "mosfet-06",
+              "covered": false,
+              "reason": "Borderless multi-column specification rows and reference pin mappings were not reliably adopted.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "mosfet-07",
+              "covered": false,
+              "reason": "Borderless multi-column specification rows and reference pin mappings were not reliably adopted.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "mosfet-08",
+              "covered": false,
+              "reason": "Borderless multi-column specification rows and reference pin mappings were not reliably adopted.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            }
+          ]
+        },
+        {
+          "case": "coin",
+          "prediction_sha256": "ddd0dadd6db772e906fa02b78539f17da0d2c89680205b7567581f7a8017f18c",
+          "seconds": 1.035,
+          "counts": {
+            "verified": 16,
+            "pending_confirmation": 1
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 1,
+          "covered_checkpoints": 7,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "coin-01",
+              "covered": false,
+              "reason": "Nominal voltage spelled out as Volts remains pending; not credited as an adopted result.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "coin-02",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_28c66119820951c2e127"
+              ],
+              "adopted_signatures": [
+                "0d12f13b2c3f88144c7b7240e719885ef1a5c2de37c6f7d6b3e47cb9d688e890"
+              ]
+            },
+            {
+              "checkpoint_id": "coin-03",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_ccca63323ca3f7a04e99"
+              ],
+              "adopted_signatures": [
+                "c365c7d7d291b04fc033aa4f7aea7ca2968d4646d9e6a8945754c5c2d01113f4"
+              ]
+            },
+            {
+              "checkpoint_id": "coin-04",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_e8146fdb576902ad8afe"
+              ],
+              "adopted_signatures": [
+                "c2d69356821cefbe6b3bfb72e1ca65dee74aee8c8b8edfe749ccfa9119391dee"
+              ]
+            },
+            {
+              "checkpoint_id": "coin-05",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_6314a90497d7f4c42fc0"
+              ],
+              "adopted_signatures": [
+                "61ce6e302feee4f64e5ecf2be9e3cb4aecf08e2b31204c6f6d783167bd42471b"
+              ]
+            },
+            {
+              "checkpoint_id": "coin-06",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_ea6e13ece3e9c682ac72"
+              ],
+              "adopted_signatures": [
+                "c019f7d2d84ed0d23080c65bbee2014690e7492b0c2323fc9db0b3da6c2ad7d9"
+              ]
+            },
+            {
+              "checkpoint_id": "coin-07",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_55603930c3b7573197c0"
+              ],
+              "adopted_signatures": [
+                "0908f41465e0d34d4d21911989eae8003ba5d324a888498d1bd565dbd4aa8e4a"
+              ]
+            },
+            {
+              "checkpoint_id": "coin-08",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_0f347c7349f6948175f7"
+              ],
+              "adopted_signatures": [
+                "43c459b09079b6c1a2de309229fffe255085e4114c87faae49c86182be6506fb"
+              ]
+            }
+          ]
+        },
+        {
+          "case": "switch",
+          "prediction_sha256": "412fd02d98f1da66fc6487a0fc0fe8b049c4af27442b5876b6aa6ceefd314610",
+          "seconds": 1.115,
+          "counts": {
+            "verified": 1
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 1,
+          "covered_checkpoints": 0,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "switch-01",
+              "covered": false,
+              "reason": "Some values remain unread or pending; section-level units/conditions and multi-line lists are incomplete.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "switch-02",
+              "covered": false,
+              "reason": "Some values remain unread or pending; section-level units/conditions and multi-line lists are incomplete.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "switch-03",
+              "covered": false,
+              "reason": "Some values remain unread or pending; section-level units/conditions and multi-line lists are incomplete.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "switch-04",
+              "covered": false,
+              "reason": "Some values remain unread or pending; section-level units/conditions and multi-line lists are incomplete.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "switch-05",
+              "covered": false,
+              "reason": "Some values remain unread or pending; section-level units/conditions and multi-line lists are incomplete.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "switch-06",
+              "covered": false,
+              "reason": "Some values remain unread or pending; section-level units/conditions and multi-line lists are incomplete.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "switch-07",
+              "covered": false,
+              "reason": "Some values remain unread or pending; section-level units/conditions and multi-line lists are incomplete.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "switch-08",
+              "covered": false,
+              "reason": "Some values remain unread or pending; section-level units/conditions and multi-line lists are incomplete.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            }
+          ]
+        },
+        {
+          "case": "camera",
+          "prediction_sha256": "86319a24e286dd6ceb20a1af7d7376a7dd6e9f9401bf8a787706869a7b9301e1",
+          "seconds": 1.008,
+          "counts": {
+            "verified": 2,
+            "pending_confirmation": 3
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 2,
+          "covered_checkpoints": 0,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "camera-01",
+              "covered": false,
+              "reason": "Side-by-side clip variants are not fully bound; the three numeric results remain pending.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "camera-02",
+              "covered": false,
+              "reason": "Side-by-side clip variants are not fully bound; the three numeric results remain pending.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "camera-03",
+              "covered": false,
+              "reason": "Side-by-side clip variants are not fully bound; the three numeric results remain pending.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "camera-04",
+              "covered": false,
+              "reason": "Side-by-side clip variants are not fully bound; the three numeric results remain pending.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "camera-05",
+              "covered": false,
+              "reason": "Side-by-side clip variants are not fully bound; the three numeric results remain pending.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "camera-06",
+              "covered": false,
+              "reason": "Side-by-side clip variants are not fully bound; the three numeric results remain pending.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "camera-07",
+              "covered": false,
+              "reason": "Side-by-side clip variants are not fully bound; the three numeric results remain pending.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "camera-08",
+              "covered": false,
+              "reason": "Side-by-side clip variants are not fully bound; the three numeric results remain pending.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            }
+          ]
+        },
+        {
+          "case": "diode",
+          "prediction_sha256": "2d2875150bc6fc275e390ecd5ed0ff198d3681640c38048d46cdb6419429169e",
+          "seconds": 2.022,
+          "counts": {
+            "verified": 12,
+            "conflict": 1
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 7,
+          "covered_checkpoints": 3,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "diode-01",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_54dc898fc5fd88293374"
+              ],
+              "adopted_signatures": [
+                "8b1b0c0eb0665255dce8dc9ac2fc1b404ccee880af73238fdf309283d07aea7b"
+              ]
+            },
+            {
+              "checkpoint_id": "diode-02",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_708f11e4712be1c3a07c"
+              ],
+              "adopted_signatures": [
+                "ef35aab0967f701c77b5451f5ccf8f226e1b79aaaa19b370b74c361141128911"
+              ]
+            },
+            {
+              "checkpoint_id": "diode-03",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_c790a4e009f63f006652"
+              ],
+              "adopted_signatures": [
+                "a9d28dc9d08a18b9914f304db098b7561a60540e3c724bf8ff87d6030bb0a2df"
+              ]
+            },
+            {
+              "checkpoint_id": "diode-04",
+              "covered": false,
+              "reason": "Absolute-maximum/ambient caption conditions are not attached, or subscript symbols in test conditions are damaged; numeric overlap alone receives no credit.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "diode-05",
+              "covered": false,
+              "reason": "Absolute-maximum/ambient caption conditions are not attached, or subscript symbols in test conditions are damaged; numeric overlap alone receives no credit.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "diode-06",
+              "covered": false,
+              "reason": "Absolute-maximum/ambient caption conditions are not attached, or subscript symbols in test conditions are damaged; numeric overlap alone receives no credit.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "diode-07",
+              "covered": false,
+              "reason": "Absolute-maximum/ambient caption conditions are not attached, or subscript symbols in test conditions are damaged; numeric overlap alone receives no credit.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "diode-08",
+              "covered": false,
+              "reason": "Absolute-maximum/ambient caption conditions are not attached, or subscript symbols in test conditions are damaged; numeric overlap alone receives no credit.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            }
+          ]
+        },
+        {
+          "case": "sensor",
+          "prediction_sha256": "ccf961d375a43eba9443c22e6e84db194ec4480e306c0ec0f04d37daff635e4d",
+          "seconds": 14.209,
+          "counts": {
+            "verified": 54,
+            "conflict": 11,
+            "pending_confirmation": 16
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 46,
+          "covered_checkpoints": 0,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "sensor-01",
+              "covered": false,
+              "reason": "Stacked idle-current values for two temperatures remain unbound; one grouped table-reading issue, not a guessed mapping.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "sensor-02",
+              "covered": false,
+              "reason": "Stacked idle-current values for two temperatures remain unbound; one grouped table-reading issue, not a guessed mapping.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "sensor-03",
+              "covered": false,
+              "reason": "Stacked idle-current values for two temperatures remain unbound; one grouped table-reading issue, not a guessed mapping.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "sensor-04",
+              "covered": false,
+              "reason": "Stacked idle-current values for two temperatures remain unbound; one grouped table-reading issue, not a guessed mapping.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "sensor-05",
+              "covered": false,
+              "reason": "Stacked idle-current values for two temperatures remain unbound; one grouped table-reading issue, not a guessed mapping.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "sensor-06",
+              "covered": false,
+              "reason": "Stacked idle-current values for two temperatures remain unbound; one grouped table-reading issue, not a guessed mapping.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "sensor-07",
+              "covered": false,
+              "reason": "Stacked idle-current values for two temperatures remain unbound; one grouped table-reading issue, not a guessed mapping.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "sensor-08",
+              "covered": false,
+              "reason": "Stacked idle-current values for two temperatures remain unbound; one grouped table-reading issue, not a guessed mapping.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            }
+          ]
+        },
+        {
+          "case": "relay",
+          "prediction_sha256": "12ae92fda0c584e6ba39669764eb0e338847b1986d8935f501f5a837e7bca58b",
+          "seconds": 4.314,
+          "counts": {
+            "conflict": 6,
+            "verified": 4,
+            "pending_confirmation": 13
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 7,
+          "covered_checkpoints": 0,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "relay-01",
+              "covered": false,
+              "reason": "Merged row hierarchies and certification conditions remain incomplete; false conflicts still exist.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "relay-02",
+              "covered": false,
+              "reason": "Merged row hierarchies and certification conditions remain incomplete; false conflicts still exist.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "relay-03",
+              "covered": false,
+              "reason": "Merged row hierarchies and certification conditions remain incomplete; false conflicts still exist.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "relay-04",
+              "covered": false,
+              "reason": "Merged row hierarchies and certification conditions remain incomplete; false conflicts still exist.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "relay-05",
+              "covered": false,
+              "reason": "Merged row hierarchies and certification conditions remain incomplete; false conflicts still exist.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "relay-06",
+              "covered": false,
+              "reason": "Merged row hierarchies and certification conditions remain incomplete; false conflicts still exist.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "relay-07",
+              "covered": false,
+              "reason": "Merged row hierarchies and certification conditions remain incomplete; false conflicts still exist.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "relay-08",
+              "covered": false,
+              "reason": "Merged row hierarchies and certification conditions remain incomplete; false conflicts still exist.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            }
+          ]
+        },
+        {
+          "case": "card",
+          "prediction_sha256": "5c54c98c37e7ff03e877c5eaf25b83502f66a0d07eee9ad056f03d812020519c",
+          "seconds": 0.939,
+          "counts": {
+            "verified": 8,
+            "pending_confirmation": 1
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 3,
+          "covered_checkpoints": 7,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "card-01",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_e605b533f5e41887fad0"
+              ],
+              "adopted_signatures": [
+                "c1a2fcd52a6f1380be25f5c5ad0a19d1c4b0ed87ba8fb764696e5eba10d653a4"
+              ]
+            },
+            {
+              "checkpoint_id": "card-02",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_8778062f5aa69c92de84"
+              ],
+              "adopted_signatures": [
+                "3b428549db1a1e1dd7c1b0a59413f91d50c136ae911ad8f1e4f8d1ab324e8a4e"
+              ]
+            },
+            {
+              "checkpoint_id": "card-03",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_aefdc22ed766cde27a26"
+              ],
+              "adopted_signatures": [
+                "3d47a5373a9ba9d4664df937b753a916973fdc5b2a0e1b37872a017cb264c6df"
+              ]
+            },
+            {
+              "checkpoint_id": "card-04",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_792d4ea3b16fc105fe4f"
+              ],
+              "adopted_signatures": [
+                "475d3370c3640afc770d50bfeb64cb6714ecacd58acffa2b7db1b0454accb5fb"
+              ]
+            },
+            {
+              "checkpoint_id": "card-05",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_c244c64cd693052bd7d7"
+              ],
+              "adopted_signatures": [
+                "ce16143cde97051d729c24536e183fded5d6691b34f4137355b999a453ebd536"
+              ]
+            },
+            {
+              "checkpoint_id": "card-06",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_110f265a88f1f2ff29ac"
+              ],
+              "adopted_signatures": [
+                "204c05629ded4159524e1933a68ab06b86667c1e2ff84630eae5e5f78e3bc90c"
+              ]
+            },
+            {
+              "checkpoint_id": "card-07",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_0ac66f09fc5230e1ca97"
+              ],
+              "adopted_signatures": [
+                "f23f969249241bb8ca04e74c5b7b5c463affdce78ad66088f042e43ca08c53f8"
+              ]
+            },
+            {
+              "checkpoint_id": "card-08",
+              "covered": false,
+              "reason": "Voltage lacks a resolved scope and remains pending.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            }
+          ]
+        },
+        {
+          "case": "ssd",
+          "prediction_sha256": "ad6ee145c212209f0f23dd72d57185025f67382aa40c54b0d9553ed7807158ca",
+          "seconds": 1.792,
+          "counts": {
+            "verified": 22,
+            "conflict": 1
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 3,
+          "covered_checkpoints": 0,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "ssd-01",
+              "covered": false,
+              "reason": "Multi-capacity model matrix and external qualification notes are incomplete; no credit for fragments.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "ssd-02",
+              "covered": false,
+              "reason": "Multi-capacity model matrix and external qualification notes are incomplete; no credit for fragments.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "ssd-03",
+              "covered": false,
+              "reason": "Multi-capacity model matrix and external qualification notes are incomplete; no credit for fragments.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "ssd-04",
+              "covered": false,
+              "reason": "Multi-capacity model matrix and external qualification notes are incomplete; no credit for fragments.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "ssd-05",
+              "covered": false,
+              "reason": "Multi-capacity model matrix and external qualification notes are incomplete; no credit for fragments.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "ssd-06",
+              "covered": false,
+              "reason": "Multi-capacity model matrix and external qualification notes are incomplete; no credit for fragments.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "ssd-07",
+              "covered": false,
+              "reason": "Multi-capacity model matrix and external qualification notes are incomplete; no credit for fragments.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "ssd-08",
+              "covered": false,
+              "reason": "Multi-capacity model matrix and external qualification notes are incomplete; no credit for fragments.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "exposed_ten_originals_retest",
+      "gold_sha256": "5fec40db4f431bd38093776bb054116b3c48c24d2337e258ac001e960d469eaa",
+      "runner_sha256": "0187aab21f6d7fc385fc4767d6e189b509bad88d9764fcbf957858db3801f602",
+      "code_sha256": "16b8ec711b950359a345b1d432bbc157c01169bb16f52b66c620d954afaffdb2",
+      "source_count": 10,
+      "counts": {
+        "verified": 149,
+        "conflict": 21,
+        "pending_confirmation": 29
+      },
+      "covered_checkpoints": 26,
+      "checkpoint_count": 80,
+      "checkpoint_coverage": 0.325,
+      "seconds": 36.603,
+      "cases": [
+        {
+          "case": "nano",
+          "prediction_sha256": "98291a14d2a33e1e58c47fc4acc8952ad272e679fcdecae5179f2ef2ebd91f41",
+          "seconds": 8.161,
+          "counts": {
+            "verified": 29,
+            "conflict": 13
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 49,
+          "covered_checkpoints": 0,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "nano-01",
+              "covered": false,
+              "reason": "No complete adopted fact for the registered feature/bullet checkpoints; section/language binding remains unresolved.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "nano-02",
+              "covered": false,
+              "reason": "No complete adopted fact for the registered feature/bullet checkpoints; section/language binding remains unresolved.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "nano-03",
+              "covered": false,
+              "reason": "No complete adopted fact for the registered feature/bullet checkpoints; section/language binding remains unresolved.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "nano-04",
+              "covered": false,
+              "reason": "No complete adopted fact for the registered feature/bullet checkpoints; section/language binding remains unresolved.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "nano-05",
+              "covered": false,
+              "reason": "No complete adopted fact for the registered feature/bullet checkpoints; section/language binding remains unresolved.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "nano-06",
+              "covered": false,
+              "reason": "No complete adopted fact for the registered feature/bullet checkpoints; section/language binding remains unresolved.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "nano-07",
+              "covered": false,
+              "reason": "No complete adopted fact for the registered feature/bullet checkpoints; section/language binding remains unresolved.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "nano-08",
+              "covered": false,
+              "reason": "No complete adopted fact for the registered feature/bullet checkpoints; section/language binding remains unresolved.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            }
+          ]
+        },
+        {
+          "case": "mosfet",
+          "prediction_sha256": "6810e3f16dbca32b223407c56c653a9c72ae16e58d0c01e3f6bebda8ab58b771",
+          "seconds": 5.279,
+          "counts": {
+            "verified": 2,
+            "conflict": 1
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 15,
+          "covered_checkpoints": 0,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "mosfet-01",
+              "covered": false,
+              "reason": "Borderless multi-column specification rows and reference pin mappings were not reliably adopted.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "mosfet-02",
+              "covered": false,
+              "reason": "Borderless multi-column specification rows and reference pin mappings were not reliably adopted.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "mosfet-03",
+              "covered": false,
+              "reason": "Borderless multi-column specification rows and reference pin mappings were not reliably adopted.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "mosfet-04",
+              "covered": false,
+              "reason": "Borderless multi-column specification rows and reference pin mappings were not reliably adopted.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "mosfet-05",
+              "covered": false,
+              "reason": "Borderless multi-column specification rows and reference pin mappings were not reliably adopted.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "mosfet-06",
+              "covered": false,
+              "reason": "Borderless multi-column specification rows and reference pin mappings were not reliably adopted.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "mosfet-07",
+              "covered": false,
+              "reason": "Borderless multi-column specification rows and reference pin mappings were not reliably adopted.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "mosfet-08",
+              "covered": false,
+              "reason": "Borderless multi-column specification rows and reference pin mappings were not reliably adopted.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            }
+          ]
+        },
+        {
+          "case": "coin",
+          "prediction_sha256": "d44a0e58a08e7f757a1a9cf520a960828ef90656754690d65022df23d7fc9f53",
+          "seconds": 1.034,
+          "counts": {
+            "verified": 15,
+            "pending_confirmation": 1
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 1,
+          "covered_checkpoints": 7,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "coin-01",
+              "covered": false,
+              "reason": "Nominal voltage spelled out as Volts remains pending; not credited as an adopted result.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "coin-02",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_28c66119820951c2e127"
+              ],
+              "adopted_signatures": [
+                "0d12f13b2c3f88144c7b7240e719885ef1a5c2de37c6f7d6b3e47cb9d688e890"
+              ]
+            },
+            {
+              "checkpoint_id": "coin-03",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_ccca63323ca3f7a04e99"
+              ],
+              "adopted_signatures": [
+                "c365c7d7d291b04fc033aa4f7aea7ca2968d4646d9e6a8945754c5c2d01113f4"
+              ]
+            },
+            {
+              "checkpoint_id": "coin-04",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_e8146fdb576902ad8afe"
+              ],
+              "adopted_signatures": [
+                "c2d69356821cefbe6b3bfb72e1ca65dee74aee8c8b8edfe749ccfa9119391dee"
+              ]
+            },
+            {
+              "checkpoint_id": "coin-05",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_6314a90497d7f4c42fc0"
+              ],
+              "adopted_signatures": [
+                "61ce6e302feee4f64e5ecf2be9e3cb4aecf08e2b31204c6f6d783167bd42471b"
+              ]
+            },
+            {
+              "checkpoint_id": "coin-06",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_ea6e13ece3e9c682ac72"
+              ],
+              "adopted_signatures": [
+                "c019f7d2d84ed0d23080c65bbee2014690e7492b0c2323fc9db0b3da6c2ad7d9"
+              ]
+            },
+            {
+              "checkpoint_id": "coin-07",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_55603930c3b7573197c0"
+              ],
+              "adopted_signatures": [
+                "0908f41465e0d34d4d21911989eae8003ba5d324a888498d1bd565dbd4aa8e4a"
+              ]
+            },
+            {
+              "checkpoint_id": "coin-08",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_0f347c7349f6948175f7"
+              ],
+              "adopted_signatures": [
+                "43c459b09079b6c1a2de309229fffe255085e4114c87faae49c86182be6506fb"
+              ]
+            }
+          ]
+        },
+        {
+          "case": "switch",
+          "prediction_sha256": "e9268fa506f4bfa821c66c6e86dec52fe8d5c30f238a7ba61e8c39a3f33c07e7",
+          "seconds": 1.183,
+          "counts": {
+            "verified": 13,
+            "pending_confirmation": 2
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 2,
+          "covered_checkpoints": 2,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "switch-01",
+              "covered": false,
+              "reason": "Some values remain unread or pending; section-level units/conditions and multi-line lists are incomplete.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "switch-02",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_54a2003cf2ed89d06def"
+              ],
+              "adopted_signatures": [
+                "93d2af20c723310557a68cb13668a661b052b76aaa4467a0fd273d35ae7eba10"
+              ]
+            },
+            {
+              "checkpoint_id": "switch-03",
+              "covered": false,
+              "reason": "Some values remain unread or pending; section-level units/conditions and multi-line lists are incomplete.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "switch-04",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_e80f8a10d85b05c93536"
+              ],
+              "adopted_signatures": [
+                "d0ae4ee29118c426aede6ca53b6e7261d30a4361e2832b008eed686497a077d3"
+              ]
+            },
+            {
+              "checkpoint_id": "switch-05",
+              "covered": false,
+              "reason": "Some values remain unread or pending; section-level units/conditions and multi-line lists are incomplete.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "switch-06",
+              "covered": false,
+              "reason": "Some values remain unread or pending; section-level units/conditions and multi-line lists are incomplete.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "switch-07",
+              "covered": false,
+              "reason": "Some values remain unread or pending; section-level units/conditions and multi-line lists are incomplete.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "switch-08",
+              "covered": false,
+              "reason": "Some values remain unread or pending; section-level units/conditions and multi-line lists are incomplete.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            }
+          ]
+        },
+        {
+          "case": "camera",
+          "prediction_sha256": "7b6fab4abf051647071573521034849a78a6d243875f7f113929ad126dc7a361",
+          "seconds": 0.929,
+          "counts": {
+            "pending_confirmation": 3
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 2,
+          "covered_checkpoints": 0,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "camera-01",
+              "covered": false,
+              "reason": "Side-by-side clip variants are not fully bound; the three numeric results remain pending.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "camera-02",
+              "covered": false,
+              "reason": "Side-by-side clip variants are not fully bound; the three numeric results remain pending.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "camera-03",
+              "covered": false,
+              "reason": "Side-by-side clip variants are not fully bound; the three numeric results remain pending.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "camera-04",
+              "covered": false,
+              "reason": "Side-by-side clip variants are not fully bound; the three numeric results remain pending.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "camera-05",
+              "covered": false,
+              "reason": "Side-by-side clip variants are not fully bound; the three numeric results remain pending.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "camera-06",
+              "covered": false,
+              "reason": "Side-by-side clip variants are not fully bound; the three numeric results remain pending.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "camera-07",
+              "covered": false,
+              "reason": "Side-by-side clip variants are not fully bound; the three numeric results remain pending.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "camera-08",
+              "covered": false,
+              "reason": "Side-by-side clip variants are not fully bound; the three numeric results remain pending.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            }
+          ]
+        },
+        {
+          "case": "diode",
+          "prediction_sha256": "cdd8c7a419a82c9b93f8c3da093617a6edbfe266c5de35497657ecd3a9fc47fd",
+          "seconds": 1.918,
+          "counts": {
+            "verified": 25
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 8,
+          "covered_checkpoints": 4,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "diode-01",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_54dc898fc5fd88293374"
+              ],
+              "adopted_signatures": [
+                "8b1b0c0eb0665255dce8dc9ac2fc1b404ccee880af73238fdf309283d07aea7b"
+              ]
+            },
+            {
+              "checkpoint_id": "diode-02",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_708f11e4712be1c3a07c"
+              ],
+              "adopted_signatures": [
+                "ef35aab0967f701c77b5451f5ccf8f226e1b79aaaa19b370b74c361141128911"
+              ]
+            },
+            {
+              "checkpoint_id": "diode-03",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_c790a4e009f63f006652"
+              ],
+              "adopted_signatures": [
+                "a9d28dc9d08a18b9914f304db098b7561a60540e3c724bf8ff87d6030bb0a2df"
+              ]
+            },
+            {
+              "checkpoint_id": "diode-04",
+              "covered": false,
+              "reason": "Absolute-maximum/ambient caption conditions are not attached, or subscript symbols in test conditions are damaged; numeric overlap alone receives no credit.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "diode-05",
+              "covered": false,
+              "reason": "Absolute-maximum/ambient caption conditions are not attached, or subscript symbols in test conditions are damaged; numeric overlap alone receives no credit.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "diode-06",
+              "covered": false,
+              "reason": "Absolute-maximum/ambient caption conditions are not attached, or subscript symbols in test conditions are damaged; numeric overlap alone receives no credit.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "diode-07",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_5d7b3e106a9a31d24301"
+              ],
+              "adopted_signatures": [
+                "9505a48c9a449e3d90dae2b9335baa3583646dc8751d561e18fa43cd6f120a50"
+              ]
+            },
+            {
+              "checkpoint_id": "diode-08",
+              "covered": false,
+              "reason": "Absolute-maximum/ambient caption conditions are not attached, or subscript symbols in test conditions are damaged; numeric overlap alone receives no credit.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            }
+          ]
+        },
+        {
+          "case": "sensor",
+          "prediction_sha256": "53a12966f65ed56ee5983857b0a60ab07206d3a1e33e460486bf8f34617cb129",
+          "seconds": 12.832,
+          "counts": {
+            "verified": 49,
+            "conflict": 1,
+            "pending_confirmation": 12
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 44,
+          "covered_checkpoints": 6,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "sensor-01",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_25f16b73eb8678c9eb58"
+              ],
+              "adopted_signatures": [
+                "f938c37859ba2351b11ff237e041108211943fc589a5b7536243a71b9f50e68b"
+              ]
+            },
+            {
+              "checkpoint_id": "sensor-02",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_25f16b73eb8678c9eb58"
+              ],
+              "adopted_signatures": [
+                "f938c37859ba2351b11ff237e041108211943fc589a5b7536243a71b9f50e68b"
+              ]
+            },
+            {
+              "checkpoint_id": "sensor-03",
+              "covered": false,
+              "reason": "Stacked idle-current values for two temperatures remain unbound; one grouped table-reading issue, not a guessed mapping.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "sensor-04",
+              "covered": false,
+              "reason": "Stacked idle-current values for two temperatures remain unbound; one grouped table-reading issue, not a guessed mapping.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "sensor-05",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_1be3721bdce6d43d16ad"
+              ],
+              "adopted_signatures": [
+                "5c059e26b895c23e5418b8cf63e8c3341a97520153b0ecf252e4ba1d35c07bb9"
+              ]
+            },
+            {
+              "checkpoint_id": "sensor-06",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_1be3721bdce6d43d16ad"
+              ],
+              "adopted_signatures": [
+                "5c059e26b895c23e5418b8cf63e8c3341a97520153b0ecf252e4ba1d35c07bb9"
+              ]
+            },
+            {
+              "checkpoint_id": "sensor-07",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_66bfa4db1002b6bd3371"
+              ],
+              "adopted_signatures": [
+                "4a5e898f9dd100323c8a6ea2c99d57be734e12a3d6f804efb9a2d3643cad1c1a"
+              ]
+            },
+            {
+              "checkpoint_id": "sensor-08",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_7a6246bbb8c339f034d0"
+              ],
+              "adopted_signatures": [
+                "18fddadc46d372d35adc5835f3f2e68bd9fc6bc03d97cb1669fa4ede1f5ddc4e"
+              ]
+            }
+          ]
+        },
+        {
+          "case": "relay",
+          "prediction_sha256": "e5d26c7f058bf4464af28652944c278b5954c0d2040159f5c6da64678e64efc3",
+          "seconds": 2.729,
+          "counts": {
+            "conflict": 6,
+            "verified": 4,
+            "pending_confirmation": 9
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 6,
+          "covered_checkpoints": 0,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "relay-01",
+              "covered": false,
+              "reason": "Merged row hierarchies and certification conditions remain incomplete; false conflicts still exist.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "relay-02",
+              "covered": false,
+              "reason": "Merged row hierarchies and certification conditions remain incomplete; false conflicts still exist.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "relay-03",
+              "covered": false,
+              "reason": "Merged row hierarchies and certification conditions remain incomplete; false conflicts still exist.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "relay-04",
+              "covered": false,
+              "reason": "Merged row hierarchies and certification conditions remain incomplete; false conflicts still exist.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "relay-05",
+              "covered": false,
+              "reason": "Merged row hierarchies and certification conditions remain incomplete; false conflicts still exist.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "relay-06",
+              "covered": false,
+              "reason": "Merged row hierarchies and certification conditions remain incomplete; false conflicts still exist.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "relay-07",
+              "covered": false,
+              "reason": "Merged row hierarchies and certification conditions remain incomplete; false conflicts still exist.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "relay-08",
+              "covered": false,
+              "reason": "Merged row hierarchies and certification conditions remain incomplete; false conflicts still exist.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            }
+          ]
+        },
+        {
+          "case": "card",
+          "prediction_sha256": "4d4dd31bb4979251f07b3c2e9a6bac875ff45576eba663501cf10f4a5a51c77f",
+          "seconds": 0.848,
+          "counts": {
+            "verified": 8,
+            "pending_confirmation": 1
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 4,
+          "covered_checkpoints": 7,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "card-01",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_76bb4eec1a00e8de111f"
+              ],
+              "adopted_signatures": [
+                "c44cba49a9628b386faa7d9760c4fe429dee703379d1bd8f59c822b19696ea13"
+              ]
+            },
+            {
+              "checkpoint_id": "card-02",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_bbbb9bcba3ac0d371b16"
+              ],
+              "adopted_signatures": [
+                "a28584b99796aa0ef7a7357182df13b5b98f17f3b0f28a6988f9b1fac3c60752"
+              ]
+            },
+            {
+              "checkpoint_id": "card-03",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_aefdc22ed766cde27a26"
+              ],
+              "adopted_signatures": [
+                "3d47a5373a9ba9d4664df937b753a916973fdc5b2a0e1b37872a017cb264c6df"
+              ]
+            },
+            {
+              "checkpoint_id": "card-04",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_792d4ea3b16fc105fe4f"
+              ],
+              "adopted_signatures": [
+                "475d3370c3640afc770d50bfeb64cb6714ecacd58acffa2b7db1b0454accb5fb"
+              ]
+            },
+            {
+              "checkpoint_id": "card-05",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_c244c64cd693052bd7d7"
+              ],
+              "adopted_signatures": [
+                "ce16143cde97051d729c24536e183fded5d6691b34f4137355b999a453ebd536"
+              ]
+            },
+            {
+              "checkpoint_id": "card-06",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_110f265a88f1f2ff29ac"
+              ],
+              "adopted_signatures": [
+                "204c05629ded4159524e1933a68ab06b86667c1e2ff84630eae5e5f78e3bc90c"
+              ]
+            },
+            {
+              "checkpoint_id": "card-07",
+              "covered": true,
+              "reason": "Complete value, material applicability and units retained in adopted fact(s); source-visual judgment.",
+              "matched_group_ids": [
+                "group_0ac66f09fc5230e1ca97"
+              ],
+              "adopted_signatures": [
+                "f23f969249241bb8ca04e74c5b7b5c463affdce78ad66088f042e43ca08c53f8"
+              ]
+            },
+            {
+              "checkpoint_id": "card-08",
+              "covered": false,
+              "reason": "Voltage lacks a resolved scope and remains pending.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            }
+          ]
+        },
+        {
+          "case": "ssd",
+          "prediction_sha256": "087a0f8e7c98a8c338aa49b6524dff2e5f6f97aa103cc37bf9c2a7dfd4dddb8c",
+          "seconds": 1.69,
+          "counts": {
+            "verified": 4,
+            "pending_confirmation": 1
+          },
+          "runtime_errors": 0,
+          "delivery_complete": false,
+          "reading_issue_count": 5,
+          "covered_checkpoints": 0,
+          "checkpoint_count": 8,
+          "judgments": [
+            {
+              "checkpoint_id": "ssd-01",
+              "covered": false,
+              "reason": "Multi-capacity model matrix and external qualification notes are incomplete; no credit for fragments.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "ssd-02",
+              "covered": false,
+              "reason": "Multi-capacity model matrix and external qualification notes are incomplete; no credit for fragments.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "ssd-03",
+              "covered": false,
+              "reason": "Multi-capacity model matrix and external qualification notes are incomplete; no credit for fragments.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "ssd-04",
+              "covered": false,
+              "reason": "Multi-capacity model matrix and external qualification notes are incomplete; no credit for fragments.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "ssd-05",
+              "covered": false,
+              "reason": "Multi-capacity model matrix and external qualification notes are incomplete; no credit for fragments.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "ssd-06",
+              "covered": false,
+              "reason": "Multi-capacity model matrix and external qualification notes are incomplete; no credit for fragments.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "ssd-07",
+              "covered": false,
+              "reason": "Multi-capacity model matrix and external qualification notes are incomplete; no credit for fragments.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            },
+            {
+              "checkpoint_id": "ssd-08",
+              "covered": false,
+              "reason": "Multi-capacity model matrix and external qualification notes are incomplete; no credit for fragments.",
+              "matched_group_ids": [],
+              "adopted_signatures": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "validation": {
+    "unittest": {
+      "total": 714,
+      "passed": 711,
+      "skipped": 3,
+      "failed": 0,
+      "seconds": 196.326,
+      "log_sha256": "7e4c0c25a0602c884b33f1884b93862aba37217ee20c83009ddc45bce086bd0c"
+    },
+    "browser": {
+      "passed": true,
+      "log_sha256": "a3f6744a1143e16646461056a62b52f0919b23d4aca55ff056c4ad0199a5971a",
+      "headless": true,
+      "foreground_automation": false
+    },
+    "real_model": {
+      "case": "energizer",
+      "device": "CPU",
+      "priority": "BelowNormal",
+      "cpu_affinity_cores": 4,
+      "exit_code": 0,
+      "seconds": 132.721,
+      "code_sha256": "4db4ebe70ef1ad5f32dea6986da1c9b5d6b605505e292c55ecf7728bd75fc149",
+      "note": "Executed before final numeric-bullet regression fix; model/visual inference code unchanged by that final fix.",
+      "mixed_pdf": {
+        "pages_detected": 1,
+        "pages_processed_with_qwen_vl": 1,
+        "pages_processed_with_openvino_ocr": 0,
+        "pages_processed_with_local_image_ai": 1,
+        "pages_structured_from_text_layer": 0,
+        "pages_handled_total": 1,
+        "pages_processed_as_observations": 0,
+        "pages_selected_for_observations": 0,
+        "pages_observation_errors": 0,
+        "qwen_calls_avoided_by_text_layer_context": 0,
+        "pages_rendered_with_roi": 1,
+        "pages_rendered_full_page": 0,
+        "mean_roi_area_reduction": 0.239,
+        "pages_skipped": 0,
+        "render_method": "pypdfium2",
+        "temporary_pages_retained": false
+      },
+      "counts": {
+        "verified": 10,
+        "pending_confirmation": 2,
+        "conflict": 0
+      },
+      "runtime_errors": 0,
+      "runner_sha256": "d735039b72260f7991c15d3d27b18709e6ab5b7cd6fdb75d1ca7c8069aa8b622"
+    }
+  }
+}

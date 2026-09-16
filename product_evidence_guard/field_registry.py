@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
+from functools import lru_cache
 import hashlib
 import json
 import re
@@ -30,6 +31,7 @@ class UnitFamily:
     name: str
     base_unit: str
     units: dict[str, UnitRule]
+    word_aliases: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass(frozen=True, slots=True)
@@ -106,7 +108,8 @@ def _load_registry() -> FieldRegistry:
         name = _identifier(raw_name, "unit family name")
         if (
             not isinstance(row, dict)
-            or set(row) != {"base_unit", "units"}
+            or not {"base_unit", "units"} <= set(row)
+            or set(row) - {"base_unit", "units", "word_aliases"}
             or not isinstance(row.get("base_unit"), str)
             or not row["base_unit"].strip()
             or len(row["base_unit"]) > 32
@@ -134,7 +137,19 @@ def _load_registry() -> FieldRegistry:
             if scale == 0:
                 raise FieldRegistryError(f"unit {alias} scale cannot be zero")
             units[unit_alias] = UnitRule(scale=scale, offset=offset)
-        families[name] = UnitFamily(name, row["base_unit"].strip(), units)
+        # Written unit names are case-insensitive; symbols are not. Keep the
+        # distinction explicit instead of guessing from token length/case.
+        word_aliases = row.get("word_aliases", {})
+        if not isinstance(word_aliases, dict):
+            raise FieldRegistryError(f"unit family {name} has invalid word_aliases")
+        for alias, symbol in word_aliases.items():
+            if (not isinstance(alias, str) or not re.fullmatch(r"[a-z]{3,32}", alias)
+                    or not isinstance(symbol, str) or symbol not in units
+                    or symbol in word_aliases
+                    or any(key.casefold() == alias for key in units)):
+                raise FieldRegistryError(f"unit family {name} has invalid word alias {alias!r}")
+        units.update({alias: units[symbol] for alias, symbol in word_aliases.items()})
+        families[name] = UnitFamily(name, row["base_unit"].strip(), units, dict(word_aliases))
 
     fields_data = data.get("fields")
     if not isinstance(fields_data, list) or not fields_data:
@@ -256,6 +271,24 @@ REGISTRY = _load_registry()
 FIELD_SPECS = REGISTRY.fields
 
 
+@lru_cache(maxsize=None)
+def unit_pattern(family: str) -> str:
+    """One case-safe unit grammar for extraction, scopes and normalization."""
+    definition = REGISTRY.unit_families[family]
+    symbols = sorted(set(definition.units) - set(definition.word_aliases), key=lambda s: (-len(s), s))
+    words = sorted(definition.word_aliases, key=lambda s: (-len(s), s))
+    parts = ["(?-i:" + "|".join(map(re.escape, symbols)) + ")"]
+    if words:
+        parts.append("(?i:" + "|".join(map(re.escape, words)) + ")")
+    return "(?:" + "|".join(parts) + ")"
+
+
+def unit_rule(family: str, token: str) -> UnitRule | None:
+    definition = REGISTRY.unit_families[family]
+    key = token.casefold() if token.casefold() in definition.word_aliases else token
+    return definition.units.get(key)
+
+
 def registry_fingerprint() -> str:
     return REGISTRY.fingerprint
 
@@ -293,7 +326,9 @@ def split_label_unit(label: str) -> tuple[str, str | None]:
     known = {alias.casefold() for family in REGISTRY.unit_families.values() for alias in family.units}
     # A unit is a unit expression, not arbitrary text between brackets.
     atom = r"(?:[numkgtµμ]?(?:m|g|s|a|v|w|pa|hz|n|j|l|ohm|ω)|min|h|rpm|db(?:\([ac]\))?|ppm|ppb|cp|pcs|%rh|%|°[cf])(?:[²³]|\^?[23])?"
-    if token not in known and not re.fullmatch(rf"{atom}(?:[/·*]{atom})*", token):
+    data_unit = r"(?:[kKMGTPE]i?[Bb]|[Bb])(?:/s)?"
+    if (token not in known and not re.fullmatch(rf"{atom}(?:[/·*]{atom})*", token)
+            and not re.fullmatch(data_unit, unit)):
         return label, None
     return match[1].strip(), unit
 

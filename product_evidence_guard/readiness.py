@@ -48,7 +48,7 @@ def assess_delivery(product: dict, *, product_ids: list[str] | None = None) -> d
     blockers = []
     upgrade = needs_value_upgrade(product)
     if upgrade:
-        blockers.append({"code": "value_upgrade_required", "message": "单位读取规则已更新，请重新读取一次；原来的人工决定会保留"})
+        blockers.append({"code": "value_upgrade_required", "message": "参数与单位读取规则已更新，请重新读取一次；原来的人工决定会保留"})
     for status, code, message in (("conflict", "conflict", "存在尚未处理的冲突"),
                                    ("pending_confirmation", "pending", "存在尚未确认的参数")):
         count = sum(g.get("fact_status") == status for g in facts)

@@ -1,0 +1,4507 @@
+{
+  "schema_version": 1,
+  "frozen_at": "2026-09-16T15:09:26.729888+00:00",
+  "protocol": "20 new simple synthetic business scenarios, three correlated formats each (TXT, single-column text PDF, two-column ruled PDF). Literal gold fixed before predictions. Not public originals, independent customer holdout, OCR testing, or production certification. No production normalizer generated gold. All output facts including unexpected ones scored.",
+  "scope": "Clear product ownership and short parameters; single sources, open labels, unit conversion, one true conflict scenario, scope separation, ordinary English units, and three value-first list facts. No scans, complex layouts, charts, footnotes or version arbitration.",
+  "logical_scenario_count": 20,
+  "format_variant_count": 60,
+  "builder_sha256": "963571d9ca7b02fdccd807c190a5429f70a92b8619322d96497c329393ee8abd",
+  "literal_cases_sha256": "ed149278df655cbde067cadf13a6e73e1c45a55001624f0fb656819003b52e40",
+  "facts_columns": [
+    "product_sku",
+    "field",
+    "scope",
+    "status",
+    "distinct_value_unit_pairs"
+  ],
+  "cases": [
+    {
+      "id": "s01_txt",
+      "logical_scenario": "s01",
+      "domain": "日用品",
+      "title": "单来源水杯",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s01_txt/source1.txt",
+          "sha256": "0f53ae58b4a21f1daa26cd6900acc258a981aa464130d88a1ca4d63f9161595d"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S01",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s01",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              275,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "capacity_volume",
+          null,
+          "verified",
+          [
+            [
+              420,
+              "mL"
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "304不锈钢",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "蓝色",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s01_pdf_lines",
+      "logical_scenario": "s01",
+      "domain": "日用品",
+      "title": "单来源水杯",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s01_pdf_lines/source1.pdf",
+          "sha256": "f31cd6ec29d73fa8748b68baeecd632ab19adf38e3cb926d0b4c29731ed0f986"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S01",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s01",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              275,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "capacity_volume",
+          null,
+          "verified",
+          [
+            [
+              420,
+              "mL"
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "304不锈钢",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "蓝色",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s01_pdf_table",
+      "logical_scenario": "s01",
+      "domain": "日用品",
+      "title": "单来源水杯",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s01_pdf_table/source1.pdf",
+          "sha256": "b33da8a6223a80402a7c56abdef7a3272dd64cb68ff42a81550341a93b48893c"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S01",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s01",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              275,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "capacity_volume",
+          null,
+          "verified",
+          [
+            [
+              420,
+              "mL"
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "304不锈钢",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S01",
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "蓝色",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s02_txt",
+      "logical_scenario": "s02",
+      "domain": "包装",
+      "title": "净重与毛重不能冲突",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s02_txt/source1.txt",
+          "sha256": "452114b6109d0737d16b1803d39189dc205511dad07a8afec46ab95f47d32fad"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S02",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s02",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              1350,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "gross_weight",
+          "gross",
+          "verified",
+          [
+            [
+              1600,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              6,
+              "count"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s02_pdf_lines",
+      "logical_scenario": "s02",
+      "domain": "包装",
+      "title": "净重与毛重不能冲突",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s02_pdf_lines/source1.pdf",
+          "sha256": "e1e97476e5025b040df3bd034e1466aa4ad72432b3cad86cfe4ab7ddaf99b92b"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S02",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s02",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              1350,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "gross_weight",
+          "gross",
+          "verified",
+          [
+            [
+              1600,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              6,
+              "count"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s02_pdf_table",
+      "logical_scenario": "s02",
+      "domain": "包装",
+      "title": "净重与毛重不能冲突",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s02_pdf_table/source1.pdf",
+          "sha256": "bb0f2df62879768290dd4efea430064ff4dcdd857f817dfb3727f24d2ac73136"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S02",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s02",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              1350,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "gross_weight",
+          "gross",
+          "verified",
+          [
+            [
+              1600,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S02",
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              6,
+              "count"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s03_txt",
+      "logical_scenario": "s03",
+      "domain": "电源",
+      "title": "输入与输出分开",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s03_txt/source1.txt",
+          "sha256": "0183d152cb845c976bffbb62e83a6389f24362ce50d32b68f8c0c62cbe894478"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S03",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s03",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              5,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              10,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "length",
+          null,
+          "verified",
+          [
+            [
+              1000,
+              "mm"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s03_pdf_lines",
+      "logical_scenario": "s03",
+      "domain": "电源",
+      "title": "输入与输出分开",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s03_pdf_lines/source1.pdf",
+          "sha256": "521e88e8213a5822ea31404d00ab6f558eb53dc87f26addedcc8373e40270530"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S03",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s03",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              5,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              10,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "length",
+          null,
+          "verified",
+          [
+            [
+              1000,
+              "mm"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s03_pdf_table",
+      "logical_scenario": "s03",
+      "domain": "电源",
+      "title": "输入与输出分开",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s03_pdf_table/source1.pdf",
+          "sha256": "be196a729a102e9667eaed718e852de622deaea6facf19f917f997610e07b1e9"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S03",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s03",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              5,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              10,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S03",
+          "length",
+          null,
+          "verified",
+          [
+            [
+              1000,
+              "mm"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s04_txt",
+      "logical_scenario": "s04",
+      "domain": "电池",
+      "title": "清晰带单位参数",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s04_txt/source1.txt",
+          "sha256": "d8d207685fd6977b6dbccc98b06607fb73826a54c59273e1d4fd207f22e0a1dc"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S04",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s04",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              3.7,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "capacity_charge",
+          null,
+          "verified",
+          [
+            [
+              2600,
+              "mAh"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "charging_time",
+          null,
+          "verified",
+          [
+            [
+              5400,
+              "s"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "current",
+          "rating:max",
+          "verified",
+          [
+            [
+              1.2,
+              "A"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s04_pdf_lines",
+      "logical_scenario": "s04",
+      "domain": "电池",
+      "title": "清晰带单位参数",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s04_pdf_lines/source1.pdf",
+          "sha256": "2a91c8ea8834b96b2b43d8a4fd997887baaef4a3d72a4b728034e8ad2d41a88d"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S04",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s04",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              3.7,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "capacity_charge",
+          null,
+          "verified",
+          [
+            [
+              2600,
+              "mAh"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "charging_time",
+          null,
+          "verified",
+          [
+            [
+              5400,
+              "s"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "current",
+          "rating:max",
+          "verified",
+          [
+            [
+              1.2,
+              "A"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s04_pdf_table",
+      "logical_scenario": "s04",
+      "domain": "电池",
+      "title": "清晰带单位参数",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s04_pdf_table/source1.pdf",
+          "sha256": "8fa7d76b9774421010ddfee7ee1b72a7141eb11c85bed58959e8aa809fb8312b"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S04",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s04",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              3.7,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "capacity_charge",
+          null,
+          "verified",
+          [
+            [
+              2600,
+              "mAh"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "charging_time",
+          null,
+          "verified",
+          [
+            [
+              5400,
+              "s"
+            ]
+          ]
+        ],
+        [
+          "EASY-S04",
+          "current",
+          "rating:max",
+          "verified",
+          [
+            [
+              1.2,
+              "A"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s05_txt",
+      "logical_scenario": "s05",
+      "domain": "纺织",
+      "title": "未预置的文字字段",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s05_txt/source1.txt",
+          "sha256": "54b76cdf341c3a52aa628429e32ac7860c8e65b76b43951dc55c65d254da2bdf"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S05",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s05",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:面料",
+          null,
+          "verified",
+          [
+            [
+              "纯棉",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:克重",
+          null,
+          "verified",
+          [
+            [
+              "180g/m2",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:洗涤方式",
+          null,
+          "verified",
+          [
+            [
+              "手洗",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              320,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s05_pdf_lines",
+      "logical_scenario": "s05",
+      "domain": "纺织",
+      "title": "未预置的文字字段",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s05_pdf_lines/source1.pdf",
+          "sha256": "7eaa3e9a1c7a660f20b2fd3c0fa77998b867ccae472425cb1bef93cbd1d85df0"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S05",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s05",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:面料",
+          null,
+          "verified",
+          [
+            [
+              "纯棉",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:克重",
+          null,
+          "verified",
+          [
+            [
+              "180g/m2",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:洗涤方式",
+          null,
+          "verified",
+          [
+            [
+              "手洗",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              320,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s05_pdf_table",
+      "logical_scenario": "s05",
+      "domain": "纺织",
+      "title": "未预置的文字字段",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s05_pdf_table/source1.pdf",
+          "sha256": "d9176f905c439be8c70af979c80010c5967b22343745c5e5c318725dcc756457"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S05",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s05",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:面料",
+          null,
+          "verified",
+          [
+            [
+              "纯棉",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:克重",
+          null,
+          "verified",
+          [
+            [
+              "180g/m2",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "custom:洗涤方式",
+          null,
+          "verified",
+          [
+            [
+              "手洗",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S05",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              320,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s06_txt",
+      "logical_scenario": "s06",
+      "domain": "图书",
+      "title": "普通图书参数",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s06_txt/source1.txt",
+          "sha256": "b6429ed55a97e6f98cc1c54a713aa2c8070849d8d24dd233f71072d1bd098026"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S06",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s06",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:页数",
+          null,
+          "verified",
+          [
+            [
+              "256页",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:装订方式",
+          null,
+          "verified",
+          [
+            [
+              "平装",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:语言",
+          null,
+          "verified",
+          [
+            [
+              "简体中文",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              410,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s06_pdf_lines",
+      "logical_scenario": "s06",
+      "domain": "图书",
+      "title": "普通图书参数",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s06_pdf_lines/source1.pdf",
+          "sha256": "0a0823f021d4d5742f4a70ab639454863f993391cc8c8ea9636b2d8d558a79db"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S06",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s06",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:页数",
+          null,
+          "verified",
+          [
+            [
+              "256页",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:装订方式",
+          null,
+          "verified",
+          [
+            [
+              "平装",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:语言",
+          null,
+          "verified",
+          [
+            [
+              "简体中文",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              410,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s06_pdf_table",
+      "logical_scenario": "s06",
+      "domain": "图书",
+      "title": "普通图书参数",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s06_pdf_table/source1.pdf",
+          "sha256": "0d269b285d9db2fff2a9c3b0e84dac4c92d5074643f1b3b704db3b96f1c76219"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S06",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s06",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:页数",
+          null,
+          "verified",
+          [
+            [
+              "256页",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:装订方式",
+          null,
+          "verified",
+          [
+            [
+              "平装",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "custom:语言",
+          null,
+          "verified",
+          [
+            [
+              "简体中文",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S06",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              410,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s07_txt",
+      "logical_scenario": "s07",
+      "domain": "工具",
+      "title": "数值与开放字段",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s07_txt/source1.txt",
+          "sha256": "71c4d681bffb6dea15a1c7f2d76fb4380a86537cd1194f60fabccc72b796acf6"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S07",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s07",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "torque",
+          "rating:max",
+          "verified",
+          [
+            [
+              18,
+              "N·m"
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "custom:转速",
+          null,
+          "verified",
+          [
+            [
+              "1800rpm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              850,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "铝合金",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s07_pdf_lines",
+      "logical_scenario": "s07",
+      "domain": "工具",
+      "title": "数值与开放字段",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s07_pdf_lines/source1.pdf",
+          "sha256": "79b36c67a88f58a2d4a38ef9fbc37418848fb79bfe78f1a6b272d5e19d156c2f"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S07",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s07",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "torque",
+          "rating:max",
+          "verified",
+          [
+            [
+              18,
+              "N·m"
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "custom:转速",
+          null,
+          "verified",
+          [
+            [
+              "1800rpm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              850,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "铝合金",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s07_pdf_table",
+      "logical_scenario": "s07",
+      "domain": "工具",
+      "title": "数值与开放字段",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s07_pdf_table/source1.pdf",
+          "sha256": "f956f1e0b64797b1ab1536f693ce84e1673ad65f71ee8db5fa0396bbef1d8a02"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S07",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s07",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "torque",
+          "rating:max",
+          "verified",
+          [
+            [
+              18,
+              "N·m"
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "custom:转速",
+          null,
+          "verified",
+          [
+            [
+              "1800rpm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              850,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S07",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "铝合金",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s08_txt",
+      "logical_scenario": "s08",
+      "domain": "照明",
+      "title": "灯具基础参数",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s08_txt/source1.txt",
+          "sha256": "e610a81ff1e0e242a4b095eabfd56079016038b839b30d68b8b08a0c5faae377"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S08",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s08",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              8,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:光通量",
+          null,
+          "verified",
+          [
+            [
+              "760lm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:色温",
+          null,
+          "verified",
+          [
+            [
+              "4000K",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:显色指数",
+          null,
+          "verified",
+          [
+            [
+              "90",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s08_pdf_lines",
+      "logical_scenario": "s08",
+      "domain": "照明",
+      "title": "灯具基础参数",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s08_pdf_lines/source1.pdf",
+          "sha256": "2b59f2c6545d8a8ad40596aa49b07604b5afca60f9294d1a0fe97fcdd6505bf0"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S08",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s08",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              8,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:光通量",
+          null,
+          "verified",
+          [
+            [
+              "760lm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:色温",
+          null,
+          "verified",
+          [
+            [
+              "4000K",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:显色指数",
+          null,
+          "verified",
+          [
+            [
+              "90",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s08_pdf_table",
+      "logical_scenario": "s08",
+      "domain": "照明",
+      "title": "灯具基础参数",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s08_pdf_table/source1.pdf",
+          "sha256": "ea99bc1e61936557634241fbc043f6962dfbf575bd6aaa5951e058832947580f"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S08",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s08",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              8,
+              "W"
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:光通量",
+          null,
+          "verified",
+          [
+            [
+              "760lm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:色温",
+          null,
+          "verified",
+          [
+            [
+              "4000K",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S08",
+          "custom:显色指数",
+          null,
+          "verified",
+          [
+            [
+              "90",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s09_txt",
+      "logical_scenario": "s09",
+      "domain": "水处理",
+      "title": "压力口径与流量换算",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s09_txt/source1.txt",
+          "sha256": "f53ae1627dec289cab3fb727602fe8a51001788a6969073217b06bf820f76873"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S09",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s09",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "pressure",
+          "operating",
+          "verified",
+          [
+            [
+              350000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "pressure",
+          "rating:max",
+          "verified",
+          [
+            [
+              600000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "flow_rate",
+          "rating:rated",
+          "verified",
+          [
+            [
+              6,
+              "L/min"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "g1/2",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s09_pdf_lines",
+      "logical_scenario": "s09",
+      "domain": "水处理",
+      "title": "压力口径与流量换算",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s09_pdf_lines/source1.pdf",
+          "sha256": "a9bc18dc0ab2fd734214dbc2dd73198affe9e2eeb3224c39d784f509b58f5347"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S09",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s09",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "pressure",
+          "operating",
+          "verified",
+          [
+            [
+              350000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "pressure",
+          "rating:max",
+          "verified",
+          [
+            [
+              600000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "flow_rate",
+          "rating:rated",
+          "verified",
+          [
+            [
+              6,
+              "L/min"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "g1/2",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s09_pdf_table",
+      "logical_scenario": "s09",
+      "domain": "水处理",
+      "title": "压力口径与流量换算",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s09_pdf_table/source1.pdf",
+          "sha256": "3d43f5468369f180a0bc4ef65cb9b6de1267230042a5720c1200098f2b906e0a"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S09",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s09",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "pressure",
+          "operating",
+          "verified",
+          [
+            [
+              350000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "pressure",
+          "rating:max",
+          "verified",
+          [
+            [
+              600000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "flow_rate",
+          "rating:rated",
+          "verified",
+          [
+            [
+              6,
+              "L/min"
+            ]
+          ]
+        ],
+        [
+          "EASY-S09",
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "g1/2",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s10_txt",
+      "logical_scenario": "s10",
+      "domain": "传感器",
+      "title": "工作与储存温度",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s10_txt/source1.txt",
+          "sha256": "fa3f7dcc5a15df91639cb47a480462b5204c50660468b9175dca371ae6b46168"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S10",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s10",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                -15,
+                55
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -30,
+                75
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "ip_rating",
+          null,
+          "verified",
+          [
+            [
+              "ip65",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s10_pdf_lines",
+      "logical_scenario": "s10",
+      "domain": "传感器",
+      "title": "工作与储存温度",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s10_pdf_lines/source1.pdf",
+          "sha256": "ffaa0494a666b161bebe578f621a5999f487be568ed15de7878f9332feb1b63b"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S10",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s10",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                -15,
+                55
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -30,
+                75
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "ip_rating",
+          null,
+          "verified",
+          [
+            [
+              "ip65",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s10_pdf_table",
+      "logical_scenario": "s10",
+      "domain": "传感器",
+      "title": "工作与储存温度",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s10_pdf_table/source1.pdf",
+          "sha256": "f7dcee7db9e7e23c7639c072d4f418b81beaa095b6de0c47fffae980f810d793"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S10",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s10",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                -15,
+                55
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -30,
+                75
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "ip_rating",
+          null,
+          "verified",
+          [
+            [
+              "ip65",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S10",
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s11_txt",
+      "logical_scenario": "s11",
+      "domain": "电子模块",
+      "title": "显式列出的内存",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s11_txt/source1.txt",
+          "sha256": "69a629873de50a0f7c1e3e1d84809ec4460d7ba58c2e17dcf182d671cecc5991"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S11",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s11",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:rom",
+          null,
+          "verified",
+          [
+            [
+              "384kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:sram",
+          null,
+          "verified",
+          [
+            [
+              "512kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:gpio",
+          null,
+          "verified",
+          [
+            [
+              "21个",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "protocol",
+          null,
+          "verified",
+          [
+            [
+              "i2c",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s11_pdf_lines",
+      "logical_scenario": "s11",
+      "domain": "电子模块",
+      "title": "显式列出的内存",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s11_pdf_lines/source1.pdf",
+          "sha256": "533bda69e6f2c62247dc79cdbd7fa56377ed4028d05c83b66cc61e686ef28fc1"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S11",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s11",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:rom",
+          null,
+          "verified",
+          [
+            [
+              "384kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:sram",
+          null,
+          "verified",
+          [
+            [
+              "512kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:gpio",
+          null,
+          "verified",
+          [
+            [
+              "21个",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "protocol",
+          null,
+          "verified",
+          [
+            [
+              "i2c",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s11_pdf_table",
+      "logical_scenario": "s11",
+      "domain": "电子模块",
+      "title": "显式列出的内存",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s11_pdf_table/source1.pdf",
+          "sha256": "c043a637fdbe35ef8517eb2cb7b27c0f2e6e5416040e66b637feae10f4fbf985"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S11",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s11",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:rom",
+          null,
+          "verified",
+          [
+            [
+              "384kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:sram",
+          null,
+          "verified",
+          [
+            [
+              "512kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "custom:gpio",
+          null,
+          "verified",
+          [
+            [
+              "21个",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S11",
+          "protocol",
+          null,
+          "verified",
+          [
+            [
+              "i2c",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s12_txt",
+      "logical_scenario": "s12",
+      "domain": "存储",
+      "title": "存储设备基础参数",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s12_txt/source1.txt",
+          "sha256": "6b1877cff9641819bfeaae0ddb3b7790222d1425fbd70274a9a54657d047a0fa"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S12",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s12",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "usb-c",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "custom:最大读速",
+          null,
+          "verified",
+          [
+            [
+              "400MB/s",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "custom:保修期",
+          null,
+          "verified",
+          [
+            [
+              "3年",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              95,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s12_pdf_lines",
+      "logical_scenario": "s12",
+      "domain": "存储",
+      "title": "存储设备基础参数",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s12_pdf_lines/source1.pdf",
+          "sha256": "fc74f199c7e9fb45280419e762a45a30c0b67ae69bef689f70aa29940607b58c"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S12",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s12",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "usb-c",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "custom:最大读速",
+          null,
+          "verified",
+          [
+            [
+              "400MB/s",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "custom:保修期",
+          null,
+          "verified",
+          [
+            [
+              "3年",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              95,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s12_pdf_table",
+      "logical_scenario": "s12",
+      "domain": "存储",
+      "title": "存储设备基础参数",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s12_pdf_table/source1.pdf",
+          "sha256": "9415c736519caae14d7490ae5d316b5b69c15380e7452de96912515e9ac18bde"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S12",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s12",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "usb-c",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "custom:最大读速",
+          null,
+          "verified",
+          [
+            [
+              "400MB/s",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "custom:保修期",
+          null,
+          "verified",
+          [
+            [
+              "3年",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S12",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              95,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s13_txt",
+      "logical_scenario": "s13",
+      "domain": "食品",
+      "title": "包装与保质期",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s13_txt/source1.txt",
+          "sha256": "87e152866f9e7cc33065888f3063d212f720ffafc867e52b6e6ca00df2da1aa1"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S13",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s13",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              12,
+              "count"
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              600,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "custom:成分",
+          null,
+          "verified",
+          [
+            [
+              "纯净水",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "custom:保质期",
+          null,
+          "verified",
+          [
+            [
+              "18个月",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s13_pdf_lines",
+      "logical_scenario": "s13",
+      "domain": "食品",
+      "title": "包装与保质期",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s13_pdf_lines/source1.pdf",
+          "sha256": "0b82bf9eaf3435d8fd4ec87356a379a2a9eefcc3fd3472359488cd5444b80a60"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S13",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s13",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              12,
+              "count"
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              600,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "custom:成分",
+          null,
+          "verified",
+          [
+            [
+              "纯净水",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "custom:保质期",
+          null,
+          "verified",
+          [
+            [
+              "18个月",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s13_pdf_table",
+      "logical_scenario": "s13",
+      "domain": "食品",
+      "title": "包装与保质期",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s13_pdf_table/source1.pdf",
+          "sha256": "a93c03d881ecc7655f8be331d0fa9f9dde5cd2e757bbadc799cdc8e7793f211a"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S13",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s13",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              12,
+              "count"
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              600,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "custom:成分",
+          null,
+          "verified",
+          [
+            [
+              "纯净水",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S13",
+          "custom:保质期",
+          null,
+          "verified",
+          [
+            [
+              "18个月",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s14_txt",
+      "logical_scenario": "s14",
+      "domain": "家具",
+      "title": "尺寸单位换算",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s14_txt/source1.txt",
+          "sha256": "510d72d1c1671d9a9d767c19c333012fd8e063e61c94ecc5be39e67b7ba10cc2"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S14",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s14",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "dimensions",
+          null,
+          "verified",
+          [
+            [
+              [
+                800,
+                500,
+                400
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "木材",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "custom:承重上限",
+          null,
+          "verified",
+          [
+            [
+              "50kg",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "custom:安装方式",
+          null,
+          "verified",
+          [
+            [
+              "螺丝固定",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s14_pdf_lines",
+      "logical_scenario": "s14",
+      "domain": "家具",
+      "title": "尺寸单位换算",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s14_pdf_lines/source1.pdf",
+          "sha256": "f7a7992bfc6b013bc9ec8308bf01ff8d3af72b73fa1c68dc8284f2912f8e4a94"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S14",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s14",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "dimensions",
+          null,
+          "verified",
+          [
+            [
+              [
+                800,
+                500,
+                400
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "木材",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "custom:承重上限",
+          null,
+          "verified",
+          [
+            [
+              "50kg",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "custom:安装方式",
+          null,
+          "verified",
+          [
+            [
+              "螺丝固定",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s14_pdf_table",
+      "logical_scenario": "s14",
+      "domain": "家具",
+      "title": "尺寸单位换算",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s14_pdf_table/source1.pdf",
+          "sha256": "516d78e9a3be4ee7a55aec47e4f3de32c894f705318978cd6dd3400f6e487260"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S14",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s14",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "dimensions",
+          null,
+          "verified",
+          [
+            [
+              [
+                800,
+                500,
+                400
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "木材",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "custom:承重上限",
+          null,
+          "verified",
+          [
+            [
+              "50kg",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S14",
+          "custom:安装方式",
+          null,
+          "verified",
+          [
+            [
+              "螺丝固定",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s15_txt",
+      "logical_scenario": "s15",
+      "domain": "照明",
+      "title": "更多未预置字段",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s15_txt/source1.txt",
+          "sha256": "43f2b4d20ccf498e98368bb8e08bee20486ac4f63a5db0e928fb6dcd2b038356"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S15",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s15",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:光斑直径",
+          null,
+          "verified",
+          [
+            [
+              "12mm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:灯珠数量",
+          null,
+          "verified",
+          [
+            [
+              "24颗",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:光束角",
+          null,
+          "verified",
+          [
+            [
+              "60度",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              190,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s15_pdf_lines",
+      "logical_scenario": "s15",
+      "domain": "照明",
+      "title": "更多未预置字段",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s15_pdf_lines/source1.pdf",
+          "sha256": "816f6b42f88a072330698fa3c8cb31a43389a513c15ad8773f2a29fc7d68b5b8"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S15",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s15",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:光斑直径",
+          null,
+          "verified",
+          [
+            [
+              "12mm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:灯珠数量",
+          null,
+          "verified",
+          [
+            [
+              "24颗",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:光束角",
+          null,
+          "verified",
+          [
+            [
+              "60度",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              190,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s15_pdf_table",
+      "logical_scenario": "s15",
+      "domain": "照明",
+      "title": "更多未预置字段",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s15_pdf_table/source1.pdf",
+          "sha256": "d70b2282579bb8734222cded81132c56cc47ee45b66ee820670bbb894fa0ff85"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S15",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s15",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:光斑直径",
+          null,
+          "verified",
+          [
+            [
+              "12mm",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:灯珠数量",
+          null,
+          "verified",
+          [
+            [
+              "24颗",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "custom:光束角",
+          null,
+          "verified",
+          [
+            [
+              "60度",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S15",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              190,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s16_txt",
+      "logical_scenario": "s16",
+      "domain": "日用品",
+      "title": "两个来源一个真实冲突",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s16_txt/source1.txt",
+          "sha256": "cece14bae95ef04b26ceddb40e2d5dc7db047a533c568409f0d494867452f03d"
+        },
+        {
+          "path": "s16_txt/source2.txt",
+          "sha256": "06d3d45478c57f25ad213ce6c9a908948a2c3e262a9bd00989b4874bcd71ebc3"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S16",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s16",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "net_weight",
+          "net",
+          "conflict",
+          [
+            [
+              560,
+              "g"
+            ],
+            [
+              585,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "dimensions",
+          null,
+          "verified",
+          [
+            [
+              [
+                160,
+                90,
+                35
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "白色",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s16_pdf_lines",
+      "logical_scenario": "s16",
+      "domain": "日用品",
+      "title": "两个来源一个真实冲突",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s16_pdf_lines/source1.pdf",
+          "sha256": "1197c434b1796241184ebf37e9da731695d7ef74614125c2000b08bea45349d8"
+        },
+        {
+          "path": "s16_pdf_lines/source2.pdf",
+          "sha256": "00e0efc864fd9b6b46c81e837947b3a4dd862357cf154a05731df2c6c33f6265"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S16",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s16",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "net_weight",
+          "net",
+          "conflict",
+          [
+            [
+              560,
+              "g"
+            ],
+            [
+              585,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "dimensions",
+          null,
+          "verified",
+          [
+            [
+              [
+                160,
+                90,
+                35
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "白色",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s16_pdf_table",
+      "logical_scenario": "s16",
+      "domain": "日用品",
+      "title": "两个来源一个真实冲突",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s16_pdf_table/source1.pdf",
+          "sha256": "ba1b0537c6805cf33174be8c2e558a8be7e1e20d23350a5544c2377c3cc43767"
+        },
+        {
+          "path": "s16_pdf_table/source2.pdf",
+          "sha256": "e8933e9571387794ae62f7e0120b069ed70dd11d6b2378ab2c3c8b2c969c9d3e"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S16",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s16",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "net_weight",
+          "net",
+          "conflict",
+          [
+            [
+              560,
+              "g"
+            ],
+            [
+              585,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "dimensions",
+          null,
+          "verified",
+          [
+            [
+              [
+                160,
+                90,
+                35
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S16",
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "白色",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s17_txt",
+      "logical_scenario": "s17",
+      "domain": "传感器",
+      "title": "不同口径不同数值不算冲突",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s17_txt/source1.txt",
+          "sha256": "28fbd3ba38b5fdd0d0035d1b54950e4caeaeddbb5bbcbb20e5dcc41810bb84c9"
+        },
+        {
+          "path": "s17_txt/source2.txt",
+          "sha256": "28fbd3ba38b5fdd0d0035d1b54950e4caeaeddbb5bbcbb20e5dcc41810bb84c9"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S17",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s17",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S17",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                0,
+                45
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S17",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -20,
+                70
+              ],
+              "°C"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s17_pdf_lines",
+      "logical_scenario": "s17",
+      "domain": "传感器",
+      "title": "不同口径不同数值不算冲突",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s17_pdf_lines/source1.pdf",
+          "sha256": "ba8fcb02cd7ee9dc45b04040d2911d70582b5b0f6cbb03e486481d4e14352ef9"
+        },
+        {
+          "path": "s17_pdf_lines/source2.pdf",
+          "sha256": "ba8fcb02cd7ee9dc45b04040d2911d70582b5b0f6cbb03e486481d4e14352ef9"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S17",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s17",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S17",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                0,
+                45
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S17",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -20,
+                70
+              ],
+              "°C"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s17_pdf_table",
+      "logical_scenario": "s17",
+      "domain": "传感器",
+      "title": "不同口径不同数值不算冲突",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s17_pdf_table/source1.pdf",
+          "sha256": "597ac3c40b94ecb282bfa4548b832f0714f299aaa1b2329d32b360891da36ec2"
+        },
+        {
+          "path": "s17_pdf_table/source2.pdf",
+          "sha256": "597ac3c40b94ecb282bfa4548b832f0714f299aaa1b2329d32b360891da36ec2"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S17",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s17",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S17",
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                0,
+                45
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          "EASY-S17",
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -20,
+                70
+              ],
+              "°C"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s18_txt",
+      "logical_scenario": "s18",
+      "domain": "电源",
+      "title": "多来源单位不同但值相同",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s18_txt/source1.txt",
+          "sha256": "30d8869a430ad6c7bc0e62ca66a5628853c7b7878d5a3dc87af654b5880d78de"
+        },
+        {
+          "path": "s18_txt/source2.txt",
+          "sha256": "e4d23a3d52de0425fdc9461a978e9ffee524f572a33f7d52b54f2493b996a5df"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S18",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s18",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              450,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "dimensions",
+          null,
+          "verified",
+          [
+            [
+              [
+                120,
+                80,
+                30
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s18_pdf_lines",
+      "logical_scenario": "s18",
+      "domain": "电源",
+      "title": "多来源单位不同但值相同",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s18_pdf_lines/source1.pdf",
+          "sha256": "14e67de678a64cd8c3b2a394c4b3e33e5fa1fbbd755b9bdfe21107a333f9f87a"
+        },
+        {
+          "path": "s18_pdf_lines/source2.pdf",
+          "sha256": "aea40bb37524bf593e86dac0fe353ac31d0570d7c6920f9a732446f8277b1252"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S18",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s18",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              450,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "dimensions",
+          null,
+          "verified",
+          [
+            [
+              [
+                120,
+                80,
+                30
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s18_pdf_table",
+      "logical_scenario": "s18",
+      "domain": "电源",
+      "title": "多来源单位不同但值相同",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s18_pdf_table/source1.pdf",
+          "sha256": "823cc0b8038fa331307df2d1764527a1ad051894602b3eae0ccf2fd6efa66725"
+        },
+        {
+          "path": "s18_pdf_table/source2.pdf",
+          "sha256": "ccdd0c16d6cc0173d61fe93296fb3e19eb4ea90c52da66ff7712e40418b5d75a"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S18",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s18",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              450,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "dimensions",
+          null,
+          "verified",
+          [
+            [
+              [
+                120,
+                80,
+                30
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          "EASY-S18",
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s19_txt",
+      "logical_scenario": "s19",
+      "domain": "电池",
+      "title": "英文完整单位写法",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s19_txt/source1.txt",
+          "sha256": "f9b7df59968900dea32a53793f0153f2659318419054e1fb8a26f8b454e08d92"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S19",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s19",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "voltage",
+          "rating:nominal",
+          "verified",
+          [
+            [
+              3,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              80,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              6,
+              "W"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s19_pdf_lines",
+      "logical_scenario": "s19",
+      "domain": "电池",
+      "title": "英文完整单位写法",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s19_pdf_lines/source1.pdf",
+          "sha256": "7fba048d291e444e1f6473fb388a96eda53e59dc4a5ff8f354b35cdc45c1e909"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S19",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s19",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "voltage",
+          "rating:nominal",
+          "verified",
+          [
+            [
+              3,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              80,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              6,
+              "W"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s19_pdf_table",
+      "logical_scenario": "s19",
+      "domain": "电池",
+      "title": "英文完整单位写法",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s19_pdf_table/source1.pdf",
+          "sha256": "0c38be1857a067b2df323b3ab8d2852cba8f30b165db62f129618f949f0bf17a"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S19",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s19",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "voltage",
+          "rating:nominal",
+          "verified",
+          [
+            [
+              3,
+              "V"
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              80,
+              "g"
+            ]
+          ]
+        ],
+        [
+          "EASY-S19",
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              6,
+              "W"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s20_txt",
+      "logical_scenario": "s20",
+      "domain": "电子模块",
+      "title": "数值在前的简单项目列表",
+      "family": "txt",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s20_txt/source1.txt",
+          "sha256": "41fcf68ca3d81066d3696890fc85a66b3408a2c6d19357f27a79a2f9c3fa304c"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S20",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s20",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:rom",
+          null,
+          "verified",
+          [
+            [
+              "384kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:sram",
+          null,
+          "verified",
+          [
+            [
+              "512kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:gpio",
+          null,
+          "verified",
+          [
+            [
+              "21",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s20_pdf_lines",
+      "logical_scenario": "s20",
+      "domain": "电子模块",
+      "title": "数值在前的简单项目列表",
+      "family": "pdf_lines",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s20_pdf_lines/source1.pdf",
+          "sha256": "184311b8b4bb12a8d2316b6f5f6e4ec5594ec6dee33dfa604d9ca648afcd6787"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S20",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s20",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:rom",
+          null,
+          "verified",
+          [
+            [
+              "384kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:sram",
+          null,
+          "verified",
+          [
+            [
+              "512kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:gpio",
+          null,
+          "verified",
+          [
+            [
+              "21",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "s20_pdf_table",
+      "logical_scenario": "s20",
+      "domain": "电子模块",
+      "title": "数值在前的简单项目列表",
+      "family": "pdf_table",
+      "source_kind": "synthetic_simple",
+      "split": "holdout",
+      "native_files": [
+        {
+          "path": "s20_pdf_table/source1.pdf",
+          "sha256": "70e5a9f3d2e2c1d5c5462ca46dbee02111533e6dd1f7ede6401df6d8e1839586"
+        }
+      ],
+      "facts": [
+        [
+          "EASY-S20",
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "easy-s20",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:rom",
+          null,
+          "verified",
+          [
+            [
+              "384kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:sram",
+          null,
+          "verified",
+          [
+            [
+              "512kB",
+              null
+            ]
+          ]
+        ],
+        [
+          "EASY-S20",
+          "custom:gpio",
+          null,
+          "verified",
+          [
+            [
+              "21",
+              null
+            ]
+          ]
+        ]
+      ]
+    }
+  ]
+}

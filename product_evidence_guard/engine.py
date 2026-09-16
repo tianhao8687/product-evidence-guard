@@ -15,7 +15,7 @@ import uuid
 from . import __version__
 from .confirmation import initialize_confirmation_outputs, reconcile_confirmations
 from .document_visuals import EmbeddedVisualAsset
-from .extractor import extract_rule_candidates, parameter_segments
+from .extractor import extract_rule_candidates, block_segments
 from .field_registry import registry_fingerprint
 from .graph import build_graph
 from .identity import IDENTITY_VERSION, resolve_product_identities
@@ -163,6 +163,7 @@ def _engine_signature(
         "device": device,
         "image_reader_identity": dict(image_reader_identity or {}),
         "identity_version": IDENTITY_VERSION,
+        "value_semantics_revision": VALUE_SEMANTICS_REVISION,
         "field_registry_sha256": registry_fingerprint(),
     }
     return hashlib.sha256(json.dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
@@ -1231,7 +1232,7 @@ def analyze_directory(
             rule_candidates: list[FactCandidate] = []
             unmatched_blocks: list[SourceBlock] = []
             for block in blocks:
-                for segment in parameter_segments(block.text):
+                for segment in block_segments(block):
                     part = replace(block, text=segment)
                     extracted = extract_rule_candidates(part)
                     if extracted:

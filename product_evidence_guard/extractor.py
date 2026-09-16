@@ -6,7 +6,7 @@ import json
 import re
 from typing import Iterable
 
-from .field_registry import FIELD_SPECS, FieldDefinition, field_for_label, split_label_unit, scope_for_label
+from .field_registry import FIELD_SPECS, FieldDefinition, field_for_label, split_label_unit, scope_for_label, unit_pattern
 from .models import FactCandidate, SourceBlock
 from .normalization import normalize_text, normalize_fact_text, normalize_value
 
@@ -59,20 +59,12 @@ _ELECTRICAL_LABEL_RE = re.compile(
 )
 _ELECTRICAL_NUMBER = r"[-+]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?"
 _ELECTRICAL_TOKEN_PATTERNS = {
-    "voltage": re.compile(
+    field: re.compile(
         rf"(?<![A-Za-z0-9,.]){_ELECTRICAL_NUMBER}"
         r"(?:\s*(?:-|–|—|~|to|至|到)\s*[-+]?\d+(?:\.\d+)?)?"
-        r"\s*(?:mV|V)(?:ac|dc)?(?![A-Za-z])",
+        rf"\s*{unit_pattern(field)}" + (r"(?:ac|dc)?" if field in {"voltage", "current"} else "") + r"(?![A-Za-z])",
         re.IGNORECASE,
-    ),
-    "current": re.compile(
-        rf"(?<![A-Za-z0-9,.]){_ELECTRICAL_NUMBER}\s*(?:mA|A)(?![A-Za-z])",
-        re.IGNORECASE,
-    ),
-    "power": re.compile(
-        rf"(?<![A-Za-z0-9,.]){_ELECTRICAL_NUMBER}\s*(?:mW|kW|W)(?![A-Za-z])",
-        re.IGNORECASE,
-    ),
+    ) for field in ("voltage", "current", "power")
 }
 _MODE_CONTEXT_RE = re.compile(
     r"(?:\b(?:by|per)\s+(?:operating\s+)?"
@@ -232,18 +224,10 @@ _ELECTRICAL_QUALIFIER_TOKEN_RE = re.compile(
     re.IGNORECASE,
 )
 _ELECTRICAL_UNIT_HEADER_PATTERNS = {
-    "voltage": re.compile(
-        r"[\(\[（【]\s*(?:mV|V)(?:ac|dc)?\s*[\)\]）】]",
+    field: re.compile(
+        rf"[\(\[（【]\s*{unit_pattern(field)}" + (r"(?:ac|dc)?" if field in {"voltage", "current"} else "") + r"\s*[\)\]）】]",
         re.IGNORECASE,
-    ),
-    "current": re.compile(
-        r"[\(\[（【]\s*(?:mA|A)\s*[\)\]）】]",
-        re.IGNORECASE,
-    ),
-    "power": re.compile(
-        r"[\(\[（【]\s*(?:mW|W|kW)\s*[\)\]）】]",
-        re.IGNORECASE,
-    ),
+    ) for field in ("voltage", "current", "power")
 }
 _SCOPE_DELIMITER_PREFIX_RE = re.compile(
     r"[\s:：=|,，;；/\\~\-–—]*"
@@ -697,7 +681,7 @@ def _extract_labeled_electrical_candidates(block: SourceBlock) -> list[FactCandi
             if item.start() < consumed_end:
                 continue
             qualifier = re.search(r"(?:<=|>=|[≤≥<>≈~]|约|大约)\s*$", value_text[:item.start()])
-            tolerance = re.match(r"\s*(?:±|\+/-)\s*[-+]?\d+(?:\.\d+)?\s*(?:mV|V|mA|A|mW|kW|W)?", value_text[item.end():], re.I)
+            tolerance = re.match(rf"\s*(?:±|\+/-)\s*[-+]?\d+(?:\.\d+)?\s*(?:{unit_pattern(field)})?", value_text[item.end():], re.I)
             start = qualifier.start() if qualifier else item.start()
             end = item.end() + (tolerance.end() if tolerance else 0)
             if item.start() and value_text[item.start() - 1] in ",.±":
@@ -839,12 +823,16 @@ def _extract_single_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
     return candidates
 
 
-def parameter_segments(text: str) -> list[str]:
+def parameter_segments(text: str, *, atomic: bool = False) -> list[str]:
     """Split explicit labels, keeping exclusion/correction context indivisible.
 
     Shared by engine fallback routing and rule extraction; repeated calls are
     idempotent. A pre-split 'template' disclaimer must not expose its value.
     """
+    # A parser-bound cell/row already owns its label. Punctuation inside its
+    # value (standards, mounting instructions, sub-values) is not another row.
+    if atomic:
+        return [text.strip()] if text.strip() else []
     result = []
     for line in text.splitlines():
         if re.search(r"仅为模板|不代表真实参数|(?:仅供|只是)(?:示例|演示)|\bexample only\b", line, re.I):
@@ -857,6 +845,15 @@ def parameter_segments(text: str) -> list[str]:
         + rf"|[;；,，。]\s*(?=(?:{_NEXT_PARAMETER})(?:\s|[:：=为是≤≥<>≈约+\-\d]))", line, flags=re.I
         ) if part.strip())
     return result
+
+
+def block_segments(block: SourceBlock) -> list[str]:
+    """One segmentation contract for the engine and every structured reader."""
+    atomic = bool(block.provenance.get("atomic_parameter") or block.provenance.get("structured_row"))
+    if block.source_kind in {"csv_row", "xlsx_row", "docx_table_row"}:
+        cells = block.text.split(" | ")
+        atomic = atomic or (len(cells) == 2 and bool(field_for_label(split_label_unit(cells[0])[0])))
+    return parameter_segments(block.text, atomic=atomic)
 
 
 def explicit_parameter(text: str):
@@ -878,11 +875,49 @@ def explicit_parameter(text: str):
     return (spec, raw) if spec and raw and len(raw) <= 512 else None
 
 
+def _value_first_parameter(text: str) -> str | None:
+    """Bind a complete short measurement/acronym line, not a prose fragment.
+
+    Known numeric labels may follow a measurement (80 grams net weight).
+    Open fields require a single uppercase technical label (384 kB ROM,
+    21 GPIO); no per-product/parameter allowlist. Unknown prose labels and
+    multiple values/conditions remain unbound rather than being guessed.
+    """
+    text = re.sub(r"^\s*[-*•]\s+", "", text).strip()
+    if len(text) > 96 or re.search(r"[:：=\n\r|;；,，。]", text):
+        return None
+    number = r"[-+]?(?:\d+(?:\.\d+)?|\.\d+)"
+    for boundary in re.finditer(r"\s+", text):
+        raw, label = text[:boundary.start()], text[boundary.end():]
+        measurement = re.fullmatch(rf"(?P<number>{number})\s*(?P<unit>[^\s\d][^\s]{{0,31}})?", raw)
+        if not measurement or not label or len(label) > 64:
+            continue
+        spec = field_for_label(label)
+        if not spec or spec.category == "identity":
+            continue
+        if spec.name.startswith("custom_"):
+            if not re.fullmatch(r"[A-Z][A-Z0-9]*(?:[_-][A-Z0-9]+)*", label) or len(label) < 2:
+                continue
+            # A bare measurement such as '21 MW' has no parameter label.
+            if split_label_unit("value (" + label + ")")[1]:
+                continue
+            unit = measurement["unit"]
+            if unit:
+                if not split_label_unit("value (" + unit + ")")[1]:
+                    continue
+            elif not re.fullmatch(r"\d+", raw):
+                continue  # unqualified acronym counts must be integers
+        elif spec.value_type == "text" or normalize_value(spec.name, raw).notes:
+            continue
+        return label + ": " + raw
+    return None
+
+
 def extract_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
     result = []
     if re.search(r"仅为模板|不代表真实参数|(?:仅供|只是)(?:示例|演示)|\bexample only\b", block.text, re.I):
         return result
-    for segment in parameter_segments(block.text):
+    for segment in block_segments(block):
         original = segment
         segment, sku = strip_product_prefix(segment)
         # A negated old value cannot be recovered by searching for its number.
@@ -899,8 +934,15 @@ def extract_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
         provenance = dict(block.provenance)
         if sku:
             provenance["explicit_product_token"] = sku
+        value_first = None if explicit_parameter(segment) else _value_first_parameter(segment)
+        if value_first:
+            segment = value_first
+            provenance["parameter_order"] = "value_first"
         part = replace(block, text=segment, provenance=provenance)
         explicit = explicit_parameter(segment)
+        if (explicit and explicit[0].name.startswith("custom_")
+                and block.provenance.get("layout_binding") == "unbound_text" and not value_first):
+            continue  # an arbitrary colon in flowing PDF prose is not a row
         # An explicit open-field label owns its meaning. A substring such as
         # "current" inside "leakage current" must not erase the qualifier.
         if explicit and explicit[0].name.startswith("custom_"):
@@ -909,6 +951,10 @@ def extract_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
             items = [item for item in _extract_labeled_electrical_candidates(part) if item.scope]
         else:
             items = _extract_single_rule_candidates(part)
+        if not explicit and block.provenance.get("layout_binding") == "unbound_text":
+            # A floating heading such as "Model Code" has neither a value
+            # boundary nor a row owner. It must not rename the whole product.
+            items = [item for item in items if item.field not in _TEXT_FIELDS]
         if explicit and not items:
             spec, raw = explicit
             if spec.value_type != "text" and not re.search(r"\d", raw):
@@ -927,6 +973,21 @@ def extract_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
             )]
         for item in items:
             item.raw_text = original
+            conditions = block.provenance.get("source_conditions", [])
+            if block.provenance.get("unresolved_condition_refs"):
+                item.notes.append("unparsed_source_condition")
+            if conditions:
+                if item.raw_value.strip().casefold() in {"-", "--", "—", "n/a", "tbd", "待定"}:
+                    item.notes.append("unparsed_missing_value")
+                full_conditions = " / ".join(note["text"] for note in conditions)
+                item.raw_text += "\n" + "\n".join(f"[{note['marker']}] {note['text']}" for note in conditions)
+                if isinstance(item.normalized_value, str):
+                    # Text facts retain the condition in the adopted value,
+                    # not merely in an evidence drawer that export may omit.
+                    item.raw_value += " [条件: " + full_conditions + "]"
+                    item.normalized_value = normalize_value(item.field, item.raw_value).value
+                    item.candidate_id = _candidate_id(part, item.field, item.raw_value)
+                item.scope = "|".join(filter(None, [item.scope, "context:" + normalize_fact_text(full_conditions)]))
             parents = block.provenance.get("parent_labels", [])
             if parents and item.field not in {"sku", "model", "variant"}:
                 # Explicit table parents qualify measurements; they are not
@@ -934,7 +995,7 @@ def extract_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
                 scopes = [item.scope] if item.scope and item.scope != "unspecified" else []
                 for parent in parents:
                     scope = {"input": "input", "output": "output", "输入": "input", "输出": "output"}.get(str(parent).casefold())
-                    scope = scope or "context:" + normalize_text(str(parent))
+                    scope = scope or "context:" + normalize_fact_text(str(parent))
                     if scope not in scopes:
                         scopes.append(scope)
                 item.scope = "|".join(sorted(set(scopes), key=lambda s: (0 if s in {"input", "output"} else 1, s))) or None

@@ -6,7 +6,7 @@ import math
 import re
 from typing import Any
 
-from .field_registry import REGISTRY, field_definition
+from .field_registry import REGISTRY, field_definition, unit_pattern, unit_rule
 
 
 @dataclass(frozen=True, slots=True)
@@ -17,7 +17,7 @@ class NormalizedValue:
 
 
 _NUMBER = r"[-+]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][-+]?\d+)?"
-VALUE_SEMANTICS_REVISION = 2
+VALUE_SEMANTICS_REVISION = 4
 
 
 UNIT_RULES = {
@@ -119,17 +119,15 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
     rules = UNIT_RULES.get(family)
     if rules is None:
         return None
-    aliases = sorted(rules, key=len, reverse=True)
-    # Inline case sensitivity survives the surrounding natural-language re.I.
-    unit_pattern = "(?-i:" + "|".join(re.escape(item) for item in aliases) + ")"
+    units = unit_pattern(family)
     for word, operator in _BOUND_PREFIX.items():
         raw = re.sub(re.escape(word) + r"\s*(?=[+\-]?\d)", operator, raw, flags=re.I)
     for word, operator in _BOUND_SUFFIX.items():
-        raw = re.sub(rf"({_NUMBER}\s*(?:{unit_pattern}))\s*{word}", operator + r"\1", raw, flags=re.I)
+        raw = re.sub(rf"({_NUMBER}\s*(?:{units}))\s*{word}", operator + r"\1", raw, flags=re.I)
     # A tolerance may share its unit: 300±5g, or use mixed units: 0.3kg±5g.
     tolerance_pattern = re.compile(
-        rf"(?<![A-Za-z0-9_.,])(?P<center>{_NUMBER})\s*(?P<unit>{unit_pattern})?\s*"
-        rf"(?:[(（]\s*)?(?:±|\+/-)\s*(?P<delta>{_NUMBER})\s*(?P<delta_unit>{unit_pattern})?(?![A-Za-z0-9_.%])\s*[)）]?",
+        rf"(?<![A-Za-z0-9_.,])(?P<center>{_NUMBER})\s*(?P<unit>{units})?\s*"
+        rf"(?:[(（]\s*)?(?:±|\+/-)\s*(?P<delta>{_NUMBER})\s*(?P<delta_unit>{units})?(?![A-Za-z0-9_.%])\s*[)）]?",
         re.I,
     )
     tolerance = tolerance_pattern.search(raw)
@@ -139,8 +137,8 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
             return None
         if not tolerance["delta_unit"] and re.match(r"\s*[A-Za-z]", raw[tolerance.end():]):
             return None
-        center_rule = rules[center_unit]
-        delta_rule = rules[tolerance["delta_unit"] or center_unit]
+        center_rule = unit_rule(family, center_unit)
+        delta_rule = unit_rule(family, tolerance["delta_unit"] or center_unit)
         center = Decimal(tolerance["center"]) * center_rule.scale + center_rule.offset
         delta = Decimal(tolerance["delta"]) * delta_rule.scale
         if delta < 0 or "%" in raw[tolerance.end():]:
@@ -148,10 +146,10 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
         return NormalizedValue(f"{_clean_decimal(center)}±{_clean_decimal(delta)}", BASE_UNITS[family], ("qualifier_preserved",))
     range_pattern = re.compile(
         rf"(?<![A-Za-z0-9_.,])(?P<start>{_NUMBER})\s*"
-        rf"(?P<start_unit>{unit_pattern})?\s*"
+        rf"(?P<start_unit>{units})?\s*"
         rf"(?:-|–|—|~|to|至|到)\s*"
         rf"(?P<end>{_NUMBER})\s*"
-        rf"(?P<end_unit>{unit_pattern})" + (r"(?:ac|dc)?" if family in {"voltage", "current"} else "") + r"(?![A-Za-z])",
+        rf"(?P<end_unit>{units})" + (r"(?:ac|dc)?" if family in {"voltage", "current"} else "") + r"(?![A-Za-z])",
         re.IGNORECASE,
     )
     range_match = range_pattern.search(raw)
@@ -160,9 +158,9 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
         if not _measurement_context_safe(raw, [m.span() for m in all_ranges], family):
             return None
         converted_ranges = [
-            [Decimal(m["start"]) * rules[m["start_unit"] or m["end_unit"]].scale
-             + rules[m["start_unit"] or m["end_unit"]].offset,
-             Decimal(m["end"]) * rules[m["end_unit"]].scale + rules[m["end_unit"]].offset]
+            [Decimal(m["start"]) * unit_rule(family, m["start_unit"] or m["end_unit"]).scale
+             + unit_rule(family, m["start_unit"] or m["end_unit"]).offset,
+             Decimal(m["end"]) * unit_rule(family, m["end_unit"]).scale + unit_rule(family, m["end_unit"]).offset]
             for m in all_ranges
         ]
         if any(any(abs(a - b) > Decimal("0.000001") for a, b in zip(converted_ranges[0], pair))
@@ -176,7 +174,7 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
         )
 
     pattern = re.compile(
-        rf"(?<![A-Za-z0-9_.,])(?P<number>{_NUMBER})\s*(?P<unit>{unit_pattern})"
+        rf"(?<![A-Za-z0-9_.,])(?P<number>{_NUMBER})\s*(?P<unit>{units})"
         + (r"(?:ac|dc)?" if family in {"voltage", "current"} else "") + r"(?![A-Za-z])",
         re.IGNORECASE,
     )
@@ -188,7 +186,7 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
     except InvalidOperation:
         return None
     unit = match.group("unit")
-    rule = rules.get(unit)
+    rule = unit_rule(family, unit)
     if rule is None:
         return None
     normalized = number * rule.scale + rule.offset
@@ -229,7 +227,7 @@ def normalize_dimensions(raw: str) -> NormalizedValue | None:
         return None  # preserve unsupported dimensional constraints as text
     pattern = re.compile(
         rf"(?P<a>{_NUMBER})\s*[x×*]\s*(?P<b>{_NUMBER})(?:\s*[x×*]\s*(?P<c>{_NUMBER}))?\s*"
-        rf"(?P<unit>(?-i:mm|cm|m|in|inch|毫米|厘米|米|英寸))(?![A-Za-z])",
+        rf"(?P<unit>{unit_pattern('length')})(?![A-Za-z])",
         re.IGNORECASE,
     )
     match = pattern.search(raw)
@@ -238,7 +236,7 @@ def normalize_dimensions(raw: str) -> NormalizedValue | None:
     matches = list(pattern.finditer(raw))
     if not _measurement_context_safe(raw, [item.span() for item in matches], "length"):
         return None
-    rule = UNIT_RULES["length"].get(match.group("unit").casefold())
+    rule = unit_rule("length", match.group("unit"))
     if rule is None:
         return None
     values: list[int | float] = []
@@ -248,7 +246,7 @@ def normalize_dimensions(raw: str) -> NormalizedValue | None:
             continue
         values.append(_clean_decimal(Decimal(text) * rule.scale + rule.offset))
     for alternative in matches[1:]:
-        other_rule = UNIT_RULES["length"][alternative["unit"].casefold()]
+        other_rule = unit_rule("length", alternative["unit"])
         other = [_clean_decimal(Decimal(alternative[key]) * other_rule.scale + other_rule.offset)
                  for key in ("a", "b", "c") if alternative[key] is not None]
         if len(values) != len(other) or any(abs(a - b) > 1e-6 for a, b in zip(values, other)):
