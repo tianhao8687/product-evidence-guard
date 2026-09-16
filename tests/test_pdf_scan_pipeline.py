@@ -38,6 +38,7 @@ class _FakePdfTextPage:
         return self._text
 
 
+@patch.dict(sys.modules, {"pdfplumber": None})
 class PdfParserTests(unittest.TestCase):
     def test_parse_pdf_document_marks_only_textless_pages_for_visual_reading(self) -> None:
         fake_reader = types.SimpleNamespace(

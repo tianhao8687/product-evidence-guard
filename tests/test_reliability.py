@@ -68,7 +68,9 @@ class ReliabilityTests(unittest.TestCase):
     def test_true_conflict_never_enters_default_export(self):
         self.analyze({"a.csv": "SKU,型号,净重,颜色\nP-1,BASE,100g,黑色\nP-2,BASE,200g,白色",
                       "b.txt": "SKU：P-1\n型号：BASE\n净重：110g"})
-        table = Path(workflow.export_table(self.output)["path"]).read_text("utf-8-sig")
+        with self.assertRaises(ValueError):
+            workflow.export_table(self.output)
+        table = Path(workflow.export_table(self.output, allow_partial=True)["path"]).read_text("utf-8-sig")
         self.assertNotIn("100", table)
         self.assertNotIn("110", table)
         self.assertIn("200", table)

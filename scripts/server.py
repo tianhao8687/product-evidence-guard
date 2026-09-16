@@ -562,6 +562,7 @@ class ResidentAnalysisWorker:
         *,
         on_model_ready: Callable[[], None],
         on_progress: Callable[[str, dict], None] | None = None,
+        cancel_check: Callable[[], bool] | None = None,
         timeout_seconds: float = MAX_SINGLE_FILE_SECONDS,
     ) -> Mapping[str, Any]:
         if timeout_seconds <= 0:
@@ -589,6 +590,9 @@ class ResidentAnalysisWorker:
             )
 
         while True:
+            if cancel_check and cancel_check():
+                self._discard_if_current(process, connection, force=True)
+                raise RuntimeError("任务已取消，已完成文件保留供恢复。")
             remaining = deadline - time.monotonic()
             if remaining <= 0:
                 raise_timeout()
@@ -605,7 +609,11 @@ class ResidentAnalysisWorker:
                 if response_type == "model_ready":
                     on_model_ready()
                     if on_progress:
-                        on_progress("model_ready", {"load_seconds": response.get("load_seconds"), "reused": response.get("reused"), "has_model": response.get("has_model", True)})
+                        try:
+                            on_progress("model_ready", {"load_seconds": response.get("load_seconds"), "reused": response.get("reused"), "has_model": response.get("has_model", True)})
+                        except Exception:
+                            self._discard_if_current(process, connection, force=True)
+                            raise
                     deadline = time.monotonic() + timeout_seconds
                     continue
                 if response_type == "progress":
@@ -614,7 +622,11 @@ class ResidentAnalysisWorker:
                     # of incorrectly limiting the whole multi-file folder.
                     deadline = time.monotonic() + timeout_seconds
                     if on_progress:
-                        on_progress(str(response.get("stage", "running")), dict(response.get("details") or {}))
+                        try:
+                            on_progress(str(response.get("stage", "running")), dict(response.get("details") or {}))
+                        except Exception:
+                            self._discard_if_current(process, connection, force=True)
+                            raise
                     continue
                 if response_type == "result":
                     summary = response.get("summary")
@@ -814,6 +826,7 @@ class ServerApplication:
                 },
                 on_model_ready=lambda: self.state.transition("running"),
                 on_progress=self.workflow.worker_progress,
+                cancel_check=self.workflow.job_cancel_check(),
             )
         else:
             self.state.transition("running")

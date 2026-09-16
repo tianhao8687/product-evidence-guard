@@ -192,9 +192,7 @@ def write_product_facts(
     run_summary["fact_count"] = len(included)
     run_summary["excluded_fact_count"] = len(group_list) - len(included)
     run_summary["blocking_conflict_count"] = fact_counts["conflict"]
-    atomic_write_json(
-        path,
-        {
+    payload = {
             "schema_version": 2,
             "identity_version": IDENTITY_VERSION,
             "field_registry_sha256": registry_fingerprint(),
@@ -213,8 +211,12 @@ def write_product_facts(
             "evidence_candidates": [candidate.to_dict() for candidate in candidate_list],
             "fact_groups": [group.to_dict() for group in group_list],
             "cross_field_relations": [relation.to_dict() for relation in relation_list],
-        },
-    )
+        }
+    from .readiness import assess_delivery
+    payload["delivery_readiness"] = assess_delivery(payload)
+    if status in {"verified", "ready_to_export"} and not payload["delivery_readiness"]["complete"]:
+        payload["status"] = "awaiting_review"
+    atomic_write_json(path, payload)
 
 
 def write_conflicts_markdown(

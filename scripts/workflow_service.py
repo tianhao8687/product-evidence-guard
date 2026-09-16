@@ -19,7 +19,7 @@ from product_evidence_guard.state import atomic_write_json, atomic_write_text
 from product_evidence_guard.task_jobs import TaskJobs
 
 
-OPERATIONS = {"warmup", "residency", "review", "task", "job", "resume", "authorize", "handoff",
+OPERATIONS = {"warmup", "residency", "review", "task", "job", "resume", "cancel", "authorize", "handoff",
               "revoke", "check-content", "deliverables", "export-table", "export-local", "export-review"}
 OPERATIONS |= {"allow-review", "review-summary", "decide", "revoke-review", "review-action"}
 
@@ -32,7 +32,19 @@ class WorkflowService:
         self.cached = {}
         self.request_path = app.state.runtime_dir / "analysis-requests.json"
         self.requests = read_json_object(self.request_path) or {}
+        self.active_job_id = None
         self.jobs = TaskJobs(app.state.runtime_dir, self._execute_job)
+
+    def job_cancel_check(self):
+        # Capture this job's ID. The worker checks it inside its own request
+        # loop, then disposes the exact process/connection it owns.
+        job_id = self.active_job_id
+        def cancelled():
+            if not job_id:
+                return False
+            with self.jobs.lock:
+                return self.jobs.jobs.get(job_id, {}).get("phase") in {"cancel_requested", "cancelled"}
+        return cancelled
 
     def remember(self, payload):
         output = str(Path(payload.get("output_dir") or Path(payload["input_dir"]) / ".peg-output").resolve())
@@ -47,6 +59,7 @@ class WorkflowService:
             if self.app.stop_event.is_set():
                 return error_response(request, status="shutdown", code="shutdown", message="服务已关闭，任务可恢复。")
             self.app._progress_callback = progress
+            self.active_job_id = getattr(progress, "job_id", None)
             try:
                 progress("loading", {})
                 return self.app._dispatch_analyze(request, payload)
@@ -56,6 +69,7 @@ class WorkflowService:
                                       message=f"{type(exc).__name__}: {exc}")
             finally:
                 self.app._progress_callback = None
+                self.active_job_id = None
                 self.app.state.touch()
 
     def worker_progress(self, stage, details):
@@ -91,11 +105,11 @@ class WorkflowService:
         jobs = self.jobs.for_output(output)
         data["jobs"] = jobs if detailed else [self.jobs.snapshot(j["job_id"]) for j in jobs]
         data["resident"] = self.resident_snapshot()
-        if any(j["phase"] in {"queued", "running"} for j in jobs):
+        if any(j["phase"] in {"queued", "running", "cancel_requested"} for j in jobs):
             data["phase"] = "analyzing"
             data["next_action"] = "wait_for_analysis"
             data.pop("performance", None)
-        elif jobs and jobs[-1]["phase"] in {"failed", "interrupted"}:
+        elif jobs and jobs[-1]["phase"] in {"failed", "interrupted", "cancelled"}:
             data.update(phase="needs_attention", next_action="resume", retry_job_id=jobs[-1]["job_id"],
                         showing_previous_result=True)
             data["coverage"] = {**data.get("coverage", {}), "status": "partial", "can_retry": True,
@@ -109,6 +123,8 @@ class WorkflowService:
             return {"job": self.jobs.snapshot(payload["job_id"])}
         if operation == "resume":
             return {"job": self.jobs.resume(payload["job_id"])}
+        if operation == "cancel":
+            return {"job": self.jobs.cancel(payload["job_id"])}
         if operation == "residency":
             if not isinstance(payload.get("keep_alive"), bool):
                 raise ConfirmationRequestError("keep_alive 必须是布尔值。")
@@ -178,15 +194,22 @@ class WorkflowService:
                 return workflow.check_content(output, content_file=payload["content_file"],
                     bundle_id=payload["bundle_id"], recipient=payload["recipient"], **kwargs)
             if operation == "export-table":
-                return workflow.export_table(output, mode=payload.get("mode", "verified"), **kwargs)
+                return workflow.export_table(output, mode=payload.get("mode", "verified"),
+                    allow_partial=payload.get("allow_partial", False), product_ids=payload.get("product_ids"), **kwargs)
             if operation == "export-review":
                 from product_evidence_guard.review_workbook import export_review
                 return export_review(output, **kwargs)
             if operation == "export-local":
-                return workflow.export_local(output, reason=payload.get("reason", "local_only"), mode=payload.get("mode", "verified"), **kwargs)
+                return workflow.export_local(output, reason=payload.get("reason", "local_only"), mode=payload.get("mode", "verified"),
+                    allow_partial=payload.get("allow_partial", False), product_ids=payload.get("product_ids"), **kwargs)
         raise ConfirmationRequestError("不支持的工作流操作。")
 
     def review_action(self, output, action, body):
+        if action == "cancel-job":
+            job = self.jobs.snapshot(body["job_id"], detailed=True)
+            if Path(job["payload"]["output_dir"]).resolve() != output.resolve():
+                raise ConfirmationRequestError("此任务不属于当前审核页面。")
+            return self.jobs.cancel(body["job_id"])
         if action == "fact-action":
             with self.app._operation_lock:
                 allowed = {key: body[key] for key in ("session_id", "action", "group_id", "expected_candidate_ids",

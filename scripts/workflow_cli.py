@@ -12,7 +12,7 @@ def add_commands(commands):
     group = residency.add_mutually_exclusive_group(required=True)
     group.add_argument("--keep-alive", action="store_true")
     group.add_argument("--allow-idle", action="store_true")
-    for name in ("job", "resume"):
+    for name in ("job", "resume", "cancel"):
         parser = commands.add_parser(name)
         parser.add_argument("--job-id", required=True)
     for name in ("review", "task", "authorize", "handoff", "revoke", "check-content", "deliverables", "export-table", "export-local", "export-review",
@@ -21,6 +21,8 @@ def add_commands(commands):
         parser.add_argument("--output-dir", required=True)
         parser.add_argument("--session-id")
         if name in {"export-table", "export-local"}:
+            parser.add_argument("--allow-partial", action="store_true", help="明确只导出已确认部分，文件附未完成事项")
+            parser.add_argument("--product-id", action="append", dest="product_ids", help="只导出选定商品；未知归属的读取缺口仍需处理")
             parser.add_argument("--mode", choices=("human", "verified"), default="verified",
                                 help="human 仅人工批准；verified 全部已确认参数（含自动核验）")
         if name == "authorize":
@@ -94,4 +96,6 @@ def brief_response(response):
                                        **summary.get("confirmation_status_counts", {})},
                             "performance": performance_summary(summary),
                             "next_action": "inspect_task", "processing": "local"}
+        from product_evidence_guard.readiness import coverage_summary
+        result["result"]["coverage"] = coverage_summary(summary)
     return result

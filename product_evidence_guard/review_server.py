@@ -126,7 +126,9 @@ class ReviewServer:
                                     data["draft_id"] = Path(record["path"]).stem
                     elif url.path == "/api/table":
                         with owner.extension.app._operation_lock:
-                            result = workflow.export_table(output, mode=query.get("mode", ["verified"])[0])
+                            result = workflow.export_table(output, mode=query.get("mode", ["verified"])[0],
+                                allow_partial=query.get("allow_partial", ["false"])[0] == "true",
+                                product_ids=query.get("product_id"))
                             data = workflow.safe_file(Path(result["path"]))
                         return self._send(200, data, "text/csv; charset=utf-8")
                     else:

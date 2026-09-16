@@ -186,7 +186,9 @@ class ContentWorkflowTests(unittest.TestCase):
         self.assertEqual(export_review(self.output)["confirmed_row_count"], 0)
         with self.assertRaises(ConfirmationRequestError):
             workflow.export_table(self.output, mode="human")
-        table = workflow.export_table(self.output)
+        with self.assertRaises(ConfirmationRequestError):
+            workflow.export_table(self.output)
+        table = workflow.export_table(self.output, allow_partial=True)
         self.assertNotIn("净重", Path(table["path"]).read_text(encoding="utf-8-sig"))
 
     def test_quantity_wrong_unit_is_not_accepted(self):
@@ -237,7 +239,9 @@ class ContentWorkflowTests(unittest.TestCase):
         with self.assertRaises(ConfirmationRequestError):
             workflow.export_local(self.output, mode="human")
         self.assertFalse((self.output / "local-product-brief.md").exists())
-        result = workflow.export_local(self.output)
+        with self.assertRaises(ConfirmationRequestError):
+            workflow.export_local(self.output)
+        result = workflow.export_local(self.output, allow_partial=True)
         self.assertNotIn("净重", Path(result["artifacts"]["brief"]).read_text(encoding="utf-8"))
 
 

@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "status": "awaiting_independent_evidence",
+  "holdout_frozen_at": null,
+  "packages": [],
+  "release_evidence": {},
+  "notes": "现有 100 包已用于调试，只算回归；不得填入本清单冒充新原件盲测。尚未获得独立人工复核和真实用户试用签认。"
+}

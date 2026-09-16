@@ -120,7 +120,8 @@ class AutomaticFactWorkflowTests(unittest.TestCase):
         with Path(result["path"]).open(encoding="utf-8-sig", newline="") as stream:
             rows = list(csv.reader(stream))
         self.assertEqual(len(rows), 2)
-        self.assertEqual(rows[1][-2:], ["自动核验", "否"])
+        self.assertEqual([rows[1][rows[0].index(key)] for key in ("确认方式", "人工批准")], ["自动核验", "否"])
+        self.assertEqual(rows[1][rows[0].index("交付范围")], "完整核验结果")
         self.assertEqual(workflow.task_snapshot(self.output, detailed=True)["deliverables"][0]["status"], "covered_fields_match")
         (self.source / "b.txt").write_text("净重：500g\n", encoding="utf-8")
         snapshot = workflow.task_snapshot(self.output, detailed=True)

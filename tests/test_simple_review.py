@@ -89,7 +89,9 @@ class SimpleReviewTests(unittest.TestCase):
         grant = workflow.create_handoff(self.output, candidate_ids=[fact["candidate_id"]], recipient="WorkBuddy", purpose="本次介绍")
         self.assertEqual(len(workflow.get_handoff(self.output, bundle_id=grant["bundle_id"], recipient="WorkBuddy")["facts"]), 1)
         self.assertEqual(self.snapshot()["counts"]["confirmed"], 0)
-        self.assertEqual(workflow.export_local(self.output)["confirmed_count"], 1)
+        with self.assertRaises(ConfirmationRequestError):
+            workflow.export_local(self.output)
+        self.assertEqual(workflow.export_local(self.output, allow_partial=True)["confirmed_count"], 1)
         with self.assertRaises(ConfirmationRequestError):
             workflow.export_table(self.output, mode="human")
 
@@ -164,7 +166,7 @@ class SimpleReviewTests(unittest.TestCase):
         self.act("edit", field="model", value="NEW-2")
         snap = self.snapshot()
         self.assertEqual(snap["product"]["products"][0]["label"], "NEW-2")
-        table = workflow.export_table(self.output)
+        table = workflow.export_table(self.output, allow_partial=True)
         self.assertIn("NEW-2", Path(table["path"]).read_text(encoding="utf-8-sig"))
         self.assertEqual((self.root / "model.txt").read_text(encoding="utf8"), "型号：OLD-1")
 

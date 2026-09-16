@@ -883,8 +883,15 @@ def extract_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
         if sku:
             provenance["explicit_product_token"] = sku
         part = replace(block, text=segment, provenance=provenance)
-        items = _extract_single_rule_candidates(part)
         explicit = explicit_parameter(segment)
+        # An explicit open-field label owns its meaning. A substring such as
+        # "current" inside "leakage current" must not erase the qualifier.
+        if explicit and explicit[0].name.startswith("custom_"):
+            # Existing compound IO/profile declarations (e.g. INPUT: 5V/3A)
+            # have a proven label+unit+scope binder, not a substring guess.
+            items = [item for item in _extract_labeled_electrical_candidates(part) if item.scope]
+        else:
+            items = _extract_single_rule_candidates(part)
         if explicit and not items:
             spec, raw = explicit
             if spec.value_type != "text" and not re.search(r"\d", raw):
@@ -903,6 +910,17 @@ def extract_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
             )]
         for item in items:
             item.raw_text = original
+            parents = block.provenance.get("parent_labels", [])
+            if parents and item.field not in {"sku", "model", "variant"}:
+                # Explicit table parents qualify measurements; they are not
+                # additional facts and do not require a specialist field rule.
+                scopes = [item.scope] if item.scope and item.scope != "unspecified" else []
+                for parent in parents:
+                    scope = {"input": "input", "output": "output", "输入": "input", "输出": "output"}.get(str(parent).casefold())
+                    scope = scope or "context:" + normalize_text(str(parent))
+                    if scope not in scopes:
+                        scopes.append(scope)
+                item.scope = "|".join(sorted(set(scopes), key=lambda s: (0 if s in {"input", "output"} else 1, s))) or None
         result.extend(items)
     return result
 

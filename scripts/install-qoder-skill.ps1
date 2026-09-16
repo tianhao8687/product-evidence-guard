@@ -54,6 +54,9 @@ $requiredRuntimeFiles = @(
     'product_evidence_guard/normalization.py',
     'product_evidence_guard/openvino_adapter.py',
     'product_evidence_guard/parsers.py',
+    'product_evidence_guard/pdf_layout.py',
+    'product_evidence_guard/input_safety.py',
+    'product_evidence_guard/readiness.py',
     'product_evidence_guard/preprocessing.py',
     'product_evidence_guard/qwen_vl_reader.py',
     'product_evidence_guard/reports.py',
@@ -116,7 +119,10 @@ $allowedFiles = $requiredFiles + @(
     'docs/SPEED_OPTIMIZATION.md',
     'docs/QODER_VALIDATION.md',
     'docs/SUBMISSION_CHECKLIST.md',
-    'docs/USER_GUIDE.md'
+    'docs/USER_GUIDE.md',
+    'docs/PRODUCTION_READINESS.md',
+    'docs/LOCAL_TRIAL_RUNBOOK.md',
+    'docs/PRODUCTION_VALIDATION_20260916.md'
 )
 $deniedSegments = @(
     '.git',

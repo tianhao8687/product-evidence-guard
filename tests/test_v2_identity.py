@@ -189,13 +189,13 @@ class V2IdentityTests(unittest.TestCase):
             confirmed = json.loads((output / CONFIRMED_FACTS_NAME).read_text("utf-8"))["facts"]
             # Default export includes only resolved facts, so ambiguous orphan
             # evidence must not prevent unrelated products from being used.
-            table = export_table(output)
+            table = export_table(output, allow_partial=True)
             self.assertTrue(Path(table["path"]).is_file())
             self.assertTrue(all(g["fact_status"] != "verified" for g in
                 json.loads((output / "product-facts.json").read_text("utf-8"))["facts"]
                 if g["product_id"] == orphan[0]["product_id"]))
             with self.assertRaisesRegex(ConfirmationRequestError, "属于哪个商品"):
-                export_table(output, mode="human")
+                export_table(output, mode="human", allow_partial=True)
             result = check_draft("重量 320g", [_public_fact(f, summary["session_id"]) for f in confirmed])
             self.assertEqual(result["claims"][0]["status"], "needs_review")
 

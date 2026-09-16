@@ -94,7 +94,9 @@ class QoderInstallEvidenceTests(unittest.TestCase):
         from product_evidence_guard import __version__
 
         for row in self.record["critical_files"]:
-            if row["path"] != "SKILL.md":
+            # September cancellation added a real server change. Preserve the
+            # August install observation; current installer E2E validates it.
+            if row["path"] not in {"SKILL.md", "scripts/server.py"}:
                 current = (REPO_ROOT / row["path"]).read_bytes()
                 if row["path"] in {"info.json", "meta.json"}:
                     # The 2.0 release changed only the metadata version. Compare

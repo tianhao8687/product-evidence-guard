@@ -46,12 +46,13 @@ from .parsers import (
 from .qwen_vl_reader import QwenVlReadResult, QwenVlReader
 from .preprocessing import preprocess_files
 from .reports import write_conflicts_markdown, write_html_report, write_product_facts
-from .state import STATE_SCHEMA_VERSION, atomic_write_json, load_state
+from .state import STATE_SCHEMA_VERSION, atomic_write_json, load_state, recover_publication, begin_publication, finish_publication
+from .readiness import reading_issue
 
 
 QWEN_MODEL_ID = "OpenVINO/Qwen3-VL-8B-Instruct-int4-ov"
 ENGINE_SCHEMA_REVISION = (
-    "v6-structured-label-context-20260916"
+    "v7-layout-coverage-20260916"
 )
 MAX_FILES_PER_TASK = 100
 MAX_FILE_BYTES = 100 * 1024 * 1024
@@ -851,6 +852,7 @@ def analyze_directory(
     if output == root:
         raise ValueError("Output directory must not be the same as the input directory.")
     output.mkdir(parents=True, exist_ok=True)
+    recovered_previous = recover_publication(output)
     output_is_inside_input = root in output.parents
 
     has_local_model = bool(
@@ -911,6 +913,13 @@ def analyze_directory(
     previous_files: dict[str, Any] = (
         previous.get("files", {}) if cache_usable else {}
     )
+    checkpoint_path = output / "analysis-checkpoint.json"
+    checkpoint = load_state(checkpoint_path)
+    if checkpoint.get("input_root") == str(root) and checkpoint.get("engine_signature") == signature:
+        previous_files = {**previous_files, **checkpoint["files"]}
+        cache_usable = True
+        if not same_input_root and checkpoint.get("session_id"):
+            session_id = checkpoint["session_id"]
     if preloaded_model_load_seconds is not None:
         model_load_seconds = round(float(preloaded_model_load_seconds), 4)
     else:
@@ -945,14 +954,18 @@ def analyze_directory(
     file_timings: list[dict[str, Any]] = []
     total_text_chars = 0
 
+    unsupported_files: list[str] = []
     discovered = [
         path
-        for path in discover_files(root)
+        for path in discover_files(root, unsupported=unsupported_files)
         if not (
             output_is_inside_input
             and (output == path or output in path.parents)
         )
     ]
+    unsupported_files = [name for name in unsupported_files if not
+                         (output_is_inside_input and ((root / name) == output or output in (root / name).parents))]
+    skipped_files.extend({"file": name, "reason": "unsupported_format"} for name in unsupported_files)
     if len(discovered) > MAX_FILES_PER_TASK:
         raise ValueError(
             f"Too many input files: {len(discovered)} (limit: {MAX_FILES_PER_TASK})"
@@ -1958,6 +1971,8 @@ def analyze_directory(
                 "file_hash": file_hash,
                 "candidate_count": len(candidates),
                 "candidates": _serialize_candidates(candidates),
+                "reading_issues": [reading_issue(file=relative, file_hash=file_hash, **issue)
+                                   for issue in getattr(prepared.parsed, "reading_issues", ())],
             }
             if file_document_visuals:
                 state_entry["document_visuals"] = file_document_visuals
@@ -1992,6 +2007,8 @@ def analyze_directory(
                 "last_error": f"{type(exc).__name__}: {exc}",
             }
         finally:
+            atomic_write_json(checkpoint_path, {"schema_version": STATE_SCHEMA_VERSION,
+                "engine_signature": signature, "session_id": session_id, "input_root": str(root), "files": new_state_files})
             elapsed = time.perf_counter() - file_started
             file_timings.append(
                 {
@@ -2002,6 +2019,18 @@ def analyze_directory(
                 }
             )
 
+    # A file may change while native parsing or slow inference is running.
+    # Discard that file's mixed-version facts instead of publishing them.
+    for relative, entry in new_state_files.items():
+        try:
+            current_hash = sha256_file(root / relative)
+        except OSError:
+            current_hash = None
+        if current_hash != entry.get("file_hash"):
+            all_candidates = [c for c in all_candidates if c.source_file != relative]
+            entry.update(candidates=[], candidate_count=0, retry_required=True,
+                         last_error="source_changed_during_read")
+            errors.append({"file": relative, "error": "source_changed_during_read"})
     current_paths = set(new_state_files)
     if progress_callback is not None:
         progress_callback(
@@ -2041,6 +2070,7 @@ def analyze_directory(
             entry["candidate_count"] = len(candidates_by_source.get(relative, []))
 
     candidates, groups, relations = build_graph(all_candidates)
+    begin_publication(output)
     confirmation_statuses = reconcile_confirmations(
         output,
         session_id=session_id,
@@ -2193,12 +2223,16 @@ def analyze_directory(
     run_summary = {
         "session_id": session_id,
         "input_name": root.name,
-        "files_discovered": len(discovered),
+        "files_discovered": len(discovered) + len(unsupported_files),
         "changed_or_new_files": sorted(changed_files),
         "unchanged_files_reused": sorted(unchanged_files),
         "removed_files_invalidated": removed_files,
         "skipped_files": skipped_files,
         "errors": errors,
+        "reading_issues": [issue for entry in new_state_files.values() for issue in entry.get("reading_issues", [])],
+        "source_snapshots": {item.relative: item.file_hash for item in preprocessed.values() if item.file_hash},
+        "source_inventory": sorted([path.relative_to(root).as_posix() for path in discovered] + unsupported_files),
+        "recovered_previous_publication": recovered_previous,
         "candidate_count": len(candidates),
         "product_count": len(products),
         "ambiguous_product_count": sum(
@@ -2404,4 +2438,6 @@ def analyze_directory(
         },
     )
     initialize_confirmation_outputs(output, session_id=session_id)
+    finish_publication(output)
+    checkpoint_path.unlink(missing_ok=True)
     return run_summary

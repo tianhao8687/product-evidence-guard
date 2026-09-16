@@ -16,7 +16,8 @@ import uuid
 
 from .confirmation import ConfirmationError, ConfirmationRequestError, export_confirmed, _load_json_object, _source_validation_error
 from .content_check import check_draft, value_key, LABELS
-from .state import atomic_write_json, atomic_write_text
+from .state import atomic_write_json, atomic_write_text, recover_publication
+from .readiness import assess_delivery, coverage_summary, reading_issue
 
 
 WORKFLOW_FILE = "content-workflow.json"
@@ -88,6 +89,7 @@ def _sources_need_refresh(output: Path, product: dict) -> bool:
 
 def context(output_dir: str | Path, session_id: str | None = None, *, read_only: bool = False) -> tuple[Path, dict, list[dict]]:
     output = safe_output(output_dir)
+    recover_publication(output)
     product = _load_json_object(output / "product-facts.json")
     actual = product["run_summary"]["session_id"]
     if session_id and session_id != actual:
@@ -100,6 +102,45 @@ def context(output_dir: str | Path, session_id: str | None = None, *, read_only:
     candidates = {c["candidate_id"]: c for c in product["candidates"]}
     for fact in confirmed:
         fact["scope"] = candidates[fact["candidate_id"]].get("scope")
+    # Validate even files which produced zero candidates. Candidate-only
+    # validation previously missed changes in unread/empty source documents.
+    from .parsers import sha256_file, discover_files
+    try:
+        analysis = _load_json_object(output / "analysis-state.json")
+    except ConfirmationError:
+        analysis = {}
+    root = Path(analysis.get("input_root") or "")
+    inventory = product["run_summary"].get("source_inventory")
+    if inventory is None:
+        product["run_summary"].setdefault("reading_issues", []).append(reading_issue(
+            file="此前的分析结果", file_hash="legacy_reading_contract", code="reading_coverage_upgrade_required", locator={},
+            message="旧结果尚未经过新版完整性检查；参数和决定保留，请重新读取一次后完整导出。"))
+    if inventory is not None and analysis.get("input_root"):
+        try:
+            unknown = []
+            current = [path.relative_to(root).as_posix() for path in discover_files(root, unsupported=unknown)] + unknown
+            current = {name for name in current if output != root / name and output not in (root / name).parents}
+            changes = current.symmetric_difference(inventory)
+        except (ValueError, OSError):
+            changes = {"输入目录"}
+        for name in sorted(changes):
+            product["run_summary"].setdefault("reading_issues", []).append(reading_issue(
+                file=name, file_hash="inventory_changed", code="source_snapshot_changed", locator={},
+                message="资料清单已变化，新增加或移除的文件尚未参与核对，请重新读取。"))
+    for name, expected in product["run_summary"].get("source_snapshots", {}).items():
+        source = root / name
+        valid = False
+        try:
+            valid = (source.resolve().is_relative_to(root.resolve()) and
+                     not any(p.is_symlink() or (p.exists() and getattr(p.lstat(), "st_file_attributes", 0) & 0x400)
+                             for p in (source, *source.parents)) and
+                     source.is_file() and source.stat().st_size <= 100 * 1024 * 1024 and sha256_file(source) == expected)
+        except OSError:
+            pass
+        if not valid:
+            product["run_summary"].setdefault("reading_issues", []).append(reading_issue(
+                file=name, file_hash=expected, code="source_snapshot_changed", locator={},
+                message="原资料已改变或移除，请重新读取后再完整交付。"))
     return output, product, confirmed
 
 
@@ -164,27 +205,20 @@ def _usable_facts(product: dict) -> list[dict]:
     return [c for c in product["candidates"] if c["candidate_id"] in usable]
 
 
-def coverage_summary(summary: dict) -> dict:
-    """Reading coverage is independent of fact status; never a recall claim."""
-    issues = [*summary.get("errors", []), *summary.get("skipped_files", [])]
-    unfinished = {str(item["file"]) for item in issues if isinstance(item, dict) and item.get("file")}
-    pages = sum(int((summary.get(key) or {}).get("pages_skipped", 0)) for key in ("scanned_pdf", "mixed_pdf"))
-    images = int((summary.get("document_visuals") or {}).get("embedded_images_skipped", 0))
-    partial = bool(issues or pages or images)
-    total = int(summary.get("files_discovered", 0))
-    message = f"已扫描 {total} 份资料。"
-    if partial:
-        message += (f"其中 {len(unfinished)} 份有未完成的读取" if unfinished else "存在未完成的读取")
-        if pages:
-            message += f"，包括 {pages} 页未完成"
-        if images:
-            message += f"、{images} 张内嵌图片未完成"
-        message += "；已确认参数可先使用，未读完部分尚未完整参与核对。"
-    else:
-        message += "本次读取已完成；不代表资料中的所有参数都已被识别。"
-    return {"status": "partial" if partial else "complete", "files": total,
-            "unfinished_files": len(unfinished), "unfinished_pages": pages,
-            "unfinished_images": images, "message": message, "can_retry": partial}
+def _delivery_check(product: dict, *, allow_partial: bool = False, product_ids: list[str] | None = None) -> dict:
+    if not isinstance(allow_partial, bool):
+        raise ConfirmationRequestError("部分导出必须明确选择 true 或 false。")
+    available = {p["product_id"] for p in product.get("products", [])}
+    if product_ids is not None and (not isinstance(product_ids, list) or not product_ids or
+            any(not isinstance(p, str) or p not in available for p in product_ids)):
+        raise ConfirmationRequestError("请选择当前任务中的商品。")
+    result = assess_delivery(product, product_ids=product_ids)
+    if not result["complete"] and not allow_partial:
+        raise ConfirmationRequestError(result["message"].rstrip("。") + "。请处理问题，或明确选择“仅导出已确认部分”。")
+    if not result["complete"] and not result["can_export_partial"]:
+        raise ConfirmationRequestError(result["message"])
+    result["partial_acknowledged"] = bool(allow_partial and not result["complete"])
+    return result
 
 
 def create_handoff(output_dir: str | Path, *, candidate_ids: list[str], recipient: str,
@@ -212,6 +246,9 @@ def create_handoff(output_dir: str | Path, *, candidate_ids: list[str], recipien
     bundle_id = uuid.uuid4().hex
     packet = {"schema_version": 1, "bundle_id": bundle_id, "recipient": recipient,
               "purpose": purpose, "facts": [_public_fact(f, session) for f in selected]}
+    # The user explicitly selected these fields, not the entire product.
+    # Carry the same completeness disclosure without blocking field-only use.
+    packet["delivery_scope"] = {"kind": "selected_fields_only", "assessment": assess_delivery(product)}
     packet["version"] = digest(packet)
     manifest = _manifest(output, session)
     manifest["bundles"][bundle_id] = {"packet": packet, "status": "active", "created_at": now(),
@@ -362,7 +399,7 @@ def task_snapshot(output_dir: str | Path, *, session_id: str | None = None, deta
     fact_counts = summary.get("fact_status_counts", {})
     coverage = coverage_summary(summary)
     phase = "needs_attention" if coverage["status"] == "partial" else product.get("status", "awaiting_review")
-    if not product["candidates"] and not errors and not counts.get("stale", 0):
+    if not product["candidates"] and not errors and not counts.get("stale", 0) and coverage["status"] != "partial":
         phase = "no_candidates"
     field_counts = Counter(c["field"] for c in product["candidates"])
     field_labels = {c["field"]: c["field_label"] for c in product["candidates"]}
@@ -390,15 +427,17 @@ def task_snapshot(output_dir: str | Path, *, session_id: str | None = None, deta
               "processing": "local", "network_sent": False,
               "performance": performance_summary(summary)}
     result["coverage"] = coverage
+    result["delivery_readiness"] = assess_delivery(product)
     result["counts"]["excluded_facts"] = sum(bool(g.get("excluded")) for g in product.get("facts", []))
     delivery = manifest.get("local_delivery")
     if isinstance(delivery, dict) and delivery.get("session_id") == session:
         statuses = {d["artifact_id"]: d["status"] for d in deliverables}
         ready = all(statuses.get(aid) == "covered_fields_match" for aid in delivery["artifact_ids"])
-        result["local_delivery"] = {"status": "ready" if ready else "needs_refresh",
+        complete = ready and result["delivery_readiness"]["complete"] and delivery.get("complete", True)
+        result["local_delivery"] = {"status": "ready" if complete else "partial" if ready else "needs_refresh",
                                     "reason": delivery["reason"], "artifact_count": len(delivery["artifact_ids"]),
                                     "created_at": delivery["created_at"]}
-        if ready:
+        if complete:
             result["next_action"] = "local_delivery_ready"
     if detailed:
         result.update(product=product, confirmed=confirmed, bundles=bundles, deliverables=deliverables,
@@ -413,12 +452,16 @@ def task_snapshot(output_dir: str | Path, *, session_id: str | None = None, deta
     return result
 
 
-def export_table(output_dir: str | Path, *, session_id: str | None = None, mode: str = "verified") -> dict:
+def export_table(output_dir: str | Path, *, session_id: str | None = None, mode: str = "verified",
+                 allow_partial: bool = False, product_ids: list[str] | None = None) -> dict:
     output, product, confirmed = context(output_dir, session_id)
+    delivery = _delivery_check(product, allow_partial=allow_partial, product_ids=product_ids)
     if mode not in {"human", "verified"}:
         raise ConfirmationRequestError("请选择已确认参数或仅人工批准参数。")
     if mode == "verified":
         confirmed = _verified_facts(product)
+    if product_ids:
+        confirmed = [f for f in confirmed if f.get("product_id") in product_ids]
     if not confirmed:
         raise ConfirmationRequestError("尚无当前有效的已确认参数。")
     _require_product_ownership(confirmed)
@@ -431,20 +474,23 @@ def export_table(output_dir: str | Path, *, session_id: str | None = None, mode:
             raise ConfirmationRequestError("同一口径存在互相矛盾的已确认值，请先明确采用哪一条；可导出核验表查看差异。")
         values[key] = value
     confirmed = list({(f.get("product_id"), f["field"], f.get("scope")): f for f in confirmed}.values())
-    rows = [["商品 ID", "SKU", "型号", "变体", "参数", "值", "单位", "口径", "确认方式", "人工批准"]]
+    rows = [["商品 ID", "SKU", "型号", "变体", "参数", "值", "单位", "口径", "确认方式", "人工批准", "交付范围", "未完成事项"]]
     for f in confirmed:
         rows.append([f.get("product_id") or "", f.get("product_sku") or "", f.get("product_model") or "",
                      f.get("product_variant") or "", f["field_label"], str(f["normalized_value"]),
                      f.get("normalized_unit") or "", f.get("scope") or "",
                      "人工确认" if mode == "human" or f.get("human_approved") else "自动核验",
-                     "是" if mode == "human" or f.get("human_approved") else "否"])
+                     "是" if mode == "human" or f.get("human_approved") else "否",
+                     "完整核验结果" if delivery["complete"] and mode != "human" else "仅已确认部分" if not delivery["complete"] else "仅人工批准参数",
+                     "" if delivery["complete"] else delivery["message"]])
     buffer = io.StringIO(newline="")
     writer = csv.writer(buffer)
     for row in rows:
         writer.writerow(["'" + x if x.startswith(("=", "+", "-", "@", "\t", "\r")) else x for x in row])
     path = output / ("verified-parameters.csv" if mode == "verified" else "confirmed-parameters.csv")
     _, fresh_product, _ = context(output, product["run_summary"]["session_id"])
-    if digest(product.get("facts")) != digest(fresh_product.get("facts")):
+    if (digest(product.get("facts")) != digest(fresh_product.get("facts")) or
+            assess_delivery(product, product_ids=product_ids) != assess_delivery(fresh_product, product_ids=product_ids)):
         raise ConfirmationRequestError("来源或决定在导出期间变化，请刷新后重试。")
     atomic_write_text(path, buffer.getvalue(), encoding="utf-8-sig")
     session = product["run_summary"]["session_id"]
@@ -457,21 +503,26 @@ def export_table(output_dir: str | Path, *, session_id: str | None = None, mode:
         "revision": manifest["deliverables"].get(artifact_id, {}).get("revision", 0) + 1,
         "references": [{"fact_id": _public_fact(f, session)["fact_id"], "lines": [i + 2]}
                        for i, f in enumerate(confirmed)],
+        "delivery_scope": delivery,
         "check": {"status": "covered_fields_match", "claim_count": len(confirmed), "finding_count": 0,
                   "findings": [], "coverage": "本地参数表直接来自当前有效的已确认事实。"}}
     atomic_write_json(output / WORKFLOW_FILE, manifest)
-    return {"path": str(path), "confirmed_count": len(confirmed), "processing": "local"}
+    return {"path": str(path), "confirmed_count": len(confirmed), "processing": "local", "delivery_scope": delivery}
 
 
-def export_local(output_dir: str | Path, *, reason: str = "local_only", session_id: str | None = None, mode: str = "verified") -> dict:
+def export_local(output_dir: str | Path, *, reason: str = "local_only", session_id: str | None = None, mode: str = "verified",
+                 allow_partial: bool = False, product_ids: list[str] | None = None) -> dict:
     """Deliver a table and a plain factual brief without model or network calls."""
     if reason not in LOCAL_DELIVERY_REASONS:
         raise ConfirmationRequestError("本地交付原因无效。")
     output, product, confirmed = context(output_dir, session_id)
+    delivery = _delivery_check(product, allow_partial=allow_partial, product_ids=product_ids)
     if mode not in {"verified", "human"}:
         raise ConfirmationRequestError("请选择全部已确认参数或仅人工批准参数。")
     if mode == "verified":
         confirmed = _verified_facts(product)
+    if product_ids:
+        confirmed = [f for f in confirmed if f.get("product_id") in product_ids]
     if not confirmed:
         raise ConfirmationRequestError("尚无有效的已确认参数，请先在对话中完成参数确认。")
     _require_product_ownership(confirmed)
@@ -483,12 +534,15 @@ def export_local(output_dir: str | Path, *, reason: str = "local_only", session_
             raise ConfirmationRequestError("同一口径仍存在多个矛盾的已确认值，请先明确采用哪个值。")
         values[key] = value
     session = product["run_summary"]["session_id"]
-    table = export_table(output, session_id=session, mode=mode)
+    table = export_table(output, session_id=session, mode=mode, allow_partial=allow_partial, product_ids=product_ids)
     # export_table revalidates sources. Refuse to mix facts from two source versions.
     _, current_product, current_facts = context(output, session)
     if mode == "verified":
         current_facts = _verified_facts(current_product)
-    if digest(confirmed) != digest(current_facts):
+    if product_ids:
+        current_facts = [f for f in current_facts if f.get("product_id") in product_ids]
+    if (digest(confirmed) != digest(current_facts) or
+            assess_delivery(product, product_ids=product_ids) != assess_delivery(current_product, product_ids=product_ids)):
         raise ConfirmationRequestError("来源在交付过程中发生变化，请重新核验后导出。")
     def literal(value):
         text = escape(str(value), quote=False).replace("\r", " ").replace("\n", " ")
@@ -496,6 +550,8 @@ def export_local(output_dir: str | Path, *, reason: str = "local_only", session_
     lines = ["# 商品参数简报", "", "生成方式：本地模板。", "",
              "交付说明：" + LOCAL_DELIVERY_REASONS[reason] + "。", "",
              "本简报只列出当前有效的已确认参数，没有生成额外的营销卖点。", "", "## 已确认参数", ""]
+    if not delivery["complete"]:
+        lines[4:4] = ["**部分交付，不是完整核验结果。**", "", literal(delivery["message"]), ""]
     scopes = {"input": "输入", "output": "输出", "rated": "额定", "nominal": "标称",
               "min": "最小", "max": "最大", "typical": "典型", "net": "净重", "gross": "毛重", "unspecified": "未限定",
               "operating": "工作/运行", "storage": "储存"}
@@ -523,12 +579,14 @@ def export_local(output_dir: str | Path, *, reason: str = "local_only", session_
         "bundle_version": digest([_public_fact(f, session) for f in current_facts]), "checked_at": now(),
         "revision": manifest["deliverables"].get(artifact_id, {}).get("revision", 0) + 1,
         "references": references,
+        "delivery_scope": delivery,
         "check": {"status": "covered_fields_match", "claim_count": len(current_facts), "finding_count": 0,
                   "findings": [], "coverage": "本地模板直接列出当前有效的已确认事实，不含生成式营销表述。"}}
-    manifest["local_delivery"] = {"session_id": session, "reason": reason, "created_at": now(),
+    manifest["local_delivery"] = {"session_id": session, "reason": reason, "created_at": now(), "complete": delivery["complete"],
                                   "artifact_ids": [digest(table["path"])[:24], artifact_id]}
     atomic_write_json(output / WORKFLOW_FILE, manifest)
-    return {"status": "local_delivery_ready", "reason": reason, "processing": "local", "network_sent": False,
+    return {"status": "local_delivery_ready" if delivery["complete"] else "partial_delivery_ready", "delivery_scope": delivery,
+            "reason": reason, "processing": "local", "network_sent": False,
             "model_called": False, "confirmed_count": len(current_facts),
             "artifacts": {"parameters": table["path"], "brief": str(path)},
             "next_action": "deliver_local_files"}

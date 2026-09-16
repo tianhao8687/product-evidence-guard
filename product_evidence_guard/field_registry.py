@@ -307,6 +307,9 @@ def scope_for_label(field: str, label: str) -> str | None:
     if spec.scope_policy != "electrical":
         return None
     quantity = {"voltage":("电压", "voltage"), "current":("电流", "current"), "power":("功率", "power")}[field]
+    for prefix, signal in (("dc", "dc"), ("ac", "ac"), ("直流", "dc"), ("交流", "ac")):
+        if any(label == prefix + (" " if prefix.isascii() else "") + name for name in quantity):
+            return "signal:" + signal
     directions = {"输入":"input", "输出":"output", "input":"input", "output":"output"}
     ratings = {"额定":"rated", "标称":"nominal", "最大":"max", "最小":"min", "典型":"typical",
                "rated":"rated", "nominal":"nominal", "maximum":"max", "minimum":"min", "typical":"typical", "max":"max", "min":"min"}

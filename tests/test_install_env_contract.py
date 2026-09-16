@@ -293,7 +293,7 @@ class InstallEnvironmentContractTests(unittest.TestCase):
                 lock,
             )
         )
-        self.assertEqual(len(packages), 35)
+        self.assertEqual(len(packages), 41)
         for expected in (
             "openvino==2026.2.1",
             "openvino-genai==2026.2.1.0",
@@ -307,6 +307,8 @@ class InstallEnvironmentContractTests(unittest.TestCase):
             "pypdf==6.0.0",
             "pypdfium2==5.12.1",
             "setuptools==80.9.0",
+            "pdfplumber==0.11.9",
+            "defusedxml==0.7.1",
         ):
             self.assertRegex(lock, rf"(?m)^{re.escape(expected)}\s*\\$")
         for index, package in enumerate(packages):

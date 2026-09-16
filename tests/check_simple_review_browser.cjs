@@ -24,6 +24,13 @@ let browser;
   const check=async(selector,text)=>{await page.locator(selector).filter({hasText:text}).waitFor();};
   await page.goto(url);
   await check('#conflict-count','1');
+  page.once('dialog',dialog=>dialog.accept());
+  const partialDownload=page.waitForEvent('download');
+  await page.locator('#export').click();
+  const downloaded=await partialDownload;
+  const partialCsv=await fs.readFile(await downloaded.path(),'utf8');
+  assert.match(partialCsv,/仅已确认部分/);
+  assert.match(partialCsv,/未完成事项/);
   assert.equal(await page.locator('.group').count(),1); // Verified facts start folded.
   await page.getByRole('button',{name:'采用 320 g',exact:true}).click();
   await check('#conflict-count','0');

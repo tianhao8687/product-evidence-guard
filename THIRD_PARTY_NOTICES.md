@@ -25,7 +25,7 @@ OpenVINO 仓库将所选工件描述为 OpenVINO IR 转换，并使用 NNCF 将�
 ## 直接 Python 依赖
 
 下表记录 `requirements.txt` 当前锁定的直接依赖。`requirements.lock` 进一步
-固定 Windows/Python 3.11.13 环境中的 35 个直接与传递软件包及其分发哈希，但它
+固定 Windows/Python 3.11.13 环境中的 41 个直接与传递软件包及其分发哈希，但它
 只是机器可复现的安装清单，不是 SBOM，也不能替代各上游发行物中附带的完整许可
 证文本。
 
@@ -40,6 +40,8 @@ OpenVINO 仓库将所选工件描述为 OpenVINO IR 转换，并使用 NNCF 将�
 | Pillow | 11.3.0 | MIT-CMU | [Pillow 许可证](https://github.com/python-pillow/Pillow/blob/main/LICENSE) |
 | python-docx | 1.2.0 | MIT | [python-openxml/python-docx](https://github.com/python-openxml/python-docx) |
 | openpyxl | 3.1.5 | MIT | [openpyxl 软件包记录](https://pypi.org/project/openpyxl/) |
+| pdfplumber | 0.11.9 | MIT | [官方仓库](https://github.com/jsvine/pdfplumber) |
+| defusedxml | 0.7.1 | PSF | [官方发行记录](https://pypi.org/project/defusedxml/0.7.1/) |
 | pypdf | 6.0.0 | BSD-3-Clause | [py-pdf/pypdf](https://github.com/py-pdf/pypdf) |
 | pypdfium2 | 5.12.1 | BSD-3-Clause / Apache-2.0，另含依赖许可证 | [pypdfium2 5.12.1 软件包记录](https://pypi.org/project/pypdfium2/5.12.1/) |
 | setuptools | 80.9.0 | MIT | [pypa/setuptools](https://github.com/pypa/setuptools) |

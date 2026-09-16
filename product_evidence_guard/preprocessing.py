@@ -71,6 +71,9 @@ def _preprocess_one(
                 parsed = parsers["xlsx"](path, relative, file_hash)
             else:
                 parsed = parsers["generic"](path, root, file_hash=file_hash)
+            if sha256_file(path) != file_hash:
+                parsed = None
+                raise ValueError("source_changed_during_read")
         except Exception as exc:  # replayed in deterministic input order by the engine
             error = exc
     return PreprocessedFile(
@@ -108,7 +111,9 @@ def preprocess_files(
         "generic": parse_file,
     }
     ordered_paths = sorted(paths, key=lambda path: path.relative_to(root).as_posix())
-    requested = workers if workers is not None else min(8, max(1, os.cpu_count() or 1))
+    # Compressed source size is not a reliable parser RAM estimate. Keep the
+    # default small on the user's workstation; model work remains serialized.
+    requested = workers if workers is not None else min(2, max(1, os.cpu_count() or 1))
     largest_source = max((path.stat().st_size for path in ordered_paths), default=0)
     memory_bound = (
         max(1, PARALLEL_SOURCE_BYTES_BUDGET // largest_source)

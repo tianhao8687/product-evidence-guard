@@ -360,6 +360,7 @@ class _RaisingVisualReader:
         raise RuntimeError("controlled reader exception")
 
 
+@patch.dict(sys.modules, {"pdfplumber": None})
 class DocumentVisualParserTests(unittest.TestCase):
     def test_docx_embedded_image_is_extracted_with_paragraph_locator(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

@@ -3,12 +3,12 @@
   "generator": "scripts/generate-sbom.py",
   "inputs": {
     "requirements_lock": "requirements.lock",
-    "requirements_lock_sha256": "36bbddb98ccc06afab8fabf4578b1f480d3eac1bab340fc25355cd31323d7360",
+    "requirements_lock_sha256": "08e5e11314ef668635775ed4e4799ae72e937505205443c2ca7797e0faf6b0a6",
     "installed_metadata": "importlib.metadata (local environment; offline)"
   },
   "summary": {
-    "locked_package_count": 35,
-    "installed_version_match_count": 35,
+    "locked_package_count": 41,
+    "installed_version_match_count": 41,
     "unresolved_license_count": 0,
     "unresolved_packages": []
   },
@@ -26,6 +26,13 @@
       "license": "MPL-2.0",
       "license_source": "License",
       "purl": "pkg:pypi/certifi@2026.7.22"
+    },
+    {
+      "name": "cffi",
+      "version": "2.1.1",
+      "license": "MIT-0",
+      "license_source": "License-Expression",
+      "purl": "pkg:pypi/cffi@2.1.1"
     },
     {
       "name": "charset-normalizer",
@@ -47,6 +54,20 @@
       "license": "MIT License",
       "license_source": "License",
       "purl": "pkg:pypi/colorlog@6.12.0"
+    },
+    {
+      "name": "cryptography",
+      "version": "50.0.1",
+      "license": "Apache-2.0 OR BSD-3-Clause",
+      "license_source": "License-Expression",
+      "purl": "pkg:pypi/cryptography@50.0.1"
+    },
+    {
+      "name": "defusedxml",
+      "version": "0.7.1",
+      "license": "PSFL",
+      "license_source": "License",
+      "purl": "pkg:pypi/defusedxml@0.7.1"
     },
     {
       "name": "et-xmlfile",
@@ -161,6 +182,20 @@
       "purl": "pkg:pypi/packaging@26.2"
     },
     {
+      "name": "pdfminer-six",
+      "version": "20251230",
+      "license": "MIT",
+      "license_source": "License-Expression",
+      "purl": "pkg:pypi/pdfminer-six@20251230"
+    },
+    {
+      "name": "pdfplumber",
+      "version": "0.11.9",
+      "license": "MIT",
+      "license_source": "Classifier",
+      "purl": "pkg:pypi/pdfplumber@0.11.9"
+    },
+    {
       "name": "pillow",
       "version": "11.3.0",
       "license": "MIT-CMU",
@@ -173,6 +208,13 @@
       "license": "MIT",
       "license_source": "License",
       "purl": "pkg:pypi/pyclipper@1.4.0"
+    },
+    {
+      "name": "pycparser",
+      "version": "3.0",
+      "license": "BSD-3-Clause",
+      "license_source": "License-Expression",
+      "purl": "pkg:pypi/pycparser@3.0"
     },
     {
       "name": "pypdf",

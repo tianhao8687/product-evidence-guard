@@ -20,6 +20,7 @@ class StructuredCell:
     value: str
     row_id: str
     identity: dict[str, str]
+    parent_labels: tuple[str, ...] = ()
 
 
 _VARIANT_HEADERS = {
@@ -97,8 +98,14 @@ def bind_structured_rows(
         if spec:
             header_map.setdefault(column, (label, spec.name))
 
+    labels = [normalize_text(header[0]) for header in header_map.values()]
+    if len(labels) != len(set(labels)):
+        return []  # parallel subtables need region binding, not one flat row
+
     result: list[StructuredCell] = []
     for row_number, cells in rows[header_position + 1:]:
+        if all(str(cells[column][1] or "").strip() == header[0] for column, header in header_map.items() if column < len(cells)):
+            continue  # repeated page header, not another product
         bound: list[tuple[Any, str, str, str]] = []
         identity_values: dict[str, set[str]] = {}
         dimensions: dict[str, set[str]] = {}
@@ -143,3 +150,67 @@ def bind_structured_rows(
                 identity=identity,
             ))
     return result
+
+
+def bind_model_matrix(rows: Sequence[tuple[int, Sequence[tuple[Any, Any]]]], *,
+                      table_id: str) -> list[StructuredCell] | None:
+    """Transpose only an explicit MODEL/SKU header, never inferred product names.
+
+    Blank cells are not forward-filled. Repeated headers start a new section;
+    ambiguous or differently sized rows remain unbound for coverage reporting.
+    Works on the same row contract as CSV/Office/PDF, without vendor rules.
+    """
+    result: list[StructuredCell] = []
+    identities: list[dict[str, str]] | None = None
+    value_columns: list[int] = []
+    context: tuple[str, ...] = ()
+    found = False
+    for row_number, cells in rows:
+        texts = [str(v).strip() if v not in (None, "") else "" for _, v in cells]
+        if not texts:
+            continue
+        identity_field = header_field(texts[0])
+        first_value = 1
+        while first_value < len(texts) and texts[first_value] in {"", texts[0]}:
+            first_value += 1
+        proposed_columns = [i for i in range(first_value, len(texts)) if texts[i]]
+        if (identity_field in {"model", "sku", "variant"} and len(proposed_columns) >= 2
+                and all(not header_field(texts[i]) and re.search(r"[A-Za-z\u3400-\u9fff]", texts[i])
+                        and re.search(r"\d", texts[i]) for i in proposed_columns)):
+            found = True
+            value_columns = proposed_columns
+            values = [texts[i] for i in value_columns]
+            if not all(values) or len(set(values)) != len(values):
+                identities = None
+                continue
+            identities = [{identity_field: value} for value in values]
+            context = ()
+            continue
+        if not identities:
+            continue
+        if texts[0] and not any(texts[value_columns[0]:]):
+            context = (texts[0],)
+            continue
+        labels = [text for text in texts[:value_columns[0]] if text]
+        label = labels[-1] if labels else ""
+        spec = field_for_label(split_label_unit(label)[0])
+        if not spec or len(texts) <= max(value_columns):
+            continue
+        for index, column in enumerate(value_columns):
+            value = texts[column]
+            if not value:
+                continue
+            row_id = hashlib.sha256(json.dumps([table_id, row_number, index],
+                                               ensure_ascii=False).encode()).hexdigest()[:20]
+            result.append(StructuredCell(row_number, cells[column][0], label, spec.name,
+                                         value, row_id, dict(identities[index]), tuple([*context, *labels[:-1]])))
+    return result if found else None
+
+
+def bind_table(rows: Sequence[tuple[int, Sequence[tuple[Any, Any]]]], *,
+               table_id: str) -> list[StructuredCell] | None:
+    """Shared orientation dispatch; keep the original row binder reusable."""
+    matrix = bind_model_matrix(rows, table_id=table_id)
+    if matrix is not None:
+        return matrix
+    return bind_structured_rows(rows, table_id=table_id)

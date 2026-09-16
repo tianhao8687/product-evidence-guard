@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+from contextlib import ExitStack
 from dataclasses import dataclass
 import hashlib
 import io
@@ -19,8 +20,9 @@ from .document_visuals import (
     extract_xlsx_visuals,
 )
 from .models import SourceBlock
-from .structured_rows import bind_structured_rows, identity_from_values
+from .structured_rows import bind_table as bind_structured_rows, identity_from_values
 from .field_registry import field_for_label
+from .input_safety import validate_office_archive, MAX_SHEET_CELLS
 
 
 TEXT_EXTENSIONS = {".txt", ".md"}
@@ -97,6 +99,7 @@ class DocumentParseResult:
     visual_assets: tuple[EmbeddedVisualAsset, ...] = ()
     structured_visuals: tuple[StructuredDocumentVisual, ...] = ()
     visual_issues: tuple[dict[str, Any], ...] = ()
+    reading_issues: tuple[dict[str, Any], ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -106,6 +109,14 @@ class PdfParseResult:
     page_count: int
     mixed_visual_page_numbers: tuple[int, ...] = ()
     visual_page_reasons: tuple[dict[str, Any], ...] = ()
+    reading_issues: tuple[dict[str, Any], ...] = ()
+
+
+class ParsedBlocks(list[SourceBlock]):
+    """Backward-compatible list parser result with document-level coverage."""
+    def __init__(self):
+        super().__init__()
+        self.reading_issues: list[dict[str, Any]] = []
 
 
 @dataclass(frozen=True, slots=True)
@@ -207,7 +218,7 @@ def parse_text(path: Path, relative_path: str, file_hash: str) -> list[SourceBlo
 
 
 def parse_csv(path: Path, relative_path: str, file_hash: str) -> list[SourceBlock]:
-    blocks: list[SourceBlock] = []
+    blocks = ParsedBlocks()
     text = read_source_text(path)
     try:
         # Sniffer's quoted-field heuristic fails on some CRLF semicolon files
@@ -223,6 +234,9 @@ def parse_csv(path: Path, relative_path: str, file_hash: str) -> list[SourceBloc
         ]
     structured = bind_structured_rows(source_rows, table_id=f"{relative_path}:csv")
     if structured is not None:
+        if not structured and any(any(value for _, value in row) for _, row in source_rows):
+            blocks.reading_issues.append({"code": "table_binding_unclear", "locator": {},
+                                          "message": "表头重复或商品列尚未明确，请拆分平行子表或补充表头。"})
         for cell in structured:
             blocks.append(_make_block(
                 relative_path=relative_path,
@@ -237,6 +251,7 @@ def parse_csv(path: Path, relative_path: str, file_hash: str) -> list[SourceBloc
                 "identity": dict(cell.identity),
                 "field": cell.field,
             }
+            blocks[-1].provenance["parent_labels"] = list(cell.parent_labels)
         return blocks
     for row_number, row in source_rows:
         nonempty = [
@@ -384,8 +399,10 @@ def parse_docx_document(
     except ImportError as exc:  # pragma: no cover - optional dependency
         raise RuntimeError("读取 DOCX 需要安装 python-docx：pip install -e '.[documents]'") from exc
 
+    validate_office_archive(path)
     document = Document(path)
     blocks: list[SourceBlock] = []
+    reading_issues: list[dict[str, Any]] = []
     paragraph_index = 0
     table_index = 0
     for child in document.element.body.iterchildren():
@@ -408,8 +425,13 @@ def parse_docx_document(
                 (row_index, [(column, cell.text) for column, cell in enumerate(row.cells)])
                 for row_index, row in enumerate(table.rows)
             ]
+            if sum(len(cells) for _, cells in source_rows) > MAX_SHEET_CELLS:
+                raise ValueError("DOCX 表格超过安全上限，请拆分资料。")
             structured = bind_structured_rows(source_rows, table_id=f"{relative_path}:docx:{table_index}")
             if structured is not None:
+                if not structured and source_rows:
+                    reading_issues.append({"code": "table_binding_unclear", "locator": {"table": table_index},
+                                           "message": "表头重复或商品列尚未明确，请拆分平行子表或补充表头。"})
                 for cell in structured:
                     blocks.append(_make_block(
                         relative_path=relative_path,
@@ -424,10 +446,16 @@ def parse_docx_document(
                         "identity": dict(cell.identity),
                         "field": cell.field,
                     }
+                    blocks[-1].provenance["parent_labels"] = list(cell.parent_labels)
                 table_index += 1
                 continue
             for row_index, row in enumerate(table.rows):
                 values = [cell.text.strip() for cell in row.cells if cell.text.strip()]
+                if len(values) > 2:
+                    if not any(i.get("locator", {}).get("table") == table_index for i in reading_issues):
+                        reading_issues.append({"code": "table_binding_unclear", "locator": {"table": table_index},
+                                               "message": "这张表的商品和参数列尚未可靠对应，请核对表头。"})
+                    continue
                 if values:
                     blocks.append(
                         _make_block(
@@ -449,6 +477,7 @@ def parse_docx_document(
         visual_assets=tuple(visual_assets),
         structured_visuals=tuple(structured_visuals),
         visual_issues=tuple(visual_issues),
+        reading_issues=tuple(reading_issues),
     )
 
 
@@ -477,16 +506,42 @@ def parse_xlsx_document(
     except ImportError as exc:  # pragma: no cover - optional dependency
         raise RuntimeError("读取 XLSX 需要安装 openpyxl：pip install -e '.[documents]'") from exc
 
-    workbook = load_workbook(path, read_only=True, data_only=False)
+    validate_office_archive(path)
+    workbook = load_workbook(path, read_only=True, data_only=False, keep_links=False)
     blocks: list[SourceBlock] = []
+    reading_issues: list[dict[str, Any]] = []
+    cell_count = 0
     try:
         for sheet in workbook.worksheets:
-            source_rows = [
-                (row_number, [(cell.coordinate, cell.value) for cell in row])
-                for row_number, row in enumerate(sheet.iter_rows(), start=1)
-            ]
+            if sheet.sheet_state != "visible":
+                reading_issues.append({"code": "hidden_sheet", "locator": {"sheet": sheet.title},
+                                       "message": "隐藏工作表未参与核对；如需使用，请先取消隐藏后重新读取。"})
+                continue
+            if (sheet.max_row or 0) * (sheet.max_column or 0) > MAX_SHEET_CELLS:
+                raise ValueError("工作表单元格超过安全上限，请拆分资料。")
+            source_rows = []
+            formula_cells = []
+            for row_number, row in enumerate(sheet.iter_rows(), start=1):
+                cell_count += len(row)
+                if cell_count > MAX_SHEET_CELLS:
+                    raise ValueError("工作簿单元格超过安全上限，请拆分资料。")
+                cells = []
+                for cell in row:
+                    value = cell.value
+                    if cell.data_type in {"f", "e"}:
+                        formula_cells.append(cell.coordinate)
+                        value = None  # Never treat formula text or old cached results as facts.
+                    cells.append((cell.coordinate, value))
+                source_rows.append((row_number, cells))
+            if formula_cells:
+                reading_issues.append({"code": "formula_unverified", "locator": {"sheet": sheet.title, "cells": formula_cells[:20]},
+                                       "cell_count": len(formula_cells),
+                                       "message": "公式或错误单元格未作为参数使用，请计算核对后提供仅值副本。"})
             structured = bind_structured_rows(source_rows, table_id=f"{relative_path}:xlsx:{sheet.title}")
             if structured is not None:
+                if not structured and source_rows:
+                    reading_issues.append({"code": "table_binding_unclear", "locator": {"sheet": sheet.title},
+                                           "message": "表头重复或商品列尚未明确，请拆分平行子表或补充表头。"})
                 for cell in structured:
                     blocks.append(_make_block(
                         relative_path=relative_path,
@@ -501,10 +556,16 @@ def parse_xlsx_document(
                         "identity": dict(cell.identity),
                         "field": cell.field,
                     }
+                    blocks[-1].provenance["parent_labels"] = list(cell.parent_labels)
                 continue
             for row_number, row in source_rows:
                 cells = [(coordinate, value) for coordinate, value in row if value not in (None, "")]
                 if not cells:
+                    continue
+                if len(cells) > 2:
+                    if not any(i["code"] == "table_binding_unclear" and i["locator"].get("sheet") == sheet.title for i in reading_issues):
+                        reading_issues.append({"code": "table_binding_unclear", "locator": {"sheet": sheet.title},
+                                               "message": "这张表的商品和参数列尚未可靠对应，请核对表头。"})
                     continue
                 text = " | ".join(str(value) for _, value in cells)
                 blocks.append(
@@ -527,6 +588,7 @@ def parse_xlsx_document(
             path,
             read_only=False,
             data_only=False,
+            keep_links=False,
         )
         try:
             (
@@ -545,6 +607,7 @@ def parse_xlsx_document(
         visual_assets=tuple(visual_assets),
         structured_visuals=tuple(structured_visuals),
         visual_issues=tuple(visual_issues),
+        reading_issues=tuple(reading_issues),
     )
 
 
@@ -688,47 +751,56 @@ def parse_pdf_document(path: Path, relative_path: str, file_hash: str) -> PdfPar
     scanned_page_numbers: list[int] = []
     mixed_visual_page_numbers: list[int] = []
     visual_page_reasons: list[dict[str, Any]] = []
-    for page_number, page in enumerate(reader.pages, start=1):
-        text = (page.extract_text() or "").strip()
-        if not text:
-            scanned_page_numbers.append(page_number)
-            visual_page_reasons.append(
-                {
-                    "page": page_number,
-                    "page_mode": "scanned",
-                    "reason": "no_text_layer",
-                }
-            )
-            continue
-        for block_index, paragraph in enumerate(part.strip() for part in text.split("\n") if part.strip()):
-            blocks.append(
-                _make_block(
-                    relative_path=relative_path,
-                    source_kind="pdf_text",
-                    file_hash=file_hash,
-                    locator={"page": page_number, "text_block": block_index},
-                    text=paragraph,
-                )
-            )
-        mixed_reason = _pdf_mixed_visual_reason(page, text)
-        if (
-            mixed_reason is not None
-            and len(mixed_visual_page_numbers) < MAX_PDF_MIXED_VISUAL_PAGES
-        ):
-            mixed_visual_page_numbers.append(page_number)
-            visual_page_reasons.append(
-                {
-                    "page": page_number,
-                    "page_mode": "mixed",
-                    **mixed_reason,
-                }
-            )
+    reading_issues: list[dict[str, Any]] = []
+    with ExitStack() as stack:
+        try:
+            import pdfplumber
+        except ImportError:
+            layout = None
+            reading_issues.append({"code": "layout_reader_missing", "message": "未安装 PDF 结构读取组件，暂不能完整核对原表。", "locator": {}})
+        else:
+            layout = stack.enter_context(pdfplumber.open(path))
+        for page_number, page in enumerate(reader.pages, start=1):
+            text = (page.extract_text() or "").strip()
+            if not text:
+                scanned_page_numbers.append(page_number)
+                visual_page_reasons.append({"page": page_number, "page_mode": "scanned", "reason": "no_text_layer"})
+                continue
+            if layout:
+                from .pdf_layout import read_layout_page
+                records, page_issues = read_layout_page(layout.pages[page_number - 1], page_number)
+                reading_issues.extend(page_issues)
+                for record in records:
+                    block = _make_block(relative_path=relative_path, source_kind="pdf_text", file_hash=file_hash,
+                                        locator=record["locator"], text=record["text"], method="deterministic_pdf_layout")
+                    block.provenance.update(record["provenance"])
+                    # Row identities are source-local; avoid collisions across files.
+                    if row := block.provenance.get("structured_row"):
+                        row["row_id"] = hashlib.sha256(f"{relative_path}:{file_hash}:{row['row_id']}".encode()).hexdigest()[:20]
+                    blocks.append(block)
+                layout.pages[page_number - 1].close()
+            else:
+                for block_index, paragraph in enumerate(part.strip() for part in text.split("\n") if part.strip()):
+                    # Without geometry only explicitly labelled pairs are safe.
+                    if not re.search(r"[:：=]", paragraph):
+                        continue
+                    blocks.append(_make_block(relative_path=relative_path, source_kind="pdf_text", file_hash=file_hash,
+                                               locator={"page": page_number, "text_block": block_index}, text=paragraph))
+            mixed_reason = _pdf_mixed_visual_reason(page, text)
+            if mixed_reason is not None:
+                if len(mixed_visual_page_numbers) < MAX_PDF_MIXED_VISUAL_PAGES:
+                    mixed_visual_page_numbers.append(page_number)
+                    visual_page_reasons.append({"page": page_number, "page_mode": "mixed", **mixed_reason})
+                else:
+                    reading_issues.append({"code": "visual_page_limit", "locator": {"page": page_number},
+                                           "message": "图形页面超过单次处理上限，请拆分资料。"})
     return PdfParseResult(
         blocks=tuple(blocks),
         scanned_page_numbers=tuple(scanned_page_numbers),
         page_count=page_count,
         mixed_visual_page_numbers=tuple(mixed_visual_page_numbers),
         visual_page_reasons=tuple(visual_page_reasons),
+        reading_issues=tuple(reading_issues),
     )
 
 
@@ -1323,10 +1395,12 @@ def parse_file(path: Path, root: Path, *, file_hash: str | None = None) -> list[
     raise ValueError(f"Unsupported file type: {relative_path}")
 
 
-def discover_files(root: Path) -> list[Path]:
+def discover_files(root: Path, *, unsupported: list[str] | None = None) -> list[Path]:
     canonical_root = root.expanduser().resolve(strict=True)
     files: set[Path] = set()
-    for path in canonical_root.rglob("*"):
+    for index, path in enumerate(canonical_root.rglob("*")):
+        if index >= 10_000:
+            raise ValueError("输入目录条目过多，请仅选择本次商品资料文件夹。")
         lexical_relative = path.relative_to(canonical_root)
         if any(part.startswith(".") for part in lexical_relative.parts):
             continue
@@ -1344,4 +1418,6 @@ def discover_files(root: Path) -> list[Path]:
         name = resolved.name.casefold()
         if name.endswith(".ocr.json") or resolved.suffix.casefold() in SUPPORTED_EXTENSIONS:
             files.add(resolved)
+        elif unsupported is not None:
+            unsupported.append(resolved_relative.as_posix())
     return sorted(files)
