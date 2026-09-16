@@ -91,10 +91,21 @@ class QoderInstallEvidenceTests(unittest.TestCase):
         # SKILL.md now teaches the fact-first workflow. Do not rewrite the
         # August installation observation to claim the new instructions were
         # installed then. Current-package installs have separate E2E tests.
+        from product_evidence_guard import __version__
+
         for row in self.record["critical_files"]:
             if row["path"] != "SKILL.md":
-                digest = hashlib.sha256((REPO_ROOT / row["path"]).read_bytes()).hexdigest()
-                self.assertEqual(row["source_sha256"], digest)
+                current = (REPO_ROOT / row["path"]).read_bytes()
+                if row["path"] in {"info.json", "meta.json"}:
+                    # The 2.0 release changed only the metadata version. Compare
+                    # all other bytes to the historical record without forging
+                    # a new installation observation or relaxing script hashes.
+                    self.assertEqual(json.loads(current)["version"], __version__)
+                    version_token = f'"version": "{__version__}"'.encode("utf-8")
+                    self.assertEqual(current.count(version_token), 1)
+                    current = current.replace(version_token, b'"version": "1.0.0"', 1)
+                digest = hashlib.sha256(current).hexdigest()
+                self.assertEqual(row["source_sha256"], digest, row["path"])
 
     def test_publishable_evidence_has_no_private_path_or_credential(self) -> None:
         self.assertIsNone(re.search(r"(?i)[a-z]:[\\/]", self.serialized))
