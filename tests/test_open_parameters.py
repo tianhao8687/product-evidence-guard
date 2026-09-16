@@ -184,6 +184,18 @@ class OpenParameterTests(unittest.TestCase):
             (root / "a.txt").write_text("噪声：46dB\n", encoding="utf-8")
             self.assertTrue(conversation.review_summary(output, review_id=grant["review_id"], recipient="test")["needs_reanalysis"])
 
+    def test_demo_key_value_table_does_not_become_a_horizontal_header(self):
+        from product_evidence_guard.structured_rows import bind_structured_rows
+        for heading in ([], [(1, [(1, "字段"), (2, "值")])]):
+            rows = heading + [(2, [(1, "材质"), (2, "不锈钢")]),
+                              (3, [(1, "套装数量"), (2, "3件")])]
+            self.assertIsNone(bind_structured_rows(rows, table_id="vertical"))
+        with tempfile.TemporaryDirectory() as tmp:
+            summary = analyze_directory(Path(__file__).resolve().parents[1] / "samples" / "demo", Path(tmp) / "output")
+            self.assertEqual(summary["candidate_count"], 13)
+            self.assertEqual(summary["fact_group_count"], 5)
+            self.assertEqual(summary["blocking_conflict_count"], 2)
+
     def test_unlabeled_new_units_are_reported_as_unchecked(self):
         ref = [{"fact_id":"f1", "field":"net_weight", "value":300, "unit":"g", "scope":"net"}]
         result = check_draft("净重：300g。噪声45dB，保修2年。", ref)

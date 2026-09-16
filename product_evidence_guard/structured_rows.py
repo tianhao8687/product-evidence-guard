@@ -44,6 +44,13 @@ def bind_structured_rows(
     rows: Sequence[tuple[int, Sequence[tuple[Any, Any]]]], *, table_id: str
 ) -> list[StructuredCell] | None:
     """Return cells only when a genuine multi-field header is present."""
+    # An explicit key/value heading owns the table orientation. Otherwise a
+    # later text value (e.g. '材质,不锈钢') can look like an all-new header.
+    for _row_number, cells in rows:
+        if len(cells) == 2:
+            labels = [normalize_text(str(value or "")) for _, value in cells]
+            if labels[0] in {"字段", "参数", "field", "parameter"} and labels[1] in {"值", "数值", "value"}:
+                return None
     header_position: int | None = None
     header_map: dict[int, tuple[str, str]] = {}
     for position, (_row_number, cells) in enumerate(rows):
@@ -67,6 +74,7 @@ def bind_structured_rows(
             next_cells = rows[position + 1][1]
             unknown_header = (len(cells) == len(next_cells) and
                               all(not re.search(r"\d", str(value)) for _, value in cells) and
+                              not header_field(next_cells[0][1]) and
                               any(re.match(r"^\s*[-+≤≥<>]?\d", str(value)) for _, value in next_cells))
             if not has_identity and not unknown_header:
                 continue
