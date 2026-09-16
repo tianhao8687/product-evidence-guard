@@ -19,7 +19,8 @@ from .document_visuals import (
     extract_xlsx_visuals,
 )
 from .models import SourceBlock
-from .structured_rows import bind_structured_rows
+from .structured_rows import bind_structured_rows, identity_from_values
+from .field_registry import field_for_label
 
 
 TEXT_EXTENSIONS = {".txt", ".md"}
@@ -209,7 +210,9 @@ def parse_csv(path: Path, relative_path: str, file_hash: str) -> list[SourceBloc
     blocks: list[SourceBlock] = []
     text = read_source_text(path)
     try:
-        dialect = csv.Sniffer().sniff(text[:65536], delimiters=",;\t")
+        # Sniffer's quoted-field heuristic fails on some CRLF semicolon files
+        # and falls back to comma, silently producing zero facts on Windows.
+        dialect = csv.Sniffer().sniff(text[:65536].replace("\r\n", "\n").replace("\r", "\n"), delimiters=",;\t")
     except csv.Error:
         dialect = csv.excel_tab if path.suffix.lower() == ".tsv" else csv.excel
     with io.StringIO(text, newline="") as handle:
@@ -268,33 +271,72 @@ def parse_csv(path: Path, relative_path: str, file_hash: str) -> list[SourceBloc
     return blocks
 
 
-def _flatten_json(value: Any, path: str = "$") -> Iterable[tuple[str, Any]]:
-    if isinstance(value, dict):
-        for key, item in value.items():
-            escaped = str(key).replace("~", "~0").replace("/", "~1")
-            yield from _flatten_json(item, f"{path}/{escaped}")
-    elif isinstance(value, list):
-        for index, item in enumerate(value):
-            yield from _flatten_json(item, f"{path}/{index}")
-    elif value is not None:
-        yield path, value
+def _unique_json_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("duplicate_json_key: " + str(key))
+        result[key] = value
+    return result
+
+
+def _reject_json_constant(value):
+    raise ValueError("nonfinite_json_number: " + value)
 
 
 def parse_json(path: Path, relative_path: str, file_hash: str) -> list[SourceBlock]:
-    data = json.loads(path.read_text(encoding="utf-8-sig"))
+    data = json.loads(path.read_text(encoding="utf-8-sig"), object_pairs_hook=_unique_json_object,
+                      parse_constant=_reject_json_constant)
     blocks: list[SourceBlock] = []
-    for json_path, value in _flatten_json(data):
-        label = json_path.rsplit("/", 1)[-1].replace("~1", "/").replace("~0", "~")
-        text = f"{label}: {value}"
-        blocks.append(
-            _make_block(
-                relative_path=relative_path,
-                source_kind="json_value",
-                file_hash=file_hash,
-                locator={"json_path": json_path},
-                text=text,
-            )
-        )
+
+    def emit(label, value, pointer, identity, anchor):
+        if value is None:
+            return
+        if isinstance(value, float) and not isfinite(value):
+            raise ValueError("nonfinite_json_number")
+        block = _make_block(relative_path=relative_path, source_kind="json_value", file_hash=file_hash,
+                            locator={"json_path":pointer}, text=f"{label}: {value}",
+                            method="deterministic_structured_json")
+        spec = field_for_label(label)
+        block.provenance["structured_row"] = {
+            "row_id": f"{relative_path}:json:{anchor}", "identity":dict(identity),
+            "field":spec.name if spec else None,
+        }
+        blocks.append(block)
+
+    def walk(value, pointer, identity, anchor, label=""):
+        if isinstance(value, dict):
+            # Only the closed {value, unit} shape is a measurement. Additional
+            # conditions must not be silently thrown away by this shortcut.
+            if set(value) == {"value", "unit"} and isinstance(value["unit"], str) and isinstance(value["value"], (str,int,float)) and not isinstance(value["value"], bool):
+                if isinstance(value["value"], float) and not isfinite(value["value"]):
+                    raise ValueError("nonfinite_json_number")
+                emit(label, f'{value["value"]} {value["unit"]}', pointer, identity, anchor)
+                return
+            own_values = {}
+            for key, item in value.items():
+                spec = field_for_label(str(key), known_only=True)
+                if spec and spec.name in {"sku","model","variant"} and isinstance(item, (str,int)) and not isinstance(item, bool) and str(item).strip():
+                    own_values.setdefault(spec.name, set()).add(str(item).strip())
+            own = identity_from_values(own_values)
+            if own:
+                # Explicit nested products replace, never inherit a parent's SKU.
+                identity, anchor = own, pointer
+            for key, item in value.items():
+                escaped = str(key).replace("~", "~0").replace("/", "~1")
+                walk(item, f"{pointer}/{escaped}", identity, anchor, str(key))
+        elif isinstance(value, list):
+            if value and all(isinstance(v, (str,int,float,bool)) for v in value):
+                if any(isinstance(v, float) and not isfinite(v) for v in value):
+                    raise ValueError("nonfinite_json_number")
+                emit(label, "; ".join(str(v) for v in value), pointer, identity, anchor)
+            else:
+                for index, item in enumerate(value):
+                    walk(item, f"{pointer}/{index}", identity, f"{pointer}/{index}", label)
+        else:
+            emit(label, value, pointer, identity, anchor)
+
+    walk(data, "$", {}, "$")
     return blocks
 
 

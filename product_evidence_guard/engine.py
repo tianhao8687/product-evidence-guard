@@ -51,7 +51,7 @@ from .state import STATE_SCHEMA_VERSION, atomic_write_json, load_state
 
 QWEN_MODEL_ID = "OpenVINO/Qwen3-VL-8B-Instruct-int4-ov"
 ENGINE_SCHEMA_REVISION = (
-    "v5-whole-measurement-semantics-20260916"
+    "v6-structured-label-context-20260916"
 )
 MAX_FILES_PER_TASK = 100
 MAX_FILE_BYTES = 100 * 1024 * 1024

@@ -1,0 +1,7462 @@
+{
+  "schema_version": 1,
+  "protocol": "See docs/TEST_PHASE_100.md; assistant-labelled, not population accuracy or independent blind data.",
+  "created_date": "2026-09-16",
+  "sample_unit": "distinct curated package",
+  "facts_columns": [
+    "product_key",
+    "field",
+    "scope",
+    "fact_status",
+    "value_unit_pairs"
+  ],
+  "cases": [
+    {
+      "id": "01-01",
+      "domain": "industrial_power",
+      "title": "LRS-35-15 输出参数选摘",
+      "family": "public_power_matrix",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "public_adapted",
+      "source_url": "https://www.meanwell.com/Upload/PDF/LRS-35/LRS-35-SPEC.PDF",
+      "source_model": "LRS-35-15",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. PDF page 2.",
+      "files": {
+        "spec.txt": "SKU: PS15\n输出电压: 15V\n额定电流: 2.4A\n额定功率: 36W\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "PS15"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "ps15",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PS15"
+          },
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              15,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PS15"
+          },
+          "current",
+          "rating:rated",
+          "verified",
+          [
+            [
+              2.4,
+              "A"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PS15"
+          },
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              36,
+              "W"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "01-02",
+      "domain": "industrial_power",
+      "title": "LRS-35-36 横向参数表",
+      "family": "public_power_matrix",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "public_adapted",
+      "source_url": "https://www.meanwell.com/Upload/PDF/LRS-35/LRS-35-SPEC.PDF",
+      "source_model": "LRS-35-36",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. PDF page 2, table units moved to header.",
+      "files": {
+        "spec.csv": "SKU,输出电压(V),额定电流(A),额定功率(W)\nPS36,36,1,36\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "PS36"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "ps36",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PS36"
+          },
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              36,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PS36"
+          },
+          "current",
+          "rating:rated",
+          "verified",
+          [
+            [
+              1,
+              "A"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PS36"
+          },
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              36,
+              "W"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "01-03",
+      "domain": "industrial_power",
+      "title": "双路适配器 JSON 商品隔离",
+      "family": "json_product_array",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.meanwell.com/Upload/PDF/LRS-35/LRS-35-SPEC.PDF",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "products.json": "[{\"SKU\": \"ADAPTER-A\", \"输入电压\": \"100~240V\", \"输出电压\": \"12V\"}, {\"SKU\": \"ADAPTER-B\", \"输入电压\": \"220V\", \"输出电压\": \"24V\"}]"
+      },
+      "facts": [
+        [
+          {
+            "sku": "ADAPTER-A"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "adapter-a",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "ADAPTER-B"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "adapter-b",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "ADAPTER-A"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              [
+                100,
+                240
+              ],
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "ADAPTER-A"
+          },
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "ADAPTER-B"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              220,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "ADAPTER-B"
+          },
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              24,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "01-04",
+      "domain": "industrial_power",
+      "title": "转换模块相同数字不同方向",
+      "family": "electrical_direction",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.meanwell.com/Upload/PDF/LRS-35/LRS-35-SPEC.PDF",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: CONVERTER\n输入电压: 24V\n输出电压: 24V\n转换效率: 93%\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "CONVERTER"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "converter",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CONVERTER"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              24,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CONVERTER"
+          },
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              24,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CONVERTER"
+          },
+          "custom:转换效率",
+          null,
+          "verified",
+          [
+            [
+              "93%",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "01-05",
+      "domain": "industrial_power",
+      "title": "充电器少数来源反例",
+      "family": "minority_conflict",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.meanwell.com/Upload/PDF/LRS-35/LRS-35-SPEC.PDF",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "manual.txt": "SKU: CHARGER\n输出电压: 19V\n额定电流: 3A",
+        "label.txt": "SKU: CHARGER\n输出电压: 20V",
+        "copy.txt": "SKU: CHARGER\n输出电压: 19V"
+      },
+      "facts": [
+        [
+          {
+            "sku": "CHARGER"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "charger",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CHARGER"
+          },
+          "voltage",
+          "output",
+          "conflict",
+          [
+            [
+              19,
+              "V"
+            ],
+            [
+              20,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CHARGER"
+          },
+          "current",
+          "rating:rated",
+          "verified",
+          [
+            [
+              3,
+              "A"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "01-06",
+      "domain": "industrial_power",
+      "title": "多档输出完整保留而非只取第一值",
+      "family": "alternative_rails",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.meanwell.com/Upload/PDF/LRS-35/LRS-35-SPEC.PDF",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: MULTIRAIL\n输出电压: 3.3V / 5V / 12V\n额定功率: 60W\n绝缘类别: Class II\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "MULTIRAIL"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "multirail",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MULTIRAIL"
+          },
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              [
+                3.3,
+                5,
+                12
+              ],
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MULTIRAIL"
+          },
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              60,
+              "W"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MULTIRAIL"
+          },
+          "custom:绝缘类别",
+          null,
+          "verified",
+          [
+            [
+              "class ii",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "01-07",
+      "domain": "industrial_power",
+      "title": "限流电源上下限不同字段",
+      "family": "rated_and_max",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.meanwell.com/Upload/PDF/LRS-35/LRS-35-SPEC.PDF",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: BENCHSUPPLY\n额定电流: 2A\n最大电流: 3A\n输入电压: 230V 50Hz\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "BENCHSUPPLY"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "benchsupply",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "BENCHSUPPLY"
+          },
+          "current",
+          "rating:rated",
+          "verified",
+          [
+            [
+              2,
+              "A"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "BENCHSUPPLY"
+          },
+          "current",
+          "rating:max",
+          "verified",
+          [
+            [
+              3,
+              "A"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "BENCHSUPPLY"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              230,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "01-08",
+      "domain": "industrial_power",
+      "title": "隔离电源多文件换算一致",
+      "family": "power_conversion",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.meanwell.com/Upload/PDF/LRS-35/LRS-35-SPEC.PDF",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: ISOLATOR\n额定功率: 0.024kW\n输出电压: 12000mV",
+        "plate.txt": "SKU: ISOLATOR\n额定功率: 24W\n输出电压: 12V"
+      },
+      "facts": [
+        [
+          {
+            "sku": "ISOLATOR"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "isolator",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "ISOLATOR"
+          },
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              24,
+              "W"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "ISOLATOR"
+          },
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "01-09",
+      "domain": "industrial_power",
+      "title": "驱动电源复合单位不得降成普通功率",
+      "family": "per_channel",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.meanwell.com/Upload/PDF/LRS-35/LRS-35-SPEC.PDF",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: LEDDRIVER\n额定功率: 30W/channel\n通道数: 4\n输入电压: 48V\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "LEDDRIVER"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "leddriver",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "LEDDRIVER"
+          },
+          "power",
+          "rating:rated",
+          "pending_confirmation",
+          [
+            [
+              "30w/channel",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "LEDDRIVER"
+          },
+          "custom:通道数",
+          null,
+          "verified",
+          [
+            [
+              "4",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "LEDDRIVER"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              48,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "01-10",
+      "domain": "industrial_power",
+      "title": "继电模块明确修订版本",
+      "family": "body_version",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.meanwell.com/Upload/PDF/LRS-35/LRS-35-SPEC.PDF",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "a.txt": "资料版本: 1.0\nSKU: RELAY\n额定电流: 5A\n接口: 螺钉端子",
+        "b.txt": "资料版本: 2.0\nSKU: RELAY\n额定电流: 8A\n接口: 螺钉端子"
+      },
+      "facts": [
+        [
+          {
+            "sku": "RELAY"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "relay",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "RELAY"
+          },
+          "current",
+          "rating:rated",
+          "pending_confirmation",
+          [
+            [
+              5,
+              "A"
+            ],
+            [
+              8,
+              "A"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "RELAY"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "螺钉端子",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "02-01",
+      "domain": "networking",
+      "title": "TL-SG105 环境与功耗",
+      "family": "public_switch",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "public_adapted",
+      "source_url": "https://static.tp-link.com/res/down/doc/TL-SG105_V2_Datasheet.pdf",
+      "source_model": "TL-SG105 V2",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. PDF page 3; metric dimensions only.",
+      "files": {
+        "spec.txt": "SKU: SW105\n最大功率: 3.2W\n产品尺寸: 99.8x98x25mm\n工作温度: 0~40°C\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "SW105"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "sw105",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SW105"
+          },
+          "power",
+          "rating:max",
+          "verified",
+          [
+            [
+              3.2,
+              "W"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SW105"
+          },
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                99.8,
+                98,
+                25
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SW105"
+          },
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                0,
+                40
+              ],
+              "°C"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "02-02",
+      "domain": "networking",
+      "title": "TL-SG108 JSON 参数单",
+      "family": "public_switch",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "public_adapted",
+      "source_url": "https://static.tp-link.com/res/down/doc/TL-SG105_V2_Datasheet.pdf",
+      "source_model": "TL-SG108 V2",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. PDF page 3.",
+      "files": {
+        "spec.json": "{\"SKU\": \"SW108\", \"最大功率\": \"3.97W\", \"工作温度\": \"0~40°C\", \"交换容量\": \"16Gbps\"}"
+      },
+      "facts": [
+        [
+          {
+            "sku": "SW108"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "sw108",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SW108"
+          },
+          "power",
+          "rating:max",
+          "verified",
+          [
+            [
+              3.97,
+              "W"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SW108"
+          },
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                0,
+                40
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SW108"
+          },
+          "custom:交换容量",
+          null,
+          "verified",
+          [
+            [
+              "16gbps",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "02-03",
+      "domain": "networking",
+      "title": "接入点嵌套 JSON 继承",
+      "family": "json_nested_specs",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://static.tp-link.com/res/down/doc/TL-SG105_V2_Datasheet.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.json": "{\"SKU\": \"ACCESSPOINT\", \"specs\": {\"输入电压\": \"12V\", \"协议\": \"802.11ax\", \"工作频率\": \"2.4GHz\"}}"
+      },
+      "facts": [
+        [
+          {
+            "sku": "ACCESSPOINT"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "accesspoint",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "ACCESSPOINT"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "ACCESSPOINT"
+          },
+          "protocol",
+          null,
+          "verified",
+          [
+            [
+              "802.11ax",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "ACCESSPOINT"
+          },
+          "frequency",
+          "operating",
+          "pending_confirmation",
+          [
+            [
+              "2.4ghz",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "02-04",
+      "domain": "networking",
+      "title": "路由器逗号列表与转义引号",
+      "family": "csv_quoting",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://static.tp-link.com/res/down/doc/TL-SG105_V2_Datasheet.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.csv": "SKU,协议,接口,输入电压\nROUTER,\"TCP, UDP, ICMP\",\"USB-C, RJ45\",12V\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "ROUTER"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "router",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "ROUTER"
+          },
+          "protocol",
+          null,
+          "verified",
+          [
+            [
+              "tcp, udp, icmp",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "ROUTER"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "usb-c, rj45",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "ROUTER"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "02-05",
+      "domain": "networking",
+      "title": "光模块新字段不依赖白名单",
+      "family": "unknown_digit_header",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://static.tp-link.com/res/down/doc/TL-SG105_V2_Datasheet.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "optics.csv": "SKU,光波长(nm),传输距离(km),连接器\nOPTICS,1310,10,LC\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "OPTICS"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "optics",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "OPTICS"
+          },
+          "custom:光波长",
+          null,
+          "verified",
+          [
+            [
+              "1310 nm",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "OPTICS"
+          },
+          "custom:传输距离",
+          null,
+          "verified",
+          [
+            [
+              "10 km",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "OPTICS"
+          },
+          "custom:连接器",
+          null,
+          "verified",
+          [
+            [
+              "lc",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "02-06",
+      "domain": "networking",
+      "title": "网关两种环境口径",
+      "family": "operating_storage",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://static.tp-link.com/res/down/doc/TL-SG105_V2_Datasheet.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: GATEWAY\n工作温度: -20~60°C\n储存温度: -40~85°C\n防护等级: IP67\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "GATEWAY"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "gateway",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "GATEWAY"
+          },
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                -20,
+                60
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "GATEWAY"
+          },
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -40,
+                85
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "GATEWAY"
+          },
+          "ip_rating",
+          null,
+          "verified",
+          [
+            [
+              "ip67",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "02-07",
+      "domain": "networking",
+      "title": "PoE 设备独立端口功率",
+      "family": "qualified_open_fields",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://static.tp-link.com/res/down/doc/TL-SG105_V2_Datasheet.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "switch.txt": "SKU: POESW\n整机功率预算: 120W\n单端口供电功率: 30W\n接口: RJ45"
+      },
+      "facts": [
+        [
+          {
+            "sku": "POESW"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "poesw",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "POESW"
+          },
+          "custom:整机功率预算",
+          null,
+          "verified",
+          [
+            [
+              "120w",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "POESW"
+          },
+          "custom:单端口供电功率",
+          null,
+          "verified",
+          [
+            [
+              "30w",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "POESW"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "rj45",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "02-08",
+      "domain": "networking",
+      "title": "两种网卡型号仅型号归属",
+      "family": "model_only_products",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://static.tp-link.com/res/down/doc/TL-SG105_V2_Datasheet.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "cards.csv": "型号,接口,协议\nCARD-USB,USB-C,USB3.2\nCARD-PCIE,PCIe,PCIe4.0\n"
+      },
+      "facts": [
+        [
+          {
+            "model": "CARD-USB",
+            "variant": null
+          },
+          "model",
+          null,
+          "verified",
+          [
+            [
+              "card-usb",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "model": "CARD-USB",
+            "variant": null
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "usb-c",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "model": "CARD-USB",
+            "variant": null
+          },
+          "protocol",
+          null,
+          "verified",
+          [
+            [
+              "usb3.2",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "model": "CARD-PCIE",
+            "variant": null
+          },
+          "model",
+          null,
+          "verified",
+          [
+            [
+              "card-pcie",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "model": "CARD-PCIE",
+            "variant": null
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "pcie",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "model": "CARD-PCIE",
+            "variant": null
+          },
+          "protocol",
+          null,
+          "verified",
+          [
+            [
+              "pcie4.0",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "02-09",
+      "domain": "networking",
+      "title": "交换机 Markdown 标题不是参数",
+      "family": "markdown_metadata",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://static.tp-link.com/res/down/doc/TL-SG105_V2_Datasheet.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: RACKSW\n# 产品说明\n\n- 接口: SFP+\n- 额定功率: 80W\n注意: 使用接地插座\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "RACKSW"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "racksw",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "RACKSW"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "sfp+",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "RACKSW"
+          },
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              80,
+              "W"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "02-10",
+      "domain": "networking",
+      "title": "中继器复制资料不得制造事实",
+      "family": "renamed_copies",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://static.tp-link.com/res/down/doc/TL-SG105_V2_Datasheet.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "a.txt": "SKU: REPEATER\n输入电压: 5V\n接口: USB-C",
+        "b.txt": "SKU: REPEATER\n输入电压: 5V\n接口: USB-C"
+      },
+      "facts": [
+        [
+          {
+            "sku": "REPEATER"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "repeater",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "REPEATER"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              5,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "REPEATER"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "usb-c",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "03-01",
+      "domain": "motion",
+      "title": "37D 19:1 减速电机",
+      "family": "public_gearmotor",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "public_adapted",
+      "source_url": "https://www.pololu.com/category/271/12v-37d-metal-gearmotors",
+      "source_model": "Pololu 4741",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. 12V 37D comparison table.",
+      "files": {
+        "spec.txt": "SKU: GEAR19\n额定电压: 12V\n空载转速: 530RPM\n减速比: 19:1\n空载电流: 0.2A\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "GEAR19"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "gear19",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "GEAR19"
+          },
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "GEAR19"
+          },
+          "custom:空载转速",
+          null,
+          "verified",
+          [
+            [
+              "530rpm",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "GEAR19"
+          },
+          "custom:减速比",
+          null,
+          "verified",
+          [
+            [
+              "19:1",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "GEAR19"
+          },
+          "custom:空载电流",
+          null,
+          "verified",
+          [
+            [
+              "0.2a",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "03-02",
+      "domain": "motion",
+      "title": "37D 50:1 堵转参数",
+      "family": "public_gearmotor",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "public_adapted",
+      "source_url": "https://www.pololu.com/category/271/12v-37d-metal-gearmotors",
+      "source_model": "Pololu 4743",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. Stall current is theoretical extrapolation, not continuous current.",
+      "files": {
+        "spec.txt": "SKU: GEAR50\n额定电压: 12V\n空载转速: 200RPM\n堵转电流: 5.5A\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "GEAR50"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "gear50",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "GEAR50"
+          },
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "GEAR50"
+          },
+          "custom:空载转速",
+          null,
+          "verified",
+          [
+            [
+              "200rpm",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "GEAR50"
+          },
+          "custom:堵转电流",
+          null,
+          "verified",
+          [
+            [
+              "5.5a",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "03-03",
+      "domain": "motion",
+      "title": "伺服的额定与峰值扭矩",
+      "family": "torque_scopes",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.pololu.com/category/271/12v-37d-metal-gearmotors",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: SERVO\n额定扭矩: 2N·m\n最大扭矩: 6N·m\n控制方式: 脉冲\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "SERVO"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "servo",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SERVO"
+          },
+          "torque",
+          "rating:rated",
+          "verified",
+          [
+            [
+              2,
+              "N·m"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SERVO"
+          },
+          "torque",
+          "rating:max",
+          "verified",
+          [
+            [
+              6,
+              "N·m"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SERVO"
+          },
+          "custom:控制方式",
+          null,
+          "verified",
+          [
+            [
+              "脉冲",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "03-04",
+      "domain": "motion",
+      "title": "减速箱扭矩单位换算",
+      "family": "torque_conversion",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.pololu.com/category/271/12v-37d-metal-gearmotors",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "a.txt": "SKU: GEARBOX\n额定扭矩: 10kgf·cm\n材质: 钢",
+        "b.txt": "SKU: GEARBOX\n额定扭矩: 0.980665N·m"
+      },
+      "facts": [
+        [
+          {
+            "sku": "GEARBOX"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "gearbox",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "GEARBOX"
+          },
+          "torque",
+          "rating:rated",
+          "verified",
+          [
+            [
+              0.980665,
+              "N·m"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "GEARBOX"
+          },
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "钢",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "03-05",
+      "domain": "motion",
+      "title": "气缸两个商品段落",
+      "family": "sku_section",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.pololu.com/category/271/12v-37d-metal-gearmotors",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: CYL-A\n工作压力: 0.6MPa\n行程: 50mm\nSKU: CYL-B\n工作压力: 0.8MPa\n行程: 100mm"
+      },
+      "facts": [
+        [
+          {
+            "sku": "CYL-A"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "cyl-a",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CYL-B"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "cyl-b",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CYL-A"
+          },
+          "pressure",
+          "operating",
+          "verified",
+          [
+            [
+              600000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CYL-A"
+          },
+          "custom:行程",
+          null,
+          "verified",
+          [
+            [
+              "50mm",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CYL-B"
+          },
+          "pressure",
+          "operating",
+          "verified",
+          [
+            [
+              800000,
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CYL-B"
+          },
+          "custom:行程",
+          null,
+          "verified",
+          [
+            [
+              "100mm",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "03-06",
+      "domain": "motion",
+      "title": "泵工作与最大流量",
+      "family": "flow_scope",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.pololu.com/category/271/12v-37d-metal-gearmotors",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.csv": "SKU,工作流量,最大流量,最大压力\nMICROPUMP,500mL/min,1L/min,2bar\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "MICROPUMP"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "micropump",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MICROPUMP"
+          },
+          "flow_rate",
+          "operating",
+          "verified",
+          [
+            [
+              0.5,
+              "L/min"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MICROPUMP"
+          },
+          "flow_rate",
+          "rating:max",
+          "verified",
+          [
+            [
+              1,
+              "L/min"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MICROPUMP"
+          },
+          "pressure",
+          "rating:max",
+          "verified",
+          [
+            [
+              200000,
+              "Pa"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "03-07",
+      "domain": "motion",
+      "title": "步进电机相电流不是电源电流",
+      "family": "phase_conditions",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.pololu.com/category/271/12v-37d-metal-gearmotors",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: STEPPER\n相电流: 1.5A\n输入电流: 0.7A\n步距角: 1.8°\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "STEPPER"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "stepper",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "STEPPER"
+          },
+          "custom:相电流",
+          null,
+          "verified",
+          [
+            [
+              "1.5a",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "STEPPER"
+          },
+          "current",
+          "input",
+          "verified",
+          [
+            [
+              0.7,
+              "A"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "STEPPER"
+          },
+          "custom:步距角",
+          null,
+          "verified",
+          [
+            [
+              "1.8°",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "03-08",
+      "domain": "motion",
+      "title": "编码器增量参数与小数点",
+      "family": "encoder_custom",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.pololu.com/category/271/12v-37d-metal-gearmotors",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: ENCODER\n分辨率: 1024PPR\n额定电压: 5V\n接口: RS422\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "ENCODER"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "encoder",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "ENCODER"
+          },
+          "custom:分辨率",
+          null,
+          "verified",
+          [
+            [
+              "1024ppr",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "ENCODER"
+          },
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              5,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "ENCODER"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "rs422",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "03-09",
+      "domain": "motion",
+      "title": "轴承规格带小数与范围",
+      "family": "bearing_geometry",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.pololu.com/category/271/12v-37d-metal-gearmotors",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.csv": "SKU,内径(mm),外径(mm),宽度(mm),材质\nBEARING,8,22,7,轴承钢\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "BEARING"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "bearing",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "BEARING"
+          },
+          "custom:内径",
+          null,
+          "verified",
+          [
+            [
+              "8 mm",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "BEARING"
+          },
+          "custom:外径",
+          null,
+          "verified",
+          [
+            [
+              "22 mm",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "BEARING"
+          },
+          "width",
+          null,
+          "verified",
+          [
+            [
+              7,
+              "mm"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "BEARING"
+          },
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "轴承钢",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "03-10",
+      "domain": "motion",
+      "title": "直线导轨复合精度单位",
+      "family": "precision_per_length",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.pololu.com/category/271/12v-37d-metal-gearmotors",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: RAIL\n长度: 400mm\n直线度: 0.02mm/m\n材质: 不锈钢\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "RAIL"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "rail",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "RAIL"
+          },
+          "length",
+          null,
+          "verified",
+          [
+            [
+              400,
+              "mm"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "RAIL"
+          },
+          "custom:直线度",
+          null,
+          "verified",
+          [
+            [
+              "0.02mm/m",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "RAIL"
+          },
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "不锈钢",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "04-01",
+      "domain": "battery",
+      "title": "LFP-Smart 50Ah 名义参数",
+      "family": "public_lfp",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "public_adapted",
+      "source_url": "https://www.victronenergy.com/media/pg/Lithium_Battery_Smart/en/technical-data.html",
+      "source_model": "LFP-Smart 12.8/50",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. Capacity at 25 C and discharge <=1C; label retains temperature.",
+      "files": {
+        "spec.txt": "SKU: LFP50\n标称电压: 12.8V\n25°C容量: 50Ah\n重量: 7kg\n防护等级: IP22\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "LFP50"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "lfp50",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "LFP50"
+          },
+          "voltage",
+          "rating:nominal",
+          "verified",
+          [
+            [
+              12.8,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "LFP50"
+          },
+          "custom:25°c容量",
+          null,
+          "verified",
+          [
+            [
+              "50ah",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "LFP50"
+          },
+          "weight",
+          "unspecified",
+          "verified",
+          [
+            [
+              7000,
+              "g"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "LFP50"
+          },
+          "ip_rating",
+          null,
+          "verified",
+          [
+            [
+              "ip22",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "04-02",
+      "domain": "battery",
+      "title": "LFP-Smart 不同温度容量",
+      "family": "public_lfp",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "public_adapted",
+      "source_url": "https://www.victronenergy.com/media/pg/Lithium_Battery_Smart/en/technical-data.html",
+      "source_model": "LFP-Smart 12.8/100",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. Two temperature conditions, discharge <=1C; no silent condition stripping.",
+      "files": {
+        "spec.txt": "SKU: LFP100\n标称电压: 12.8V\n电池容量(25°C): 100Ah\n电池容量(0°C): 80Ah\n重量: 14kg\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "LFP100"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "lfp100",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "LFP100"
+          },
+          "voltage",
+          "rating:nominal",
+          "verified",
+          [
+            [
+              12.8,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "LFP100"
+          },
+          "custom:电池容量(25°c)",
+          null,
+          "verified",
+          [
+            [
+              "100ah",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "LFP100"
+          },
+          "custom:电池容量(0°c)",
+          null,
+          "verified",
+          [
+            [
+              "80ah",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "LFP100"
+          },
+          "weight",
+          "unspecified",
+          "verified",
+          [
+            [
+              14000,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "04-03",
+      "domain": "battery",
+      "title": "充电宝 Ah 与 mAh 一致",
+      "family": "charge_conversion",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.victronenergy.com/media/pg/Lithium_Battery_Smart/en/technical-data.html",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "a.txt": "SKU: POWERBANK\n电池容量: 10Ah\n输出电压: 5V",
+        "b.txt": "SKU: POWERBANK\n电池容量: 10000mAh"
+      },
+      "facts": [
+        [
+          {
+            "sku": "POWERBANK"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "powerbank",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "POWERBANK"
+          },
+          "capacity_charge",
+          null,
+          "verified",
+          [
+            [
+              10000,
+              "mAh"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "POWERBANK"
+          },
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              5,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "04-04",
+      "domain": "battery",
+      "title": "储能电芯容量与能量不混用",
+      "family": "charge_energy",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.victronenergy.com/media/pg/Lithium_Battery_Smart/en/technical-data.html",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: CELLENERGY\n电池容量: 50Ah\n额定能量: 160Wh\n标称电压: 3.2V\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "CELLENERGY"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "cellenergy",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CELLENERGY"
+          },
+          "capacity_charge",
+          null,
+          "verified",
+          [
+            [
+              50000,
+              "mAh"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CELLENERGY"
+          },
+          "custom:额定能量",
+          null,
+          "verified",
+          [
+            [
+              "160wh",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CELLENERGY"
+          },
+          "voltage",
+          "rating:nominal",
+          "verified",
+          [
+            [
+              3.2,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "04-05",
+      "domain": "battery",
+      "title": "电池系列 JSON 嵌套商品",
+      "family": "json_child_products",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.victronenergy.com/media/pg/Lithium_Battery_Smart/en/technical-data.html",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "batteries.json": "{\"products\": [{\"SKU\": \"PACK-A\", \"specs\": {\"电池容量\": \"2Ah\", \"标称电压\": \"18V\"}}, {\"SKU\": \"PACK-B\", \"specs\": {\"电池容量\": \"4Ah\", \"标称电压\": \"18V\"}}]}"
+      },
+      "facts": [
+        [
+          {
+            "sku": "PACK-A"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "pack-a",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PACK-B"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "pack-b",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PACK-A"
+          },
+          "capacity_charge",
+          null,
+          "verified",
+          [
+            [
+              2000,
+              "mAh"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PACK-A"
+          },
+          "voltage",
+          "rating:nominal",
+          "verified",
+          [
+            [
+              18,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PACK-B"
+          },
+          "capacity_charge",
+          null,
+          "verified",
+          [
+            [
+              4000,
+              "mAh"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PACK-B"
+          },
+          "voltage",
+          "rating:nominal",
+          "verified",
+          [
+            [
+              18,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "04-06",
+      "domain": "battery",
+      "title": "低温电池不同充放电温度",
+      "family": "charge_discharge_temp",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.victronenergy.com/media/pg/Lithium_Battery_Smart/en/technical-data.html",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: COLDPACK\n充电温度: 0~45°C\n放电温度: -20~60°C\n储存温度: -10~30°C\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "COLDPACK"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "coldpack",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "COLDPACK"
+          },
+          "custom:充电温度",
+          null,
+          "verified",
+          [
+            [
+              "0~45°c",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "COLDPACK"
+          },
+          "custom:放电温度",
+          null,
+          "verified",
+          [
+            [
+              "-20~60°c",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "COLDPACK"
+          },
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -10,
+                30
+              ],
+              "°C"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "04-07",
+      "domain": "battery",
+      "title": "电池包续航与充电时间",
+      "family": "duration_conversion",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.victronenergy.com/media/pg/Lithium_Battery_Smart/en/technical-data.html",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: UPS\n续航时间: 1.5h\n充电时间: 90min\n接口: DC5521\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "UPS"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "ups",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "UPS"
+          },
+          "runtime",
+          null,
+          "verified",
+          [
+            [
+              5400,
+              "s"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "UPS"
+          },
+          "charging_time",
+          null,
+          "verified",
+          [
+            [
+              5400,
+              "s"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "UPS"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "dc5521",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "04-08",
+      "domain": "battery",
+      "title": "电芯最低容量不能变成精确值",
+      "family": "capacity_bound",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.victronenergy.com/media/pg/Lithium_Battery_Smart/en/technical-data.html",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: MINCELL\n电池容量: 不低于2500mAh\n标称电压: 3.7V\n化学体系: NMC\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "MINCELL"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "mincell",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MINCELL"
+          },
+          "capacity_charge",
+          null,
+          "verified",
+          [
+            [
+              "≥2500",
+              "mAh"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MINCELL"
+          },
+          "voltage",
+          "rating:nominal",
+          "verified",
+          [
+            [
+              3.7,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MINCELL"
+          },
+          "custom:化学体系",
+          null,
+          "verified",
+          [
+            [
+              "nmc",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "04-09",
+      "domain": "battery",
+      "title": "储能组件缺单位需要局部确认",
+      "family": "missing_unit",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.victronenergy.com/media/pg/Lithium_Battery_Smart/en/technical-data.html",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: BARECAP\n电池容量: 3000\n标称电压: 48V\n化学体系: LFP\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "BARECAP"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "barecap",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "BARECAP"
+          },
+          "capacity_charge",
+          null,
+          "pending_confirmation",
+          [
+            [
+              "3000",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "BARECAP"
+          },
+          "voltage",
+          "rating:nominal",
+          "verified",
+          [
+            [
+              48,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "BARECAP"
+          },
+          "custom:化学体系",
+          null,
+          "verified",
+          [
+            [
+              "lfp",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "04-10",
+      "domain": "battery",
+      "title": "两来源电芯容量冲突",
+      "family": "capacity_conflict",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.victronenergy.com/media/pg/Lithium_Battery_Smart/en/technical-data.html",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "lab.txt": "SKU: CELLCONFLICT\n电池容量: 2600mAh\n重量: 46g",
+        "spec.txt": "SKU: CELLCONFLICT\n电池容量: 2800mAh\n重量: 46g"
+      },
+      "facts": [
+        [
+          {
+            "sku": "CELLCONFLICT"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "cellconflict",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CELLCONFLICT"
+          },
+          "capacity_charge",
+          null,
+          "conflict",
+          [
+            [
+              2600,
+              "mAh"
+            ],
+            [
+              2800,
+              "mAh"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CELLCONFLICT"
+          },
+          "weight",
+          "unspecified",
+          "verified",
+          [
+            [
+              46,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "05-01",
+      "domain": "cooling",
+      "title": "NF-A8 参数与包装区分",
+      "family": "public_fan",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "public_adapted",
+      "source_url": "https://cdn.noctua.at/media/noctua_nf_a8_pwm_infosheet_en_web.pdf",
+      "source_model": "NF-A8 PWM",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. Single packaged product weight, not 11.30 kg master carton.",
+      "files": {
+        "spec.txt": "SKU: FAN80\n产品尺寸: 80x80x25mm\n输入功率: 0.96W\n毛重: 245g\n保修期: 6年\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "FAN80"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "fan80",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "FAN80"
+          },
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                80,
+                80,
+                25
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "FAN80"
+          },
+          "power",
+          "input",
+          "verified",
+          [
+            [
+              0.96,
+              "W"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "FAN80"
+          },
+          "gross_weight",
+          "gross",
+          "verified",
+          [
+            [
+              245,
+              "g"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "FAN80"
+          },
+          "custom:保修期",
+          null,
+          "verified",
+          [
+            [
+              "6年",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "05-02",
+      "domain": "cooling",
+      "title": "NF-A12x25 5V 与包装单位",
+      "family": "public_fan",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "public_adapted",
+      "source_url": "https://cdn.noctua.at/media/noctua_nf_a12x25_5v_pwm_infosheet_en_web.pdf",
+      "source_model": "NF-A12x25 5V PWM",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. ",
+      "files": {
+        "spec.txt": "SKU: FAN120\n输入电压: 5V\n输入功率: 1.75W\n产品尺寸: 120x120x25mm\n毛重: 364g\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "FAN120"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "fan120",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "FAN120"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              5,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "FAN120"
+          },
+          "power",
+          "input",
+          "verified",
+          [
+            [
+              1.75,
+              "W"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "FAN120"
+          },
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                120,
+                120,
+                25
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "FAN120"
+          },
+          "gross_weight",
+          "gross",
+          "verified",
+          [
+            [
+              364,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "05-03",
+      "domain": "cooling",
+      "title": "风机静音与性能档噪声",
+      "family": "noise_modes",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://cdn.noctua.at/media/noctua_nf_a8_pwm_infosheet_en_web.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: DUCTFAN\n静音档噪声: 18dB(A)\n性能档噪声: 28dB(A)\n输入电压: 24V\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "DUCTFAN"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "ductfan",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "DUCTFAN"
+          },
+          "custom:静音档噪声",
+          null,
+          "verified",
+          [
+            [
+              "18db(a)",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "DUCTFAN"
+          },
+          "custom:性能档噪声",
+          null,
+          "verified",
+          [
+            [
+              "28db(a)",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "DUCTFAN"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              24,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "05-04",
+      "domain": "cooling",
+      "title": "散热器 mm 与 cm 尺寸",
+      "family": "dim_conversion",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://cdn.noctua.at/media/noctua_nf_a8_pwm_infosheet_en_web.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "a.txt": "SKU: HEATSINK\n产品尺寸: 10x5x2cm\n材质: 铝",
+        "b.txt": "SKU: HEATSINK\n产品尺寸: 100x50x20mm"
+      },
+      "facts": [
+        [
+          {
+            "sku": "HEATSINK"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "heatsink",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "HEATSINK"
+          },
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                100,
+                50,
+                20
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "HEATSINK"
+          },
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "铝",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "05-05",
+      "domain": "cooling",
+      "title": "包装数量与单品毛重",
+      "family": "pack_count",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://cdn.noctua.at/media/noctua_nf_a8_pwm_infosheet_en_web.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: FANBOX\n包装数量: 24pcs\n毛重: 0.25kg\n整箱毛重: 6.8kg\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "FANBOX"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "fanbox",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "FANBOX"
+          },
+          "quantity",
+          null,
+          "verified",
+          [
+            [
+              24,
+              "count"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "FANBOX"
+          },
+          "gross_weight",
+          "gross",
+          "verified",
+          [
+            [
+              250,
+              "g"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "FANBOX"
+          },
+          "custom:整箱毛重",
+          null,
+          "verified",
+          [
+            [
+              "6.8kg",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "05-06",
+      "domain": "cooling",
+      "title": "风扇表中方括号单位",
+      "family": "square_bracket_units",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://cdn.noctua.at/media/noctua_nf_a8_pwm_infosheet_en_web.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "fans.csv": "SKU,输入电压[V],输入功率[W],噪声[dB(A)]\nBRACKETFAN,12,2.4,25\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "BRACKETFAN"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "bracketfan",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "BRACKETFAN"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "BRACKETFAN"
+          },
+          "power",
+          "input",
+          "verified",
+          [
+            [
+              2.4,
+              "W"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "BRACKETFAN"
+          },
+          "custom:噪声",
+          null,
+          "verified",
+          [
+            [
+              "25 db(a)",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "05-07",
+      "domain": "cooling",
+      "title": "循环泵流量与扬程分开",
+      "family": "pump_custom",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://cdn.noctua.at/media/noctua_nf_a8_pwm_infosheet_en_web.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: COOLPUMP\n工作流量: 2L/min\n扬程: 3m\n输入电压: 12V\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "COOLPUMP"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "coolpump",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "COOLPUMP"
+          },
+          "flow_rate",
+          "operating",
+          "verified",
+          [
+            [
+              2,
+              "L/min"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "COOLPUMP"
+          },
+          "custom:扬程",
+          null,
+          "verified",
+          [
+            [
+              "3m",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "COOLPUMP"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "05-08",
+      "domain": "cooling",
+      "title": "风机寿命不是单次续航",
+      "family": "lifetime_custom",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://cdn.noctua.at/media/noctua_nf_a8_pwm_infosheet_en_web.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: LONGFAN\nMTTF: >150000h\n运行时间: 8h\n轴承类型: 双滚珠\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "LONGFAN"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "longfan",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "LONGFAN"
+          },
+          "custom:mttf",
+          null,
+          "verified",
+          [
+            [
+              ">150000h",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "LONGFAN"
+          },
+          "runtime",
+          null,
+          "verified",
+          [
+            [
+              28800,
+              "s"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "LONGFAN"
+          },
+          "custom:轴承类型",
+          null,
+          "verified",
+          [
+            [
+              "双滚珠",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "05-09",
+      "domain": "cooling",
+      "title": "冷板毫米公差不应丢失",
+      "family": "length_tolerance",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://cdn.noctua.at/media/noctua_nf_a8_pwm_infosheet_en_web.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: COLDPLATE\n长度: 100±0.2mm\n宽度: 80mm\n材质: 铜\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "COLDPLATE"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "coldplate",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "COLDPLATE"
+          },
+          "length",
+          null,
+          "verified",
+          [
+            [
+              "100±0.2",
+              "mm"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "COLDPLATE"
+          },
+          "width",
+          null,
+          "verified",
+          [
+            [
+              80,
+              "mm"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "COLDPLATE"
+          },
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "铜",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "05-10",
+      "domain": "cooling",
+      "title": "冷热模块相同描述一致",
+      "family": "custom_agreement",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://cdn.noctua.at/media/noctua_nf_a8_pwm_infosheet_en_web.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "a.txt": "SKU: PELTIER\n冷热模式: 制冷/制热\n输入电压: 12V",
+        "b.txt": "SKU: PELTIER\n冷热模式: 制冷/制热\n输入电压: 12000mV"
+      },
+      "facts": [
+        [
+          {
+            "sku": "PELTIER"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "peltier",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PELTIER"
+          },
+          "custom:冷热模式",
+          null,
+          "verified",
+          [
+            [
+              "制冷/制热",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PELTIER"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "06-01",
+      "domain": "solar",
+      "title": "CS6R-400MS STC 参数",
+      "family": "public_pv_conditions",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "public_adapted",
+      "source_url": "https://static.csisolar.com/wp-content/uploads/2020/06/27131418/CS-Datasheet-HiKu6_CS6R-MS_v2.0_EN.pdf",
+      "source_model": "CS6R-400MS",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. Page 2 STC irradiance 1000 W/m2, cell 25 C, AM1.5. Conditions explicitly retained, not a generic maximum.",
+      "files": {
+        "spec.txt": "SKU: PV400\nSTC最大功率: 400W\nSTC工作电压: 30.8V\nSTC工作电流: 12.99A\n工作温度: -40~85°C\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "PV400"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "pv400",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PV400"
+          },
+          "custom:stc最大功率",
+          null,
+          "verified",
+          [
+            [
+              "400w",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PV400"
+          },
+          "custom:stc工作电压",
+          null,
+          "verified",
+          [
+            [
+              "30.8v",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PV400"
+          },
+          "custom:stc工作电流",
+          null,
+          "verified",
+          [
+            [
+              "12.99a",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PV400"
+          },
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                -40,
+                85
+              ],
+              "°C"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "06-02",
+      "domain": "solar",
+      "title": "CS6R-405MS STC 对比 NMOT",
+      "family": "public_pv_conditions",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "public_adapted",
+      "source_url": "https://static.csisolar.com/wp-content/uploads/2020/06/27131418/CS-Datasheet-HiKu6_CS6R-MS_v2.0_EN.pdf",
+      "source_model": "CS6R-405MS",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. Page 2 separate STC and NMOT tables, not a conflict.",
+      "files": {
+        "spec.txt": "SKU: PV405\nSTC最大功率: 405W\nNMOT最大功率: 304W\n重量: 21.3kg\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "PV405"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "pv405",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PV405"
+          },
+          "custom:stc最大功率",
+          null,
+          "verified",
+          [
+            [
+              "405w",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PV405"
+          },
+          "custom:nmot最大功率",
+          null,
+          "verified",
+          [
+            [
+              "304w",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PV405"
+          },
+          "weight",
+          "unspecified",
+          "verified",
+          [
+            [
+              21300,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "06-03",
+      "domain": "solar",
+      "title": "双面组件温度系数",
+      "family": "temperature_coefficient",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://static.csisolar.com/wp-content/uploads/2020/06/27131418/CS-Datasheet-HiKu6_CS6R-MS_v2.0_EN.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: BIFACIAL\n功率温度系数: -0.34%/°C\n双面率: 80%\n防护等级: IP68\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "BIFACIAL"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "bifacial",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "BIFACIAL"
+          },
+          "custom:功率温度系数",
+          null,
+          "verified",
+          [
+            [
+              "-0.34%/°c",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "BIFACIAL"
+          },
+          "custom:双面率",
+          null,
+          "verified",
+          [
+            [
+              "80%",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "BIFACIAL"
+          },
+          "ip_rating",
+          null,
+          "verified",
+          [
+            [
+              "ip68",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "06-04",
+      "domain": "solar",
+      "title": "组件参数条件写在括号",
+      "family": "parenthetical_conditions",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://static.csisolar.com/wp-content/uploads/2020/06/27131418/CS-Datasheet-HiKu6_CS6R-MS_v2.0_EN.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "pv.csv": "SKU,功率(STC),功率(NMOT),重量(kg)\nPVCOND,430W,325W,22.5\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "PVCOND"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "pvcond",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PVCOND"
+          },
+          "custom:功率(stc)",
+          null,
+          "verified",
+          [
+            [
+              "430w",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PVCOND"
+          },
+          "custom:功率(nmot)",
+          null,
+          "verified",
+          [
+            [
+              "325w",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PVCOND"
+          },
+          "weight",
+          "unspecified",
+          "verified",
+          [
+            [
+              22500,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "06-05",
+      "domain": "solar",
+      "title": "控制器极限电压与工作电压",
+      "family": "controller_scope",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://static.csisolar.com/wp-content/uploads/2020/06/27131418/CS-Datasheet-HiKu6_CS6R-MS_v2.0_EN.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: MPPT\n最大电压: 100V\n输入电压: 20~80V\n额定电流: 30A\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "MPPT"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "mppt",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MPPT"
+          },
+          "voltage",
+          "rating:max",
+          "verified",
+          [
+            [
+              100,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MPPT"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              [
+                20,
+                80
+              ],
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MPPT"
+          },
+          "current",
+          "rating:rated",
+          "verified",
+          [
+            [
+              30,
+              "A"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "06-06",
+      "domain": "solar",
+      "title": "支架装配尺寸与零件长度",
+      "family": "mount_geometry",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://static.csisolar.com/wp-content/uploads/2020/06/27131418/CS-Datasheet-HiKu6_CS6R-MS_v2.0_EN.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: PVMOUNT\n产品尺寸: 1200x800x400mm\n长度: 1.2m\n材质: 铝合金\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "PVMOUNT"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "pvmount",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PVMOUNT"
+          },
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                1200,
+                800,
+                400
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PVMOUNT"
+          },
+          "length",
+          null,
+          "verified",
+          [
+            [
+              1200,
+              "mm"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PVMOUNT"
+          },
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "铝合金",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "06-07",
+      "domain": "solar",
+      "title": "逆变器带备注的分号表",
+      "family": "semicolon_nested_quotes",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://static.csisolar.com/wp-content/uploads/2020/06/27131418/CS-Datasheet-HiKu6_CS6R-MS_v2.0_EN.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "inverter.csv": "SKU;输入电压;输出电压;接口\nINVERTER;48V;230V;\"RS485; CAN\"\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "INVERTER"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "inverter",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "INVERTER"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              48,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "INVERTER"
+          },
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              230,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "INVERTER"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "rs485; can",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "06-08",
+      "domain": "solar",
+      "title": "光伏线缆面积单位不当长度",
+      "family": "area_not_length",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://static.csisolar.com/wp-content/uploads/2020/06/27131418/CS-Datasheet-HiKu6_CS6R-MS_v2.0_EN.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: PVCABLE\n导体截面积: 4mm²\n长度: 10m\n颜色: 黑色\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "PVCABLE"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "pvcable",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PVCABLE"
+          },
+          "custom:导体截面积",
+          null,
+          "verified",
+          [
+            [
+              "4mm²",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PVCABLE"
+          },
+          "length",
+          null,
+          "verified",
+          [
+            [
+              10000,
+              "mm"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PVCABLE"
+          },
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "黑色",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "06-09",
+      "domain": "solar",
+      "title": "接线盒结构化重复键不得无声覆盖",
+      "family": "json_duplicate_key",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://static.csisolar.com/wp-content/uploads/2020/06/27131418/CS-Datasheet-HiKu6_CS6R-MS_v2.0_EN.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. Invalid duplicate keys must produce a reported parse error, not choose the last rating.",
+      "files": {
+        "spec.json": "{\"SKU\":\"JBOX\",\"输入电压\":\"1000V\",\"输入电压\":\"1500V\",\"防护等级\":\"IP68\"}"
+      },
+      "facts": [],
+      "expected_error": "duplicate_json_key"
+    },
+    {
+      "id": "06-10",
+      "domain": "solar",
+      "title": "微逆额定功率中的负值",
+      "family": "negative_power",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://static.csisolar.com/wp-content/uploads/2020/06/27131418/CS-Datasheet-HiKu6_CS6R-MS_v2.0_EN.pdf",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: MICROINV\n额定功率: -600W\n接口: AC端子\n防护等级: IP67\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "MICROINV"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "microinv",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MICROINV"
+          },
+          "power",
+          "rating:rated",
+          "pending_confirmation",
+          [
+            [
+              -600,
+              "W"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MICROINV"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "ac端子",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MICROINV"
+          },
+          "ip_rating",
+          null,
+          "verified",
+          [
+            [
+              "ip67",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "07-01",
+      "domain": "environmental_sensor",
+      "title": "SCD41 环境与供电",
+      "family": "public_sensor",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "public_adapted",
+      "source_url": "https://sensirion.com/products/catalog/SCD41",
+      "source_model": "SCD41",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. ",
+      "files": {
+        "spec.txt": "SKU: CO2SENSOR\n输入电压: 2.4~5.5V\n工作温度: -10~60°C\n产品尺寸: 10.1x10.1x6.5mm\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "CO2SENSOR"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "co2sensor",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CO2SENSOR"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              [
+                2.4,
+                5.5
+              ],
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CO2SENSOR"
+          },
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                -10,
+                60
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CO2SENSOR"
+          },
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                10.1,
+                10.1,
+                6.5
+              ],
+              "mm"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "07-02",
+      "domain": "environmental_sensor",
+      "title": "SHT31 小尺寸与宽温度",
+      "family": "public_sensor",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "public_adapted",
+      "source_url": "https://sensirion.com/products/catalog/SHT31-DIS-B",
+      "source_model": "SHT31-DIS-B",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. ",
+      "files": {
+        "spec.txt": "SKU: HUMIDSENSOR\n输入电压: 2.4~5.5V\n工作温度: -40~125°C\n产品尺寸: 2.5x2.5x0.9mm\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "HUMIDSENSOR"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "humidsensor",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "HUMIDSENSOR"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              [
+                2.4,
+                5.5
+              ],
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "HUMIDSENSOR"
+          },
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                -40,
+                125
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "HUMIDSENSOR"
+          },
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                2.5,
+                2.5,
+                0.9
+              ],
+              "mm"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "07-03",
+      "domain": "environmental_sensor",
+      "title": "气体传感器带数字的新表头",
+      "family": "digit_custom_field",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://sensirion.com/products/catalog/SCD41",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "gas.csv": "SKU,CO2量程,PM2.5量程,接口\nAIRMON,400-5000ppm,0-1000ug/m3,I2C\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "AIRMON"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "airmon",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "AIRMON"
+          },
+          "custom:co2量程",
+          null,
+          "verified",
+          [
+            [
+              "400-5000ppm",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "AIRMON"
+          },
+          "custom:pm2.5量程",
+          null,
+          "verified",
+          [
+            [
+              "0-1000ug/m3",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "AIRMON"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "i2c",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "07-04",
+      "domain": "environmental_sensor",
+      "title": "湿度与温度相同数字不合并",
+      "family": "different_parameters",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://sensirion.com/products/catalog/SCD41",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: THSENSOR\n湿度量程: 0~100%RH\n工作温度: 0~100°C\n接口: I2C\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "THSENSOR"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "thsensor",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "THSENSOR"
+          },
+          "custom:湿度量程",
+          null,
+          "verified",
+          [
+            [
+              "0~100%rh",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "THSENSOR"
+          },
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                0,
+                100
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "THSENSOR"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "i2c",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "07-05",
+      "domain": "environmental_sensor",
+      "title": "采集模块 value-unit JSON",
+      "family": "json_value_unit",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://sensirion.com/products/catalog/SCD41",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.json": "{\"SKU\": \"DAQ\", \"输入电压\": {\"value\": 5, \"unit\": \"V\"}, \"重量\": {\"value\": 20, \"unit\": \"g\"}, \"接口\": \"USB\"}"
+      },
+      "facts": [
+        [
+          {
+            "sku": "DAQ"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "daq",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "DAQ"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              5,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "DAQ"
+          },
+          "weight",
+          "unspecified",
+          "verified",
+          [
+            [
+              20,
+              "g"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "DAQ"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "usb",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "07-06",
+      "domain": "environmental_sensor",
+      "title": "传感探头科学计数法",
+      "family": "scientific_notation",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://sensirion.com/products/catalog/SCD41",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: PROBE\n额定电流: 2e-3A\n输入电压: 5V\n接口: 模拟\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "PROBE"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "probe",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PROBE"
+          },
+          "current",
+          "rating:rated",
+          "verified",
+          [
+            [
+              0.002,
+              "A"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PROBE"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              5,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PROBE"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "模拟",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "07-07",
+      "domain": "environmental_sensor",
+      "title": "数据记录器 JSON 空值不能制造 None 字符串",
+      "family": "json_null",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://sensirion.com/products/catalog/SCD41",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. Absent/null attribute is not a claimed fact; missing-source coverage tracked separately.",
+      "files": {
+        "spec.json": "{\"SKU\": \"LOGGER\", \"重量\": null, \"输入电压\": \"3.3V\", \"接口\": \"UART\"}"
+      },
+      "facts": [
+        [
+          {
+            "sku": "LOGGER"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "logger",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "LOGGER"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              3.3,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "LOGGER"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "uart",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "07-08",
+      "domain": "environmental_sensor",
+      "title": "仪表元数据标签不可变事实",
+      "family": "metadata_labels",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://sensirion.com/products/catalog/SCD41",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: AIRQUALITY\n测量原理: 激光散射\n校准周期: 12个月\n注意: 避免凝露\n文档版本: 1.0\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "AIRQUALITY"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "airquality",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "AIRQUALITY"
+          },
+          "custom:测量原理",
+          null,
+          "verified",
+          [
+            [
+              "激光散射",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "AIRQUALITY"
+          },
+          "custom:校准周期",
+          null,
+          "verified",
+          [
+            [
+              "1年",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "07-09",
+      "domain": "environmental_sensor",
+      "title": "压力传感器保留精度表达",
+      "family": "accuracy_expression",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://sensirion.com/products/catalog/SCD41",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: PRESSENSOR\n工作压力: 0~1MPa\n测量精度: ±0.5%FS\n输入电压: 24V\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "PRESSENSOR"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "pressensor",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PRESSENSOR"
+          },
+          "pressure",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                0,
+                1000000
+              ],
+              "Pa"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PRESSENSOR"
+          },
+          "custom:测量精度",
+          null,
+          "verified",
+          [
+            [
+              "±0.5%fs",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PRESSENSOR"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              24,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "07-10",
+      "domain": "environmental_sensor",
+      "title": "监测器单位大小写不得误认微安",
+      "family": "micro_current",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://sensirion.com/products/catalog/SCD41",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "micro.csv": "SKU,输入电压,额定电流,接口\nMICROSENSOR,3V,20uA,SPI\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "MICROSENSOR"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "microsensor",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MICROSENSOR"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              3,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MICROSENSOR"
+          },
+          "current",
+          "rating:rated",
+          "verified",
+          [
+            [
+              2e-05,
+              "A"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MICROSENSOR"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "spi",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "08-01",
+      "domain": "power_tool",
+      "title": "DDF490Z 裸机规格",
+      "family": "public_drill",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "public_adapted",
+      "source_url": "https://www.makita.co.nz/products/model/DDF490Z",
+      "source_model": "DDF490Z",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. Skin weight, not battery-installed weight.",
+      "files": {
+        "spec.txt": "SKU: DRILL490\n裸机净重: 1.0kg\n最大扭矩: 65Nm\n钢材钻孔直径: 13mm\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "DRILL490"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "drill490",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "DRILL490"
+          },
+          "custom:裸机净重",
+          null,
+          "verified",
+          [
+            [
+              "1.0kg",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "DRILL490"
+          },
+          "torque",
+          "rating:max",
+          "verified",
+          [
+            [
+              65,
+              "N·m"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "DRILL490"
+          },
+          "custom:钢材钻孔直径",
+          null,
+          "verified",
+          [
+            [
+              "13mm",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "08-02",
+      "domain": "power_tool",
+      "title": "DDF484Z 材料钻孔能力",
+      "family": "public_drill",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "public_adapted",
+      "source_url": "https://www.makita.co.nz/products/model/DDF484Z",
+      "source_model": "DDF484Z",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. Torque not used: headline 60Nm and table 54Nm use different wording.",
+      "files": {
+        "spec.txt": "SKU: DRILL484\n净重: 1.5kg\n钢材钻孔直径: 13mm\n木材钻孔直径: 38mm\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "DRILL484"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "drill484",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "DRILL484"
+          },
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              1500,
+              "g"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "DRILL484"
+          },
+          "custom:钢材钻孔直径",
+          null,
+          "verified",
+          [
+            [
+              "13mm",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "DRILL484"
+          },
+          "custom:木材钻孔直径",
+          null,
+          "verified",
+          [
+            [
+              "38mm",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "08-03",
+      "domain": "power_tool",
+      "title": "冲击扳手工具与附件商品",
+      "family": "json_child_identity",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.makita.co.nz/products/model/DDF490Z",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.json": "{\"SKU\": \"WRENCH\", \"净重\": \"1.2kg\", \"附件\": {\"SKU\": \"SOCKET\", \"净重\": \"200g\", \"材质\": \"钢\"}}"
+      },
+      "facts": [
+        [
+          {
+            "sku": "WRENCH"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "wrench",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SOCKET"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "socket",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "WRENCH"
+          },
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              1200,
+              "g"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SOCKET"
+          },
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              200,
+              "g"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SOCKET"
+          },
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "钢",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "08-04",
+      "domain": "power_tool",
+      "title": "砂轮机空载转速和负载不同",
+      "family": "rpm_modes",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.makita.co.nz/products/model/DDF490Z",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: GRINDER\n空载转速: 10000rpm\n额定负载转速: 8000rpm\n砂轮直径: 125mm\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "GRINDER"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "grinder",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "GRINDER"
+          },
+          "custom:空载转速",
+          null,
+          "verified",
+          [
+            [
+              "10000rpm",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "GRINDER"
+          },
+          "custom:额定负载转速",
+          null,
+          "verified",
+          [
+            [
+              "8000rpm",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "GRINDER"
+          },
+          "custom:砂轮直径",
+          null,
+          "verified",
+          [
+            [
+              "125mm",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "08-05",
+      "domain": "power_tool",
+      "title": "热风枪档位温度不取第一个",
+      "family": "temperature_options",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.makita.co.nz/products/model/DDF490Z",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: HEATGUN\n工作温度: 300°C / 500°C\n额定功率: 1500W\n接口: 欧规插头\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "HEATGUN"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "heatgun",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "HEATGUN"
+          },
+          "temperature",
+          "operating",
+          "pending_confirmation",
+          [
+            [
+              "300°c / 500°c",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "HEATGUN"
+          },
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              1500,
+              "W"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "HEATGUN"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "欧规插头",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "08-06",
+      "domain": "power_tool",
+      "title": "测距工具否定后明确更正",
+      "family": "explicit_correction",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.makita.co.nz/products/model/DDF490Z",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: DISTANCE\n净重不是300g，正确为净重: 250g\n测量范围: 0.05~40m\n防护等级: IP54\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "DISTANCE"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "distance",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "DISTANCE"
+          },
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              250,
+              "g"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "DISTANCE"
+          },
+          "custom:测量范围",
+          null,
+          "verified",
+          [
+            [
+              "0.05~40m",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "DISTANCE"
+          },
+          "ip_rating",
+          null,
+          "verified",
+          [
+            [
+              "ip54",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "08-07",
+      "domain": "power_tool",
+      "title": "电锯铭牌千分逗号与小数",
+      "family": "thousands",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.makita.co.nz/products/model/DDF490Z",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: SAW\n额定功率: 1,800W\n净重: 4.25kg\n锯片直径: 185mm\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "SAW"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "saw",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SAW"
+          },
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              1800,
+              "W"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SAW"
+          },
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              4250,
+              "g"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SAW"
+          },
+          "custom:锯片直径",
+          null,
+          "verified",
+          [
+            [
+              "185mm",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "08-08",
+      "domain": "power_tool",
+      "title": "批头套装错误数量只阻断自身",
+      "family": "nonintegral_count",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.makita.co.nz/products/model/DDF490Z",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.csv": "SKU,包装数量,材质,颜色\nBITSET,12.5pcs,S2钢,银色\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "BITSET"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "bitset",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "BITSET"
+          },
+          "quantity",
+          null,
+          "pending_confirmation",
+          [
+            [
+              "12.5pcs",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "BITSET"
+          },
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "s2钢",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "BITSET"
+          },
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "银色",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "08-09",
+      "domain": "power_tool",
+      "title": "抛光机模板说明不能变证据",
+      "family": "template_injection",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.makita.co.nz/products/model/DDF490Z",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: POLISHER\n额定功率: 700W\n接口: 两脚插头\n仅为模板，净重: 0.01kg\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "POLISHER"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "polisher",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "POLISHER"
+          },
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              700,
+              "W"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "POLISHER"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "两脚插头",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "08-10",
+      "domain": "power_tool",
+      "title": "多功能机商品隔离表顺序颠倒",
+      "family": "reordered_header",
+      "identity_mode": "product_key",
+      "split": "development",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.makita.co.nz/products/model/DDF490Z",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "tools.csv": "额定功率,接口,SKU,净重\n350W,AC,MULTITOOL,1.4kg\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "MULTITOOL"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "multitool",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MULTITOOL"
+          },
+          "power",
+          "rating:rated",
+          "verified",
+          [
+            [
+              350,
+              "W"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MULTITOOL"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "ac",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "MULTITOOL"
+          },
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              1400,
+              "g"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "09-01",
+      "domain": "adhesive",
+      "title": "VHB4910 厚度与透明外观",
+      "family": "public_tape",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "public_adapted",
+      "source_url": "https://www.3m.com/3M/en_US/p/d/b40072022/",
+      "source_model": "3M VHB 4910",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. Metric nominal thickness selected; not exact imperial conversion.",
+      "files": {
+        "spec.txt": "SKU: TAPE4910\n厚度: 1.0mm\n颜色: 透明\n胶系: 丙烯酸\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "TAPE4910"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "tape4910",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "TAPE4910"
+          },
+          "custom:厚度",
+          null,
+          "verified",
+          [
+            [
+              "1.0mm",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "TAPE4910"
+          },
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "透明",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "TAPE4910"
+          },
+          "custom:胶系",
+          null,
+          "verified",
+          [
+            [
+              "丙烯酸",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "09-02",
+      "domain": "adhesive",
+      "title": "VHB4905 指定卷宽长度",
+      "family": "public_tape",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "public_adapted",
+      "source_url": "https://www.3m.com/3M/en_US/p/d/v100809126/",
+      "source_model": "3M 7010535963",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. ",
+      "files": {
+        "spec.txt": "SKU: TAPE4905\n宽度: 203.2mm\n长度: 65.84m\n厚度: 0.5mm\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "TAPE4905"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "tape4905",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "TAPE4905"
+          },
+          "width",
+          null,
+          "verified",
+          [
+            [
+              203.2,
+              "mm"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "TAPE4905"
+          },
+          "length",
+          null,
+          "verified",
+          [
+            [
+              65840,
+              "mm"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "TAPE4905"
+          },
+          "custom:厚度",
+          null,
+          "verified",
+          [
+            [
+              "0.5mm",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "09-03",
+      "domain": "adhesive",
+      "title": "双面泡棉胶面积不是尺寸",
+      "family": "tape_area",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.3m.com/3M/en_US/p/d/b40072022/",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: FOAMTAPE\n粘接面积: 25cm²\n厚度: 2mm\n颜色: 白色\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "FOAMTAPE"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "foamtape",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "FOAMTAPE"
+          },
+          "custom:粘接面积",
+          null,
+          "verified",
+          [
+            [
+              "25cm²",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "FOAMTAPE"
+          },
+          "custom:厚度",
+          null,
+          "verified",
+          [
+            [
+              "2mm",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "FOAMTAPE"
+          },
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "白色",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "09-04",
+      "domain": "adhesive",
+      "title": "结构胶组分独立对象",
+      "family": "adhesive_components",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.3m.com/3M/en_US/p/d/b40072022/",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "adhesive.json": "[{\"SKU\": \"RESIN-A\", \"净重\": \"750g\", \"颜色\": \"白色\"}, {\"SKU\": \"RESIN-B\", \"净重\": \"250g\", \"颜色\": \"黑色\"}]"
+      },
+      "facts": [
+        [
+          {
+            "sku": "RESIN-A"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "resin-a",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "RESIN-B"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "resin-b",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "RESIN-A"
+          },
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              750,
+              "g"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "RESIN-A"
+          },
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "白色",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "RESIN-B"
+          },
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              250,
+              "g"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "RESIN-B"
+          },
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "黑色",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "09-05",
+      "domain": "adhesive",
+      "title": "环氧胶混合比例不可当数字范围",
+      "family": "mixing_ratio",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.3m.com/3M/en_US/p/d/b40072022/",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: EPOXY\n混合比例: 2:1\n适用期: 30min\n固化时间: 24h\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "EPOXY"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "epoxy",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "EPOXY"
+          },
+          "custom:混合比例",
+          null,
+          "verified",
+          [
+            [
+              "2:1",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "EPOXY"
+          },
+          "custom:适用期",
+          null,
+          "verified",
+          [
+            [
+              "30min",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "EPOXY"
+          },
+          "custom:固化时间",
+          null,
+          "verified",
+          [
+            [
+              "24h",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "09-06",
+      "domain": "adhesive",
+      "title": "密封胶同值单位转换",
+      "family": "sealant_volume",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.3m.com/3M/en_US/p/d/b40072022/",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "a.txt": "SKU: SEALANT\n净容量: 0.3L\n颜色: 灰色",
+        "b.txt": "SKU: SEALANT\n净容量: 300mL"
+      },
+      "facts": [
+        [
+          {
+            "sku": "SEALANT"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "sealant",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SEALANT"
+          },
+          "capacity_volume",
+          null,
+          "verified",
+          [
+            [
+              300,
+              "mL"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SEALANT"
+          },
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "灰色",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "09-07",
+      "domain": "adhesive",
+      "title": "绝缘胶带短期长期耐温",
+      "family": "tape_duration_condition",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.3m.com/3M/en_US/p/d/b40072022/",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: INSUTAPE\n长期耐温: 90°C\n短期耐温: 150°C\n宽度: 19mm\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "INSUTAPE"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "insutape",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "INSUTAPE"
+          },
+          "custom:长期耐温",
+          null,
+          "verified",
+          [
+            [
+              "90°c",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "INSUTAPE"
+          },
+          "custom:短期耐温",
+          null,
+          "verified",
+          [
+            [
+              "150°c",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "INSUTAPE"
+          },
+          "width",
+          null,
+          "verified",
+          [
+            [
+              19,
+              "mm"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "09-08",
+      "domain": "adhesive",
+      "title": "导热胶表格条件不是单位",
+      "family": "adhesive_test_condition",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.3m.com/3M/en_US/p/d/b40072022/",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.csv": "SKU,粘度(25°C),粘度(60°C),颜色\nTHERMALGLUE,4000cP,2000cP,白色\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "THERMALGLUE"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "thermalglue",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "THERMALGLUE"
+          },
+          "custom:粘度(25°c)",
+          null,
+          "verified",
+          [
+            [
+              "4000cp",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "THERMALGLUE"
+          },
+          "custom:粘度(60°c)",
+          null,
+          "verified",
+          [
+            [
+              "2000cp",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "THERMALGLUE"
+          },
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "白色",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "09-09",
+      "domain": "adhesive",
+      "title": "胶粘片限值与公差不同",
+      "family": "adhesive_tolerance",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.3m.com/3M/en_US/p/d/b40072022/",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: SHEETGLUE\n长度: 不超过100mm\n宽度: 50±1mm\n颜色: 透明\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "SHEETGLUE"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "sheetglue",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SHEETGLUE"
+          },
+          "length",
+          null,
+          "verified",
+          [
+            [
+              "≤100",
+              "mm"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SHEETGLUE"
+          },
+          "width",
+          null,
+          "verified",
+          [
+            [
+              "50±1",
+              "mm"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SHEETGLUE"
+          },
+          "color",
+          null,
+          "verified",
+          [
+            [
+              "透明",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "09-10",
+      "domain": "adhesive",
+      "title": "包装胶带关键字值不得当表头",
+      "family": "key_value_orientation",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.3m.com/3M/en_US/p/d/b40072022/",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.csv": "参数,值\nSKU,PACKTAPE\n材质,聚丙烯\n宽度,48mm\n长度,100m\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "PACKTAPE"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "packtape",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PACKTAPE"
+          },
+          "material",
+          null,
+          "verified",
+          [
+            [
+              "聚丙烯",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PACKTAPE"
+          },
+          "width",
+          null,
+          "verified",
+          [
+            [
+              48,
+              "mm"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "PACKTAPE"
+          },
+          "length",
+          null,
+          "verified",
+          [
+            [
+              100000,
+              "mm"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "10-01",
+      "domain": "metrology",
+      "title": "Fluke117 外形与环境",
+      "family": "public_meter",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "public_adapted",
+      "source_url": "https://www.fluke.com/en-us/product/electrical-testing/digital-multimeters/fluke-117",
+      "source_model": "Fluke 117",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. ",
+      "files": {
+        "spec.txt": "SKU: METER117\n产品尺寸: 167x84x46mm\n重量: 550g\n工作温度: -10~50°C\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "METER117"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "meter117",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "METER117"
+          },
+          "dimensions",
+          "product",
+          "verified",
+          [
+            [
+              [
+                167,
+                84,
+                46
+              ],
+              "mm"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "METER117"
+          },
+          "weight",
+          "unspecified",
+          "verified",
+          [
+            [
+              550,
+              "g"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "METER117"
+          },
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                -10,
+                50
+              ],
+              "°C"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "10-02",
+      "domain": "metrology",
+      "title": "Fluke62MAX 测温范围非工作温度",
+      "family": "public_meter",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "public_adapted",
+      "source_url": "https://www.fluke.com/en-us/product/temperature-measurement/ir-thermometers/fluke-62-max",
+      "source_model": "Fluke 62 MAX",
+      "provenance": "Selected factual specifications; translated/reformatted; SKU replaced. Not an original-document end-to-end test. ",
+      "files": {
+        "spec.txt": "SKU: IR62\n测温范围: -30~500°C\n重量: 255g\n防护等级: IP54\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "IR62"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "ir62",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "IR62"
+          },
+          "custom:测温范围",
+          null,
+          "verified",
+          [
+            [
+              "-30~500°c",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "IR62"
+          },
+          "weight",
+          "unspecified",
+          "verified",
+          [
+            [
+              255,
+              "g"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "IR62"
+          },
+          "ip_rating",
+          null,
+          "verified",
+          [
+            [
+              "ip54",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "10-03",
+      "domain": "metrology",
+      "title": "卡尺分辨率与误差不同",
+      "family": "metrology_error",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.fluke.com/en-us/product/electrical-testing/digital-multimeters/fluke-117",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: CALIPER\n测量范围: 0~150mm\n分辨率: 0.01mm\n示值误差: ±0.02mm\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "CALIPER"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "caliper",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CALIPER"
+          },
+          "custom:测量范围",
+          null,
+          "verified",
+          [
+            [
+              "0~150mm",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CALIPER"
+          },
+          "custom:分辨率",
+          null,
+          "verified",
+          [
+            [
+              "0.01mm",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "CALIPER"
+          },
+          "custom:示值误差",
+          null,
+          "verified",
+          [
+            [
+              "±0.02mm",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "10-04",
+      "domain": "metrology",
+      "title": "电子秤防止克和千克混淆",
+      "family": "scale_conflict",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.fluke.com/en-us/product/electrical-testing/digital-multimeters/fluke-117",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "a.txt": "SKU: SCALE\n重量: 2kg\n最大称量: 5kg",
+        "b.txt": "SKU: SCALE\n重量: 2100g\n最大称量: 5kg"
+      },
+      "facts": [
+        [
+          {
+            "sku": "SCALE"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "scale",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SCALE"
+          },
+          "weight",
+          "unspecified",
+          "conflict",
+          [
+            [
+              2000,
+              "g"
+            ],
+            [
+              2100,
+              "g"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SCALE"
+          },
+          "custom:最大称量",
+          null,
+          "verified",
+          [
+            [
+              "5kg",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "10-05",
+      "domain": "metrology",
+      "title": "温度记录仪华氏等价范围",
+      "family": "fahrenheit_range",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.fluke.com/en-us/product/electrical-testing/digital-multimeters/fluke-117",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: TEMPLOGGER\n工作温度: 32~104°F\n储存温度: -40~158°F\n接口: USB\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "TEMPLOGGER"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "templogger",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "TEMPLOGGER"
+          },
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                0,
+                40
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "TEMPLOGGER"
+          },
+          "temperature",
+          "storage",
+          "verified",
+          [
+            [
+              [
+                -40,
+                70
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "TEMPLOGGER"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "usb",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "10-06",
+      "domain": "metrology",
+      "title": "示波器单位列含括号参数",
+      "family": "scope_unit_headers",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.fluke.com/en-us/product/electrical-testing/digital-multimeters/fluke-117",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "scope.csv": "SKU,额定电压(V),净重(g),带宽(MHz)\nOSCILLOSCOPE,12,850,100\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "OSCILLOSCOPE"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "oscilloscope",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "OSCILLOSCOPE"
+          },
+          "voltage",
+          "rating:rated",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "OSCILLOSCOPE"
+          },
+          "net_weight",
+          "net",
+          "verified",
+          [
+            [
+              850,
+              "g"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "OSCILLOSCOPE"
+          },
+          "custom:带宽",
+          null,
+          "verified",
+          [
+            [
+              "100 mhz",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "10-07",
+      "domain": "metrology",
+      "title": "频率计上下界与精度条件",
+      "family": "frequency_limit",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.fluke.com/en-us/product/electrical-testing/digital-multimeters/fluke-117",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: FREQCOUNTER\n最大频率: 10MHz\n典型频率: 1MHz\n精度: ±1ppm\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "FREQCOUNTER"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "freqcounter",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "FREQCOUNTER"
+          },
+          "frequency",
+          "rating:max",
+          "verified",
+          [
+            [
+              10000000,
+              "Hz"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "FREQCOUNTER"
+          },
+          "frequency",
+          "rating:typical",
+          "verified",
+          [
+            [
+              1000000,
+              "Hz"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "FREQCOUNTER"
+          },
+          "custom:精度",
+          null,
+          "verified",
+          [
+            [
+              "±1ppm",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "10-08",
+      "domain": "metrology",
+      "title": "两个型号仪表无 SKU 归属",
+      "family": "meter_model_identity",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.fluke.com/en-us/product/electrical-testing/digital-multimeters/fluke-117",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "meter.json": "[{\"型号\": \"DM-LOW\", \"输入电压\": \"5V\", \"接口\": \"USB\"}, {\"型号\": \"DM-HIGH\", \"输入电压\": \"12V\", \"接口\": \"LAN\"}]"
+      },
+      "facts": [
+        [
+          {
+            "model": "DM-LOW",
+            "variant": null
+          },
+          "model",
+          null,
+          "verified",
+          [
+            [
+              "dm-low",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "model": "DM-LOW",
+            "variant": null
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              5,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "model": "DM-LOW",
+            "variant": null
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "usb",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "model": "DM-HIGH",
+            "variant": null
+          },
+          "model",
+          null,
+          "verified",
+          [
+            [
+              "dm-high",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "model": "DM-HIGH",
+            "variant": null
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              12,
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "model": "DM-HIGH",
+            "variant": null
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "lan",
+              null
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "10-09",
+      "domain": "metrology",
+      "title": "声级计 A 与 C 计权",
+      "family": "acoustic_weighting",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.fluke.com/en-us/product/electrical-testing/digital-multimeters/fluke-117",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: SOUNDMETER\nA计权量程: 30~130dB\nC计权量程: 35~130dB\n输入电压: 9V\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "SOUNDMETER"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "soundmeter",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SOUNDMETER"
+          },
+          "custom:a计权量程",
+          null,
+          "verified",
+          [
+            [
+              "30~130db",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SOUNDMETER"
+          },
+          "custom:c计权量程",
+          null,
+          "verified",
+          [
+            [
+              "35~130db",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "SOUNDMETER"
+          },
+          "voltage",
+          "input",
+          "verified",
+          [
+            [
+              9,
+              "V"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "10-10",
+      "domain": "metrology",
+      "title": "耐压仪负号不能被吞掉",
+      "family": "signed_environment",
+      "identity_mode": "product_key",
+      "split": "holdout",
+      "source_kind": "synthetic_stress",
+      "source_url": "https://www.fluke.com/en-us/product/electrical-testing/digital-multimeters/fluke-117",
+      "source_model": null,
+      "provenance": "Fictional product and values; domain reference is inspiration, NOT evidence of these claims. ",
+      "files": {
+        "spec.txt": "SKU: HIPOT\n工作温度: −10~40°C\n输出电压: 0~5000V\n接口: RS232\n"
+      },
+      "facts": [
+        [
+          {
+            "sku": "HIPOT"
+          },
+          "sku",
+          null,
+          "verified",
+          [
+            [
+              "hipot",
+              null
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "HIPOT"
+          },
+          "temperature",
+          "operating",
+          "verified",
+          [
+            [
+              [
+                -10,
+                40
+              ],
+              "°C"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "HIPOT"
+          },
+          "voltage",
+          "output",
+          "verified",
+          [
+            [
+              [
+                0,
+                5000
+              ],
+              "V"
+            ]
+          ]
+        ],
+        [
+          {
+            "sku": "HIPOT"
+          },
+          "interface",
+          null,
+          "verified",
+          [
+            [
+              "rs232",
+              null
+            ]
+          ]
+        ]
+      ]
+    }
+  ]
+}

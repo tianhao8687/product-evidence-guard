@@ -9,9 +9,11 @@ def equal_value(left: Any, right: Any) -> bool:
     if isinstance(left, bool) or isinstance(right, bool):
         return type(left) is type(right) and left == right
     if isinstance(left, (int, float)) and isinstance(right, (int, float)):
-        return math.isfinite(left) and math.isfinite(right) and abs(left - right) <= 1e-6
+        return math.isfinite(left) and math.isfinite(right) and math.isclose(left, right, rel_tol=1e-12, abs_tol=1e-9)
     if isinstance(left, list) and isinstance(right, list):
         return len(left) == len(right) and all(equal_value(a, b) for a, b in zip(left, right))
+    if isinstance(left, dict) and isinstance(right, dict):
+        return left.keys() == right.keys() and all(equal_value(left[k], right[k]) for k in left)
     return type(left) is type(right) and left == right
 
 

@@ -6,7 +6,7 @@ import json
 import re
 from typing import Iterable
 
-from .field_registry import FIELD_SPECS, FieldDefinition, field_for_label
+from .field_registry import FIELD_SPECS, FieldDefinition, field_for_label, split_label_unit, scope_for_label
 from .models import FactCandidate, SourceBlock
 from .normalization import normalize_text, normalize_value
 
@@ -502,6 +502,11 @@ def infer_semantic_scope(field: str, text: str) -> str | None:
     spec = next((spec for spec in FIELD_SPECS if spec.name == field), None)
     if spec is None:
         return None
+    explicit_label = re.match(r"^\s*(?:[-*•]\s*)?([^:：=]+)[:：=]", text)
+    if explicit_label:
+        declared = scope_for_label(field, explicit_label[1].strip())
+        if declared:
+            return declared
 
     # Only a unique, explicit field label establishes a configured scope.
     # Prefer the longest label so e.g. a compound label is not reinterpreted
@@ -555,13 +560,8 @@ def _table_cell_matches_alias(cell: str, alias: str) -> bool:
     if match:
         return True
     # Unit annotations are common in real spreadsheets: "Weight (kg)".
-    return bool(
-        re.fullmatch(
-            rf"{pattern.pattern}\s*[\(\（][^()\n\r]{{1,32}}[\)\）]",
-            compact,
-            re.IGNORECASE,
-        )
-    )
+    label, unit = split_label_unit(compact)
+    return bool(unit and pattern.fullmatch(label))
 
 
 def _extract_value_after_alias(text: str, alias: str) -> tuple[str, str] | None:
@@ -594,10 +594,13 @@ def _extract_value_after_alias(text: str, alias: str) -> tuple[str, str] | None:
         return None
 
     tail = text[match.end() :]
-    unit_annotation = re.match(r"^\s*[（(]([^()（）\n\r]{1,32})[)）]\s*", tail)
+    unit_annotation = re.match(r"^\s*(?:[（(]([^()（）\n\r]{1,32})[)）]|\[([^\[\]\n\r]{1,32})\])\s*", tail)
     unit_suffix = ""
     if unit_annotation:
-        unit_suffix = " " + unit_annotation[1]
+        _label, unit = split_label_unit(alias + unit_annotation[0].strip())
+        if not unit:
+            return None  # e.g. power(STC) is its own conditioned field
+        unit_suffix = " " + unit
         tail = tail[unit_annotation.end():]
     explicit = re.match(r"^\s*(?:[:：=]|->|为|是)\s*(?P<value>.+?)\s*$", tail)
     if explicit:
@@ -820,11 +823,23 @@ def _extract_single_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
 
 
 def parameter_segments(text: str) -> list[str]:
-    """Split only at a new explicit label; preserve lists and thousands commas."""
-    return [part.strip() for part in re.split(
-        r"[\n\r]|[;；。]\s*(?=[^:：=;；。]{1,64}[:：=])|[,，]\s*(?=[A-Za-z\u3400-\u9fff][^:：=,，;；。]{0,63}[:：=])"
-        + rf"|[;；,，。]\s*(?=(?:{_NEXT_PARAMETER})(?:\s|[:：=为是≤≥<>≈约+\-\d]))", text, flags=re.I
-    ) if part.strip()]
+    """Split explicit labels, keeping exclusion/correction context indivisible.
+
+    Shared by engine fallback routing and rule extraction; repeated calls are
+    idempotent. A pre-split 'template' disclaimer must not expose its value.
+    """
+    result = []
+    for line in text.splitlines():
+        if re.search(r"仅为模板|不代表真实参数|(?:仅供|只是)(?:示例|演示)|\bexample only\b", line, re.I):
+            continue
+        if re.search(r"不是|并非|不为", line):
+            result.append(line.strip())
+            continue
+        result.extend(part.strip() for part in re.split(
+        r"[;；。]\s*(?=[^:：=;；。]{1,64}[:：=])|[,，]\s*(?=[A-Za-z\u3400-\u9fff][^:：=,，;；。]{0,63}[:：=])"
+        + rf"|[;；,，。]\s*(?=(?:{_NEXT_PARAMETER})(?:\s|[:：=为是≤≥<>≈约+\-\d]))", line, flags=re.I
+        ) if part.strip())
+    return result
 
 
 def explicit_parameter(text: str):
@@ -838,11 +853,10 @@ def explicit_parameter(text: str):
         return None
     label, raw = match[1].strip(), match[2].strip()
     # A bracketed table unit is metadata, not part of the field identity.
-    unit = re.fullmatch(r"(.+?)\s*[（(]([^()（）]{1,24})[)）]", label)
+    label, unit = split_label_unit(label)
     if unit:
-        label = unit[1].strip()
-        if not re.search(re.escape(unit[2]), raw, re.I):
-            raw += " " + unit[2]
+        if not re.search(re.escape(unit), raw, re.I):
+            raw += " " + unit
     spec = field_for_label(label)
     return (spec, raw) if spec and raw and len(raw) <= 512 else None
 
@@ -857,7 +871,7 @@ def extract_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
         # A negated old value cannot be recovered by searching for its number.
         # Only use an explicit correction; keep the complete source as evidence.
         if re.search(r"不是|并非|不为", segment):
-            correction = re.search(r"(?:正确|更正为|应为)\s*(.+)$", segment)
+            correction = re.search(r"(?:正确(?:为|是)?|更正为|应为)\s*(.+)$", segment)
             if not correction:
                 continue
             corrected = correction[1]

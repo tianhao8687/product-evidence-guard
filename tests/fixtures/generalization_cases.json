@@ -582,6 +582,7 @@
     {
       "id": "n18",
       "family": "number",
+      "contract_revision": "2026-09-16: bounded scientific notation now supported; 1e3g is exactly 1000g, no longer an unsupported measurement.",
       "files": {
         "spec.txt": "SKU：T100\n净重：1e3g\n"
       },
@@ -602,11 +603,11 @@
           "T100",
           "net_weight",
           "net",
-          "pending_confirmation",
+          "verified",
           [
             [
-              "1e3g",
-              null
+              1000,
+              "g"
             ]
           ]
         ]

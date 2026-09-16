@@ -7,7 +7,7 @@ import json
 import re
 from typing import Any, Sequence
 
-from .field_registry import FIELD_SPECS, field_for_label
+from .field_registry import FIELD_SPECS, field_for_label, split_label_unit
 from .normalization import normalize_text, normalize_value
 
 
@@ -22,22 +22,26 @@ class StructuredCell:
     identity: dict[str, str]
 
 
-_HEADERS = {
-    normalize_text(alias): spec.name
-    for spec in FIELD_SPECS
-    for alias in (*spec.aliases, spec.name)
-}
 _VARIANT_HEADERS = {
     normalize_text(header): spec.name
     for spec in FIELD_SPECS for header in spec.variant_headers
 }
 
 
+def identity_from_values(values: dict[str, set[str]]) -> dict[str, str]:
+    """Shared row/object identity contract; conflicting aliases are ambiguous."""
+    identity = {field: next(iter(items)) for field, items in values.items() if len(items) == 1}
+    if any(len(items) > 1 for items in values.values()):
+        identity["_ambiguous_identity"] = "true"
+    return identity
+
+
 def header_field(value: Any) -> str | None:
     text = normalize_text(str(value or ""))
     # Unit annotations such as "Weight (kg)" are common.
-    base = text.split("(", 1)[0].split("（", 1)[0].strip()
-    return _HEADERS.get(text) or _HEADERS.get(base)
+    base, _unit = split_label_unit(text)
+    spec = field_for_label(base, known_only=True)
+    return spec.name if spec else None
 
 
 def bind_structured_rows(
@@ -80,7 +84,7 @@ def bind_structured_rows(
                 continue
             if any(re.search(r"\d", str(value)) and not header_field(value) for _, value in cells):
                 continue
-            if len(cells) < 2 or not all(field_for_label(str(value).split("(")[0].split("（")[0].strip()) for _, value in cells):
+            if len(cells) < 2 or not all(field_for_label(split_label_unit(str(value))[0]) for _, value in cells):
                 continue
             header_position = position
             break
@@ -89,7 +93,7 @@ def bind_structured_rows(
     # Never discard a column just because there is no specialist rule for it.
     for column, (_location, value) in enumerate(rows[header_position][1]):
         label = str(value or "").strip()
-        spec = field_for_label(label.split("(")[0].split("（")[0].strip())
+        spec = field_for_label(split_label_unit(label)[0])
         if spec:
             header_map.setdefault(column, (label, spec.name))
 
@@ -107,11 +111,10 @@ def bind_structured_rows(
                 bound.append((location, header_text, field, text))
                 if field in {"sku", "model", "variant"}:
                     identity_values.setdefault(field, set()).add(text)
-                base = header_text.split("(", 1)[0].split("（", 1)[0].strip()
+                base, unit = split_label_unit(header_text)
                 if normalize_text(base) in _VARIANT_HEADERS:
                     # Normalize units so 1 L and 1000 mL are one variant.
-                    unit = re.search(r"[（(]([^()（）]+)[)）]", header_text)
-                    normalized = normalize_value(field, text + (" " + unit[1] if unit else ""))
+                    normalized = normalize_value(field, text + (" " + unit if unit else ""))
                     if any(note.startswith("unparsed_") for note in normalized.notes):
                         uncertain_variant = True
                     else:
@@ -120,11 +123,7 @@ def bind_structured_rows(
                         dimensions.setdefault(field, set()).add(token)
         if not bound:
             continue
-        identity = {
-            field: next(iter(values)) for field, values in identity_values.items() if len(values) == 1
-        }
-        if any(len(values) > 1 for values in identity_values.values()):
-            identity["_ambiguous_identity"] = "true"
+        identity = identity_from_values(identity_values)
         if "variant" not in identity:
             if uncertain_variant or any(len(values) > 1 for values in dimensions.values()):
                 identity["_ambiguous_variant"] = "true"

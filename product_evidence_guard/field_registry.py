@@ -275,18 +275,70 @@ def field_definition(name: str) -> FieldDefinition | None:
     return None
 
 
+def split_label_unit(label: str) -> tuple[str, str | None]:
+    """Separate an actual unit annotation, never a test condition (STC, 25°C).
+
+    Common opaque SI/industry units are allowed as header metadata without
+    claiming the normalizer knows how to convert them. Unknown annotations
+    remain part of the open field's identity instead of silently disappearing.
+    """
+    label = str(label).strip()
+    match = re.fullmatch(r"(.+?)\s*(?:\[([^\[\]]{1,32})\]|[（(](.{1,32})[)）])", label)
+    if not match:
+        return label, None
+    unit = (match[2] or match[3]).strip()
+    token = unit.casefold().replace(" ", "")
+    known = {alias.casefold() for family in REGISTRY.unit_families.values() for alias in family.units}
+    # A unit is a unit expression, not arbitrary text between brackets.
+    atom = r"(?:[numkgtµμ]?(?:m|g|s|a|v|w|pa|hz|n|j|l|ohm|ω)|min|h|rpm|db(?:\([ac]\))?|ppm|ppb|cp|pcs|%rh|%|°[cf])(?:[²³]|\^?[23])?"
+    if token not in known and not re.fullmatch(rf"{atom}(?:[/·*]{atom})*", token):
+        return label, None
+    return match[1].strip(), unit
+
+
+def scope_for_label(field: str, label: str) -> str | None:
+    """Scope of an exact explicit label, independent of numeric parsing success."""
+    label = split_label_unit(label)[0].casefold()
+    spec = REGISTRY.by_name(field)
+    if not spec:
+        return None
+    if label in spec.scope_aliases:
+        return spec.scope_aliases[label]
+    if spec.scope_policy != "electrical":
+        return None
+    quantity = {"voltage":("电压", "voltage"), "current":("电流", "current"), "power":("功率", "power")}[field]
+    directions = {"输入":"input", "输出":"output", "input":"input", "output":"output"}
+    ratings = {"额定":"rated", "标称":"nominal", "最大":"max", "最小":"min", "典型":"typical",
+               "rated":"rated", "nominal":"nominal", "maximum":"max", "minimum":"min", "typical":"typical", "max":"max", "min":"min"}
+    for word, scope in directions.items():
+        if any(label == word + (" " if word.isascii() else "") + name for name in quantity):
+            return scope
+    for word, scope in ratings.items():
+        if any(label == word + (" " if word.isascii() else "") + name for name in quantity):
+            return "rating:" + scope
+    return None
+
+
 def field_for_label(label: str, *, known_only: bool = False) -> FieldDefinition | None:
     label = re.sub(r"\s+", " ", str(label).strip()).casefold()
     label = {"噪音": "噪声", "质保期": "保修期", "凈重": "净重", "淨重": "净重"}.get(label, label)
     for spec in FIELD_SPECS:
-        if label in {spec.name, *(alias.casefold() for alias in spec.aliases)}:
+        if label in {spec.name, *(alias.casefold() for alias in spec.aliases)} or scope_for_label(spec.name, label):
             return spec
-    if known_only or not re.fullmatch(r"[a-z\u3400-\u9fff][a-z0-9\u3400-\u9fff _/()（）%+.-]{0,63}", label):
+    if (known_only or not re.fullmatch(r"[a-z0-9\u3400-\u9fff][a-z0-9\u3400-\u9fff _/()（）%+°.\-]{0,63}", label)
+            or not re.search(r"[a-z\u3400-\u9fff]", label)):
+        return None
+    # A leading measurement condition can qualify a field (25°C容量); a
+    # numbered paragraph or a bare measurement (3. Tolerance, 230VAC) cannot.
+    if label[0].isdigit() and not re.match(r"^\d+(?:\.\d+)?\s*(?:°[cf]|%)\s*[a-z\u3400-\u9fff]", label):
         return None
     # These are document structure, not product attributes. Their contents are
     # still retained in source blocks for later extraction/coverage reporting.
     if label in {"备注", "说明", "注", "注意", "提示", "note", "notes", "description", "参数", "数值", "单位", "字段", "值", "field", "value", "parameter", "unit",
-                 "项目", "内容", "主产品", "资料版本", "文档版本", "测试意图", "示例", "样例", "example", "example only"}:
+                 "项目", "内容", "主产品", "资料版本", "文档版本", "测试意图", "示例", "样例", "example", "example only",
+                 "file name", "filename", "document version", "electrical data", "mechanical data"}:
+        return None
+    if re.search(r"(?:^|\s)https?$", label) or re.match(r"^(?:please\s+)?(?:refer\s+to|see\s+)", label):
         return None
     if re.match(r"^(?:figure|fig\.?|table)\s+(?:\d|context\s+line\s+\d)|^[图表]\s*\d+", label):
         return None

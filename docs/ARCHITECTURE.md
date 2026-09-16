@@ -1,14 +1,17 @@
 # Product Evidence Guard 架构设计
 
-最后复核：2026-09-08
+当前契约复核：2026-09-16；下文历史真机耗时与宿主记录保留各自原日期。
+
+本轮测试与局部重构决定见 [100 包跨领域测试报告](CROSS_DOMAIN_TEST_REPORT_20260916.md)。
+结构化改编包通过不代表原始 PDF 表格已经可靠；复杂型号矩阵仍是发布缺口。
 
 Product Evidence Guard 是一条本地证据核验管线。它的核心合同不是“让模型给
 答案”，而是：
 
 ```text
-正式事实
-    ↑ 明确人工确认
-事实候选 ← 证据块 ← 精确来源文件哈希
+来源文件与哈希 → 证据块 → 候选 → 商品 / 参数 / 口径事实组
+                                     ↓
+                          冲突 / 待确认 / 已确认
 ```
 
 模型可以读取或映射证据；文件身份、schema 强制、单位归一、冲突分级、人工确认、
@@ -24,10 +27,11 @@ Product Evidence Guard 是一条本地证据核验管线。它的核心合同不
    两者都没有云端推理回退。
 5. 只有 `qwen_deep_fallback` 才把视觉原文读取和字段映射拆成两次独立模型调用；
    紧凑复核返回 schema 有效空结果时直接安全结束，不重复进入深度调用。
-6. 原始模型输出在通过 JSON、schema、字段白名单、长度/数量和来源关联检查前
-   都是不可信内容。
+6. 原始模型输出在通过 JSON、schema、开放字段标签与专业规则、长度/数量和来源
+   关联检查前都是不可信内容。注册表不是穷尽全部商品参数的白名单。
 7. 单位换算与冲突分级不能依赖模型意见。
-8. 没有明确选择和理由，候选不能成为正式事实。
+8. 清楚、归属明确且无冲突的单来源参数可自动进入已确认；自动确认不是人工批准，
+   也不代替对外授权。用户操作说明选填，原始证据不可被改写。
 9. 只有候选和来源文件哈希仍存在时，人工决定才有效。
 10. “已实现”“单元测试通过”“真机验证”“Qoder 验证”和“离线验证”是不同
     结论。
@@ -238,8 +242,8 @@ flowchart LR
 | 记录 | 关键字段 | 产生方 |
 |---|---|---|
 | `SourceBlock` | block ID、相对文件、文件哈希、类型、定位、原文、识别 confidence 及来源、提取方式、provenance | 解析器或通过校验的视觉读取器 |
-| `FactCandidate` | candidate ID、Product、白名单字段、Scope、原值与标准值、单位、source block ID、文件哈希、定位、mapping confidence 及来源、状态 | 规则提取或通过校验的 mapping |
-| `FactGroup` | Product、字段、Scope、稳定 group ID、分类、严重度、candidate IDs、标准值、三类 confidence、解释与建议 | 确定性 graph engine |
+| `FactCandidate` | candidate ID、Product、开放字段、Scope、原值与标准值、单位、source block ID、文件哈希、定位、mapping confidence 及来源、decision_status | 规则提取或通过校验的 mapping |
+| `FactGroup` | Product、字段、Scope、稳定 group ID、fact_status、verification_method、selected_value/unit、candidate IDs、human_approved、来源数、解释与建议 | 确定性 graph engine |
 | `CrossFieldRelation` | 相关字段、严重度、解释、candidate IDs | 确定性语义口径规则 |
 | `HumanDecision` | session、candidate、动作、理由、来源文件/哈希、时间、工具版本 | 显式用户命令 |
 
@@ -252,13 +256,16 @@ flowchart LR
 - `likely_version_update`
 - `strong_conflict` / `semantic_scope_split`
 
-`pass` 只表示证据内部一致，不代表已经正式批准；`review` 需要人工判断；`block`
-阻止自动选择真值。
+上述 classification 与 pass/review/block 保留为底层诊断和兼容信息，不能直接作为
+用户状态。用户状态以 `fact_status` 为准：verified、pending_confirmation、conflict。
+自动确认与人工确认共用事实表，`human_approved` 单独表示人工批准。
 
 ## 4. 确认、导出与精准失效
 
-人工决定属于某个分析 session 和 candidate。正式导出每次都从当前候选与当前
-决定重建，而不是永久追加曾经确认过的值。
+人工决定属于某个分析 session、候选或事实组。导出每次按当前来源和事实重建，
+不是永久追加曾经确认过的值。默认导出全部当前已确认事实；`--mode human`
+只导出人工批准事实。低层旧 confirm/reject 接口保持兼容，简化入口支持采用、
+修改、本次不使用、撤销；说明选填。以下图描述旧候选决定子流程，不是用户主界面。
 
 ```mermaid
 flowchart TD
@@ -309,7 +316,8 @@ v2 的统一证据身份是 `SourceBlock + Product + Field + Scope + Unit + Valu
 注册表内容变化会更新指纹并使旧缓存失效。新增字段的 Scope/Variant 配置不需要新增
 字段级 Python 分支；未配置的标签不猜 Scope，未配置的表头不参与变体。
 
-决定与导出必须提供同一个 `session_id`。确认和拒绝要求非空理由。
+决定与导出必须校验当前 `session_id`。旧候选接口的理由约束不强加给用户；
+简化事实操作入口允许说明留空，内部仍记录操作审计。
 `confirmation-audit.jsonl` 记录决定及后续 stale。来源一旦改变，文件哈希和
 candidate identity 会变化，旧决定不能静默存活。
 
@@ -382,7 +390,7 @@ AUTO 公开入口记录仍应在最终证据包中保留。官方兼容边界见
 
 | 工件 | 用途 |
 |---|---|
-| `product-facts.json` | 完整候选图；顶层状态始终是 `pending_human_confirmation` |
+| `product-facts.json` | 事实、待确认、冲突与底层证据分离；顶层状态按实际结果为 blocked / awaiting_review / verified / ready_to_export |
 | `conflicts.md` | 冲突、待复核和一致分组的人类可读报告 |
 | `evidence-report.html` | 已转义的本地证据报告 |
 | `run-summary.json` | 改变、复用、删除、跳过和失败文件及分组计数 |
@@ -397,6 +405,10 @@ AUTO 公开入口记录仍应在最终证据包中保留。官方兼容边界见
 [`PRIVACY.md`](../PRIVACY.md) 与 [`SECURITY.md`](../SECURITY.md)。
 
 ## 实现与验证边界
+
+以下表格是历史验证范围，不能把“解析完成、无异常”解释为整篇资料正确提取。
+2026-09-16 的 100 包及 4 份原始 PDF 验证见本页顶部报告；PDF 型号矩阵、父级条件
+和包装层级仍不可靠，不能依据旧功能 smoke 判定当前已满足全面发布要求。
 
 | 领域 | 状态 | 证据或缺口 |
 |---|---|---|

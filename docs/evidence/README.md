@@ -32,6 +32,13 @@ observation-only mixed PDF 结果取代这三份旧基线，旧记录只保留�
 
 ## 其他发布证据
 
+- [cross-domain-100-20260916.json](cross-domain-100-20260916.json)：100 个跨领域结构化资料包的
+  最终预测、修复前 development 与首次 holdout 旧预测的统一重评分；包含 623 项回归、
+  原始 PDF 通路、只读结构探针和旧中文资料包摘要。20 公开改编 / 80 虚构压力，
+  不等于真实业务准确率；原始复杂 PDF 发布门槛未通过。
+  [标注修订](cross-domain-100-annotation-log.md)明确保留初版评分与 gold 的变化。
+  该证据未包含私有文件名/正文、模型目录或第三方 PDF 完整内容。
+
 - Qoder 用户级 Skill 发现截图位于
   [`../assets/qoder/01-skill-discovered.png`](../assets/qoder/01-skill-discovered.png)：
   它来自 2026-08-05 本机 Qoder“技能与指令”设置页，直接显示

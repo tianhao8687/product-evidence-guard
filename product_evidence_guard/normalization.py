@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
+import math
 import re
 from typing import Any
 
@@ -15,7 +16,7 @@ class NormalizedValue:
     notes: tuple[str, ...] = ()
 
 
-_NUMBER = r"[-+]?\d+(?:\.\d+)?"
+_NUMBER = r"[-+]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][-+]?\d+)?"
 
 
 UNIT_RULES = {
@@ -49,6 +50,11 @@ def normalize_text(value: str) -> str:
 def _numeric_text(raw: str) -> str | None:
     # PDF/OCR typography must not turn a negative value into a positive one.
     raw = raw.translate(str.maketrans({"−": "-", "﹣": "-", "－": "-", "＋": "+", "～": "~"}))
+    # Bound numeric expansion before Decimal/int conversion; preserve extreme
+    # or malformed values as reviewable text, never produce Infinity or huge ints.
+    for exponent in re.findall(r"(?<=\d)[eE]([-+]?\d+)", raw):
+        if len(exponent.lstrip("+-")) > 3 or abs(int(exponent)) > 100:
+            return None
     # Never start matching inside a comma-separated number (1,000g -> 0g).
     for token in re.findall(r"\d[\d,]*,\d[\d,]*(?:\.\d+)?", raw):
         if not re.fullmatch(r"\d{1,3}(?:,\d{3})+(?:\.\d+)?", token):
@@ -234,6 +240,10 @@ def normalize_value(field: str, raw: str) -> NormalizedValue:
         text = normalize_text(raw)
         # Spacing is cosmetic; unfamiliar units are retained, never converted.
         text = re.sub(r"(?<=\d)\s+(?=[a-z%°\u3400-\u9fff])", "", text)
+        # Native text and OCR often differ only around a range/tolerance sign.
+        # Preserve the operator, bounds, units and trailing conditions verbatim;
+        # do not interpret a hyphen as a range or infer compatible expressions.
+        text = re.sub(r"\s*([~±])\s*(?=[+\-]?(?:\d|\.\d))", r"\1", text)
         # Calendar periods are not fixed numbers of seconds. Only exact,
         # whole-year/month expressions are interchangeable here.
         period = re.fullmatch(r"(\d+)\s*(年|years?|个月|月|months?)", text)
@@ -268,7 +278,7 @@ def invalid_fact_value(field: str, raw: str, value: Any) -> bool:
         return True
     spec = field_definition(field)
     nonnegative = field == "quantity" or bool(spec and spec.unit_family in {
-        "mass", "length", "capacity_volume", "capacity_charge", "duration"})
+        "mass", "length", "capacity_volume", "capacity_charge", "duration", "power"})
     values = value if isinstance(value, list) else [value]
     if spec and spec.value_type != "dimensions" and isinstance(value, list) and len(value) == 2:
         is_range = re.search(r"\d(?:\s*[A-Za-z°℃℉]+)?\s*(?:[-~–—]|to|至|到)\s*[+\-]?\d", _numeric_text(raw) or "", re.I)
@@ -277,9 +287,19 @@ def invalid_fact_value(field: str, raw: str, value: Any) -> bool:
     return nonnegative and any(isinstance(v, (int, float)) and v < 0 for v in values)
 
 
-def values_equal(a: Any, b: Any, tolerance: float = 1e-6) -> bool:
+def values_equal(a: Any, b: Any, tolerance: float = 1e-9) -> bool:
+    """Computational rounding tolerance, never a product's allowed deviation.
+
+    A blanket 1e-6 in base units merged distinct sub-microamp measurements.
+    Reuse this comparison for graph, user decisions and content validation.
+    """
+    if isinstance(a, bool) or isinstance(b, bool):
+        return type(a) is type(b) and a == b
     if isinstance(a, (int, float)) and isinstance(b, (int, float)):
-        return abs(float(a) - float(b)) <= tolerance
+        return math.isfinite(a) and math.isfinite(b) and math.isclose(a, b, rel_tol=1e-12, abs_tol=tolerance)
+    if isinstance(a, list) or isinstance(b, list):
+        return (isinstance(a, list) and isinstance(b, list) and len(a) == len(b)
+                and all(values_equal(left, right, tolerance) for left, right in zip(a, b)))
     return a == b
 
 
