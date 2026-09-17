@@ -80,6 +80,18 @@
       "test_review_consistency"
     ]
   },
+  "packaging_fixture_regression": {
+    "first_actual_package": "blocked: synthetic Windows absolute-path literal in tests/test_source_links.py",
+    "resolution": "Generate the same synthetic absolute path at runtime with PureWindowsPath; preserve the absolute-path and link-rejection assertions. Release privacy rules are unchanged.",
+    "product_code_changed": false,
+    "test_methods": 36,
+    "passed": 34,
+    "skipped": 2,
+    "skip_reason": "Windows symbolic-link privilege unavailable",
+    "failures": 0,
+    "seconds": 61.696,
+    "suites": ["test_source_links", "test_release_package", "test_submission_contract"]
+  },
   "browser_regression": {
     "status": "passed",
     "headless": true,

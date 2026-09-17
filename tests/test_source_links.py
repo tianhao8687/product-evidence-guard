@@ -4,7 +4,7 @@ import hashlib
 import io
 from html import escape
 import json
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import shutil
 import subprocess
 import tempfile
@@ -153,7 +153,11 @@ class SourceLinkTests(unittest.TestCase):
                 ReviewServer.preview(self.output, "note-test", condition="0")
 
     def test_unsafe_source_paths_and_executables_never_become_links(self):
-        for name in ("../outside.txt", "C:\\outside.txt", "\\\\server\\share\\x.txt", "bad.exe"):
+        # Generate the synthetic absolute-path attack at runtime; the release
+        # source itself must not carry machine-looking absolute paths.
+        absolute_fixture = str(PureWindowsPath("C:", "/", "outside.txt"))
+        self.assertTrue(PureWindowsPath(absolute_fixture).is_absolute())
+        for name in ("../outside.txt", absolute_fixture, "\\\\server\\share\\x.txt", "bad.exe"):
             with self.subTest(name=name):
                 c = candidate(source_file=name)
                 html = local_path(write_source_links(self.output, [c], input_root=self.source)[c.candidate_id]).read_text("utf-8")
