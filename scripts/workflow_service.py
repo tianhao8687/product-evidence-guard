@@ -51,6 +51,8 @@ class WorkflowService:
         self.requests[output] = {k: payload.get(k) for k in
                                  ("input_dir", "openvino_model", "openvino_vlm_model", "device")}
         self.requests[output]["output_dir"] = output
+        if "no_semantic_assist" in payload:
+            self.requests[output]["no_semantic_assist"] = payload["no_semantic_assist"]
         atomic_write_json(self.request_path, self.requests)
 
     def _execute_job(self, payload, progress):

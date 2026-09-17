@@ -133,21 +133,16 @@ def _identity_values(items: Iterable[FactCandidate]) -> tuple[str | None, str | 
 
 
 def _expand_applicability(rows: list[FactCandidate]) -> list[FactCandidate]:
-    declarations: dict[str, list[list[str]]] = defaultdict(list)
-    for item in rows:
-        if item.field == "sku" and not item.provenance.get("structured_row"):
-            tokens = product_tokens(_candidate_text(item))
-            if tokens:
-                declarations[item.source_file].append(tokens)
     expanded = []
     for item in rows:
         if item.provenance.get("structured_row") or item.provenance.get("applicable_sku"):
             expanded.append(item)
             continue
         inline = product_tokens(str(item.provenance.get("explicit_product_token") or ""))
-        declared = declarations.get(item.source_file, [])
-        shared = declared[0] if len(declared) == 1 and len(declared[0]) > 1 else []
-        tokens = inline or (product_tokens(_candidate_text(item)) if item.field == "sku" else shared)
+        # A document listing several SKUs does not say that every following
+        # parameter applies to all of them. Only an explicit inline binding
+        # (or a structured row above) establishes shared applicability.
+        tokens = inline or (product_tokens(_candidate_text(item)) if item.field == "sku" else [])
         if not tokens:
             expanded.append(item)
             continue
@@ -155,6 +150,7 @@ def _expand_applicability(rows: list[FactCandidate]) -> list[FactCandidate]:
             candidate = item if index == 0 else replace(item)
             candidate.provenance = {**item.provenance, "applicable_sku": token}
             if item.field == "sku" and len(tokens) > 1:
+                candidate.provenance["multi_product_declaration"] = True
                 candidate.raw_value, candidate.normalized_value = token, normalize_text(token)
             expanded.append(candidate)
     return expanded
@@ -208,14 +204,22 @@ def resolve_product_identities(
             for candidate in unstructured:
                 if id(candidate) not in uncertain and not candidate.provenance.get("applicable_sku"):
                     resolved[id(candidate)] = anchor
-        elif len(explicit_skus) > 1:
-            # Explicit SKU headings own following lines until the next SKU.
-            # Never propagate a row in a multi-product table to other rows.
+        else:
+            # SKU and model sections share one inheritance rule. Model sections
+            # are used only without SKU anchors; do not merge model variants or
+            # let a table row lend identity to surrounding prose.
+            section_field = ("sku" if len(explicit_skus) > 1 else
+                             "model" if not explicit_skus and len(models) > 1 else None)
+            if section_field is None:
+                continue
             anchor = None
-            for candidate in unstructured:
+            for candidate in items:
+                if candidate.provenance.get("structured_row"):
+                    anchor = None
+                    continue
                 own = resolved.get(id(candidate))
-                if own and own[1] and candidate.field == "sku":
-                    anchor = own
+                if candidate.field == section_field:
+                    anchor = None if candidate.provenance.get("multi_product_declaration") else own
                 elif anchor and id(candidate) not in uncertain and not candidate.provenance.get("applicable_sku"):
                     resolved[id(candidate)] = (*anchor[:4], "derived_from_source_section")
 

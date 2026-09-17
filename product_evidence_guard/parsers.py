@@ -246,12 +246,7 @@ def parse_csv(path: Path, relative_path: str, file_hash: str) -> list[SourceBloc
                 text=f"{cell.header}: {cell.value}",
                 method="deterministic_structured_row",
             ))
-            blocks[-1].provenance["structured_row"] = {
-                "row_id": cell.row_id,
-                "identity": dict(cell.identity),
-                "field": cell.field,
-            }
-            blocks[-1].provenance["parent_labels"] = list(cell.parent_labels)
+            blocks[-1].provenance.update(cell.provenance)
         return blocks
     for row_number, row in source_rows:
         nonempty = [
@@ -441,12 +436,7 @@ def parse_docx_document(
                         text=f"{cell.header}: {cell.value}",
                         method="deterministic_structured_row",
                     ))
-                    blocks[-1].provenance["structured_row"] = {
-                        "row_id": cell.row_id,
-                        "identity": dict(cell.identity),
-                        "field": cell.field,
-                    }
-                    blocks[-1].provenance["parent_labels"] = list(cell.parent_labels)
+                    blocks[-1].provenance.update(cell.provenance)
                 table_index += 1
                 continue
             for row_index, row in enumerate(table.rows):
@@ -551,12 +541,7 @@ def parse_xlsx_document(
                         text=f"{cell.header}: {cell.value}",
                         method="deterministic_structured_row",
                     ))
-                    blocks[-1].provenance["structured_row"] = {
-                        "row_id": cell.row_id,
-                        "identity": dict(cell.identity),
-                        "field": cell.field,
-                    }
-                    blocks[-1].provenance["parent_labels"] = list(cell.parent_labels)
+                    blocks[-1].provenance.update(cell.provenance)
                 continue
             for row_number, row in source_rows:
                 cells = [(coordinate, value) for coordinate, value in row if value not in (None, "")]

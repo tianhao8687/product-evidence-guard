@@ -7,7 +7,7 @@ import re
 from typing import Any, Callable, Generic, Mapping, Sequence, TypeVar
 
 from .extractor import FIELD_SPECS
-from .field_registry import field_definition, field_for_label
+from .field_registry import field_definition, field_for_label, is_parameter_heading
 
 
 SCHEMA_VERSION = 1
@@ -678,6 +678,8 @@ def parse_field_mapping_output(
                     "transcription_id 未关联到第一步的合法原文。",
                     index,
                 )
+            elif is_parameter_heading(source_text):
+                association_error = _issue(stage, "heading_without_value", "完整字段名本身不是参数值。", index)
             elif raw_value is not None and raw_value not in source_text:
                 association_error = _issue(
                     stage,

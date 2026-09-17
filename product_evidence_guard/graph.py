@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+from decimal import Decimal
+import math
 from pathlib import PurePosixPath
 import re
 from statistics import mean
@@ -8,8 +10,8 @@ from typing import Iterable
 
 from .models import CrossFieldRelation, FactCandidate, FactGroup
 from .identity import conflict_group_id, evidence_identity, graph_identity, identity_needs_review, product_label
-from .normalization import normalize_text, normalize_fact_text, values_equal, qualified_values_compatible, invalid_fact_value
-from .field_registry import field_definition
+from .normalization import normalize_text, normalize_fact_text, values_equal, qualified_values_compatible, value_review_reason
+from .field_registry import REGISTRY, field_definition, unit_rule
 
 
 FACT_STATUS_LABELS = {"verified": "已确认", "pending_confirmation": "待确认", "conflict": "冲突"}
@@ -35,6 +37,43 @@ def _clear_recognition(item: FactCandidate) -> bool:
 def _corroborated(item: FactCandidate, candidates: list[FactCandidate]) -> bool:
     return any(_clear_recognition(other) and other.normalized_unit == item.normalized_unit
                and values_equal(other.normalized_value, item.normalized_value) for other in candidates)
+
+
+def _field_binding_clear(item: FactCandidate, candidates: list[FactCandidate]) -> bool:
+    if item.status == "confirmed" or item.provenance.get("parameter_binding") != "inferred_value_first":
+        return True
+    # These candidates already share a product/field/scope group. An explicit
+    # label establishes the field even when its value differs (a conflict),
+    # while repeated ambiguous prose cannot certify itself by majority vote.
+    return any((other.status == "confirmed" or other.provenance.get("parameter_binding") != "inferred_value_first")
+               and _clear_recognition(other) and other.mapping_confidence >= 0.8
+               and other.scope == item.scope for other in candidates)
+
+
+def _opaque_text_needs_review(field: str, candidates: list[FactCandidate]) -> bool:
+    """Different untyped prose is not proof of a contradiction.
+
+    Open fields still support clear numeric conflicts (45dB vs 60dB). For
+    compound/free text, keep both original expressions for one user choice;
+    don't invent a semantic equivalence or a blocking conflict.
+    """
+    if not field.startswith("custom_"):
+        return False
+    scalar = re.compile(r"^(?P<number>[-+]?(?:\d+(?:\.\d+)?|\.\d+))\s*(?P<unit>[A-Za-zµμΩω°℃%²³/·\u3400-\u9fff]*)$")
+    matches = [scalar.fullmatch(str(c.normalized_value)) for c in candidates]
+    if not all(matches):
+        return True
+    if len({m["unit"] for m in matches}) == 1:
+        return False
+    # Different unit spellings need the shared, case-sensitive unit registry.
+    # 1 mW vs 1 MW is a real numeric difference; 1000 mW vs 1 W is not.
+    # Do not add field-name exceptions or invent conversions for opaque units.
+    common = [[unit_rule(family, m["unit"]) for m in matches] for family in REGISTRY.unit_families]
+    common = [rules for rules in common if all(rule is not None for rule in rules)]
+    if len(common) != 1:
+        return True
+    values = [float(Decimal(m["number"]) * rule.scale + rule.offset) for m, rule in zip(matches, common[0])]
+    return not all(math.isfinite(value) for value in values) or all(values_equal(values[0], value) for value in values[1:])
 
 
 def refresh_fact_status(groups: Iterable[FactGroup], candidates: Iterable[FactCandidate],
@@ -75,6 +114,8 @@ def refresh_fact_status(groups: Iterable[FactGroup], candidates: Iterable[FactCa
         # Same-byte renamed copies are not additional independent documents.
         group.independent_source_count = len({item.file_hash or item.source_file for item in verified_sources})
         spec = field_definition(group.field)
+        value_errors = {value_review_reason(item.field, item.value_input, item.normalized_value,
+                                           item.normalized_unit, item.notes) for item in valid}
         if not group.current:
             code = "source_changed"
         elif not active:
@@ -88,19 +129,19 @@ def refresh_fact_status(groups: Iterable[FactGroup], candidates: Iterable[FactCa
             code = "scope_unclear"
         elif blocked_ids.intersection(group.candidate_ids):
             code = "blocking_relation"
-        elif any(invalid_fact_value(item.field, item.raw_value, item.normalized_value) for item in valid):
+        elif "invalid_value" in value_errors:
             code = "invalid_value"
-        elif any((any(note.startswith("unparsed_") for note in item.notes) or
-                 (spec and spec.value_type != "text" and item.normalized_unit is None) or
-                 (item.status != "confirmed" and (not _corroborated(item, valid) or
-                    (item.mapping_confidence_source != "deterministic" and item.mapping_confidence < 0.8))))
-                 and not (item.status == "confirmed" and item.extraction_method == "human_correction")
-                 for item in valid):
+        elif "unclear_value" in value_errors or any(
+                item.status != "confirmed" and (not _field_binding_clear(item, valid) or not _corroborated(item, valid) or
+                (item.mapping_confidence_source != "deterministic" and item.mapping_confidence < 0.8
+                 and not (item.mapping_confidence_source == "local_ai_literal_guard"
+                          and item.provenance.get("semantic_review", {}).get("accepted") is True)))
+                for item in valid):
             code = "unclear_value"
         elif _likely_version_update(valid) and not (human and _all_equal(valid)):
             code = "version_unclear"
         elif not _all_equal(valid):
-            if (group.field in {"material", "color"} and _compatible_text_values(valid)) or all(
+            if _opaque_text_needs_review(group.field, valid) or (group.field in {"material", "color"} and _compatible_text_values(valid)) or all(
                 a.normalized_unit == b.normalized_unit and (
                     values_equal(a.normalized_value, b.normalized_value) or
                     qualified_values_compatible(a.normalized_value, b.normalized_value))

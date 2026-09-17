@@ -745,6 +745,7 @@ def _command_payload(args: argparse.Namespace) -> dict[str, Any]:
         return {
             **({"background": True} if args.background else {}),
             **({"no_visual_cache": True} if args.no_visual_cache else {}),
+            "no_semantic_assist": args.no_semantic_assist,
             "input_dir": str(Path(args.input_dir).expanduser().resolve()),
             "output_dir": (
                 str(Path(args.output_dir).expanduser().resolve())
@@ -871,6 +872,10 @@ def build_parser() -> argparse.ArgumentParser:
     analyze.add_argument("--background", action="store_true", help="返回任务编号，后台运行并保留进度")
     analyze.add_argument("--brief", action="store_true", help="仅返回可交给宿主的简短统计")
     analyze.add_argument("--no-visual-cache", action="store_true", help="仅供基准测试跳过常驻图片缓存；模型仍复用")
+    semantic = analyze.add_mutually_exclusive_group()
+    semantic.add_argument("--semantic-assist", dest="no_semantic_assist", action="store_false", default=True,
+                          help="可选：启用疑难文字的本地 AI 辅助")
+    semantic.add_argument("--no-semantic-assist", action="store_true", help="关闭疑难文字的 AI 辅助；保留图片识别")
     analyze.add_argument("--output", "--output-dir", dest="output_dir", default=None)
     analyze.add_argument("--openvino-model", default=None)
     analyze.add_argument(

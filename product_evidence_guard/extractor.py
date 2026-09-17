@@ -6,9 +6,9 @@ import json
 import re
 from typing import Iterable
 
-from .field_registry import FIELD_SPECS, FieldDefinition, field_for_label, split_label_unit, scope_for_label, unit_pattern
+from .field_registry import FIELD_SPECS, FieldDefinition, field_for_label, is_parameter_heading, split_label_unit, scope_for_label, unit_pattern
 from .models import FactCandidate, SourceBlock
-from .normalization import normalize_text, normalize_fact_text, normalize_value
+from .normalization import normalize_text, normalize_fact_text, normalize_value, measurement_context_consumed
 
 # Compatibility name retained for integrations that imported FieldSpec.
 FieldSpec = FieldDefinition
@@ -673,6 +673,7 @@ def _extract_labeled_electrical_candidates(block: SourceBlock) -> list[FactCandi
     result: list[FactCandidate] = []
     specs = {spec.name: spec for spec in FIELD_SPECS}
     field_kinds = [name for name, pattern in _ELECTRICAL_TOKEN_PATTERNS.items() if pattern.search(value_text)]
+    consumed_spans = []
     for field, token_pattern in _ELECTRICAL_TOKEN_PATTERNS.items():
         # Bounds and tolerances belong to the measurement, not decoration.
         tokens = []
@@ -687,6 +688,7 @@ def _extract_labeled_electrical_candidates(block: SourceBlock) -> list[FactCandi
             if item.start() and value_text[item.start() - 1] in ",.±":
                 continue
             tokens.append(value_text[start:end].strip())
+            consumed_spans.append((start, end))
             consumed_end = end
         if not tokens:
             continue
@@ -754,12 +756,32 @@ def _extract_labeled_electrical_candidates(block: SourceBlock) -> list[FactCandi
                 provenance=dict(block.provenance),
             )
         )
+    if len(field_kinds) > 1:
+        # A compound IO line is one assertion. All of its words must be
+        # explained, not only the measurement substrings chosen above.
+        spans = sorted(set(consumed_spans))
+        context = value_text
+        # Separators are meaningful only *between* complete measurements;
+        # a slash inside an unknown unit must not pass this check.
+        for left, right in zip(spans, spans[1:]):
+            gap = context[left[1]:right[0]]
+            if re.fullmatch(r"[\s/;,，；]+", gap):
+                context = context[:left[1]] + " " * len(gap) + context[right[0]:]
+        if not measurement_context_consumed(context, spans, "voltage"):
+            for item in result:
+                item.raw_value = value_text
+                item.normalized_value = normalize_fact_text(value_text)
+                item.normalized_unit = None
+                item.notes = ["unparsed_compound_expression"]
+                item.candidate_id = _candidate_id(block, item.field, value_text)
     return result
 
 
 def _extract_single_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
     text = block.text.strip()
-    if not text:
+    if not text or is_parameter_heading(text):
+        # Resolve the whole field label before searching shorter aliases.
+        # A heading has no value, even when OCR and a model agree on its text.
         return []
     if (
         len(_io_directions(text)) > 1
@@ -876,12 +898,11 @@ def explicit_parameter(text: str):
 
 
 def _value_first_parameter(text: str) -> str | None:
-    """Bind a complete short measurement/acronym line, not a prose fragment.
+    """Recognize a complete short value/label line, without a casing heuristic.
 
     Known numeric labels may follow a measurement (80 grams net weight).
-    Open fields require a single uppercase technical label (384 kB ROM,
-    21 GPIO); no per-product/parameter allowlist. Unknown prose labels and
-    multiple values/conditions remain unbound rather than being guessed.
+    Open labels are hypotheses until an explicit field binding (or a human)
+    establishes their meaning. Capital letters are not semantic evidence.
     """
     text = re.sub(r"^\s*[-*•]\s+", "", text).strip()
     if len(text) > 96 or re.search(r"[:：=\n\r|;；,，。]", text):
@@ -896,7 +917,7 @@ def _value_first_parameter(text: str) -> str | None:
         if not spec or spec.category == "identity":
             continue
         if spec.name.startswith("custom_"):
-            if not re.fullmatch(r"[A-Z][A-Z0-9]*(?:[_-][A-Z0-9]+)*", label) or len(label) < 2:
+            if not re.fullmatch(r"[A-Za-z][A-Za-z0-9]*(?:[_-][A-Za-z0-9]+)*", label) or len(label) < 2:
                 continue
             # A bare measurement such as '21 MW' has no parameter label.
             if split_label_unit("value (" + label + ")")[1]:
@@ -920,6 +941,13 @@ def extract_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
     for segment in block_segments(block):
         original = segment
         segment, sku = strip_product_prefix(segment)
+        row = block.provenance.get("structured_row", {})
+        explicit = explicit_parameter(segment)
+        if explicit and row.get("field") == explicit[0].name and isinstance(row.get("parameter_value"), str):
+            # The reader already separated the value and context columns.
+            # Keep the full evidence row while normalizing only its value.
+            label = re.split(r"[:：=]", segment, maxsplit=1)[0]
+            segment = label + ": " + row["parameter_value"]
         # A negated old value cannot be recovered by searching for its number.
         # Only use an explicit correction; keep the complete source as evidence.
         if re.search(r"不是|并非|不为", segment):
@@ -938,6 +966,8 @@ def extract_rule_candidates(block: SourceBlock) -> list[FactCandidate]:
         if value_first:
             segment = value_first
             provenance["parameter_order"] = "value_first"
+            if explicit_parameter(segment)[0].name.startswith("custom_"):
+                provenance["parameter_binding"] = "inferred_value_first"
         part = replace(block, text=segment, provenance=provenance)
         explicit = explicit_parameter(segment)
         if (explicit and explicit[0].name.startswith("custom_")

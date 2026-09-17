@@ -1,0 +1,2896 @@
+{
+  "annotation": "agent visual source-side adjudication, not independent human signoff",
+  "gold_sha256": "984c3808cb7bb03eb9dc1668e9a670ed6471a6da9375f40342c0c65ca2c3f888",
+  "code_sha256": "f3daaae90004d2057461a49d957f171f2ad718da1bfaa04c6cc1050f65b1ce45",
+  "interpretation": "22/44 is complete adopted checkpoint coverage, not whole-document accuracy or recall. Fidelity checks are only on emitted adopted values, not a certification of cross-model ownership.",
+  "modes": {
+    "stable-rules": {
+      "runner": {
+        "manifest_sha256": "984c3808cb7bb03eb9dc1668e9a670ed6471a6da9375f40342c0c65ca2c3f888",
+        "code_sha256": "f3daaae90004d2057461a49d957f171f2ad718da1bfaa04c6cc1050f65b1ce45",
+        "mode": "rules",
+        "results": [
+          {
+            "case": "monacor",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"monacor\", \"counts\": {\"verified\": 18, \"pending_confirmation\": 4, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 1.244
+          },
+          {
+            "case": "moxa",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"moxa\", \"counts\": {\"verified\": 57, \"pending_confirmation\": 3, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 3.847
+          },
+          {
+            "case": "danfoss",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"danfoss\", \"counts\": {\"verified\": 2, \"pending_confirmation\": 0, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 1.723
+          },
+          {
+            "case": "cable",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"cable\", \"counts\": {\"verified\": 26, \"pending_confirmation\": 8, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 2.962
+          }
+        ],
+        "complete": true
+      },
+      "cases": [
+        {
+          "case": "monacor",
+          "output_sha256": "887d4dc2fae9dbe810305832a2bfaa6bbc20509ad18da7efb6b61473e0ac426d",
+          "fact_status_counts": {
+            "verified": 18,
+            "pending_confirmation": 4,
+            "conflict": 0
+          },
+          "coverage": {
+            "status": "complete",
+            "files": 1,
+            "unfinished_files": 0,
+            "unfinished_pages": 0,
+            "unfinished_images": 0,
+            "message": "已扫描 1 份资料。本次读取已完成；不代表资料中的所有参数都已被识别。",
+            "can_retry": false,
+            "issue_count": 0
+          },
+          "checkpoints": [
+            {
+              "id": "monacor-01",
+              "outcome": "complete_adopted",
+              "group_id": "group_3701fa756bdc2da84bf5"
+            },
+            {
+              "id": "monacor-02",
+              "outcome": "complete_adopted",
+              "group_id": "group_0f179010aac6105df2a7"
+            },
+            {
+              "id": "monacor-03",
+              "outcome": "complete_adopted",
+              "group_id": "group_027cea37a0903747e1e7"
+            },
+            {
+              "id": "monacor-04",
+              "outcome": "complete_adopted",
+              "group_id": "group_6822dea1c93fc3e2d957"
+            },
+            {
+              "id": "monacor-05",
+              "outcome": "complete_adopted",
+              "group_id": "group_69294f22c657efe024f4"
+            },
+            {
+              "id": "monacor-06",
+              "outcome": "complete_adopted",
+              "group_id": "group_9336a6e9683a2e90b2fa"
+            },
+            {
+              "id": "monacor-07",
+              "outcome": "complete_adopted",
+              "group_id": "group_d9e78b832f08574250a4"
+            },
+            {
+              "id": "monacor-08",
+              "outcome": "complete_adopted",
+              "group_id": "group_b8c167d34ffbf46e3150"
+            },
+            {
+              "id": "monacor-09",
+              "outcome": "complete_adopted",
+              "group_id": "group_70e80d4b04d23c661795"
+            },
+            {
+              "id": "monacor-10",
+              "outcome": "complete_adopted",
+              "group_id": "group_7e5bcf6182566058cca9"
+            }
+          ],
+          "adopted_audit": [
+            {
+              "group_id": "group_b8c167d34ffbf46e3150",
+              "adopted_value_sha256": "f1446a91d0c9347f33199ebfb5b0cc8d84d6b87b15e30ce5585e691d62d22252",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_d9e78b832f08574250a4",
+              "adopted_value_sha256": "431b32a99fd132b5bc94b084e1b22fd14211fe41054e092d5390b558c7dafb13",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_5a359fa5e6b9ffb45d8c",
+              "adopted_value_sha256": "f69a318c48876f2e978f7f4847941e1cff2a31c81274904424d81171ac894eb0",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_3701fa756bdc2da84bf5",
+              "adopted_value_sha256": "d007511751841a9208f7b005718a57f32ffeaa2b761dc601a8bcf236d6cde7a3",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_0f122bf96ab9d644c27a",
+              "adopted_value_sha256": "dd3f2012c89a7057623529530889b71d77d7953a120b41f34df69babb22f4dc7",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_69294f22c657efe024f4",
+              "adopted_value_sha256": "a07e241b160198306bcf91e1bb7979149b02c73a2a75f05c0ec52d98ebb129d7",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_9336a6e9683a2e90b2fa",
+              "adopted_value_sha256": "5db023950733a8d04d7cfc92eefd763d613fe34eb80787e9a30bc8a217f803fd",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_4157addd79f8e826a7b7",
+              "adopted_value_sha256": "fa27bc4feca3a7ecae182eef38cf24b18726ee1e910112661852fc260a0d5ee2",
+              "locator_pages": [
+                1
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_70e80d4b04d23c661795",
+              "adopted_value_sha256": "f19f7f5958473f57918606a054364c020091b317b8a5185766d063de45383a6a",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_7e5bcf6182566058cca9",
+              "adopted_value_sha256": "c6aff5f4c4b08f43ecc4c795751cc739afac2f81ddca09edd3d03c8b88cfcbb9",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_4ac3140be46801f2fb13",
+              "adopted_value_sha256": "7f3da205c5d0bd2ee66552ce4b848b11f8a695629e7b55427615b8993cce159e",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_0f179010aac6105df2a7",
+              "adopted_value_sha256": "5160c266dabe1a9032c26ffd685f51214c316b0d5e69223f60cc923e400b3e57",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_8066205ceb723a6cab97",
+              "adopted_value_sha256": "35777a4b2c817b52a7267ea43088f6e4e42cabff0296afdc04b2737ec9f41fec",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_df9e4016104febe0e86d",
+              "adopted_value_sha256": "194875e57053f0abef26e016bf81f488361449b20f657781695e3ac912193496",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_835cadfa04c3278cb4aa",
+              "adopted_value_sha256": "6f4596f4b4a1f34476978815f29bd286637e4085bddb4935ab4d510c1ea369ed",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_6822dea1c93fc3e2d957",
+              "adopted_value_sha256": "71d760e2796796b00e495d35d03b5887b172b05bf1d6a63dc57cd9695864677e",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_027cea37a0903747e1e7",
+              "adopted_value_sha256": "80a0c345ef3d018d075b8488fc4d964b67887f7cd55c9fced5779eb770054438",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_f86eb2adbb150d7805aa",
+              "adopted_value_sha256": "dd5834e1be0d81c60aed02e93b05d1880267ef46c0864ffe1e04fd5230a95809",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            }
+          ]
+        },
+        {
+          "case": "moxa",
+          "output_sha256": "cd9458a244b226011d00de566d1a3a60cd1a22e008229a56d433f7db7e3c7d04",
+          "fact_status_counts": {
+            "verified": 57,
+            "pending_confirmation": 3,
+            "conflict": 0
+          },
+          "coverage": {
+            "status": "partial",
+            "files": 1,
+            "unfinished_files": 1,
+            "unfinished_pages": 2,
+            "unfinished_images": 0,
+            "message": "已扫描 1 份资料。其中 1 份尚未完整核对。可先导出已确认部分；不能作为完整结果交付。",
+            "can_retry": true,
+            "issue_count": 4
+          },
+          "checkpoints": [
+            {
+              "id": "moxa-01",
+              "outcome": "unresolved_not_adopted",
+              "group_id": "group_f9de44b31789e3ebc6a1"
+            },
+            {
+              "id": "moxa-02",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "moxa-03",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "moxa-04",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "moxa-05",
+              "outcome": "complete_adopted",
+              "group_id": "group_10c5a7b7659813282e0e"
+            },
+            {
+              "id": "moxa-06",
+              "outcome": "complete_adopted",
+              "group_id": "group_68194764ebdd1359e88e"
+            },
+            {
+              "id": "moxa-07",
+              "outcome": "complete_adopted",
+              "group_id": "group_18bd182125d65eccb4b1"
+            },
+            {
+              "id": "moxa-08",
+              "outcome": "missed_conflict",
+              "group_id": null
+            },
+            {
+              "id": "moxa-09",
+              "outcome": "missed_conflict",
+              "group_id": null
+            },
+            {
+              "id": "moxa-10",
+              "outcome": "unresolved_not_adopted",
+              "group_id": "group_30e7ded11bdb60c467dc"
+            },
+            {
+              "id": "moxa-11",
+              "outcome": "unresolved_not_adopted",
+              "group_id": "group_30e7ded11bdb60c467dc"
+            },
+            {
+              "id": "moxa-12",
+              "outcome": "unresolved_not_adopted",
+              "group_id": "group_283c779626b2a89f8895"
+            },
+            {
+              "id": "moxa-13",
+              "outcome": "unresolved_not_adopted",
+              "group_id": "group_283c779626b2a89f8895"
+            },
+            {
+              "id": "moxa-14",
+              "outcome": "missing",
+              "group_id": null
+            }
+          ],
+          "adopted_audit": [
+            {
+              "group_id": "group_bc4e63c94a1af91ec25a",
+              "adopted_value_sha256": "8e4155c1b2981e799b5568a1e06afe028beee44a895531ee63449a1232856356",
+              "locator_pages": [
+                4
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_68194764ebdd1359e88e",
+              "adopted_value_sha256": "9506bb65c425a30c9b04658f001d6f396ebabda56e4887f6bf0135a1f05814ea",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_292a05b63b72b8a1c57e",
+              "adopted_value_sha256": "debeb6b578ad6617d7cf55c804284c6c40b7e232f89ad6cc25e91c0fb03819b2",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_6e3ea5f51cc6853fc492",
+              "adopted_value_sha256": "fe5f15c4b5f2cfe0057539267cd208a50e0b7a973371dcd66c559a3c050b750b",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_9d055bbeed928896b872",
+              "adopted_value_sha256": "09766ca3e3f2ffd5032c5e3991f57b5e1d3bf43b1746a88a921decf117888b64",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_2aa7d9b347e570e80bbd",
+              "adopted_value_sha256": "7ab8be0c311edac2b6b83f5f9e9e871a01c8d63cd7a5689600997bbcf8ea9faa",
+              "locator_pages": [
+                4
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_2ea39fa5637891a1841a",
+              "adopted_value_sha256": "5e3440633d474f46b696947a95c7fd0dd85cd1fee20566ed924008e52b466b61",
+              "locator_pages": [
+                4
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_486f533c9f69ccabcbc8",
+              "adopted_value_sha256": "8a2ff8dbbb3e195f1098897be947879c683ca875d630ea56044a8c370aa90621",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_65a1612b3153f80a141c",
+              "adopted_value_sha256": "74714736caf9f14f65e75ac3c7edd438558fada5de349b0822effa32160dea73",
+              "locator_pages": [
+                4
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_63ddc35078eb2dd052ef",
+              "adopted_value_sha256": "d9b238068c44e190e43833401b349260a12fcd6941daee4b56670b268412ae01",
+              "locator_pages": [
+                4
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_8348c9fc3c2ee2eac82f",
+              "adopted_value_sha256": "d9459c0c8e8e3f437a47ba73707ade99d737c1dd97e7f8886b6befcc1cc60db1",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_8b661f0d7c0bd3768f60",
+              "adopted_value_sha256": "9fcaeb001510d773654bea4942e6cf61a9a0597f731f8f25f8dd0d6a71694e76",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_d4bdc2b6020dbe357f4d",
+              "adopted_value_sha256": "9a26f34d32377c3cf96c467a9f70d5ae438cc82d23fe8d64a5b67d2c27307250",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_0f16dbf4b88afbd62dd0",
+              "adopted_value_sha256": "32fe783640ce81e7098529c9caa08229f1d3395fa0c0ac609214d457ddd42918",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_01d71ba7181f2754003a",
+              "adopted_value_sha256": "3d65296d498d0909304b102ed6f4d57bb0d6f4e466ca048a4520722aea6d94a5",
+              "locator_pages": [
+                4
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_98a5f64789adbc25cb2a",
+              "adopted_value_sha256": "a6bb224c9970ee772db52720f4333b51db6a2d522261539e1b8f7099e788dbab",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_b2ec944d4733a0706cbc",
+              "adopted_value_sha256": "622e9bcdc3fd44aff3aee19e2ca106b9573f0b2854aa3c8423ed887ae6894ca0",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_6b9bf6fa72946ac425e2",
+              "adopted_value_sha256": "6cbd8438dbbcdef135ff6f0e68eca4feb59edd4099d643f4d9088cb2691a7369",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_68e01b92d785b022fdf6",
+              "adopted_value_sha256": "ab23378e5c528a66dbc83e1c8ccc32fde751aaf1c5577c076117c3aa97cb060e",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_66f0e3183b5a44b6433e",
+              "adopted_value_sha256": "b5456f1149e04c04d10dc745d7d1b273b5be073e25ad29c4be4822ee2484dda7",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_1a3a21c1b8049b61e3ad",
+              "adopted_value_sha256": "1c3ecdfa7e378cd3d552516d85d08e75845cdc60c454a8bb9be52849b67eb5f0",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_64206a9fcb2a4bc0466c",
+              "adopted_value_sha256": "10fb89f597baaa3c78bc73b70a401c6a538f6c9c01cd9c8a5f05aa175079c969",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_05933868e16009bd1bbd",
+              "adopted_value_sha256": "d3e9f2cf4169f0791268a781dac5916b7377d936812c3d0ba6dd9c26041dbee6",
+              "locator_pages": [
+                1
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_7d026b2b3295d19718e0",
+              "adopted_value_sha256": "3ed6c978608568236179446200cc9291cdbe336b539419c8e99b0c7ee5876c85",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_4a1069e41dc3ee9f167d",
+              "adopted_value_sha256": "a6a034a01c0a04cc4564927219880ea77e2471b706f0762b753b61b9c3ded866",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_57170f71fa67d0d63154",
+              "adopted_value_sha256": "298a6591d96c0a7b0ca4ccbffe38fac4b8b5e7e5c4a0ed1e0f0888ae689a2e75",
+              "locator_pages": [
+                4
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_4e864a5a8c2fc4bc48f2",
+              "adopted_value_sha256": "7f3da205c5d0bd2ee66552ce4b848b11f8a695629e7b55427615b8993cce159e",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_922ffe6407d9bd1596dd",
+              "adopted_value_sha256": "7f3da205c5d0bd2ee66552ce4b848b11f8a695629e7b55427615b8993cce159e",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_75084d2b7d54b7b5b0b9",
+              "adopted_value_sha256": "ab6d242d7c711c4b2e2e6c10d4dbedc02e0caf3eb550cfc54855fcdfab344cb5",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_1894f4e38e3d2cb2dac7",
+              "adopted_value_sha256": "3501dd72fa51597b120762e0b25e239ebe490171c4490e53dab57705d77f81c0",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_3930b1150a93e8aab5a5",
+              "adopted_value_sha256": "9ff43142df4dd01cefae7f920d109fcfc5edb6d7c1d9c3320e351a563a45eebc",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_9513f68ab8ade2f42392",
+              "adopted_value_sha256": "dca511fdc116eee248c72801b1200daae88e536f3bb61855904ab40b981d1441",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_c34643ce92ab9f3f0aa1",
+              "adopted_value_sha256": "026a3357421d63baaee3197a8928bd2cb2c43f418f92a3934982f43eddf58cee",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_0d0a6137e477048c44b3",
+              "adopted_value_sha256": "8dbaf80f3658c1c59073d6882f518c0f62b2c62c549bf2e82acb0aa2bdd7b39a",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_8607f809c54a564766ce",
+              "adopted_value_sha256": "c25ce4eea5833ca950e248d783c0fa47878816b6760356d3af57acffcc2e0a69",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_7b6f301b740f1d399e7a",
+              "adopted_value_sha256": "43fdcd04eb7a4963c85cf6691a2e8da2e6bc8d8d76019324714d9e3615272702",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_13c652a99041e65db01b",
+              "adopted_value_sha256": "28412030dd6ec3922ab66f19bf3f19b04c094e1837b12062e87f37e45120d354",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_90dbbc5b37fca7a152d1",
+              "adopted_value_sha256": "afc2d910342cb5a8f31afb0da65bfcee9c826ab127137840b88b549e8f869ae8",
+              "locator_pages": [
+                4
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_bb62a4a0e243447f5f46",
+              "adopted_value_sha256": "d4ddf9a8207e3d6896085ea4c57e84f4f056d446a200731e714247da31560902",
+              "locator_pages": [
+                4
+              ],
+              "source_value_fidelity": "condition_incomplete",
+              "note": "Applicable Models continues onto page 5 and is missing in the adopted value."
+            },
+            {
+              "group_id": "group_beb4240f7fea7091b7de",
+              "adopted_value_sha256": "202574bb7fc1f61320ed3b599774e3bc2dc142ea7d874583fa6ad52368ad950f",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_e85a05bc112430a712b2",
+              "adopted_value_sha256": "55171bac5b2c744dc5ae8dcac8524cfbf0c139452c4e22c4e8c3084453be8f3d",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_558aaf5790881198dde2",
+              "adopted_value_sha256": "5628108e9316138500b5ebf0b6d66e15d0708eb0f50c67b627a9a6dbed96e6bc",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_cbd9e3efbe723b5ed00a",
+              "adopted_value_sha256": "afbd7212d14aab07205555dbd4bd44a351c112a3d1121bf4f2e672335effd94d",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_a177d3f0f0d5c94ee722",
+              "adopted_value_sha256": "ce57fab1fdb93566e9a055cc74b3dc85e89a3762399c2b2388437e51d19ed5c8",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_a5629c8e2d002e69f78f",
+              "adopted_value_sha256": "6f296c593a642f037d47a65cd663ecd9e423dfaf54d38e5c591d95925b0a443a",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_dc2f1d8159017dbda71a",
+              "adopted_value_sha256": "97895620be6ad39b027677e2866123b673bce84aee8746fdd73da2ddf1771b0d",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_b9bdd5a0e602519adf22",
+              "adopted_value_sha256": "ce57fab1fdb93566e9a055cc74b3dc85e89a3762399c2b2388437e51d19ed5c8",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_1ac470b81540ff42b74a",
+              "adopted_value_sha256": "f2cfcd21c7b6952fb6421bc8ac2ba26e53ba926cfca5aa43da85cddc1ce554db",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_1ed2c85d0020f740597d",
+              "adopted_value_sha256": "89540298888bd6e37941323ef5f7fb835af4060b48badcdedd40d1c1b6cbff25",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_4517106d1fa010a1d3de",
+              "adopted_value_sha256": "abd8eba0aa04610e12f407a9329eec0b2f1bd205b42216ddfa3cbfa7eabc0a54",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_ae26ac99d2b9b8a684eb",
+              "adopted_value_sha256": "ae64ace96edc65b39d0d7c430abac5bd278f9ce2e9ea14db9885cf4e9dc3a639",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_e3922beea3b208b48545",
+              "adopted_value_sha256": "bf2d53087f6edc8c7f0bb39ee0fdad3cec5b8807b889a34efcfcd9e60a757ed0",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_10c5a7b7659813282e0e",
+              "adopted_value_sha256": "f22e5effe5022196b6017670ad59aafcdc05c4690a39354cb0f457d37cae5b16",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_6ee603f68874fafd9151",
+              "adopted_value_sha256": "af3901f7d7addddabba0e6c482a5fc8e0ae9bf1801a02b256468d6b63561c178",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_18bd182125d65eccb4b1",
+              "adopted_value_sha256": "d40bf7487725c89f0495427d8b1272327cc9e843b471e4af5e7c9b82d0a9a09a",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_a7b87317d4b62b4ce9e7",
+              "adopted_value_sha256": "c6f4547468abfc03a73e667509bf387ad709af05eacf61df6c4a4a984eb31640",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_1c4849753beb9d7f0218",
+              "adopted_value_sha256": "8c3fb60315a9190de680918400eda82987ce51cfb93b6acf09c1d2e95ac877fc",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            }
+          ]
+        },
+        {
+          "case": "danfoss",
+          "output_sha256": "4fc07bae563393486c48ddb6a12e3352ebbcb19b2171d139359736f27a99c07c",
+          "fact_status_counts": {
+            "verified": 2,
+            "pending_confirmation": 0,
+            "conflict": 0
+          },
+          "coverage": {
+            "status": "partial",
+            "files": 1,
+            "unfinished_files": 1,
+            "unfinished_pages": 1,
+            "unfinished_images": 0,
+            "message": "已扫描 1 份资料。其中 1 份尚未完整核对。可先导出已确认部分；不能作为完整结果交付。",
+            "can_retry": true,
+            "issue_count": 3
+          },
+          "checkpoints": [
+            {
+              "id": "danfoss-01",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "danfoss-02",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "danfoss-03",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "danfoss-04",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "danfoss-05",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "danfoss-06",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "danfoss-07",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "danfoss-08",
+              "outcome": "missing",
+              "group_id": null
+            }
+          ],
+          "adopted_audit": [
+            {
+              "group_id": "group_112ab5805bbfe24a6829",
+              "adopted_value_sha256": "7218c10acb6c33e9278fc26f3649038904617e32f23b9dc9ef5fadd8e501e76a",
+              "locator_pages": [
+                1
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_b4343727fb7799d9bee1",
+              "adopted_value_sha256": "55caa88259e1a805706c83805d430529dbe5129a91cac9583372b7bb5bc69575",
+              "locator_pages": [
+                1
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            }
+          ]
+        },
+        {
+          "case": "cable",
+          "output_sha256": "aa01ed0ca4b0efb680db55281440b90eddbdc40ef06daecb2f31ef51379e6ad9",
+          "fact_status_counts": {
+            "verified": 26,
+            "pending_confirmation": 8,
+            "conflict": 0
+          },
+          "coverage": {
+            "status": "partial",
+            "files": 1,
+            "unfinished_files": 1,
+            "unfinished_pages": 3,
+            "unfinished_images": 0,
+            "message": "已扫描 1 份资料。其中 1 份尚未完整核对。可先导出已确认部分；不能作为完整结果交付。",
+            "can_retry": true,
+            "issue_count": 14
+          },
+          "checkpoints": [
+            {
+              "id": "cable-01",
+              "outcome": "complete_adopted",
+              "group_id": "group_563ad8f298c38bb08190"
+            },
+            {
+              "id": "cable-02",
+              "outcome": "complete_adopted",
+              "group_id": "group_dc8dbc853aa81ff065a0"
+            },
+            {
+              "id": "cable-03",
+              "outcome": "complete_adopted",
+              "group_id": "group_a2fe8d2e14a6966aa831"
+            },
+            {
+              "id": "cable-04",
+              "outcome": "complete_adopted",
+              "group_id": "group_21745acf2eb32da0a38c"
+            },
+            {
+              "id": "cable-05",
+              "outcome": "complete_adopted",
+              "group_id": "group_e88e9a1c28898c0416b3"
+            },
+            {
+              "id": "cable-06",
+              "outcome": "complete_adopted",
+              "group_id": "group_a9175e9c6a5a27a5f94c"
+            },
+            {
+              "id": "cable-07",
+              "outcome": "condition_incomplete",
+              "group_id": "group_cffcdbc4ca666bd46fec"
+            },
+            {
+              "id": "cable-08",
+              "outcome": "condition_incomplete",
+              "group_id": "group_a0c0f5f8222a2223ec9b"
+            },
+            {
+              "id": "cable-09",
+              "outcome": "condition_incomplete",
+              "group_id": "group_488b24c05ea64f76137f"
+            },
+            {
+              "id": "cable-10",
+              "outcome": "complete_adopted",
+              "group_id": "group_89e0875dc25b9cda4256"
+            },
+            {
+              "id": "cable-11",
+              "outcome": "complete_adopted",
+              "group_id": "group_874f9a206de4214940d5"
+            },
+            {
+              "id": "cable-12",
+              "outcome": "complete_adopted",
+              "group_id": "group_20e9fb7e03db4a4bec99"
+            }
+          ],
+          "adopted_audit": [
+            {
+              "group_id": "group_dc8dbc853aa81ff065a0",
+              "adopted_value_sha256": "6ffe8591aa474fc528146359e1e9819195c1d1657f50c97c33209a383e17b028",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_a0c0f5f8222a2223ec9b",
+              "adopted_value_sha256": "eb7ec4284270c161f4eb8b073ffa1b53271f44d20051e0c4d2dc2ac385bf36a7",
+              "locator_pages": [
+                6
+              ],
+              "source_value_fidelity": "condition_incomplete",
+              "note": "The required source/device support condition in the adjacent Important/Note paragraph is not attached."
+            },
+            {
+              "group_id": "group_6c4b6d562294e21aa7c1",
+              "adopted_value_sha256": "b28f1819a1eb381c9c6a3d3cf83c5cdce70873dba1afb206a14aa4bcaffbb994",
+              "locator_pages": [
+                6
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_20e9fb7e03db4a4bec99",
+              "adopted_value_sha256": "64de2c0e30f78c3b54bdef31264be22c668c68ef0d2370b01a7970e32a7ff924",
+              "locator_pages": [
+                8
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_21745acf2eb32da0a38c",
+              "adopted_value_sha256": "126695fcb90675e71a4dbc603ec9034839701b26c4bb162c1234026ebd237cc5",
+              "locator_pages": [
+                3,
+                8
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_d9e3042154465bbfbb7a",
+              "adopted_value_sha256": "88dad03c880cbdd9d32ad4f0707c93813eb37fa1d6c94ae799bb4796fac38882",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_eba18c3465a11731fc20",
+              "adopted_value_sha256": "2a124c5356a42f53ba99f05c5294067b583b6018f355a97e749a2bde7d3c007e",
+              "locator_pages": [
+                11
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_69206326c1bfe5dccf98",
+              "adopted_value_sha256": "e6e572485f2988007cafa718379b3e1044be372ceeb5f093a6d684280c9c48da",
+              "locator_pages": [
+                11
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_89e0875dc25b9cda4256",
+              "adopted_value_sha256": "d12d90ed44bc6743645fe01bc197abb6652fa8863a454beb516604752af85c21",
+              "locator_pages": [
+                7
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_e88e9a1c28898c0416b3",
+              "adopted_value_sha256": "3d50a7e7d12ae845ca9a783c8900c0d0cdce33407135a4344b0c5910c928a3da",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_a9175e9c6a5a27a5f94c",
+              "adopted_value_sha256": "3d50a7e7d12ae845ca9a783c8900c0d0cdce33407135a4344b0c5910c928a3da",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_57972b4b51105b040758",
+              "adopted_value_sha256": "1fd05d5e8a7c3f4ca32083b8f569fc8ac268a0b8d0ed6a1f7de9daae7e1018ea",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_5c26dddabd0ce121c357",
+              "adopted_value_sha256": "44614d1a9fc9bf16323473be87f068ca117fe5dd6598d18ac4b9873292e09df6",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_165981f77a9bba8456e6",
+              "adopted_value_sha256": "999aa7c15f34a8983d5e3334919ca5a02e76afa2fe685bb4823c7d5e263fc22a",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "condition_incomplete",
+              "note": "The required source/device support condition in the adjacent Important/Note paragraph is not attached."
+            },
+            {
+              "group_id": "group_a34d1d490b3783ea2889",
+              "adopted_value_sha256": "49b124e3cd91825afb73926e4efed8c88d272044c5f1b69f825d72d716b96ea1",
+              "locator_pages": [
+                9
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_874f9a206de4214940d5",
+              "adopted_value_sha256": "43513b76ca041b6660ad7ebacc328565ab09403cc20a89180cff73eb6f6ed2b7",
+              "locator_pages": [
+                7
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_b448b76a7cc94cf208ae",
+              "adopted_value_sha256": "c1784de0796c043169c11635994d12647155d341c4fb1122762f301fd894a14f",
+              "locator_pages": [
+                6
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_563ad8f298c38bb08190",
+              "adopted_value_sha256": "196bcfe51b84fd341346475c55f4c7bb1a12c0e96973179450b116279732efa4",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_6c31258c1cf9eb45bd12",
+              "adopted_value_sha256": "3e8207f461fd8a6a73c26a04d1bb7ec1292924f3faf98d67566d4ae67963d384",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_102a4353bb3cff00ca36",
+              "adopted_value_sha256": "e1f7304d08f5baef408b4999dc13aeb062f684e1aa0a536c017f457e82f33be1",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_fd20c1c5288852fb41c6",
+              "adopted_value_sha256": "8b0f65fb8b407bba9582e5ae2c62f6f9c1ca3aa5e14a10f46c192adaad2cfbdd",
+              "locator_pages": [
+                6
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_67fe55dc25db98edfb78",
+              "adopted_value_sha256": "c5627a325f848dbf80f32ba4b0baea98d2d310230ad3e7ccac79d8e673c2998b",
+              "locator_pages": [
+                6
+              ],
+              "source_value_fidelity": "condition_incomplete",
+              "note": "The required source/device support condition in the adjacent Important/Note paragraph is not attached."
+            },
+            {
+              "group_id": "group_488b24c05ea64f76137f",
+              "adopted_value_sha256": "1a450afc8ebae6a7a2f435c097dd581cf53e50e57a4b14ac9fddb56979e0f3c6",
+              "locator_pages": [
+                6
+              ],
+              "source_value_fidelity": "condition_incomplete",
+              "note": "The required source/device support condition in the adjacent Important/Note paragraph is not attached."
+            },
+            {
+              "group_id": "group_4974f135304ed9c88151",
+              "adopted_value_sha256": "196bcfe51b84fd341346475c55f4c7bb1a12c0e96973179450b116279732efa4",
+              "locator_pages": [
+                1
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_cffcdbc4ca666bd46fec",
+              "adopted_value_sha256": "5fff4643b7450f71bd626f1fa97d44454197d47de2d292f8b036dd030f5d9263",
+              "locator_pages": [
+                6
+              ],
+              "source_value_fidelity": "condition_incomplete",
+              "note": "The required source/device support condition in the adjacent Important/Note paragraph is not attached."
+            },
+            {
+              "group_id": "group_a2fe8d2e14a6966aa831",
+              "adopted_value_sha256": "7762e9af43f5e31eed200205efbe77b3879f8bba00cf0b33f3ed74ec7820bd88",
+              "locator_pages": [
+                3,
+                8
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            }
+          ]
+        }
+      ],
+      "summary": {
+        "complete_adopted_checkpoints": 22,
+        "checkpoints": 44,
+        "missed_conflicts": 2,
+        "adopted_values_audited": 103,
+        "source_supported_adopted_values": 97,
+        "adopted_values_with_missing_conditions": 6
+      }
+    },
+    "stable-ai": {
+      "runner": {
+        "manifest_sha256": "984c3808cb7bb03eb9dc1668e9a670ed6471a6da9375f40342c0c65ca2c3f888",
+        "code_sha256": "f3daaae90004d2057461a49d957f171f2ad718da1bfaa04c6cc1050f65b1ce45",
+        "mode": "local_ai",
+        "results": [
+          {
+            "case": "monacor",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"monacor\", \"counts\": {\"verified\": 18, \"pending_confirmation\": 4, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": true, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 3, \"calls\": 1, \"accepted\": 0, \"budget_exhausted\": false}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 45.97
+          },
+          {
+            "case": "moxa",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"moxa\", \"counts\": {\"verified\": 57, \"pending_confirmation\": 4, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": true, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 2, \"calls\": 1, \"accepted\": 0, \"budget_exhausted\": false}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 150.575
+          },
+          {
+            "case": "danfoss",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"danfoss\", \"counts\": {\"verified\": 2, \"pending_confirmation\": 0, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": true, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0, \"budget_exhausted\": false}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 10.525
+          },
+          {
+            "case": "cable",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"cable\", \"counts\": {\"verified\": 26, \"pending_confirmation\": 8, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": true, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 3, \"calls\": 1, \"accepted\": 0, \"budget_exhausted\": false}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 165.859
+          }
+        ],
+        "complete": true
+      },
+      "cases": [
+        {
+          "case": "monacor",
+          "output_sha256": "30b4b8905861ee08132d566ebf8b9bf0cbb2a1b5d794d812540090cdb34cdc84",
+          "fact_status_counts": {
+            "verified": 18,
+            "pending_confirmation": 4,
+            "conflict": 0
+          },
+          "coverage": {
+            "status": "complete",
+            "files": 1,
+            "unfinished_files": 0,
+            "unfinished_pages": 0,
+            "unfinished_images": 0,
+            "message": "已扫描 1 份资料。本次读取已完成；不代表资料中的所有参数都已被识别。",
+            "can_retry": false,
+            "issue_count": 0
+          },
+          "checkpoints": [
+            {
+              "id": "monacor-01",
+              "outcome": "complete_adopted",
+              "group_id": "group_3701fa756bdc2da84bf5"
+            },
+            {
+              "id": "monacor-02",
+              "outcome": "complete_adopted",
+              "group_id": "group_0f179010aac6105df2a7"
+            },
+            {
+              "id": "monacor-03",
+              "outcome": "complete_adopted",
+              "group_id": "group_027cea37a0903747e1e7"
+            },
+            {
+              "id": "monacor-04",
+              "outcome": "complete_adopted",
+              "group_id": "group_6822dea1c93fc3e2d957"
+            },
+            {
+              "id": "monacor-05",
+              "outcome": "complete_adopted",
+              "group_id": "group_69294f22c657efe024f4"
+            },
+            {
+              "id": "monacor-06",
+              "outcome": "complete_adopted",
+              "group_id": "group_9336a6e9683a2e90b2fa"
+            },
+            {
+              "id": "monacor-07",
+              "outcome": "complete_adopted",
+              "group_id": "group_d9e78b832f08574250a4"
+            },
+            {
+              "id": "monacor-08",
+              "outcome": "complete_adopted",
+              "group_id": "group_b8c167d34ffbf46e3150"
+            },
+            {
+              "id": "monacor-09",
+              "outcome": "complete_adopted",
+              "group_id": "group_70e80d4b04d23c661795"
+            },
+            {
+              "id": "monacor-10",
+              "outcome": "complete_adopted",
+              "group_id": "group_7e5bcf6182566058cca9"
+            }
+          ],
+          "adopted_audit": [
+            {
+              "group_id": "group_b8c167d34ffbf46e3150",
+              "adopted_value_sha256": "f1446a91d0c9347f33199ebfb5b0cc8d84d6b87b15e30ce5585e691d62d22252",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_d9e78b832f08574250a4",
+              "adopted_value_sha256": "431b32a99fd132b5bc94b084e1b22fd14211fe41054e092d5390b558c7dafb13",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_5a359fa5e6b9ffb45d8c",
+              "adopted_value_sha256": "f69a318c48876f2e978f7f4847941e1cff2a31c81274904424d81171ac894eb0",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_3701fa756bdc2da84bf5",
+              "adopted_value_sha256": "d007511751841a9208f7b005718a57f32ffeaa2b761dc601a8bcf236d6cde7a3",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_0f122bf96ab9d644c27a",
+              "adopted_value_sha256": "dd3f2012c89a7057623529530889b71d77d7953a120b41f34df69babb22f4dc7",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_69294f22c657efe024f4",
+              "adopted_value_sha256": "a07e241b160198306bcf91e1bb7979149b02c73a2a75f05c0ec52d98ebb129d7",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_9336a6e9683a2e90b2fa",
+              "adopted_value_sha256": "5db023950733a8d04d7cfc92eefd763d613fe34eb80787e9a30bc8a217f803fd",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_4157addd79f8e826a7b7",
+              "adopted_value_sha256": "fa27bc4feca3a7ecae182eef38cf24b18726ee1e910112661852fc260a0d5ee2",
+              "locator_pages": [
+                1
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_70e80d4b04d23c661795",
+              "adopted_value_sha256": "f19f7f5958473f57918606a054364c020091b317b8a5185766d063de45383a6a",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_7e5bcf6182566058cca9",
+              "adopted_value_sha256": "c6aff5f4c4b08f43ecc4c795751cc739afac2f81ddca09edd3d03c8b88cfcbb9",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_4ac3140be46801f2fb13",
+              "adopted_value_sha256": "7f3da205c5d0bd2ee66552ce4b848b11f8a695629e7b55427615b8993cce159e",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_0f179010aac6105df2a7",
+              "adopted_value_sha256": "5160c266dabe1a9032c26ffd685f51214c316b0d5e69223f60cc923e400b3e57",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_8066205ceb723a6cab97",
+              "adopted_value_sha256": "35777a4b2c817b52a7267ea43088f6e4e42cabff0296afdc04b2737ec9f41fec",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_df9e4016104febe0e86d",
+              "adopted_value_sha256": "194875e57053f0abef26e016bf81f488361449b20f657781695e3ac912193496",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_835cadfa04c3278cb4aa",
+              "adopted_value_sha256": "6f4596f4b4a1f34476978815f29bd286637e4085bddb4935ab4d510c1ea369ed",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_6822dea1c93fc3e2d957",
+              "adopted_value_sha256": "71d760e2796796b00e495d35d03b5887b172b05bf1d6a63dc57cd9695864677e",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_027cea37a0903747e1e7",
+              "adopted_value_sha256": "80a0c345ef3d018d075b8488fc4d964b67887f7cd55c9fced5779eb770054438",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_f86eb2adbb150d7805aa",
+              "adopted_value_sha256": "dd5834e1be0d81c60aed02e93b05d1880267ef46c0864ffe1e04fd5230a95809",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            }
+          ]
+        },
+        {
+          "case": "moxa",
+          "output_sha256": "19ad523d2d87206eeb126e9b07f1e42fee3ce10c61836d83caf6417b3ab36ba8",
+          "fact_status_counts": {
+            "verified": 57,
+            "pending_confirmation": 4,
+            "conflict": 0
+          },
+          "coverage": {
+            "status": "partial",
+            "files": 1,
+            "unfinished_files": 1,
+            "unfinished_pages": 0,
+            "unfinished_images": 0,
+            "message": "已扫描 1 份资料。其中 1 份尚未完整核对。可先导出已确认部分；不能作为完整结果交付。",
+            "can_retry": true,
+            "issue_count": 2
+          },
+          "checkpoints": [
+            {
+              "id": "moxa-01",
+              "outcome": "unresolved_not_adopted",
+              "group_id": "group_f9de44b31789e3ebc6a1"
+            },
+            {
+              "id": "moxa-02",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "moxa-03",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "moxa-04",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "moxa-05",
+              "outcome": "complete_adopted",
+              "group_id": "group_10c5a7b7659813282e0e"
+            },
+            {
+              "id": "moxa-06",
+              "outcome": "complete_adopted",
+              "group_id": "group_68194764ebdd1359e88e"
+            },
+            {
+              "id": "moxa-07",
+              "outcome": "complete_adopted",
+              "group_id": "group_18bd182125d65eccb4b1"
+            },
+            {
+              "id": "moxa-08",
+              "outcome": "missed_conflict",
+              "group_id": null
+            },
+            {
+              "id": "moxa-09",
+              "outcome": "missed_conflict",
+              "group_id": null
+            },
+            {
+              "id": "moxa-10",
+              "outcome": "unresolved_not_adopted",
+              "group_id": "group_30e7ded11bdb60c467dc"
+            },
+            {
+              "id": "moxa-11",
+              "outcome": "unresolved_not_adopted",
+              "group_id": "group_30e7ded11bdb60c467dc"
+            },
+            {
+              "id": "moxa-12",
+              "outcome": "unresolved_not_adopted",
+              "group_id": "group_df028e68c337cc881d6f"
+            },
+            {
+              "id": "moxa-13",
+              "outcome": "unresolved_not_adopted",
+              "group_id": "group_df028e68c337cc881d6f"
+            },
+            {
+              "id": "moxa-14",
+              "outcome": "missing",
+              "group_id": null
+            }
+          ],
+          "adopted_audit": [
+            {
+              "group_id": "group_bc4e63c94a1af91ec25a",
+              "adopted_value_sha256": "8e4155c1b2981e799b5568a1e06afe028beee44a895531ee63449a1232856356",
+              "locator_pages": [
+                4
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_68194764ebdd1359e88e",
+              "adopted_value_sha256": "9506bb65c425a30c9b04658f001d6f396ebabda56e4887f6bf0135a1f05814ea",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_292a05b63b72b8a1c57e",
+              "adopted_value_sha256": "debeb6b578ad6617d7cf55c804284c6c40b7e232f89ad6cc25e91c0fb03819b2",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_6e3ea5f51cc6853fc492",
+              "adopted_value_sha256": "fe5f15c4b5f2cfe0057539267cd208a50e0b7a973371dcd66c559a3c050b750b",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_9d055bbeed928896b872",
+              "adopted_value_sha256": "09766ca3e3f2ffd5032c5e3991f57b5e1d3bf43b1746a88a921decf117888b64",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_2aa7d9b347e570e80bbd",
+              "adopted_value_sha256": "7ab8be0c311edac2b6b83f5f9e9e871a01c8d63cd7a5689600997bbcf8ea9faa",
+              "locator_pages": [
+                4
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_2ea39fa5637891a1841a",
+              "adopted_value_sha256": "5e3440633d474f46b696947a95c7fd0dd85cd1fee20566ed924008e52b466b61",
+              "locator_pages": [
+                4
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_486f533c9f69ccabcbc8",
+              "adopted_value_sha256": "8a2ff8dbbb3e195f1098897be947879c683ca875d630ea56044a8c370aa90621",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_65a1612b3153f80a141c",
+              "adopted_value_sha256": "74714736caf9f14f65e75ac3c7edd438558fada5de349b0822effa32160dea73",
+              "locator_pages": [
+                4
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_63ddc35078eb2dd052ef",
+              "adopted_value_sha256": "d9b238068c44e190e43833401b349260a12fcd6941daee4b56670b268412ae01",
+              "locator_pages": [
+                4
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_8348c9fc3c2ee2eac82f",
+              "adopted_value_sha256": "d9459c0c8e8e3f437a47ba73707ade99d737c1dd97e7f8886b6befcc1cc60db1",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_8b661f0d7c0bd3768f60",
+              "adopted_value_sha256": "9fcaeb001510d773654bea4942e6cf61a9a0597f731f8f25f8dd0d6a71694e76",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_d4bdc2b6020dbe357f4d",
+              "adopted_value_sha256": "9a26f34d32377c3cf96c467a9f70d5ae438cc82d23fe8d64a5b67d2c27307250",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_0f16dbf4b88afbd62dd0",
+              "adopted_value_sha256": "32fe783640ce81e7098529c9caa08229f1d3395fa0c0ac609214d457ddd42918",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_01d71ba7181f2754003a",
+              "adopted_value_sha256": "3d65296d498d0909304b102ed6f4d57bb0d6f4e466ca048a4520722aea6d94a5",
+              "locator_pages": [
+                4
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_98a5f64789adbc25cb2a",
+              "adopted_value_sha256": "a6bb224c9970ee772db52720f4333b51db6a2d522261539e1b8f7099e788dbab",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_b2ec944d4733a0706cbc",
+              "adopted_value_sha256": "622e9bcdc3fd44aff3aee19e2ca106b9573f0b2854aa3c8423ed887ae6894ca0",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_6b9bf6fa72946ac425e2",
+              "adopted_value_sha256": "6cbd8438dbbcdef135ff6f0e68eca4feb59edd4099d643f4d9088cb2691a7369",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_68e01b92d785b022fdf6",
+              "adopted_value_sha256": "ab23378e5c528a66dbc83e1c8ccc32fde751aaf1c5577c076117c3aa97cb060e",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_66f0e3183b5a44b6433e",
+              "adopted_value_sha256": "b5456f1149e04c04d10dc745d7d1b273b5be073e25ad29c4be4822ee2484dda7",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_1a3a21c1b8049b61e3ad",
+              "adopted_value_sha256": "1c3ecdfa7e378cd3d552516d85d08e75845cdc60c454a8bb9be52849b67eb5f0",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_64206a9fcb2a4bc0466c",
+              "adopted_value_sha256": "10fb89f597baaa3c78bc73b70a401c6a538f6c9c01cd9c8a5f05aa175079c969",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_05933868e16009bd1bbd",
+              "adopted_value_sha256": "d3e9f2cf4169f0791268a781dac5916b7377d936812c3d0ba6dd9c26041dbee6",
+              "locator_pages": [
+                1
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_7d026b2b3295d19718e0",
+              "adopted_value_sha256": "3ed6c978608568236179446200cc9291cdbe336b539419c8e99b0c7ee5876c85",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_4a1069e41dc3ee9f167d",
+              "adopted_value_sha256": "a6a034a01c0a04cc4564927219880ea77e2471b706f0762b753b61b9c3ded866",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_57170f71fa67d0d63154",
+              "adopted_value_sha256": "298a6591d96c0a7b0ca4ccbffe38fac4b8b5e7e5c4a0ed1e0f0888ae689a2e75",
+              "locator_pages": [
+                4
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_4e864a5a8c2fc4bc48f2",
+              "adopted_value_sha256": "7f3da205c5d0bd2ee66552ce4b848b11f8a695629e7b55427615b8993cce159e",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_922ffe6407d9bd1596dd",
+              "adopted_value_sha256": "7f3da205c5d0bd2ee66552ce4b848b11f8a695629e7b55427615b8993cce159e",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_75084d2b7d54b7b5b0b9",
+              "adopted_value_sha256": "ab6d242d7c711c4b2e2e6c10d4dbedc02e0caf3eb550cfc54855fcdfab344cb5",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_1894f4e38e3d2cb2dac7",
+              "adopted_value_sha256": "3501dd72fa51597b120762e0b25e239ebe490171c4490e53dab57705d77f81c0",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_3930b1150a93e8aab5a5",
+              "adopted_value_sha256": "9ff43142df4dd01cefae7f920d109fcfc5edb6d7c1d9c3320e351a563a45eebc",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_9513f68ab8ade2f42392",
+              "adopted_value_sha256": "dca511fdc116eee248c72801b1200daae88e536f3bb61855904ab40b981d1441",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_c34643ce92ab9f3f0aa1",
+              "adopted_value_sha256": "026a3357421d63baaee3197a8928bd2cb2c43f418f92a3934982f43eddf58cee",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_0d0a6137e477048c44b3",
+              "adopted_value_sha256": "8dbaf80f3658c1c59073d6882f518c0f62b2c62c549bf2e82acb0aa2bdd7b39a",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_8607f809c54a564766ce",
+              "adopted_value_sha256": "c25ce4eea5833ca950e248d783c0fa47878816b6760356d3af57acffcc2e0a69",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_7b6f301b740f1d399e7a",
+              "adopted_value_sha256": "43fdcd04eb7a4963c85cf6691a2e8da2e6bc8d8d76019324714d9e3615272702",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_13c652a99041e65db01b",
+              "adopted_value_sha256": "28412030dd6ec3922ab66f19bf3f19b04c094e1837b12062e87f37e45120d354",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_90dbbc5b37fca7a152d1",
+              "adopted_value_sha256": "afc2d910342cb5a8f31afb0da65bfcee9c826ab127137840b88b549e8f869ae8",
+              "locator_pages": [
+                4
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_bb62a4a0e243447f5f46",
+              "adopted_value_sha256": "d4ddf9a8207e3d6896085ea4c57e84f4f056d446a200731e714247da31560902",
+              "locator_pages": [
+                4
+              ],
+              "source_value_fidelity": "condition_incomplete",
+              "note": "Applicable Models continues onto page 5 and is missing in the adopted value."
+            },
+            {
+              "group_id": "group_beb4240f7fea7091b7de",
+              "adopted_value_sha256": "202574bb7fc1f61320ed3b599774e3bc2dc142ea7d874583fa6ad52368ad950f",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_e85a05bc112430a712b2",
+              "adopted_value_sha256": "55171bac5b2c744dc5ae8dcac8524cfbf0c139452c4e22c4e8c3084453be8f3d",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_558aaf5790881198dde2",
+              "adopted_value_sha256": "5628108e9316138500b5ebf0b6d66e15d0708eb0f50c67b627a9a6dbed96e6bc",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_cbd9e3efbe723b5ed00a",
+              "adopted_value_sha256": "afbd7212d14aab07205555dbd4bd44a351c112a3d1121bf4f2e672335effd94d",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_a177d3f0f0d5c94ee722",
+              "adopted_value_sha256": "ce57fab1fdb93566e9a055cc74b3dc85e89a3762399c2b2388437e51d19ed5c8",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_a5629c8e2d002e69f78f",
+              "adopted_value_sha256": "6f296c593a642f037d47a65cd663ecd9e423dfaf54d38e5c591d95925b0a443a",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_dc2f1d8159017dbda71a",
+              "adopted_value_sha256": "97895620be6ad39b027677e2866123b673bce84aee8746fdd73da2ddf1771b0d",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_b9bdd5a0e602519adf22",
+              "adopted_value_sha256": "ce57fab1fdb93566e9a055cc74b3dc85e89a3762399c2b2388437e51d19ed5c8",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_1ac470b81540ff42b74a",
+              "adopted_value_sha256": "f2cfcd21c7b6952fb6421bc8ac2ba26e53ba926cfca5aa43da85cddc1ce554db",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_1ed2c85d0020f740597d",
+              "adopted_value_sha256": "89540298888bd6e37941323ef5f7fb835af4060b48badcdedd40d1c1b6cbff25",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_4517106d1fa010a1d3de",
+              "adopted_value_sha256": "abd8eba0aa04610e12f407a9329eec0b2f1bd205b42216ddfa3cbfa7eabc0a54",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_ae26ac99d2b9b8a684eb",
+              "adopted_value_sha256": "ae64ace96edc65b39d0d7c430abac5bd278f9ce2e9ea14db9885cf4e9dc3a639",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_e3922beea3b208b48545",
+              "adopted_value_sha256": "bf2d53087f6edc8c7f0bb39ee0fdad3cec5b8807b889a34efcfcd9e60a757ed0",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_10c5a7b7659813282e0e",
+              "adopted_value_sha256": "f22e5effe5022196b6017670ad59aafcdc05c4690a39354cb0f457d37cae5b16",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_6ee603f68874fafd9151",
+              "adopted_value_sha256": "af3901f7d7addddabba0e6c482a5fc8e0ae9bf1801a02b256468d6b63561c178",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_18bd182125d65eccb4b1",
+              "adopted_value_sha256": "d40bf7487725c89f0495427d8b1272327cc9e843b471e4af5e7c9b82d0a9a09a",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_a7b87317d4b62b4ce9e7",
+              "adopted_value_sha256": "c6f4547468abfc03a73e667509bf387ad709af05eacf61df6c4a4a984eb31640",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_1c4849753beb9d7f0218",
+              "adopted_value_sha256": "8c3fb60315a9190de680918400eda82987ce51cfb93b6acf09c1d2e95ac877fc",
+              "locator_pages": [
+                2
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            }
+          ]
+        },
+        {
+          "case": "danfoss",
+          "output_sha256": "d36ca484dc6688cb67dbd2ffd02ea6e1ef0d103971f0d64522c448cebd847c4b",
+          "fact_status_counts": {
+            "verified": 2,
+            "pending_confirmation": 0,
+            "conflict": 0
+          },
+          "coverage": {
+            "status": "partial",
+            "files": 1,
+            "unfinished_files": 1,
+            "unfinished_pages": 0,
+            "unfinished_images": 0,
+            "message": "已扫描 1 份资料。其中 1 份尚未完整核对。可先导出已确认部分；不能作为完整结果交付。",
+            "can_retry": true,
+            "issue_count": 1
+          },
+          "checkpoints": [
+            {
+              "id": "danfoss-01",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "danfoss-02",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "danfoss-03",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "danfoss-04",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "danfoss-05",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "danfoss-06",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "danfoss-07",
+              "outcome": "missing",
+              "group_id": null
+            },
+            {
+              "id": "danfoss-08",
+              "outcome": "missing",
+              "group_id": null
+            }
+          ],
+          "adopted_audit": [
+            {
+              "group_id": "group_112ab5805bbfe24a6829",
+              "adopted_value_sha256": "7218c10acb6c33e9278fc26f3649038904617e32f23b9dc9ef5fadd8e501e76a",
+              "locator_pages": [
+                1
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_b4343727fb7799d9bee1",
+              "adopted_value_sha256": "55caa88259e1a805706c83805d430529dbe5129a91cac9583372b7bb5bc69575",
+              "locator_pages": [
+                1
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            }
+          ]
+        },
+        {
+          "case": "cable",
+          "output_sha256": "d919ca2f54d852fb26e4d9464db6625ece1e8aa144d1ab7538c2d481c6fdcb60",
+          "fact_status_counts": {
+            "verified": 26,
+            "pending_confirmation": 8,
+            "conflict": 0
+          },
+          "coverage": {
+            "status": "partial",
+            "files": 1,
+            "unfinished_files": 1,
+            "unfinished_pages": 0,
+            "unfinished_images": 0,
+            "message": "已扫描 1 份资料。其中 1 份尚未完整核对。可先导出已确认部分；不能作为完整结果交付。",
+            "can_retry": true,
+            "issue_count": 12
+          },
+          "checkpoints": [
+            {
+              "id": "cable-01",
+              "outcome": "complete_adopted",
+              "group_id": "group_563ad8f298c38bb08190"
+            },
+            {
+              "id": "cable-02",
+              "outcome": "complete_adopted",
+              "group_id": "group_dc8dbc853aa81ff065a0"
+            },
+            {
+              "id": "cable-03",
+              "outcome": "complete_adopted",
+              "group_id": "group_a2fe8d2e14a6966aa831"
+            },
+            {
+              "id": "cable-04",
+              "outcome": "complete_adopted",
+              "group_id": "group_21745acf2eb32da0a38c"
+            },
+            {
+              "id": "cable-05",
+              "outcome": "complete_adopted",
+              "group_id": "group_e88e9a1c28898c0416b3"
+            },
+            {
+              "id": "cable-06",
+              "outcome": "complete_adopted",
+              "group_id": "group_a9175e9c6a5a27a5f94c"
+            },
+            {
+              "id": "cable-07",
+              "outcome": "condition_incomplete",
+              "group_id": "group_cffcdbc4ca666bd46fec"
+            },
+            {
+              "id": "cable-08",
+              "outcome": "condition_incomplete",
+              "group_id": "group_a0c0f5f8222a2223ec9b"
+            },
+            {
+              "id": "cable-09",
+              "outcome": "condition_incomplete",
+              "group_id": "group_488b24c05ea64f76137f"
+            },
+            {
+              "id": "cable-10",
+              "outcome": "complete_adopted",
+              "group_id": "group_89e0875dc25b9cda4256"
+            },
+            {
+              "id": "cable-11",
+              "outcome": "complete_adopted",
+              "group_id": "group_874f9a206de4214940d5"
+            },
+            {
+              "id": "cable-12",
+              "outcome": "complete_adopted",
+              "group_id": "group_20e9fb7e03db4a4bec99"
+            }
+          ],
+          "adopted_audit": [
+            {
+              "group_id": "group_dc8dbc853aa81ff065a0",
+              "adopted_value_sha256": "6ffe8591aa474fc528146359e1e9819195c1d1657f50c97c33209a383e17b028",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_a0c0f5f8222a2223ec9b",
+              "adopted_value_sha256": "eb7ec4284270c161f4eb8b073ffa1b53271f44d20051e0c4d2dc2ac385bf36a7",
+              "locator_pages": [
+                1,
+                6
+              ],
+              "source_value_fidelity": "condition_incomplete",
+              "note": "The required source/device support condition in the adjacent Important/Note paragraph is not attached."
+            },
+            {
+              "group_id": "group_6c4b6d562294e21aa7c1",
+              "adopted_value_sha256": "b28f1819a1eb381c9c6a3d3cf83c5cdce70873dba1afb206a14aa4bcaffbb994",
+              "locator_pages": [
+                6
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_20e9fb7e03db4a4bec99",
+              "adopted_value_sha256": "64de2c0e30f78c3b54bdef31264be22c668c68ef0d2370b01a7970e32a7ff924",
+              "locator_pages": [
+                8
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_21745acf2eb32da0a38c",
+              "adopted_value_sha256": "126695fcb90675e71a4dbc603ec9034839701b26c4bb162c1234026ebd237cc5",
+              "locator_pages": [
+                3,
+                8
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_d9e3042154465bbfbb7a",
+              "adopted_value_sha256": "88dad03c880cbdd9d32ad4f0707c93813eb37fa1d6c94ae799bb4796fac38882",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_eba18c3465a11731fc20",
+              "adopted_value_sha256": "2a124c5356a42f53ba99f05c5294067b583b6018f355a97e749a2bde7d3c007e",
+              "locator_pages": [
+                11
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_69206326c1bfe5dccf98",
+              "adopted_value_sha256": "e6e572485f2988007cafa718379b3e1044be372ceeb5f093a6d684280c9c48da",
+              "locator_pages": [
+                11
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_89e0875dc25b9cda4256",
+              "adopted_value_sha256": "d12d90ed44bc6743645fe01bc197abb6652fa8863a454beb516604752af85c21",
+              "locator_pages": [
+                7
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_e88e9a1c28898c0416b3",
+              "adopted_value_sha256": "3d50a7e7d12ae845ca9a783c8900c0d0cdce33407135a4344b0c5910c928a3da",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_a9175e9c6a5a27a5f94c",
+              "adopted_value_sha256": "3d50a7e7d12ae845ca9a783c8900c0d0cdce33407135a4344b0c5910c928a3da",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_57972b4b51105b040758",
+              "adopted_value_sha256": "1fd05d5e8a7c3f4ca32083b8f569fc8ac268a0b8d0ed6a1f7de9daae7e1018ea",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_5c26dddabd0ce121c357",
+              "adopted_value_sha256": "44614d1a9fc9bf16323473be87f068ca117fe5dd6598d18ac4b9873292e09df6",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_165981f77a9bba8456e6",
+              "adopted_value_sha256": "999aa7c15f34a8983d5e3334919ca5a02e76afa2fe685bb4823c7d5e263fc22a",
+              "locator_pages": [
+                5
+              ],
+              "source_value_fidelity": "condition_incomplete",
+              "note": "The required source/device support condition in the adjacent Important/Note paragraph is not attached."
+            },
+            {
+              "group_id": "group_a34d1d490b3783ea2889",
+              "adopted_value_sha256": "49b124e3cd91825afb73926e4efed8c88d272044c5f1b69f825d72d716b96ea1",
+              "locator_pages": [
+                9
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_874f9a206de4214940d5",
+              "adopted_value_sha256": "43513b76ca041b6660ad7ebacc328565ab09403cc20a89180cff73eb6f6ed2b7",
+              "locator_pages": [
+                7
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_b448b76a7cc94cf208ae",
+              "adopted_value_sha256": "c1784de0796c043169c11635994d12647155d341c4fb1122762f301fd894a14f",
+              "locator_pages": [
+                6
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_563ad8f298c38bb08190",
+              "adopted_value_sha256": "196bcfe51b84fd341346475c55f4c7bb1a12c0e96973179450b116279732efa4",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_6c31258c1cf9eb45bd12",
+              "adopted_value_sha256": "3e8207f461fd8a6a73c26a04d1bb7ec1292924f3faf98d67566d4ae67963d384",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_102a4353bb3cff00ca36",
+              "adopted_value_sha256": "e1f7304d08f5baef408b4999dc13aeb062f684e1aa0a536c017f457e82f33be1",
+              "locator_pages": [
+                3
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_fd20c1c5288852fb41c6",
+              "adopted_value_sha256": "8b0f65fb8b407bba9582e5ae2c62f6f9c1ca3aa5e14a10f46c192adaad2cfbdd",
+              "locator_pages": [
+                6
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_67fe55dc25db98edfb78",
+              "adopted_value_sha256": "c5627a325f848dbf80f32ba4b0baea98d2d310230ad3e7ccac79d8e673c2998b",
+              "locator_pages": [
+                6
+              ],
+              "source_value_fidelity": "condition_incomplete",
+              "note": "The required source/device support condition in the adjacent Important/Note paragraph is not attached."
+            },
+            {
+              "group_id": "group_488b24c05ea64f76137f",
+              "adopted_value_sha256": "1a450afc8ebae6a7a2f435c097dd581cf53e50e57a4b14ac9fddb56979e0f3c6",
+              "locator_pages": [
+                1,
+                6
+              ],
+              "source_value_fidelity": "condition_incomplete",
+              "note": "The required source/device support condition in the adjacent Important/Note paragraph is not attached."
+            },
+            {
+              "group_id": "group_4974f135304ed9c88151",
+              "adopted_value_sha256": "196bcfe51b84fd341346475c55f4c7bb1a12c0e96973179450b116279732efa4",
+              "locator_pages": [
+                1
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            },
+            {
+              "group_id": "group_cffcdbc4ca666bd46fec",
+              "adopted_value_sha256": "5fff4643b7450f71bd626f1fa97d44454197d47de2d292f8b036dd030f5d9263",
+              "locator_pages": [
+                1,
+                6
+              ],
+              "source_value_fidelity": "condition_incomplete",
+              "note": "The required source/device support condition in the adjacent Important/Note paragraph is not attached."
+            },
+            {
+              "group_id": "group_a2fe8d2e14a6966aa831",
+              "adopted_value_sha256": "7762e9af43f5e31eed200205efbe77b3879f8bba00cf0b33f3ed74ec7820bd88",
+              "locator_pages": [
+                3,
+                8
+              ],
+              "source_value_fidelity": "source_supported",
+              "note": null
+            }
+          ]
+        }
+      ],
+      "summary": {
+        "complete_adopted_checkpoints": 22,
+        "checkpoints": 44,
+        "missed_conflicts": 2,
+        "adopted_values_audited": 103,
+        "source_supported_adopted_values": 97,
+        "adopted_values_with_missing_conditions": 6
+      }
+    }
+  },
+  "development_history": [
+    {
+      "directory_label": "rules",
+      "qualification": "intermediate exposed-sample development, not final acceptance",
+      "runner": {
+        "manifest_sha256": "984c3808cb7bb03eb9dc1668e9a670ed6471a6da9375f40342c0c65ca2c3f888",
+        "mode": "rules",
+        "results": [
+          {
+            "case": "monacor",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"monacor\", \"counts\": {\"verified\": 18, \"pending_confirmation\": 4, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 2, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 0.963
+          },
+          {
+            "case": "moxa",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"moxa\", \"counts\": {\"verified\": 60, \"pending_confirmation\": 0, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 2, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 2.94
+          },
+          {
+            "case": "danfoss",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"danfoss\", \"counts\": {\"verified\": 2, \"pending_confirmation\": 0, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 2, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 1.41
+          },
+          {
+            "case": "cable",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"cable\", \"counts\": {\"verified\": 23, \"pending_confirmation\": 4, \"conflict\": 5}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 2, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 2.481
+          }
+        ],
+        "complete": true
+      }
+    },
+    {
+      "directory_label": "ai",
+      "qualification": "intermediate exposed-sample development, not final acceptance",
+      "runner": {
+        "manifest_sha256": "984c3808cb7bb03eb9dc1668e9a670ed6471a6da9375f40342c0c65ca2c3f888",
+        "mode": "local_ai",
+        "results": [
+          {
+            "case": "monacor",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"monacor\", \"counts\": {\"verified\": 18, \"pending_confirmation\": 4, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": true, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 3, \"calls\": 1, \"accepted\": 0, \"budget_exhausted\": false}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 46.125
+          },
+          {
+            "case": "moxa",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"moxa\", \"counts\": {\"verified\": 61, \"pending_confirmation\": 1, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": true, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0, \"budget_exhausted\": false}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 61.526
+          },
+          {
+            "case": "danfoss",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"danfoss\", \"counts\": {\"verified\": 2, \"pending_confirmation\": 0, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": true, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0, \"budget_exhausted\": false}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 10.139
+          },
+          {
+            "case": "cable",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"cable\", \"counts\": {\"verified\": 23, \"pending_confirmation\": 4, \"conflict\": 5}, \"errors\": [], \"local_ai\": {\"enabled\": true, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 3, \"calls\": 1, \"accepted\": 0, \"budget_exhausted\": false}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 154.649
+          }
+        ],
+        "complete": true
+      }
+    },
+    {
+      "directory_label": "final-rules",
+      "qualification": "intermediate exposed-sample development, not final acceptance",
+      "runner": {
+        "manifest_sha256": "984c3808cb7bb03eb9dc1668e9a670ed6471a6da9375f40342c0c65ca2c3f888",
+        "code_sha256": "fbddaded6105b0e56b512837a4c0e938fab6011d938b5025d29f18bcde774228",
+        "mode": "rules",
+        "results": [
+          {
+            "case": "monacor",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"monacor\", \"counts\": {\"verified\": 18, \"pending_confirmation\": 4, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 0.685
+          },
+          {
+            "case": "moxa",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"moxa\", \"counts\": {\"verified\": 57, \"pending_confirmation\": 3, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 2.442
+          },
+          {
+            "case": "danfoss",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"danfoss\", \"counts\": {\"verified\": 2, \"pending_confirmation\": 0, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 1.251
+          },
+          {
+            "case": "cable",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"cable\", \"counts\": {\"verified\": 22, \"pending_confirmation\": 12, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 2.042
+          }
+        ],
+        "complete": true
+      }
+    },
+    {
+      "directory_label": "final-ai",
+      "qualification": "intermediate exposed-sample development, not final acceptance",
+      "runner": {
+        "manifest_sha256": "984c3808cb7bb03eb9dc1668e9a670ed6471a6da9375f40342c0c65ca2c3f888",
+        "code_sha256": "fbddaded6105b0e56b512837a4c0e938fab6011d938b5025d29f18bcde774228",
+        "mode": "local_ai",
+        "results": [
+          {
+            "case": "monacor",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"monacor\", \"counts\": {\"verified\": 18, \"pending_confirmation\": 4, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": true, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 3, \"calls\": 1, \"accepted\": 0, \"budget_exhausted\": false}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 44.696
+          },
+          {
+            "case": "moxa",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"moxa\", \"counts\": {\"verified\": 58, \"pending_confirmation\": 4, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": true, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 2, \"calls\": 1, \"accepted\": 0, \"budget_exhausted\": false}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 143.62
+          },
+          {
+            "case": "danfoss",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"danfoss\", \"counts\": {\"verified\": 2, \"pending_confirmation\": 0, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": true, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0, \"budget_exhausted\": false}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 10.072
+          },
+          {
+            "case": "cable",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"cable\", \"counts\": {\"verified\": 22, \"pending_confirmation\": 12, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": true, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 5, \"calls\": 2, \"accepted\": 0, \"budget_exhausted\": false}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 160.576
+          }
+        ],
+        "complete": true
+      }
+    },
+    {
+      "directory_label": "release-rules",
+      "qualification": "intermediate exposed-sample development, not final acceptance",
+      "runner": {
+        "manifest_sha256": "984c3808cb7bb03eb9dc1668e9a670ed6471a6da9375f40342c0c65ca2c3f888",
+        "code_sha256": "30aef674e64936eb305c02a495b5c9cba8c76828c7bbf967f6c4e366d49e3423",
+        "mode": "rules",
+        "results": [
+          {
+            "case": "monacor",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"monacor\", \"counts\": {\"verified\": 18, \"pending_confirmation\": 4, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 0.979
+          },
+          {
+            "case": "moxa",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"moxa\", \"counts\": {\"verified\": 57, \"pending_confirmation\": 3, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 2.38
+          },
+          {
+            "case": "danfoss",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"danfoss\", \"counts\": {\"verified\": 2, \"pending_confirmation\": 0, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 1.111
+          },
+          {
+            "case": "cable",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"cable\", \"counts\": {\"verified\": 26, \"pending_confirmation\": 8, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 1.938
+          }
+        ],
+        "complete": true
+      }
+    },
+    {
+      "directory_label": "release-ai",
+      "qualification": "intermediate exposed-sample development, not final acceptance",
+      "runner": {
+        "manifest_sha256": "984c3808cb7bb03eb9dc1668e9a670ed6471a6da9375f40342c0c65ca2c3f888",
+        "code_sha256": "30aef674e64936eb305c02a495b5c9cba8c76828c7bbf967f6c4e366d49e3423",
+        "mode": "local_ai",
+        "results": [
+          {
+            "case": "monacor",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"monacor\", \"counts\": {\"verified\": 18, \"pending_confirmation\": 4, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": true, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 3, \"calls\": 1, \"accepted\": 0, \"budget_exhausted\": false}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 47.707
+          },
+          {
+            "case": "moxa",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"moxa\", \"counts\": {\"verified\": 58, \"pending_confirmation\": 4, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": true, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 2, \"calls\": 1, \"accepted\": 0, \"budget_exhausted\": false}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 159.029
+          },
+          {
+            "case": "danfoss",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"danfoss\", \"counts\": {\"verified\": 2, \"pending_confirmation\": 0, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": true, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0, \"budget_exhausted\": false}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 11.359
+          },
+          {
+            "case": "cable",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"cable\", \"counts\": {\"verified\": 26, \"pending_confirmation\": 8, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": true, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 3, \"calls\": 1, \"accepted\": 0, \"budget_exhausted\": false}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 163.777
+          }
+        ],
+        "complete": true
+      }
+    },
+    {
+      "directory_label": "accepted-rules",
+      "qualification": "intermediate exposed-sample development, not final acceptance",
+      "runner": {
+        "manifest_sha256": "984c3808cb7bb03eb9dc1668e9a670ed6471a6da9375f40342c0c65ca2c3f888",
+        "code_sha256": "5e8503ee4ff86ef2b990db0bd93fd2732833d8285d244b2a38c1f3ab962f50f0",
+        "mode": "rules",
+        "results": [
+          {
+            "case": "monacor",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"monacor\", \"counts\": {\"verified\": 18, \"pending_confirmation\": 4, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 0.708
+          },
+          {
+            "case": "moxa",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"moxa\", \"counts\": {\"verified\": 16, \"pending_confirmation\": 68, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 3.158
+          },
+          {
+            "case": "danfoss",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"danfoss\", \"counts\": {\"verified\": 2, \"pending_confirmation\": 0, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 1.048
+          },
+          {
+            "case": "cable",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"cable\", \"counts\": {\"verified\": 10, \"pending_confirmation\": 27, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": false, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 0, \"calls\": 0, \"accepted\": 0}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 2.193
+          }
+        ],
+        "complete": true
+      }
+    },
+    {
+      "directory_label": "accepted-ai",
+      "qualification": "intermediate exposed-sample development, not final acceptance",
+      "runner": {
+        "manifest_sha256": "984c3808cb7bb03eb9dc1668e9a670ed6471a6da9375f40342c0c65ca2c3f888",
+        "code_sha256": "5e8503ee4ff86ef2b990db0bd93fd2732833d8285d244b2a38c1f3ab962f50f0",
+        "mode": "local_ai",
+        "results": [
+          {
+            "case": "monacor",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"monacor\", \"counts\": {\"verified\": 18, \"pending_confirmation\": 4, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": true, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 3, \"calls\": 1, \"accepted\": 0, \"budget_exhausted\": false}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 44.412
+          },
+          {
+            "case": "moxa",
+            "exit_code": 0,
+            "stdout": "{\"case\": \"moxa\", \"counts\": {\"verified\": 16, \"pending_confirmation\": 69, \"conflict\": 0}, \"errors\": [], \"local_ai\": {\"enabled\": true, \"revision\": 3, \"repeat_prompt\": false, \"eligible\": 4, \"calls\": 1, \"accepted\": 0, \"budget_exhausted\": false}, \"model_unavailable\": null}\n",
+            "stderr": "",
+            "seconds": 161.668,
+            "invalid_accuracy_result": "code_changed_during_case"
+          }
+        ],
+        "complete": false
+      }
+    }
+  ]
+}

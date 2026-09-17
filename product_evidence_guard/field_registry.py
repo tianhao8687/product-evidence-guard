@@ -359,6 +359,19 @@ def scope_for_label(field: str, label: str) -> str | None:
     return None
 
 
+def is_parameter_heading(text: str) -> bool:
+    """A complete field/column heading has no value, regardless of its reader.
+
+    This is a structural role, not a new alias asserting SKU/model ownership.
+    'Model Name' is a heading; 'Model: Name' is still an explicit value.
+    """
+    label = re.sub(r"\s+", " ", text.strip().rstrip(":：=")).casefold()
+    if field_for_label(label, known_only=True):
+        return True
+    role = re.fullmatch(r"(.+?)\s+(?:name|number|code|value|unit)", label)
+    return bool(role and field_for_label(role[1], known_only=True))
+
+
 def field_for_label(label: str, *, known_only: bool = False) -> FieldDefinition | None:
     label = re.sub(r"\s+", " ", str(label).strip()).casefold()
     label = {"噪音": "噪声", "质保期": "保修期", "凈重": "净重", "淨重": "净重"}.get(label, label)

@@ -49,6 +49,8 @@ $requiredRuntimeFiles = @(
     'product_evidence_guard/hybrid_image_reader.py',
     'product_evidence_guard/identity.py',
     'product_evidence_guard/source_context.py',
+    'product_evidence_guard/semantic_review.py',
+    'product_evidence_guard/runtime_resources.py',
     'product_evidence_guard/model_output_schema.py',
     'product_evidence_guard/models.py',
     'product_evidence_guard/normalization.py',

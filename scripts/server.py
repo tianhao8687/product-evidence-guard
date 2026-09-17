@@ -293,6 +293,17 @@ class ResidentModelCache:
         openvino_vlm_model: str | None,
         requested_device: str,
     ) -> dict[str, Any]:
+        try:
+            return self._prepare(openvino_model=openvino_model, openvino_vlm_model=openvino_vlm_model,
+                                 requested_device=requested_device)
+        except (RuntimeError, OSError, MemoryError) as exc:
+            # Do not publish a failed load as resident/ready, or retry it inside
+            # analyze_directory. Native documents can still be processed.
+            return {"llm": None, "vlm": None, "selection": None, "load_seconds": 0.0,
+                    "reused": False, "error": f"{type(exc).__name__}: {exc}"}
+
+    def _prepare(self, *, openvino_model: str | None, openvino_vlm_model: str | None,
+                 requested_device: str) -> dict[str, Any]:
         # A deterministic-only analysis must remain usable on a clean machine
         # where OpenVINO is not installed.  Bypass device discovery entirely
         # and leave any resident model cache intact for a later model request.
@@ -375,6 +386,8 @@ def _resident_analysis_worker_main(connection: Any) -> None:
         except (BrokenPipeError, EOFError, OSError) as exc:
             raise ParentDisconnected from exc
 
+    from product_evidence_guard.runtime_resources import lower_worker_priority
+    lower_worker_priority()
     cache = ResidentModelCache()
     while True:
         try:
@@ -408,11 +421,14 @@ def _resident_analysis_worker_main(connection: Any) -> None:
                 requested_device=str(payload.get("device") or "AUTO"),
             )
             if payload.get("warmup_only"):
+                if prepared.get("error"):
+                    raise RuntimeError(prepared["error"])
                 if getattr(cache, "_warmed_key", None) != cache._key and prepared["vlm"] is not None:
                     prepared["vlm"].warmup()
                     cache._warmed_key = cache._key
                 send_to_parent({"type": "model_ready", "job_id": job_id,
-                                 "load_seconds": prepared["load_seconds"], "reused": prepared["reused"], "has_model": True})
+                                 "load_seconds": prepared["load_seconds"], "reused": prepared["reused"],
+                                 "has_model": prepared["vlm"] is not None or prepared["llm"] is not None})
                 send_to_parent({"type": "result", "job_id": job_id,
                                  "summary": {"model_reused": prepared["reused"], "load_seconds": prepared["load_seconds"]}})
                 continue
@@ -422,7 +438,7 @@ def _resident_analysis_worker_main(connection: Any) -> None:
                     "job_id": job_id,
                     "load_seconds": prepared["load_seconds"],
                     "reused": prepared["reused"],
-                    "has_model": prepared["vlm"] is not None,
+                    "has_model": prepared["vlm"] is not None or prepared["llm"] is not None,
                 }
             )
             if isinstance(prepared["vlm"], HybridImageReader):
@@ -437,7 +453,9 @@ def _resident_analysis_worker_main(connection: Any) -> None:
                 preloaded_image_reader=prepared["vlm"],
                 preloaded_model_load_seconds=prepared["load_seconds"],
                 preloaded_model_reused=prepared["reused"],
+                preloaded_model_error=prepared.get("error"),
                 device_selection=prepared["selection"],
+                semantic_assist=not bool(payload.get("no_semantic_assist", True)),
                 progress_callback=lambda stage, details: send_to_parent(
                     {
                         "type": "progress",
@@ -786,6 +804,8 @@ class ServerApplication:
         openvino_model = _optional_text(payload, "openvino_model")
         openvino_vlm_model = _optional_text(payload, "openvino_vlm_model")
         device = _optional_text(payload, "device") or "AUTO"
+        if "no_semantic_assist" in payload and not isinstance(payload["no_semantic_assist"], bool):
+            raise ProtocolError("no_semantic_assist 必须是布尔值。")
         self.workflow.remember({**payload, "output_dir": output_dir})
 
         for model_path in (openvino_model, openvino_vlm_model):
@@ -814,6 +834,8 @@ class ServerApplication:
             "openvino_vlm_model": openvino_vlm_model,
             "device": device,
         }
+        if "no_semantic_assist" in payload:
+            analyze_options["semantic_assist"] = not payload["no_semantic_assist"]
         if openvino_model or openvino_vlm_model:
             self.state.transition("loading")
         if self._supports_resident_models:
@@ -823,6 +845,7 @@ class ServerApplication:
                     "output_dir": output_dir,
                     **analyze_options,
                     "no_visual_cache": bool(payload.get("no_visual_cache", False)),
+                    "no_semantic_assist": bool(payload.get("no_semantic_assist", True)),
                 },
                 on_model_ready=lambda: self.state.transition("running"),
                 on_progress=self.workflow.worker_progress,

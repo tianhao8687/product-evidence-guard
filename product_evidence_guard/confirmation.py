@@ -13,7 +13,7 @@ import uuid
 from . import __version__
 from .models import CrossFieldRelation, FactCandidate, FactGroup
 from .graph import build_graph
-from .normalization import values_equal
+from .normalization import values_equal, value_review_reason
 from .reports import (
     write_conflicts_markdown,
     write_html_report,
@@ -989,6 +989,11 @@ def apply_review_action(output_dir: str | Path, *, session_id: str, action: str,
             raise ConfirmationRequestError("请先选择一个当前选项。")
         if action == "adopt" and group.get("review_reason_code") in {"identity_ambiguous", "scope_unclear"}:
             raise ConfirmationRequestError("请使用“修改”选择商品或口径，再保存。")
+        if action == "adopt":
+            chosen = FactCandidate.from_dict(selected)
+            if value_review_reason(chosen.field, chosen.value_input, chosen.normalized_value,
+                                   chosen.normalized_unit, chosen.notes):
+                raise ConfirmationRequestError("这个值尚不完整或无法解析，请使用“修改”填写正确参数及单位。")
         note = reason.strip() or {"adopt": "用户选择采用此值，并不采用本组其他不同值。",
                                  "edit": "用户修改并采用；原始识别内容保留。",
                                  "skip": "用户选择本次不使用此参数。"}[action]
@@ -1011,6 +1016,9 @@ def apply_review_action(output_dir: str | Path, *, session_id: str, action: str,
             corrected = _json_clone(selected)
             spec = field_definition(corrected["field"])
             normalized = normalize_value(corrected["field"], value.strip())
+            if value_review_reason(corrected["field"], value.strip(), normalized.value,
+                                   normalized.unit, normalized.notes):
+                raise ConfirmationRequestError("请输入完整、有效的参数；数值参数请包含正确单位，不能填写待定或缺失值。")
             corrected.update(candidate_id="manual_" + transaction, source_block_id=selected["source_block_id"] + ":manual:" + transaction,
                 normalized_value=normalized.value, normalized_unit=normalized.unit, notes=list(normalized.notes),
                 extraction_method="human_correction", mapping_confidence_source="human", mapping_confidence=1.0)

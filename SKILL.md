@@ -1,6 +1,6 @@
 ---
 name: local-product-evidence-guard
-version: 2.0.0
+version: 2.0.1
 description: 本地、离线使用 OpenVINO 在 Intel AIPC 核验商品资料、说明书、参数表、包装图和扫描 PDF，发现冲突并保留证据。Use to verify local/offline product facts, evidence, content and conflicts. 正式事实由用户确认。
 ---
 
@@ -35,7 +35,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\run.ps1 analyze "<
 未指定输出时使用输入目录下的 `.peg-output`。`--deterministic-only` 仅供纯文档/CI 测试，不能用于跳过图片识别。
 
 若本地环境尚未安装，按 [用户指南](docs/USER_GUIDE.md) 运行 `scripts\install-env.ps1`。
-模型缺失或损坏时报告状态；不要另起模型或换云端 API。下载返回退出码 3 时用 `scripts\run.ps1 --continue`。
+模型缺失、损坏或内存不足时，报告状态，不反复预热，不关闭用户软件或换云端 API。
+分析会保留可读取的文档结果，并标明未完成的图片/扫描页；不要把回退说成全部读取成功。
+已有完整模型只是暂时加载失败时，仍可提交分析；资源恢复后用 `resume` 或“重试未完成部分”补齐。
+下载返回退出码 3 时用 `scripts\run.ps1 --continue`。
 
 ## 进度与事实
 
@@ -105,6 +108,9 @@ Excel 备注不改变正式确认状态，参数选择通过对话 `review-actio
 ## 速度与运行状态
 
 千问提前预热后单实例常驻，不按请求加载；不同图片的推理排队执行。
+疑难文字的本地 AI 辅助为可选功能：用户想尝试时加 `--semantic-assist`，回退用 `--no-semantic-assist`；图片识别不受这两个开关影响。
+AI 只能辅助拆分原文，不能自动解释未被验证的限定词；原文、归属和人工选择不被改写。长文只使用完整页/表上下文，不能安全读取的仍待确认。
+默认不重复整段提示词或让 AI 反复重读。CPU 模型推理最多使用 4 个线程，后台工作进程低优先级运行。
 同图跨任务按内容哈希复用识别结果，改名后重新绑定当前来源，人工确认不随缓存继承。
 默认使用整图紧凑复核；上下文裁剪保留为开发实验，不在日常路径启用。
 性能与缓存边界见 [速度优化记录](docs/SPEED_OPTIMIZATION.md)，不要把缓存命中宣传成模型生成速度。

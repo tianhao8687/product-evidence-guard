@@ -104,7 +104,7 @@ def context(output_dir: str | Path, session_id: str | None = None, *, read_only:
         confirmed = []
         product["run_summary"].setdefault("reading_issues", []).append(reading_issue(
             file="此前的分析结果", file_hash="value_semantics_upgrade", code="value_upgrade_required", locator={},
-            message="单位读取规则已更新，请重新读取一次；原人工决定保留，只有读取结果变化的项目需要重新核对。"))
+            message="参数校验规则已更新，请重新读取一次；原人工决定保留，只有读取结果变化的项目需要重新核对。"))
     candidates = {c["candidate_id"]: c for c in product["candidates"]}
     for fact in confirmed:
         fact["scope"] = candidates[fact["candidate_id"]].get("scope")
@@ -163,7 +163,10 @@ def _manifest(output: Path, session: str) -> dict:
 
 
 def _public_fact(fact: dict, session: str) -> dict:
-    identity = {k: fact.get(k) for k in ("candidate_id", "file_hash", "normalized_value", "normalized_unit", "scope", "product_id")}
+    # Identity corrections invalidate prior exports/grants too. Labels only
+    # enter this local digest; unselected identity fields are never disclosed.
+    identity = {k: fact.get(k) for k in ("candidate_id", "file_hash", "normalized_value", "normalized_unit", "scope", "product_id",
+                                       "product_sku", "product_model", "product_variant")}
     return {"fact_id": digest([session, identity])[:24], "field": fact["field"],
             "field_label": fact["field_label"], "value": fact["normalized_value"],
             "unit": fact["normalized_unit"], "scope": fact.get("scope"),
@@ -180,23 +183,51 @@ def _require_product_ownership(facts: list[dict]) -> None:
         raise ConfirmationRequestError("需要先确认参数属于哪个商品：请补充来源中的 SKU/型号/变体并重新分析；可先导出核验表。")
 
 
-def _verified_facts(product: dict) -> list[dict]:
-    from .readiness import needs_value_upgrade
-    if needs_value_upgrade(product):
-        return []
-    by_id = {c["candidate_id"]: c for c in product["candidates"]}
-    facts = [{**by_id[g["verified_candidate_ids"][0]],
-             "normalized_value": g["selected_value"], "normalized_unit": g["selected_unit"],
-             "verification_method": g["verification_method"], "human_approved": g["human_approved"]}
-            for g in product.get("facts", []) if not g.get("excluded") and g["fact_status"] == "verified" and g["verified_candidate_ids"]]
+def _with_current_identity(facts: list[dict], product: dict) -> list[dict]:
     products = {p["product_id"]: p for p in product.get("products", [])}
-    for fact in facts:
+    result = []
+    for original in facts:
+        fact = dict(original)
         owner = products.get(fact.get("product_id"), {})
         fact["product_sku"] = owner.get("sku", fact.get("product_sku"))
         fact["product_model"] = owner.get("model", fact.get("product_model"))
         if len(owner.get("variants", [])) == 1:
             fact["product_variant"] = owner["variants"][0]
-    return facts
+        result.append(fact)
+    return result
+
+
+def _verified_facts(product: dict) -> list[dict]:
+    from .readiness import needs_value_upgrade
+    if needs_value_upgrade(product):
+        return []
+    by_id = {c["candidate_id"]: c for c in product["candidates"]}
+    facts = []
+    for group in product.get("facts", []):
+        if group.get("excluded") or group["fact_status"] != "verified" or not group["verified_candidate_ids"]:
+            continue
+        evidence = [by_id[cid] for cid in group["verified_candidate_ids"]]
+        chosen = next((c for c in evidence if c["status"] == "confirmed"), evidence[0])
+        facts.append({**chosen, "normalized_value": group["selected_value"],
+                      "normalized_unit": group["selected_unit"],
+                      "verification_method": group["verification_method"], "human_approved": group["human_approved"]})
+    return _with_current_identity(facts, product)
+
+
+def _export_facts(product: dict, confirmed: list[dict], *, mode: str,
+                  product_ids: list[str] | None = None) -> list[dict]:
+    """Export modes filter one current projection, never historical snapshots."""
+    if mode not in {"verified", "human"}:
+        raise ConfirmationRequestError("请选择全部已确认参数或仅人工批准参数。")
+    if mode == "human":
+        selected = [f for f in confirmed if not product_ids or f.get("product_id") in product_ids]
+        # Preserve explicit feedback about invalid human decisions rather than
+        # silently dropping approved-but-unresolved facts from a partial export.
+        _require_product_ownership(selected)
+        _require_resolved_facts(selected, product)
+    return [f for f in _verified_facts(product)
+            if (mode != "human" or f["human_approved"])
+            and (not product_ids or f.get("product_id") in product_ids)]
 
 
 def _require_resolved_facts(facts: list[dict], product: dict) -> None:
@@ -214,7 +245,7 @@ def _usable_candidate_ids(product: dict) -> set[str]:
 
 def _usable_facts(product: dict) -> list[dict]:
     usable = _usable_candidate_ids(product)
-    return [c for c in product["candidates"] if c["candidate_id"] in usable]
+    return _with_current_identity([c for c in product["candidates"] if c["candidate_id"] in usable], product)
 
 
 def _delivery_check(product: dict, *, allow_partial: bool = False, product_ids: list[str] | None = None) -> dict:
@@ -470,12 +501,7 @@ def export_table(output_dir: str | Path, *, session_id: str | None = None, mode:
                  allow_partial: bool = False, product_ids: list[str] | None = None) -> dict:
     output, product, confirmed = context(output_dir, session_id)
     delivery = _delivery_check(product, allow_partial=allow_partial, product_ids=product_ids)
-    if mode not in {"human", "verified"}:
-        raise ConfirmationRequestError("请选择已确认参数或仅人工批准参数。")
-    if mode == "verified":
-        confirmed = _verified_facts(product)
-    if product_ids:
-        confirmed = [f for f in confirmed if f.get("product_id") in product_ids]
+    confirmed = _export_facts(product, confirmed, mode=mode, product_ids=product_ids)
     if not confirmed:
         raise ConfirmationRequestError("尚无当前有效的已确认参数。")
     _require_product_ownership(confirmed)
@@ -531,12 +557,7 @@ def export_local(output_dir: str | Path, *, reason: str = "local_only", session_
         raise ConfirmationRequestError("本地交付原因无效。")
     output, product, confirmed = context(output_dir, session_id)
     delivery = _delivery_check(product, allow_partial=allow_partial, product_ids=product_ids)
-    if mode not in {"verified", "human"}:
-        raise ConfirmationRequestError("请选择全部已确认参数或仅人工批准参数。")
-    if mode == "verified":
-        confirmed = _verified_facts(product)
-    if product_ids:
-        confirmed = [f for f in confirmed if f.get("product_id") in product_ids]
+    confirmed = _export_facts(product, confirmed, mode=mode, product_ids=product_ids)
     if not confirmed:
         raise ConfirmationRequestError("尚无有效的已确认参数，请先在对话中完成参数确认。")
     _require_product_ownership(confirmed)
@@ -551,16 +572,13 @@ def export_local(output_dir: str | Path, *, reason: str = "local_only", session_
     table = export_table(output, session_id=session, mode=mode, allow_partial=allow_partial, product_ids=product_ids)
     # export_table revalidates sources. Refuse to mix facts from two source versions.
     _, current_product, current_facts = context(output, session)
-    if mode == "verified":
-        current_facts = _verified_facts(current_product)
-    if product_ids:
-        current_facts = [f for f in current_facts if f.get("product_id") in product_ids]
+    current_facts = _export_facts(current_product, current_facts, mode=mode, product_ids=product_ids)
     if (digest(confirmed) != digest(current_facts) or
             assess_delivery(product, product_ids=product_ids) != assess_delivery(current_product, product_ids=product_ids)):
         raise ConfirmationRequestError("来源在交付过程中发生变化，请重新核验后导出。")
     def literal(value):
         text = escape(str(value), quote=False).replace("\r", " ").replace("\n", " ")
-        return re.sub(r"([\\`*_{}\[\]()#+.!|>-])", r"\\\1", text)
+        return re.sub(r"([\\`*_{}\[\]()#+.!|>])", r"\\\1", text)
     lines = ["# 商品参数简报", "", "生成方式：本地模板。", "",
              "交付说明：" + LOCAL_DELIVERY_REASONS[reason] + "。", "",
              "本简报只列出当前有效的已确认参数，没有生成额外的营销卖点。", "", "## 已确认参数", ""]
@@ -570,7 +588,14 @@ def export_local(output_dir: str | Path, *, reason: str = "local_only", session_
               "min": "最小", "max": "最大", "typical": "典型", "net": "净重", "gross": "毛重", "unspecified": "未限定",
               "operating": "工作/运行", "storage": "储存"}
     references = []
+    multiple_products = len({f.get("product_id") for f in current_facts}) > 1
+    previous_product = None
     for fact in current_facts:
+        if multiple_products and fact.get("product_id") != previous_product:
+            previous_product = fact.get("product_id")
+            owner = fact.get("product_sku") or fact.get("product_model") or previous_product
+            variant = fact.get("product_variant")
+            lines.extend(["", "### " + literal(owner) + (" / " + literal(variant) if variant else ""), ""])
         scope = fact.get("scope")
         label = fact["field_label"]
         if scope and scope not in {"net", "gross", "unspecified"}:

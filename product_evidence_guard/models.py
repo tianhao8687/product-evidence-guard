@@ -65,6 +65,15 @@ class FactCandidate:
     def decision_status(self) -> str:
         return "undecided" if self.status == "pending" else self.status
 
+    @property
+    def value_input(self) -> str:
+        """Input behind the current value; raw_value remains original evidence."""
+        if self.extraction_method == "human_correction":
+            edited = self.provenance.get("human_correction", {}).get("input_value")
+            if isinstance(edited, str):
+                return edited
+        return self.raw_value
+
     def to_dict(self) -> dict[str, Any]:
         return {**asdict(self), "decision_status": self.decision_status}
 

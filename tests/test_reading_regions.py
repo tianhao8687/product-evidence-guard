@@ -190,8 +190,8 @@ class ParameterTableTests(unittest.TestCase):
                          ["Unfamiliar quantity", "X", "heater on at 1MW", "-", "6", "10", "mA"]]), table_id="t")
         self.assertEqual(len(cells), 1)
         self.assertEqual(cells[0].header, "Unfamiliar quantity")
-        self.assertEqual(cells[0].value, "typ: 6 mA; max: 10 mA (heater on at 1MW)")
-        self.assertEqual(cells[0].parent_labels, ("heater on at 1MW",))
+        self.assertEqual(cells[0].value, "typ: 6 mA; max: 10 mA (symbol: X; heater on at 1MW)")
+        self.assertEqual(cells[0].parent_labels, ("symbol: X", "heater on at 1MW"))
         candidate = extract_rule_candidates(block(cells[0].header + ": " + cells[0].value,
             atomic_parameter=True, parent_labels=list(cells[0].parent_labels)))[0]
         self.assertIn("1MW", candidate.scope)

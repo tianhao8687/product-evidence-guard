@@ -15,10 +15,10 @@
     },
     "component": {
       "type": "application",
-      "bom-ref": "pkg:pypi/product-evidence-guard@2.0.0",
+      "bom-ref": "pkg:pypi/product-evidence-guard@2.0.1",
       "name": "product-evidence-guard",
-      "version": "2.0.0",
-      "purl": "pkg:pypi/product-evidence-guard@2.0.0",
+      "version": "2.0.1",
+      "purl": "pkg:pypi/product-evidence-guard@2.0.1",
       "licenses": [
         {
           "license": {
@@ -4402,7 +4402,7 @@
   ],
   "dependencies": [
     {
-      "ref": "pkg:pypi/product-evidence-guard@2.0.0",
+      "ref": "pkg:pypi/product-evidence-guard@2.0.1",
       "dependsOn": [
         "pkg:pypi/antlr4-python3-runtime@4.9.3",
         "pkg:pypi/certifi@2026.7.22",

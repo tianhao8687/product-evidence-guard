@@ -97,7 +97,9 @@ class ValueFirstParameterTests(unittest.TestCase):
                     self.assertEqual(row.provenance["parameter_order"], "value_first")
                     self.assertEqual(row.locator["page"], 1)
                     self.assertEqual(row.source_block_id, "b")
-                    self.assertEqual(build_graph(rows)[1][0].fact_status, "verified")
+                    # A casing convention alone cannot prove that a trailing
+                    # word names a parameter; explicit labels bind it later.
+                    self.assertEqual(build_graph(rows)[1][0].fact_status, "pending_confirmation")
 
     def test_known_labels_use_existing_normalization_and_scope(self):
         for text, expected in (("80 grams Net Weight", ("net_weight", 80, "g", "net")),
@@ -109,11 +111,17 @@ class ValueFirstParameterTests(unittest.TestCase):
 
     def test_prose_identity_units_and_multiple_values_are_not_parameters(self):
         for text in ("There are 21 GPIO available", "384 kB ROM is optional", "384 kB ROM (max)",
-                     "3 Volts required", "21 errors", "2026 MODEL", "123 SKU", "21 GPIO: optional",
+                     "2026 MODEL", "123 SKU", "21 GPIO: optional",
                      "384 kB ROM 512 kB SRAM", "21 GPIO / 14 UART", "21 MW", "21 WATTS", "384 kB",
                      "3 unknownunits ROM", "1.5 GPIO", "-2 GPIO", "without interruption: improved design"):
             with self.subTest(text=text):
                 self.assertFalse(extract(text, layout_binding="unbound_text"))
+
+    def test_short_ambiguous_prose_is_not_auto_approved_in_any_case(self):
+        for text in ("3 Volts required", "3 Volts REQUIRED", "21 errors", "21 ERRORS"):
+            rows = extract(text, layout_binding="unbound_text")
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(build_graph(rows)[1][0].fact_status, "pending_confirmation")
 
     def test_opaque_unit_case_is_not_lost(self):
         for text, expected in (("384 kB ROM", "384kB"), ("384 kb ROM", "384kb"),

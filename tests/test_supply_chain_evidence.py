@@ -91,6 +91,8 @@ class SupplyChainEvidenceTests(unittest.TestCase):
 
         self.assertEqual(sbom["bomFormat"], "CycloneDX")
         self.assertEqual(sbom["specVersion"], "1.5")
+        self.assertEqual(sbom["metadata"]["component"]["version"], GENERATOR.PROJECT_VERSION)
+        self.assertTrue(sbom["metadata"]["component"]["purl"].endswith("@" + GENERATOR.PROJECT_VERSION))
         self.assertEqual(len(sbom["components"]), len(locked))
         self.assertEqual(
             inventory["summary"]["installed_version_match_count"], len(locked)

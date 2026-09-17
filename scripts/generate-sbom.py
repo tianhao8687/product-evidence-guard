@@ -21,6 +21,7 @@ from typing import Iterable, Mapping
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_VERSION = json.loads((REPO_ROOT / "info.json").read_text(encoding="utf-8"))["version"]
 DEFAULT_LOCK = REPO_ROOT / "requirements.lock"
 DEFAULT_SBOM = REPO_ROOT / "docs" / "evidence" / "sbom.json"
 DEFAULT_LICENSES = REPO_ROOT / "docs" / "evidence" / "license-inventory.json"
@@ -239,7 +240,7 @@ def build_documents(
         raise ValueError("installed environment does not match requirements.lock: " + " | ".join(details))
 
     lock_digest = sha256_bytes(lock_bytes)
-    root_ref = "pkg:pypi/product-evidence-guard@2.0.0"
+    root_ref = f"pkg:pypi/product-evidence-guard@{PROJECT_VERSION}"
     components: list[dict[str, object]] = []
     license_rows: list[dict[str, object]] = []
     for package, found in packages:
@@ -295,7 +296,7 @@ def build_documents(
                 "type": "application",
                 "bom-ref": root_ref,
                 "name": "product-evidence-guard",
-                "version": "2.0.0",
+                "version": PROJECT_VERSION,
                 "purl": root_ref,
                 "licenses": [{"license": {"id": "MIT"}}],
             },

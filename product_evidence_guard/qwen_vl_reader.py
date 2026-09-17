@@ -526,6 +526,10 @@ class QwenVlReader:
         self._mapping_max_new_tokens = mapping_max_new_tokens
 
     @property
+    def semantic_generator(self):
+        return getattr(self._backend, "generate_semantic", None)
+
+    @property
     def supports_review_region(self) -> bool:
         return callable(getattr(self._backend, "load_image_region", None))
 

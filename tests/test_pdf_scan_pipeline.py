@@ -300,7 +300,7 @@ class PdfEnginePipelineTests(unittest.TestCase):
                 self.assertIn("qwen_vl_field_mapping", report)
                 self.assertIn("模型自评", report)
                 self.assertIn("近似坐标", report)
-                self.assertIn("待人工确认", report)
+                self.assertIn("未人工操作", report)
 
         self.assertEqual(len(rendered_paths), 1)
         self.assertFalse(rendered_paths[0].exists())

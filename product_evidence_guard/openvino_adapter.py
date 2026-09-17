@@ -13,6 +13,7 @@ from .field_registry import field_definition, field_for_label
 from .models import FactCandidate, SourceBlock
 from .normalization import normalize_value
 from .parsers import sha256_file
+from .runtime_resources import check_model_memory, cpu_pipeline_options
 
 
 @dataclass(frozen=True, slots=True)
@@ -134,6 +135,25 @@ def _decoded_text(result: Any) -> str:
     return str(result)
 
 
+def _generate_semantic(pipe, prompt: str, *, max_new_tokens: int, deadline: float) -> str:
+    """One bounded deterministic generation, sharing the resident model."""
+    import time
+    import openvino_genai as genai
+    if time.perf_counter() >= deadline:
+        raise TimeoutError("semantic_review_deadline")
+    timed_out = False
+
+    def stream(_chunk):
+        nonlocal timed_out
+        timed_out = time.perf_counter() >= deadline
+        return genai.StreamingStatus.STOP if timed_out else genai.StreamingStatus.RUNNING
+
+    result = pipe.generate(prompt, max_new_tokens=max_new_tokens, do_sample=False, streamer=stream)
+    if timed_out or time.perf_counter() >= deadline:
+        raise TimeoutError("semantic_review_deadline")
+    return _decoded_text(result)
+
+
 def _strict_json_array(text: str, *, max_items: int = 50) -> list[Any]:
     """Parse one complete top-level array, optionally wrapped by one code fence."""
 
@@ -164,6 +184,7 @@ class OpenVinoFactExtractor:
     """
 
     def __init__(self, model_path: str | Path, device: str = "CPU") -> None:
+        check_model_memory(model_path)
         try:
             import openvino_genai as ov_genai
         except ImportError as exc:  # pragma: no cover - optional dependency
@@ -171,8 +192,11 @@ class OpenVinoFactExtractor:
                 "OpenVINO extraction requires openvino-genai. Install with: "
                 "pip install -e '.[openvino]'"
             ) from exc
-        self._pipe = ov_genai.LLMPipeline(str(model_path), device)
+        self._pipe = ov_genai.LLMPipeline(str(model_path), device, **cpu_pipeline_options(device))
         self._allowed = {spec.name: spec for spec in FIELD_SPECS}
+
+    def generate_semantic(self, prompt: str, *, max_new_tokens: int, deadline: float) -> str:
+        return _generate_semantic(self._pipe, prompt, max_new_tokens=max_new_tokens, deadline=deadline)
 
     def extract(self, blocks: Iterable[SourceBlock]) -> list[FactCandidate]:
         block_list = list(blocks)
@@ -284,6 +308,7 @@ class OpenVinoVlmBackend:
         *,
         model_id: str | None = None,
     ) -> None:
+        check_model_memory(model_path)
         try:
             import numpy as np
             import openvino as ov
@@ -300,7 +325,10 @@ class OpenVinoVlmBackend:
         self._ImageOps = ImageOps
         self.model_id = model_id or str(Path(model_path))
         self.device = device
-        self._pipe = ov_genai.VLMPipeline(str(model_path), device)
+        self._pipe = ov_genai.VLMPipeline(str(model_path), device, **cpu_pipeline_options(device))
+
+    def generate_semantic(self, prompt: str, *, max_new_tokens: int, deadline: float) -> str:
+        return _generate_semantic(self._pipe, prompt, max_new_tokens=max_new_tokens, deadline=deadline)
 
     def load_image(self, image_path: Path) -> Any:
         return self.load_image_region(image_path, None)

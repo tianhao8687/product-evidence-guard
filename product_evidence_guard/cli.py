@@ -43,6 +43,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Deterministic parser workers (1 keeps the serial reference path)",
     )
+    semantic = analyze.add_mutually_exclusive_group()
+    semantic.add_argument("--semantic-assist", dest="no_semantic_assist", action="store_false", default=True,
+                          help="Opt in to bounded local-AI clarification of unclear text")
+    semantic.add_argument("--no-semantic-assist", action="store_true",
+                         help="Disable local-AI clarification; image reading remains enabled")
 
     for command, help_text in (
         ("confirm", "Confirm one candidate after human review"),
@@ -83,6 +88,7 @@ def main(argv: list[str] | None = None) -> int:
                 openvino_vlm_model=args.openvino_vlm_model,
                 device=args.device,
                 preprocessing_workers=args.preprocessing_workers,
+                semantic_assist=not args.no_semantic_assist,
             )
         except Exception as exc:
             print(f"ERROR: {exc}", file=sys.stderr)

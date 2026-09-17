@@ -52,7 +52,7 @@ def _linked_values(group, by_id, links, *, html=False):
 
 
 _STATUS_LABELS = {
-    "pending": "待人工确认",
+    "pending": "未人工操作",
     "confirmed": "已人工确认",
     "rejected": "已人工拒绝",
     "stale": "已失效",
@@ -192,6 +192,9 @@ def write_product_facts(
     run_summary["fact_count"] = len(included)
     run_summary["excluded_fact_count"] = len(group_list) - len(included)
     run_summary["blocking_conflict_count"] = fact_counts["conflict"]
+    run_summary["conflict_count"] = fact_counts["conflict"]
+    run_summary["review_count"] = fact_counts["pending_confirmation"]
+    run_summary["pass_count"] = fact_counts["verified"]
     payload = {
             "schema_version": 2,
             "identity_version": IDENTITY_VERSION,
@@ -253,7 +256,7 @@ def write_conflicts_markdown(
         "",
         "# 人工确认状态",
         "",
-        f"- 待人工确认：{status_counts['pending']}",
+        f"- 尚未人工操作的证据：{status_counts['pending']}（不代表事实待确认）",
         f"- 已人工确认：{status_counts['confirmed']}",
         f"- 已人工拒绝：{status_counts['rejected']}",
         f"- 已失效：{status_counts['stale']}",
@@ -314,14 +317,13 @@ def write_conflicts_markdown(
                 "",
             ]
         )
-    ordered = sorted(group_list, key=lambda item: ({"block": 0, "review": 1, "pass": 2}.get(item.severity, 3), item.field))
+    ordered = sorted(group_list, key=lambda item: ({"conflict": 0, "pending_confirmation": 1, "verified": 2}[item.fact_status], item.field))
     for group in ordered:
         recommendation = _group_recommendation(group, by_id)
         lines.extend(
             [
-                f"## {group.field_label} — `{group.classification}`",
+                f"## {group.field_label} — {FACT_STATUS_LABELS[group.fact_status]}",
                 "",
-                f"- 严重程度：**{group.severity}**",
                 f"- 商品：`{group.product_label or group.product_id or 'unresolved'}`",
                 f"- 口径：`{group.scope or 'unspecified'}`",
                 f"- 判断：{group.reason}",
@@ -345,7 +347,7 @@ def write_conflicts_markdown(
             )
             lines.extend(
                 [
-                    f"- `{candidate.raw_value}` → `{standard}`；状态："
+                    f"- `{candidate.raw_value}` → `{standard}`；人工决策："
                     f"**{_status_label(candidate.status)}** (`{candidate.status}`)",
                     f"  - 来源：`{candidate.source_file}`；类型：`{candidate.source_kind}`；"
                     f"方法：`{candidate.extraction_method}`",
@@ -434,7 +436,7 @@ def write_html_report(
             f"字段理解 {group.mapping_confidence:.0%} · 证据一致 {group.evidence_consistency:.0%}</p>"
             "<div class='table-wrap'><table><thead><tr><th>原始值</th><th>标准值</th>"
             "<th>来源</th><th>来源类型 / 方法</th><th>证据位置</th>"
-            "<th>识别 / 字段理解</th><th>确认状态</th></tr></thead>"
+            "<th>识别 / 字段理解</th><th>人工决策</th></tr></thead>"
             f"<tbody>{''.join(evidence_rows)}</tbody></table></div></details></section>"
         )
 

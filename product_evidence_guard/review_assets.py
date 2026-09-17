@@ -46,7 +46,7 @@ const value = c => `${Array.isArray(c.normalized_value)?c.normalized_value.join(
 const compactValue = c => c.provenance?.source_conditions?.length ? value(c).split(' [条件:')[0]+'（含附注条件）' : value(c);
 function notice(text,error=false){$('notice').hidden=!text;$('notice').textContent=text;$('notice').classList.toggle('error',error);}
 async function api(path,body){const response=await fetch('/api/'+path,{method:body?'POST':'GET',headers:{'X-PEG-Token':token||'',...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});const data=await response.json();if(!response.ok)throw Error(data.error||'操作失败，请重试。');return data;}
-async function action(button,work){button.disabled=true;try{await work();}catch(error){notice(error.message,true);}finally{button.disabled=false;if(state)renderReviewTools();}}
+async function action(button,work){button.disabled=true;const dialog=button.closest('dialog');dialog?.querySelector('[data-action-error]')?.remove();try{await work();}catch(error){if(dialog?.open){const feedback=el('p','notice error',error.message);feedback.dataset.actionError='';feedback.setAttribute('role','alert');dialog.querySelector('.dialog-actions').before(feedback);}else notice(error.message,true);}finally{button.disabled=false;if(state)renderReviewTools();}}
 function button(text,cls,fn){const b=el('button',cls,text);b.type='button';b.addEventListener('click',()=>action(b,fn));return b;}
 function sourceLink(c,text='查看原文',condition=null){const a=el('a','text-button',text);a.href='#source='+encodeURIComponent(c.candidate_id);a.title=c.source_file+' · '+position(condition===null?c.locator:c.provenance.source_conditions[condition].locator);a.addEventListener('click',e=>{e.preventDefault();preview(c,condition).catch(error=>notice(error.message,true));});return a;}
 function reviewTitle(){if(!state)return '正在读取资料…';if(state.phase==='analyzing')return '正在读取，完成后会自动更新。';if((state.counts?.conflicts||0)+(state.counts?.pending_facts||0))return '先处理有问题的参数。';if(!state.counts?.verified_facts)return '还没有可用参数，请补充资料。';return state.coverage?.status==='partial'?'已确认参数可以先使用。':'参数已确认，可以导出。';}
@@ -66,7 +66,7 @@ function render(){
  $('keep-alive').textContent=m.keep_alive?'释放空闲模型':'保持模型就绪';
  const active=(s.jobs||[]).find(j=>['queued','running','cancel_requested'].includes(j.phase));
  $('progress').hidden=!active;
- if(active){const p=active.progress||{};$('progress').textContent=`${active.phase==='cancel_requested'?'正在停止本次读取…':active.phase==='queued'?'任务排队中':'正在本地处理'}${p.index?` · 第 ${p.index} / ${p.total||'?'} 份资料`:''}${p.stage==='loading'?' · 模型准备中':''}`;}
+ if(active){const p=active.progress||{};$('progress').textContent=`${active.phase==='cancel_requested'?'正在停止本次读取…':active.phase==='queued'?'任务排队中':p.stage==='semantic_review'?'正在用本地 AI 核对少量疑难参数':'正在本地处理'}${p.index?` · 第 ${p.index} / ${p.total||'?'} 份资料`:''}${p.stage==='loading'?' · 模型准备中':''}`;}
  if(active&&!polling)polling=setInterval(()=>refresh().catch(e=>{clearInterval(polling);polling=null;notice(e.message,true);}),1800);
  if(!active&&polling){clearInterval(polling);polling=null;}
  renderFilters();renderGroups();renderHandoff();renderDeliverables();renderReviewTools();
@@ -105,7 +105,7 @@ function renderGroups(){
    top.append(pick,el('strong','',value(c)),badge(c.source_current===false?'stale':c.status,c.source_current!==false&&c.status==='pending'?'未作人工决定':undefined));row.append(top,el('div','source',c.source_file+' · '+position(c.locator)));
    const actions=el('div','candidate-actions');actions.append(sourceLink(c));
    if(c.source_current!==false){if(c.status!=='confirmed')actions.append(button('人工确认','small-action adopt',()=>openDecision(c,'confirm')));if(c.status!=='rejected')actions.append(button('拒绝此值','small-action',()=>openDecision(c,'reject')));}
-   row.append(actions);for(const [i,note] of (c.provenance?.source_conditions||[]).entries()){const condition=el('p','source-condition',`附注 ${note.marker}：${note.text} `);condition.append(sourceLink(c,'查看条件原文',i));row.append(condition);}if(c.provenance?.human_correction)row.append(el('p','muted','用户填写：'+c.provenance.human_correction.input_value+'；上方原文保留修改前的识别记录。'));details.append(row);
+   row.append(actions);for(const [i,note] of (c.provenance?.source_conditions||[]).entries()){const condition=el('p','source-condition',`附注 ${note.marker}：${note.text} `);condition.append(sourceLink(c,'查看条件原文',i));row.append(condition);}if(c.provenance?.human_correction)row.append(el('p','muted','用户填写：'+c.provenance.human_correction.input_value+'；上方原文保留修改前的识别记录。'));if(c.provenance?.semantic_review?.accepted)row.append(el('p','muted','本地 AI 辅助核对；原文未改动。'));details.append(row);
   }
   card.append(details);root.append(card);
  }
@@ -130,8 +130,8 @@ function renderReviewTools(){
  $('handle').disabled=state.phase==='analyzing';$('export').disabled=state.phase==='analyzing'||!(selectedDelivery()?.verified_count??state.counts?.verified_facts);
  $('product-filter').hidden=($('product-filter').options.length<=2);
  $('undo').hidden=!state.undo_token;
- const partial=state.coverage?.status==='partial';$('coverage').hidden=!partial;
- $('coverage-message').textContent=state.coverage?.message||'';$('retry-incomplete').hidden=!partial;
+ const partial=state.coverage?.status==='partial',retry=!!state.coverage?.can_retry;$('coverage').hidden=!(partial||retry);
+ $('coverage-message').textContent=state.coverage?.message||'';$('retry-incomplete').hidden=!retry;
  $('reading-details').hidden=!partial;const issueRoot=$('reading-issues');issueRoot.replaceChildren();
  const active=(state.jobs||[]).find(j=>['queued','running','cancel_requested'].includes(j.phase));$('cancel-job').hidden=!active;$('cancel-job').disabled=active?.phase==='cancel_requested';
  const summary=state.product?.run_summary||{},issues=[...(summary.reading_issues||[]),...(summary.errors||[]),...(summary.skipped_files||[])];
@@ -185,6 +185,7 @@ $('retry-incomplete').onclick=()=>action($('retry-incomplete'),reanalyze);
 $('cancel-job').onclick=()=>action($('cancel-job'),async()=>{const job=(state.jobs||[]).find(j=>['queued','running'].includes(j.phase));if(job){await api('cancel-job',{job_id:job.job_id});await refresh();notice('已请求停止，已完成的文件可在继续处理时复用。');}});
 $('select-usable').onclick=()=>document.querySelectorAll('.approved-row input').forEach(n=>n.checked=true);
 $('close-edit').onclick=$('cancel-edit').onclick=()=>$('edit-dialog').close();
+document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('close',()=>dialog.querySelector('[data-action-error]')?.remove()));
 $('edit-form').addEventListener('submit',e=>{e.preventDefault();action($('save-edit'),async()=>{
  if(!editContext)throw Error('请重新选择参数。');
  await performFact(editContext.group,'edit',editContext.candidate,{value:$('edit-value').value,

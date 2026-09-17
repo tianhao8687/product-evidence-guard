@@ -40,6 +40,22 @@ class WorkflowServiceTests(unittest.TestCase):
         self.base = f"{parsed.scheme}://{parsed.netloc}"
         self.token = parse_qs(parsed.fragment)["token"][0]
 
+    def test_semantic_fallback_option_reaches_nonresident_engine(self):
+        seen = []
+        def analyze(source, output, **options):
+            seen.append(options)
+            return analyze_directory(source, output, **options)
+        self.app._analyze = analyze
+        response = self.app.dispatch(build_request("analyze", {"input_dir": str(self.source),
+            "output_dir": str(self.output), "no_semantic_assist": True}))
+        self.assertTrue(response["ok"], response)
+        self.assertIs(seen[0]["semantic_assist"], False)
+        self.assertIs(self.app.workflow.requests[str(self.output.resolve())]["no_semantic_assist"], True)
+        invalid = self.app.dispatch(build_request("analyze", {"input_dir": str(self.source),
+            "output_dir": str(self.output), "no_semantic_assist": "false"}))
+        self.assertFalse(invalid["ok"])
+        self.assertIs(self.app.workflow.requests[str(self.output.resolve())]["no_semantic_assist"], True)
+
     def request(self, path, *, authorized=True, origin=None, body=None):
         headers = {"X-PEG-Token": self.token} if authorized else {}
         if origin:

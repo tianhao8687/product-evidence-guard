@@ -17,7 +17,7 @@ class NormalizedValue:
 
 
 _NUMBER = r"[-+]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][-+]?\d+)?"
-VALUE_SEMANTICS_REVISION = 4
+VALUE_SEMANTICS_REVISION = 7
 
 
 UNIT_RULES = {
@@ -85,7 +85,7 @@ def _numeric_text(raw: str) -> str | None:
 
 
 _BOUND_PREFIX = {
-    "不小于": "≥", "不大于": "≤", "不得超过": "≤",
+    "不小于": "≥", "不大于": "≤", "不得超过": "≤", "不能超过": "≤",
     "no more than": "≤", "not more than": "≤", "no less than": "≥", "not less than": "≥",
     "at least": "≥", "at most": "≤", "less than": "<", "greater than": ">", "up to": "≤",
     "不超过": "≤", "不高于": "≤", "至多": "≤", "最多": "≤",
@@ -95,11 +95,11 @@ _BOUND_PREFIX = {
 _BOUND_SUFFIX = {"以下": "≤", "以内": "≤", "以上": "≥"}
 
 
-def _measurement_context_safe(raw: str, spans: list[tuple[int, int]], family: str) -> bool:
-    """Never silently discard another value, tolerance or compound unit.
+def measurement_context_consumed(raw: str, spans: list[tuple[int, int]], family: str) -> bool:
+    """Every non-formatting token must be accounted for by the parser.
 
-    Keep harmless labels/order notes, plus the standard mains-frequency suffix.
-    This checks the *whole* value after recognized measurements are removed.
+    Unknown words can change a value just as much as unknown numbers do.
+    Labels and table conditions are bound separately, never discarded here.
     """
     for _, end in spans:
         if re.match(r"\s*(?:(?:/|per\b|每|[·⋅])\s*[A-Za-z\u3400-\u9fff]|[²³^])", raw[end:], re.I):
@@ -109,7 +109,9 @@ def _measurement_context_safe(raw: str, spans: list[tuple[int, int]], family: st
         remainder = remainder[:start] + " " + remainder[end:]
     if family == "voltage":
         remainder = re.sub(rf"~?\s*{_NUMBER}(?:\s*[-~]\s*{_NUMBER})?\s*Hz\b", "", remainder, flags=re.I)
-    return not re.search(r"\d|[±≤≥<>≈]|\+/-", remainder)
+    if family == "length":
+        remainder = re.sub(r"[(（]\s*L\s*[x×*]\s*W(?:\s*[x×*]\s*H)?\s*[)）]", "", remainder, flags=re.I)
+    return bool(re.fullmatch(r"[\s()（）\[\]【】,，;；:：.。]*", remainder))
 
 
 def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
@@ -120,8 +122,9 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
     if rules is None:
         return None
     units = unit_pattern(family)
+    raw = raw.strip()
     for word, operator in _BOUND_PREFIX.items():
-        raw = re.sub(re.escape(word) + r"\s*(?=[+\-]?\d)", operator, raw, flags=re.I)
+        raw = re.sub("^" + re.escape(word) + r"\s*(?=[+\-]?(?:\d|\.\d))", operator, raw, flags=re.I)
     for word, operator in _BOUND_SUFFIX.items():
         raw = re.sub(rf"({_NUMBER}\s*(?:{units}))\s*{word}", operator + r"\1", raw, flags=re.I)
     # A tolerance may share its unit: 300±5g, or use mixed units: 0.3kg±5g.
@@ -133,12 +136,14 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
     tolerance = tolerance_pattern.search(raw)
     if tolerance:
         center_unit = tolerance["unit"] or tolerance["delta_unit"]
-        if not center_unit or not _measurement_context_safe(raw, [tolerance.span()], family):
+        if not center_unit or not measurement_context_consumed(raw, [tolerance.span()], family):
             return None
         if not tolerance["delta_unit"] and re.match(r"\s*[A-Za-z]", raw[tolerance.end():]):
             return None
         center_rule = unit_rule(family, center_unit)
         delta_rule = unit_rule(family, tolerance["delta_unit"] or center_unit)
+        if center_rule is None or delta_rule is None:
+            return None
         center = Decimal(tolerance["center"]) * center_rule.scale + center_rule.offset
         delta = Decimal(tolerance["delta"]) * delta_rule.scale
         if delta < 0 or "%" in raw[tolerance.end():]:
@@ -149,13 +154,16 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
         rf"(?P<start_unit>{units})?\s*"
         rf"(?:-|–|—|~|to|至|到)\s*"
         rf"(?P<end>{_NUMBER})\s*"
-        rf"(?P<end_unit>{units})" + (r"(?:ac|dc)?" if family in {"voltage", "current"} else "") + r"(?![A-Za-z])",
+        rf"(?P<end_unit>{units})" + (r"(?:\s*(?:ac|dc))?" if family in {"voltage", "current"} else "") + r"(?![A-Za-z])",
         re.IGNORECASE,
     )
     range_match = range_pattern.search(raw)
     if range_match:
         all_ranges = list(range_pattern.finditer(raw))
-        if not _measurement_context_safe(raw, [m.span() for m in all_ranges], family):
+        if not measurement_context_consumed(raw, [m.span() for m in all_ranges], family):
+            return None
+        if any(unit_rule(family, m["start_unit"] or m["end_unit"]) is None
+               or unit_rule(family, m["end_unit"]) is None for m in all_ranges):
             return None
         converted_ranges = [
             [Decimal(m["start"]) * unit_rule(family, m["start_unit"] or m["end_unit"]).scale
@@ -175,7 +183,7 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
 
     pattern = re.compile(
         rf"(?<![A-Za-z0-9_.,])(?P<number>{_NUMBER})\s*(?P<unit>{units})"
-        + (r"(?:ac|dc)?" if family in {"voltage", "current"} else "") + r"(?![A-Za-z])",
+        + (r"(?:\s*(?:ac|dc))?" if family in {"voltage", "current"} else "") + r"(?![A-Za-z])",
         re.IGNORECASE,
     )
     match = pattern.search(raw)
@@ -190,17 +198,17 @@ def normalize_number_with_unit(raw: str, family: str) -> NormalizedValue | None:
     if rule is None:
         return None
     normalized = number * rule.scale + rule.offset
-    prefix = raw[:match.start()].strip()
-    qualifier = re.search(r"(<=|>=|≤|≥|<|>|约|大约|≈|~|about|approx\.?)\s*$", prefix, re.I)
-    if qualifier and re.search(r"(?:不|非|not)\s*$", prefix[:qualifier.start()], re.I):
-        return None
+    prefix = raw[:match.start()]
+    qualifier = re.search(r"(<=|>=|≤|≥|<|>|大?约(?:为)?|≈|~|about|approx(?:imately)?\.?)\s*$", prefix, re.I)
     context_start = qualifier.start() if qualifier else match.start()
-    if not _measurement_context_safe(raw, [(context_start, match.end())], family):
+    if not measurement_context_consumed(raw, [(context_start, match.end())], family):
         return None
     if len(list(pattern.finditer(raw))) > 1:
         return None  # alternatives must not silently become the first value
     if qualifier:
-        operator = {"<=": "≤", ">=": "≥", "约": "≈", "大约": "≈", "~": "≈", "about": "≈", "approx": "≈", "approx.": "≈"}.get(qualifier[1].lower(), qualifier[1])
+        operator = {"<=": "≤", ">=": "≥"}.get(qualifier[1], qualifier[1])
+        if operator not in {"≤", "≥", "<", ">"}:
+            operator = "≈"
         return NormalizedValue(f"{operator}{_clean_decimal(normalized)}", BASE_UNITS[family], ("qualifier_preserved",))
     return NormalizedValue(_clean_decimal(normalized), BASE_UNITS[family])
 
@@ -234,7 +242,7 @@ def normalize_dimensions(raw: str) -> NormalizedValue | None:
     if not match:
         return None
     matches = list(pattern.finditer(raw))
-    if not _measurement_context_safe(raw, [item.span() for item in matches], "length"):
+    if not measurement_context_consumed(raw, [item.span() for item in matches], "length"):
         return None
     rule = unit_rule("length", match.group("unit"))
     if rule is None:
@@ -247,6 +255,8 @@ def normalize_dimensions(raw: str) -> NormalizedValue | None:
         values.append(_clean_decimal(Decimal(text) * rule.scale + rule.offset))
     for alternative in matches[1:]:
         other_rule = unit_rule("length", alternative["unit"])
+        if other_rule is None:
+            return None
         other = [_clean_decimal(Decimal(alternative[key]) * other_rule.scale + other_rule.offset)
                  for key in ("a", "b", "c") if alternative[key] is not None]
         if len(values) != len(other) or any(abs(a - b) > 1e-6 for a, b in zip(values, other)):
@@ -280,19 +290,27 @@ def normalize_value(field: str, raw: str) -> NormalizedValue:
         colors = {"black": "黑色", "white": "白色", "red": "红色", "blue": "蓝色",
                   "green": "绿色", "yellow": "黄色", "orange": "橙色", "grey": "灰色", "gray": "灰色"}
         return NormalizedValue(colors.get(text, text), None)
+    # Compatibility for complete labeled measurements (e.g. NET WT 8oz).
+    # Only the registered field's own leading label is structural metadata.
+    value_text = raw
+    if definition and definition.value_type != "text":
+        aliases = "|".join(re.escape(a) for a in sorted(definition.aliases, key=len, reverse=True))
+        labeled = re.fullmatch(rf"\s*(?:{aliases})(?:\s*[:：=]\s*|\s+)(.+)", raw, re.I | re.S)
+        if labeled:
+            value_text = labeled[1]
     if field == "capacity":
         return (
-            normalize_number_with_unit(raw, "capacity_charge")
-            or normalize_number_with_unit(raw, "capacity_volume")
+            normalize_number_with_unit(value_text, "capacity_charge")
+            or normalize_number_with_unit(value_text, "capacity_volume")
             or NormalizedValue(normalize_fact_text(raw), None, ("unparsed_capacity",))
         )
     if definition and definition.value_type == "dimensions":
-        return normalize_dimensions(raw) or NormalizedValue(normalize_fact_text(raw), None, ("unparsed_dimensions",))
+        return normalize_dimensions(value_text) or NormalizedValue(normalize_fact_text(raw), None, ("unparsed_dimensions",))
     if definition and definition.value_type == "count":
-        return normalize_count(raw) or NormalizedValue(normalize_fact_text(raw), None, ("unparsed_count",))
+        return normalize_count(value_text) or NormalizedValue(normalize_fact_text(raw), None, ("unparsed_count",))
     family = definition.unit_family if definition else None
     if family:
-        return normalize_number_with_unit(raw, family) or NormalizedValue(normalize_fact_text(raw), None, ("unparsed_unit",))
+        return normalize_number_with_unit(value_text, family) or NormalizedValue(normalize_fact_text(raw), None, ("unparsed_unit",))
     return NormalizedValue(normalize_fact_text(raw), None)
 
 
@@ -309,6 +327,18 @@ def invalid_fact_value(field: str, raw: str, value: Any) -> bool:
         if is_range and all(isinstance(v, (int, float)) for v in value) and value[0] > value[1]:
             return True  # an inverted measurement range cannot be silently approved
     return nonnegative and any(isinstance(v, (int, float)) and v < 0 for v in values)
+
+
+def value_review_reason(field: str, raw: str, value: Any, unit: str | None,
+                        notes: list[str] | tuple[str, ...] = ()) -> str | None:
+    """The same value contract for extracted, edited and reloaded facts."""
+    if not raw.strip() or invalid_fact_value(field, raw, value):
+        return "invalid_value"
+    spec = field_definition(field)
+    if (any(note.startswith("unparsed_") for note in notes)
+            or (spec and spec.value_type != "text" and unit is None)):
+        return "unclear_value"
+    return None
 
 
 def values_equal(a: Any, b: Any, tolerance: float = 1e-9) -> bool:

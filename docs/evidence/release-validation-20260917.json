@@ -1,0 +1,262 @@
+{
+  "schema_version": 1,
+  "release": "2.0.1",
+  "date": "2026-09-17",
+  "scope": "Local assisted-review software validation; not independent human production acceptance",
+  "final_source_sha256": "776539624cddd8b51fb7a10bb94d9ee604a96ee1fd70a4cc363f0f90ddc419d4",
+  "regression_attempts": [
+    {
+      "test_methods": 799,
+      "passed": 795,
+      "skipped": 3,
+      "failures": 1,
+      "seconds": 315.776,
+      "failure": "test_evidence_deduplication_cannot_hide_unit_case_conflicts",
+      "resolution": "Restored numeric conflicts through shared case-sensitive unit conversion and values_equal; original test unchanged."
+    },
+    {
+      "status": "failed",
+      "test_methods": 800,
+      "passed": 796,
+      "skipped": [
+        {
+          "test": "test_discovery_rejects_file_link_that_escapes_input_root (test_engine.ProductEvidenceGuardTests.test_discovery_rejects_file_link_that_escapes_input_root)",
+          "reason": "Windows symbolic-link privilege unavailable (WinError 1314)"
+        },
+        {
+          "test": "test_rejects_git_symlink_when_platform_supports_it (test_release_package.ReleasePackageIntegrationTests.test_rejects_git_symlink_when_platform_supports_it)",
+          "reason": "Windows symbolic-link privilege unavailable (WinError 1314)"
+        },
+        {
+          "test": "test_link_output_refuses_symlink_redirection (test_source_links.SourceLinkTests.test_link_output_refuses_symlink_redirection)",
+          "reason": "Windows symbolic-link privilege unavailable (WinError 1314)"
+        }
+      ],
+      "failures": 1,
+      "errors": 0,
+      "seconds": 275.195,
+      "code_sha256": "776539624cddd8b51fb7a10bb94d9ee604a96ee1fd70a4cc363f0f90ddc419d4",
+      "code_unchanged": true,
+      "completed_at": "2026-09-17T11:42:56.863845+08:00",
+      "qualification": "code regression, not independent human production acceptance",
+      "failure_test": "test_all_local_markdown_links_resolve",
+      "resolution": "Create this previously missing release validation attachment; rerun the suite before publishing."
+    }
+  ],
+  "unified_regression": {
+    "status": "passed",
+    "test_methods": 800,
+    "passed": 797,
+    "skipped": [
+      {
+        "test": "test_discovery_rejects_file_link_that_escapes_input_root (test_engine.ProductEvidenceGuardTests.test_discovery_rejects_file_link_that_escapes_input_root)",
+        "reason": "Windows symbolic-link privilege unavailable (WinError 1314)"
+      },
+      {
+        "test": "test_rejects_git_symlink_when_platform_supports_it (test_release_package.ReleasePackageIntegrationTests.test_rejects_git_symlink_when_platform_supports_it)",
+        "reason": "Windows symbolic-link privilege unavailable (WinError 1314)"
+      },
+      {
+        "test": "test_link_output_refuses_symlink_redirection (test_source_links.SourceLinkTests.test_link_output_refuses_symlink_redirection)",
+        "reason": "Windows symbolic-link privilege unavailable (WinError 1314)"
+      }
+    ],
+    "failures": 0,
+    "errors": 0,
+    "seconds": 317.438,
+    "code_sha256": "776539624cddd8b51fb7a10bb94d9ee604a96ee1fd70a4cc363f0f90ddc419d4",
+    "code_unchanged": true,
+    "completed_at": "2026-09-17T03:50:57.037960+00:00",
+    "qualification": "code regression, not independent human production acceptance"
+  },
+  "targeted_after_unit_fix": {
+    "status": "passed",
+    "tests": 58,
+    "seconds": 13.794,
+    "suites": [
+      "test_value_integrity",
+      "test_stable_delivery_semantics",
+      "test_parser_contracts",
+      "test_review_consistency"
+    ]
+  },
+  "browser_regression": {
+    "status": "passed",
+    "headless": true,
+    "browser": "Microsoft Edge",
+    "tests": [
+      "adopt",
+      "invalid edit feedback",
+      "edit",
+      "undo",
+      "skip",
+      "authorize",
+      "content check",
+      "four viewport widths",
+      "6000 facts pagination",
+      "navigation during loading",
+      "update failure feedback"
+    ]
+  },
+  "installed_public_entry": {
+    "status": "passed",
+    "commands": 32,
+    "seconds": 27.352,
+    "browser_commands": 0,
+    "data": "synthetic fixture, no cloud or model inference",
+    "scope": "isolated installer copy, public scripts/run.ps1, not the subsequently committed ZIP",
+    "actions": [
+      "adopt",
+      "edit",
+      "skip",
+      "undo",
+      "source links",
+      "authorize",
+      "content rejection and acceptance",
+      "verified and human export",
+      "unchanged-source reuse",
+      "changed-source invalidation",
+      "resume"
+    ]
+  },
+  "post_qa_original_revalidation": {
+    "kind": "native_original_rerun_and_saved_ai_evidence_reaggregation_not_new_model_inference",
+    "code_sha256": "776539624cddd8b51fb7a10bb94d9ee604a96ee1fd70a4cc363f0f90ddc419d4",
+    "cases": [
+      {
+        "case": "monacor",
+        "native_result_unchanged": true,
+        "recorded_ai_reaggregation_unchanged": true,
+        "recorded_ai_source_sha256": "30b4b8905861ee08132d566ebf8b9bf0cbb2a1b5d794d812540090cdb34cdc84",
+        "final_native_source_sha256": "e0a3595d25ab375b64f109071c25843362804f7ef253f12048c5cf7579e43a4a"
+      },
+      {
+        "case": "moxa",
+        "native_result_unchanged": true,
+        "recorded_ai_reaggregation_unchanged": true,
+        "recorded_ai_source_sha256": "19ad523d2d87206eeb126e9b07f1e42fee3ce10c61836d83caf6417b3ab36ba8",
+        "final_native_source_sha256": "a88f7947d2ac0acb2dc8f3feb6115b99d4bcb4df7ac2c21ac298ae47f8c9b526"
+      },
+      {
+        "case": "danfoss",
+        "native_result_unchanged": true,
+        "recorded_ai_reaggregation_unchanged": true,
+        "recorded_ai_source_sha256": "d36ca484dc6688cb67dbd2ffd02ea6e1ef0d103971f0d64522c448cebd847c4b",
+        "final_native_source_sha256": "6371f95d4c0947c5cebc9bbed816f9ab73318a44930ba2523f81e83c8b1a925e"
+      },
+      {
+        "case": "cable",
+        "native_result_unchanged": true,
+        "recorded_ai_reaggregation_unchanged": true,
+        "recorded_ai_source_sha256": "d919ca2f54d852fb26e4d9464db6625ece1e8aa144d1ab7538c2d481c6fdcb60",
+        "final_native_source_sha256": "5df7027a39b73ea863001a8e7b00cf67636d6886e10a28720f780b94a7fc4499"
+      }
+    ],
+    "status": "passed"
+  },
+  "final_semantic_replay": {
+    "kind": "saved_response_replay_not_new_inference",
+    "source_result_sha256": "39eeba02ea9ddf05329b2b440c4772486bc3a61d1777505f98661dc1930c85d3",
+    "code_sha256": "776539624cddd8b51fb7a10bb94d9ee604a96ee1fd70a4cc363f0f90ddc419d4",
+    "complete": true,
+    "cases": 36,
+    "summaries": {
+      "baseline": {
+        "cases": 36,
+        "case_passes": 20,
+        "case_exact_rate": 0.5555555555555556,
+        "auto_confirmed": 12,
+        "wrong_auto_confirmed": 0,
+        "auto_confirmed_precision": 1,
+        "pending_facts": 23,
+        "conflicts": 3,
+        "missed_conflicts": 0,
+        "false_conflicts": 0
+      },
+      "single": {
+        "cases": 36,
+        "case_passes": 25,
+        "case_exact_rate": 0.6944444444444444,
+        "auto_confirmed": 19,
+        "wrong_auto_confirmed": 0,
+        "auto_confirmed_precision": 1,
+        "pending_facts": 18,
+        "conflicts": 3,
+        "missed_conflicts": 0,
+        "false_conflicts": 0
+      },
+      "repeat": {
+        "cases": 36,
+        "case_passes": 22,
+        "case_exact_rate": 0.6111111111111112,
+        "auto_confirmed": 16,
+        "wrong_auto_confirmed": 0,
+        "auto_confirmed_precision": 1,
+        "pending_facts": 21,
+        "conflicts": 3,
+        "missed_conflicts": 0,
+        "false_conflicts": 0
+      }
+    }
+  },
+  "strict_production_acceptance": {
+    "status": "blocked",
+    "failures": [
+      {
+        "gate": "packages",
+        "actual": 0,
+        "minimum": 60
+      },
+      {
+        "gate": "suppliers",
+        "actual": 0,
+        "minimum": 15
+      },
+      {
+        "gate": "domains",
+        "actual": 0,
+        "minimum": 10
+      },
+      {
+        "gate": "annotated_facts",
+        "actual": 0,
+        "minimum": 3000
+      },
+      {
+        "gate": "development_packages",
+        "actual": 0,
+        "minimum": 40
+      },
+      {
+        "gate": "holdout_packages",
+        "actual": 0,
+        "minimum": 20
+      },
+      {
+        "gate": "real_user_trial",
+        "reason": "'path'"
+      },
+      {
+        "gate": "continuous_batch_stability",
+        "reason": "'path'"
+      },
+      {
+        "gate": "recovery_and_security",
+        "reason": "'path'"
+      },
+      {
+        "gate": "unified_regression",
+        "reason": "'path'"
+      }
+    ],
+    "summary": {
+      "packages": 0,
+      "suppliers": 0,
+      "domains": 0,
+      "annotated_facts": 0,
+      "development_packages": 0,
+      "holdout_packages": 0
+    },
+    "thresholds_unchanged": true
+  }
+}

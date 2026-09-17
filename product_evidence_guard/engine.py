@@ -18,7 +18,7 @@ from .document_visuals import EmbeddedVisualAsset
 from .extractor import extract_rule_candidates, block_segments
 from .field_registry import registry_fingerprint
 from .graph import build_graph
-from .identity import IDENTITY_VERSION, resolve_product_identities
+from .identity import IDENTITY_VERSION, resolve_product_identities, product_entities_from_candidates
 from .hybrid_image_reader import (
     OBSERVATION_FACT_OVERRIDE_REASON,
     HybridImageReader,
@@ -27,6 +27,7 @@ from .model_output_schema import ModelOutputIssue
 from .models import FactCandidate, SourceBlock
 from .normalization import VALUE_SEMANTICS_REVISION
 from .source_context import document_context
+from .semantic_review import SEMANTIC_REVIEW_REVISION, assist_candidates, context_record
 from .openvino_adapter import (
     OpenVinoDeviceSelection,
     OpenVinoFactExtractor,
@@ -53,7 +54,7 @@ from .readiness import reading_issue
 
 QWEN_MODEL_ID = "OpenVINO/Qwen3-VL-8B-Instruct-int4-ov"
 ENGINE_SCHEMA_REVISION = (
-    "v8-case-sensitive-units-wrapped-values-20260916"
+    "v9-bounded-semantic-assist-explicit-applicability-20260917"
 )
 MAX_FILES_PER_TASK = 100
 MAX_FILE_BYTES = 100 * 1024 * 1024
@@ -152,6 +153,8 @@ def _engine_signature(
     device: str,
     *,
     image_reader_identity: Mapping[str, Any] | None = None,
+    semantic_assist: bool = False,
+    semantic_repeat: bool = False,
 ) -> str:
     payload = {
         "version": __version__,
@@ -165,6 +168,8 @@ def _engine_signature(
         "identity_version": IDENTITY_VERSION,
         "value_semantics_revision": VALUE_SEMANTICS_REVISION,
         "field_registry_sha256": registry_fingerprint(),
+        "semantic_review": {"enabled": semantic_assist, "repeat": semantic_repeat,
+                            "revision": SEMANTIC_REVIEW_REVISION},
     }
     return hashlib.sha256(json.dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
 
@@ -842,9 +847,12 @@ def analyze_directory(
     preloaded_image_reader: QwenVlReader | HybridImageReader | None = None,
     preloaded_model_load_seconds: float | None = None,
     preloaded_model_reused: bool | None = None,
+    preloaded_model_error: str | None = None,
     device_selection: OpenVinoDeviceSelection | None = None,
     progress_callback: Callable[[str, Mapping[str, Any]], None] | None = None,
     preprocessing_workers: int | None = None,
+    semantic_assist: bool = False,
+    semantic_repeat: bool = False,
 ) -> dict[str, Any]:
     started_at = time.perf_counter()
     root = Path(input_dir).expanduser().resolve()
@@ -863,12 +871,14 @@ def analyze_directory(
         or preloaded_llm_extractor
         or preloaded_image_reader
     )
-    if has_local_model:
-        selection = device_selection or resolve_openvino_device(device)
-        actual_device = selection.actual
-    else:
-        selection = None
-        actual_device = str(device or "AUTO")
+    selection = device_selection
+    model_error = preloaded_model_error
+    if has_local_model and not model_error:
+        try:
+            selection = selection or resolve_openvino_device(device)
+        except (RuntimeError, OSError, MemoryError) as exc:
+            model_error = f"{type(exc).__name__}: {exc}"
+    actual_device = selection.actual if selection else str(device or "AUTO")
 
     state_path = output / "analysis-state.json"
     previous = load_state(state_path)
@@ -887,27 +897,36 @@ def analyze_directory(
         else uuid.uuid4().hex
     )
     model_load_started = time.perf_counter()
-    llm_extractor = preloaded_llm_extractor or (
-        OpenVinoFactExtractor(openvino_model, actual_device)
-        if openvino_model
-        else None
-    )
-    image_reader = preloaded_image_reader or (
-        HybridImageReader.from_openvino(
-            openvino_vlm_model,
-            device=actual_device,
-            model_id=QWEN_MODEL_ID,
-        )
-        if openvino_vlm_model
-        else None
-    )
+    llm_extractor, image_reader = preloaded_llm_extractor, preloaded_image_reader
+    if not model_error:
+        try:
+            if llm_extractor is None and openvino_model:
+                llm_extractor = OpenVinoFactExtractor(openvino_model, actual_device)
+            if image_reader is None and openvino_vlm_model:
+                image_reader = HybridImageReader.from_openvino(
+                    openvino_vlm_model, device=actual_device, model_id=QWEN_MODEL_ID)
+        except (RuntimeError, OSError, MemoryError) as exc:
+            model_error = f"{type(exc).__name__}: {exc}"
+            llm_extractor, image_reader = None, None
     reader_identity = _image_reader_identity(image_reader)
+    semantic_generator = (getattr(image_reader, "semantic_generator", None)
+                          or getattr(llm_extractor, "generate_semantic", None)) if semantic_assist else None
+    semantic_enabled = callable(semantic_generator)
     signature = _engine_signature(
         openvino_model,
         openvino_vlm_model,
         actual_device,
         image_reader_identity=reader_identity,
+        semantic_assist=semantic_enabled,
+        semantic_repeat=semantic_repeat,
     )
+    request_signature = _engine_signature(openvino_model, openvino_vlm_model, str(device),
+        semantic_assist=semantic_assist, semantic_repeat=semantic_repeat)
+    # A temporary resource failure is not a new interpretation of unchanged
+    # evidence. Preserve the last successful cache and human decisions, while
+    # marking newly read fallback files for retry when the model is available.
+    if model_error and same_input_root and previous.get("request_signature") == request_signature:
+        signature = previous.get("engine_signature", signature)
     cache_usable = (
         same_input_root
         and previous.get("engine_signature") == signature
@@ -1976,6 +1995,10 @@ def analyze_directory(
                 "reading_issues": [reading_issue(file=relative, file_hash=file_hash, **issue)
                                    for issue in getattr(prepared.parsed, "reading_issues", ())],
             }
+            if semantic_enabled:
+                state_entry["semantic_context"] = context_record(blocks)
+            if model_error:
+                state_entry["retry_required"] = True
             if file_document_visuals:
                 state_entry["document_visuals"] = file_document_visuals
             if serialized_file_visuals:
@@ -2081,6 +2104,43 @@ def analyze_directory(
     for candidate in candidates:
         candidate.status = confirmation_statuses.get(candidate.candidate_id, "pending")
     candidates, groups, relations = build_graph(candidates)
+    semantic_trace = {"enabled": semantic_enabled, "revision": SEMANTIC_REVIEW_REVISION,
+                      "repeat_prompt": semantic_repeat, "eligible": 0, "calls": 0, "accepted": 0, "attempts": []}
+    if semantic_enabled:
+        candidates, details = assist_candidates(
+            candidates, groups, {name: entry.get("semantic_context", {}) for name, entry in new_state_files.items()},
+            semantic_generator, repeat=semantic_repeat, progress_callback=progress_callback,
+        )
+        semantic_trace.update(details)
+        # Inference can be slow. Never publish facts from files changed during
+        # semantic review, including an existing human confirmation.
+        for relative, entry in new_state_files.items():
+            try:
+                current_hash = sha256_file(root / relative)
+            except OSError:
+                current_hash = None
+            if current_hash != entry.get("file_hash"):
+                candidates = [c for c in candidates if c.source_file != relative]
+                entry.update(candidates=[], candidate_count=0, retry_required=True,
+                             last_error="source_changed_during_read")
+                error = {"file": relative, "error": "source_changed_during_read"}
+                if error not in errors:
+                    errors.append(error)
+        # Save parser/AI evidence only. Human corrections are reconstructed by
+        # reconciliation, never frozen as fresh extraction results in the cache.
+        for relative, entry in new_state_files.items():
+            evidence = [replace(c, status="pending", excluded_from_review=False) for c in candidates
+                        if c.source_file == relative and c.extraction_method != "human_correction"]
+            entry["candidates"] = _serialize_candidates(evidence)
+            entry["candidate_count"] = len(evidence)
+        statuses = reconcile_confirmations(output, session_id=session_id, candidates=candidates)
+        for candidate in candidates:
+            candidate.status = statuses.get(candidate.candidate_id, "pending")
+        candidates, groups, relations = build_graph(candidates)
+        # Ownership is immutable in this stage; only refresh each entity's
+        # evidence membership, without reassigning any user-corrected owner.
+        products = product_entities_from_candidates(candidates, dataset_name=root.name)
+    atomic_write_json(output / "semantic-review.json", semantic_trace)
     confirmation_counts = _confirmation_status_counts(output, candidates)
     scanned_pages_detected = sum(
         len(entry.get("scanned_pdf_pages", []))
@@ -2245,8 +2305,8 @@ def analyze_directory(
         "field_registry_sha256": registry_fingerprint(),
         "fact_group_count": len(groups),
         "blocking_conflict_count": sum(1 for group in groups if group.fact_status == "conflict"),
-        "review_count": sum(1 for group in groups if group.severity == "review"),
-        "pass_count": sum(1 for group in groups if group.severity == "pass"),
+        "review_count": sum(1 for group in groups if not group.excluded and group.fact_status == "pending_confirmation"),
+        "pass_count": sum(1 for group in groups if not group.excluded and group.fact_status == "verified"),
         "engine_signature_changed": not cache_usable,
         "analysis_seconds": round(time.perf_counter() - started_at, 4),
         "model_load_seconds": model_load_seconds,
@@ -2358,7 +2418,9 @@ def analyze_directory(
             "max_pdf_pages": MAX_PDF_PAGES,
         },
         "local_ai": {
-            "fact_extractor": bool(openvino_model),
+            "unavailable_reason": model_error,
+            "semantic_assist": {key: value for key, value in semantic_trace.items() if key != "attempts"},
+            "fact_extractor": llm_extractor is not None,
             "image_reader": image_reader is not None,
             "device": actual_device,
             "requested_device": selection.requested if selection else str(device),
@@ -2435,6 +2497,7 @@ def analyze_directory(
         {
             "schema_version": STATE_SCHEMA_VERSION,
             "engine_signature": signature,
+            "request_signature": request_signature,
             "session_id": session_id,
             "input_root": str(root),
             "files": new_state_files,

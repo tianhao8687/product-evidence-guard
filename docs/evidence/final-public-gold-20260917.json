@@ -1,0 +1,351 @@
+{
+  "schema_version": 1,
+  "frozen_at": "2026-09-17T02:51:42.130789+00:00",
+  "annotation_method": "agent visual inspection before any predictions, not independent human signoff",
+  "protocol": "Untouched complete official PDFs; predeclared checkpoints, not exhaustive whole-document recall. All verified outputs must be separately checked for precision. No prediction may be discarded because it failed. No source was used in prior tuning.",
+  "selection_notes": "Two unavailable candidate URLs (Bosch and Sennheiser, HTTP 404) were replaced before prediction, not counted as tested packages.",
+  "sources": [
+    {
+      "case": "monacor",
+      "domain": "音响",
+      "title": "EDL-26",
+      "url": "https://www.monacor.com/products/pa-technology/speakers-/flush-mount-speakers/100-v/edl-26/?r=pdf",
+      "sha256": "921e26b6cf70159ed88411a05e28df7a29c235263df9b54152b0670758b456c4",
+      "pages": 2
+    },
+    {
+      "case": "moxa",
+      "domain": "工业通信",
+      "title": "NPort 5100 series, v1.7",
+      "url": "https://www.moxa.com/getmedia/fddfbc29-64b9-4897-aaaf-b25ca11706fe/moxa-nport-5100-series-datasheet-v1.7.pdf",
+      "sha256": "e2c0b183c446def023c3f2806bd6422597dd776b94d7a061b7071a06235cf14a",
+      "pages": 5
+    },
+    {
+      "case": "danfoss",
+      "domain": "液压电磁阀",
+      "title": "SV08-24-01",
+      "url": "https://assets.danfoss.com/documents/latest/368087/BC366465128290en-000201.pdf",
+      "sha256": "2fe5dc7a212fe59aa3c218b2009c5878f3e87f91f679bcfa2dec21127ec095e0",
+      "pages": 1
+    },
+    {
+      "case": "cable",
+      "domain": "消费电子线材",
+      "title": "Arduino TPX00243",
+      "url": "https://docs.arduino.cc/resources/datasheets/TPX00243-datasheet.pdf",
+      "sha256": "7a806159d3eb7f21887de6841e597d3f3a1e6a13635e616860b40bd427cd1261",
+      "pages": 11
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "monacor-01",
+      "case": "monacor",
+      "page": 2,
+      "parameter": "frequency",
+      "expected": "80–14000 Hz"
+    },
+    {
+      "id": "monacor-02",
+      "case": "monacor",
+      "page": 2,
+      "parameter": "RMS power taps",
+      "expected": "10 / 5 / 2.5 / 1.25 W, selectable taps not a conflict"
+    },
+    {
+      "id": "monacor-03",
+      "case": "monacor",
+      "page": 2,
+      "parameter": "net weight",
+      "expected": "922 g"
+    },
+    {
+      "id": "monacor-04",
+      "case": "monacor",
+      "page": 2,
+      "parameter": "gross weight",
+      "expected": "1070 g"
+    },
+    {
+      "id": "monacor-05",
+      "case": "monacor",
+      "page": 2,
+      "parameter": "mounting cutout",
+      "expected": "diameter 200 mm"
+    },
+    {
+      "id": "monacor-06",
+      "case": "monacor",
+      "page": 2,
+      "parameter": "mounting depth",
+      "expected": "75 mm"
+    },
+    {
+      "id": "monacor-07",
+      "case": "monacor",
+      "page": 2,
+      "parameter": "ambient temperature",
+      "expected": "0–40 °C"
+    },
+    {
+      "id": "monacor-08",
+      "case": "monacor",
+      "page": 2,
+      "parameter": "colour",
+      "expected": "white"
+    },
+    {
+      "id": "monacor-09",
+      "case": "monacor",
+      "page": 2,
+      "parameter": "outside diameter",
+      "expected": "230 mm"
+    },
+    {
+      "id": "monacor-10",
+      "case": "monacor",
+      "page": 2,
+      "parameter": "packaging dimensions",
+      "expected": "W×H×L = 230×90×230 mm"
+    },
+    {
+      "id": "moxa-01",
+      "case": "moxa",
+      "page": 3,
+      "parameter": "all models input voltage",
+      "expected": "12–48 V DC"
+    },
+    {
+      "id": "moxa-02",
+      "case": "moxa",
+      "page": 3,
+      "parameter": "all models weight",
+      "expected": "340 g"
+    },
+    {
+      "id": "moxa-03",
+      "case": "moxa",
+      "page": 3,
+      "parameter": "dimensions with ears",
+      "expected": "75.2×80×22 mm"
+    },
+    {
+      "id": "moxa-04",
+      "case": "moxa",
+      "page": 3,
+      "parameter": "dimensions without ears",
+      "expected": "52×80×22 mm"
+    },
+    {
+      "id": "moxa-05",
+      "case": "moxa",
+      "page": 3,
+      "parameter": "storage temperature",
+      "expected": "-40–75 °C, package included"
+    },
+    {
+      "id": "moxa-06",
+      "case": "moxa",
+      "page": 3,
+      "parameter": "relative humidity",
+      "expected": "5–95%, non-condensing"
+    },
+    {
+      "id": "moxa-07",
+      "case": "moxa",
+      "page": 3,
+      "parameter": "warranty",
+      "expected": "5 years"
+    },
+    {
+      "id": "moxa-08",
+      "case": "moxa",
+      "page": "3,4",
+      "parameter": "NPort 5110 input current",
+      "expected": "CONFLICT: 128 mA versus 128.7 mA at 12 V DC, no declared version/condition difference"
+    },
+    {
+      "id": "moxa-09",
+      "case": "moxa",
+      "page": "3,4",
+      "parameter": "NPort 5110-T input current",
+      "expected": "CONFLICT: 128 mA versus 128.7 mA at 12 V DC, no declared version/condition difference"
+    },
+    {
+      "id": "moxa-10",
+      "case": "moxa",
+      "page": 4,
+      "parameter": "NPort 5110 operating temperature",
+      "expected": "0–55 °C"
+    },
+    {
+      "id": "moxa-11",
+      "case": "moxa",
+      "page": 4,
+      "parameter": "NPort 5110-T operating temperature",
+      "expected": "-40–75 °C"
+    },
+    {
+      "id": "moxa-12",
+      "case": "moxa",
+      "page": 4,
+      "parameter": "NPort 5130 input current",
+      "expected": "200 mA at 12 V DC"
+    },
+    {
+      "id": "moxa-13",
+      "case": "moxa",
+      "page": 4,
+      "parameter": "NPort 5150 input current",
+      "expected": "200 mA at 12 V DC"
+    },
+    {
+      "id": "moxa-14",
+      "case": "moxa",
+      "page": 3,
+      "parameter": "housing",
+      "expected": "metal"
+    },
+    {
+      "id": "danfoss-01",
+      "case": "danfoss",
+      "page": 1,
+      "parameter": "weight",
+      "expected": "320 g"
+    },
+    {
+      "id": "danfoss-02",
+      "case": "danfoss",
+      "page": 1,
+      "parameter": "flow capability",
+      "expected": "12 L/min"
+    },
+    {
+      "id": "danfoss-03",
+      "case": "danfoss",
+      "page": 1,
+      "parameter": "coil options",
+      "expected": "M13 or R13"
+    },
+    {
+      "id": "danfoss-04",
+      "case": "danfoss",
+      "page": 1,
+      "parameter": "cavity",
+      "expected": "SDC08-4"
+    },
+    {
+      "id": "danfoss-05",
+      "case": "danfoss",
+      "page": 1,
+      "parameter": "rated pressure",
+      "expected": "230 bar, based on NFPA fatigue testing at 1 million cycles"
+    },
+    {
+      "id": "danfoss-06",
+      "case": "danfoss",
+      "page": 1,
+      "parameter": "inlet pressure allowance",
+      "expected": "315 bar only at port 3 for 500000 cycles; not a conflict with rated pressure"
+    },
+    {
+      "id": "danfoss-07",
+      "case": "danfoss",
+      "page": 1,
+      "parameter": "12D/R12D coil voltage",
+      "expected": "12 V DC"
+    },
+    {
+      "id": "danfoss-08",
+      "case": "danfoss",
+      "page": 1,
+      "parameter": "24D/R24D coil voltage",
+      "expected": "24 V DC"
+    },
+    {
+      "id": "cable-01",
+      "case": "cable",
+      "page": 3,
+      "parameter": "model",
+      "expected": "TPX00243"
+    },
+    {
+      "id": "cable-02",
+      "case": "cable",
+      "page": 3,
+      "parameter": "colour",
+      "expected": "black"
+    },
+    {
+      "id": "cable-03",
+      "case": "cable",
+      "page": "3,8",
+      "parameter": "weight",
+      "expected": "37 g"
+    },
+    {
+      "id": "cable-04",
+      "case": "cable",
+      "page": "3,8",
+      "parameter": "cable length",
+      "expected": "1000 mm nominal"
+    },
+    {
+      "id": "cable-05",
+      "case": "cable",
+      "page": 3,
+      "parameter": "connector P1",
+      "expected": "USB Type-C male, 24 pins"
+    },
+    {
+      "id": "cable-06",
+      "case": "cable",
+      "page": 3,
+      "parameter": "connector P2",
+      "expected": "USB Type-C male, 24 pins"
+    },
+    {
+      "id": "cable-07",
+      "case": "cable",
+      "page": 6,
+      "parameter": "maximum voltage",
+      "expected": "20 V DC, PD capability depends on connected source/device"
+    },
+    {
+      "id": "cable-08",
+      "case": "cable",
+      "page": 6,
+      "parameter": "maximum current",
+      "expected": "3 A, PD capability depends on connected source/device"
+    },
+    {
+      "id": "cable-09",
+      "case": "cable",
+      "page": 6,
+      "parameter": "maximum power",
+      "expected": "60 W, PD capability depends on connected source/device"
+    },
+    {
+      "id": "cable-10",
+      "case": "cable",
+      "page": 7,
+      "parameter": "conduction impedance",
+      "expected": "maximum 2 ohm"
+    },
+    {
+      "id": "cable-11",
+      "case": "cable",
+      "page": 7,
+      "parameter": "insulation resistance",
+      "expected": "minimum 10 Mohm at DC 300 V / 10 ms, wire end"
+    },
+    {
+      "id": "cable-12",
+      "case": "cable",
+      "page": 8,
+      "parameter": "cable diameter",
+      "expected": "4.5 mm ±0.15 mm"
+    }
+  ]
+}

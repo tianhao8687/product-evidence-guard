@@ -35,9 +35,12 @@ def coverage_summary(summary: dict) -> dict:
         message += "可先导出已确认部分；不能作为完整结果交付。"
     else:
         message += "本次读取已完成；不代表资料中的所有参数都已被识别。"
+    model_unavailable = bool((summary.get("local_ai") or {}).get("unavailable_reason"))
+    if model_unavailable:
+        message += "本地 AI 暂不可用，已保留可读取的参数；空闲时可重新读取补齐。"
     return {"status": "partial" if partial else "complete", "files": total,
             "unfinished_files": len(unfinished), "unfinished_pages": pages,
-            "unfinished_images": images, "message": message, "can_retry": partial,
+            "unfinished_images": images, "message": message, "can_retry": partial or model_unavailable,
             "issue_count": len(issues) + (1 if pages or images or visual_issues else 0)}
 
 

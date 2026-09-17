@@ -96,7 +96,10 @@ class QoderInstallEvidenceTests(unittest.TestCase):
         for row in self.record["critical_files"]:
             # September cancellation added a real server change. Preserve the
             # August install observation; current installer E2E validates it.
-            if row["path"] not in {"SKILL.md", "scripts/server.py"}:
+            # September's public semantic rollback switch changed client.py;
+            # its new routing is covered by test_runtime_fallback, not this
+            # immutable record of what was actually installed in August.
+            if row["path"] not in {"SKILL.md", "scripts/server.py", "scripts/client.py"}:
                 current = (REPO_ROOT / row["path"]).read_bytes()
                 if row["path"] in {"info.json", "meta.json"}:
                     # The 2.0 release changed only the metadata version. Compare

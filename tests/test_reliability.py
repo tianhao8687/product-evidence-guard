@@ -34,9 +34,9 @@ class ReliabilityTests(unittest.TestCase):
         self.assertEqual(summary["errors"], [])
         return json.loads((self.output / "product-facts.json").read_text("utf-8"))
 
-    def test_shared_sku_list_and_inline_subsets_are_not_fictitious_products(self):
+    def test_explicit_shared_inline_specs_and_subsets_are_not_fictitious_products(self):
         product = self.analyze({"master.csv": "SKU,型号,净重\nP-1,BASE,100g\nP-2,BASE,200g\nP-3,BASE,200g",
-            "manual.txt": "SKU：P-1 / P-2 / P-3\n输入电压：5V\nP-1 净重：100g\nP-2 / P-3 净重：200g\n额定电压：12V"})
+            "manual.txt": "SKU：P-1 / P-2 / P-3\nP-1 / P-2 / P-3 输入电压：5V\nP-1 净重：100g\nP-2 / P-3 净重：200g\nP-1 / P-2 / P-3 额定电压：12V"})
         self.assertEqual({p["sku"] for p in product["products"]}, {"P-1", "P-2", "P-3"})
         for sku in ("P-1", "P-2", "P-3"):
             facts = [c for c in product["candidates"] if c["source_file"] == "manual.txt" and c["product_sku"] == sku]

@@ -1313,6 +1313,10 @@ class HybridImageReader:
         self._recognition_cache = RecognitionCache()
 
     @property
+    def semantic_generator(self):
+        return self._qwen_reader.semantic_generator
+
+    @property
     def optimization_revision(self):
         prompt_hash = hashlib.sha256(ocr_review_template().encode("utf-8")).hexdigest()[:16]
         region_mode = "context-band-v2" if self.enable_review_region else "full-image"

@@ -164,7 +164,8 @@ class SubmissionContractTests(unittest.TestCase):
         content = (REPO_ROOT / "SKILL.md").read_text(encoding="utf-8")
         match = re.match(r"\A---\r?\n(.*?)\r?\n---\r?\n", content, re.DOTALL)
         self.assertIsNotNone(match, "SKILL.md must start with YAML frontmatter")
-        self.assertIn("version: 2.0.0", match.group(1))
+        from product_evidence_guard import __version__
+        self.assertIn(f"version: {__version__}", match.group(1))
         frontmatter: dict[str, str] = {}
         for line in match.group(1).splitlines():
             key, separator, value = line.partition(":")

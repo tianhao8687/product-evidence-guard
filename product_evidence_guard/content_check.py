@@ -13,7 +13,7 @@ import re
 from typing import Any
 
 from .extractor import FIELD_SPECS, infer_semantic_scope, explicit_parameter, parameter_segments, strip_product_prefix
-from .field_registry import REGISTRY, field_definition
+from .field_registry import REGISTRY, field_definition, field_for_label
 from .models import ClaimCandidate
 from .normalization import normalize_text, normalize_value, values_equal
 
@@ -82,12 +82,46 @@ def _claim_id(*, line: int, clause: str, field: str | None, value: Any,
     return "claim_" + hashlib.sha256(payload).hexdigest()[:20]
 
 
-def _product_for_clause(clause: str, facts: list[dict[str, Any]]) -> tuple[str | None, bool]:
+def _claim_product_prefix(clause: str, facts: list[dict[str, Any]]) -> tuple[str, str | None]:
+    """A declared owner is a constraint, not a hint to fall back from.
+
+    Source extraction intentionally accepts fewer unlabeled SKU forms. Here an
+    explicit `owner: parameter: value` must also be checked against the grant.
+    Do not invent owners from open labels such as MTBF1 Ground Benign.
+    """
+    body, token = strip_product_prefix(clause)
+    if token:
+        return body, token
+    match = re.match(r"^\s*(?:[-*•]\s*)?([A-Za-z0-9][A-Za-z0-9_.+/-]*)(\s*[:：]\s*|\s+)(.+)$", clause)
+    if not match or field_for_label(match[1], known_only=True):
+        return clause, None
+    token, separator, body = match.groups()
+    known = any(f.get("field") in {"sku", "model", "variant"}
+                and normalize_text(str(f.get("value", ""))) == normalize_text(token) for f in facts)
+    parameter = ALIAS_PATTERN.match(body)
+    if not parameter and not STANDALONE_IP.match(body) and not (known and explicit_parameter(body)):
+        return clause, None
+    if parameter:
+        field = ALIAS_FIELDS[parameter.group().casefold()]
+        # An electrical direction preceding a label is a scope, not a SKU.
+        if (SCOPE_POLICIES.get(field) == "electrical" and
+                infer_semantic_scope(field, clause) != infer_semantic_scope(field, body)):
+            return clause, None
+    if ":" in separator or "：" in separator or known or re.search(r"[\d_.-]", token):
+        return body, token
+    return clause, None
+
+
+def _product_for_clause(clause: str, facts: list[dict[str, Any]],
+                        explicit_token: str | None = None) -> tuple[str | None, bool]:
     if any(f.get("product_identity_status") in {"ambiguous", "unresolved"} for f in facts):
         return None, True
+    if explicit_token:
+        owners = {f["product_id"] for f in facts if f.get("product_id")
+                  and f.get("field") in {"sku", "model", "variant"}
+                  and normalize_text(str(f.get("value", ""))) == normalize_text(explicit_token)}
+        return (next(iter(owners)), False) if len(owners) == 1 else (None, True)
     products = {str(f.get("product_id")) for f in facts if f.get("product_id")}
-    if len(products) <= 1:
-        return (next(iter(products)) if products else None), False
     text = normalize_text(clause)
     mentioned: set[str] = set()
     for fact in facts:
@@ -96,10 +130,33 @@ def _product_for_clause(clause: str, facts: list[dict[str, Any]]) -> tuple[str |
             fact.get("product_id")
             and fact.get("field") in {"sku", "model", "variant"}
             and token
-            and token in text
+            and re.search(_bounded_alias(token), text)
         ):
             mentioned.add(str(fact["product_id"]))
+    if not mentioned and len(products) <= 1:
+        return (next(iter(products)) if products else None), False
     return (next(iter(mentioned)) if len(mentioned) == 1 else None), len(mentioned) != 1
+
+
+def _evaluate_claim(field: str, value: Any, unit: str | None, scope: str | None,
+                    product_id: str | None, product_ambiguous: bool,
+                    references: dict[str, list[dict[str, Any]]]) -> tuple[str, str, str, list[dict[str, Any]]]:
+    """All spellings share the same product/field/scope/value contract."""
+    candidates = references.get(field, [])
+    if product_id:
+        candidates = [f for f in candidates if f.get("product_id") in {None, product_id}]
+    scoped = [f for f in candidates if _scope_matches(scope, f.get("scope"))]
+    exact = [f for f in scoped if values_equal(value, f.get("value"))
+             and (unit or "") == (f.get("unit") or "")]
+    if product_ambiguous:
+        return "needs_review", "product_ambiguous", "声明中的商品未获得明确授权，或无法确定所属商品。", candidates
+    if exact:
+        return "supported", "", "与同商品、同字段、同口径的已确认事实一致。", exact
+    kind = "scope_ambiguous" if candidates and not scoped else "conflict" if scoped else "unsupported"
+    reason = {"conflict": "与授权的已确认参数不一致。",
+              "unsupported": "该字段没有授权的已确认依据。",
+              "scope_ambiguous": "参数口径或适用条件不明确，需要人工核对。"}[kind]
+    return "needs_review" if kind == "scope_ambiguous" else kind, kind, reason, scoped or candidates
 
 
 def _claim_row(claim: ClaimCandidate, raw_value: str | None = None) -> dict[str, Any]:
@@ -108,6 +165,16 @@ def _claim_row(claim: ClaimCandidate, raw_value: str | None = None) -> dict[str,
     row.update({"raw_value": raw_value, "value": claim.normalized_value,
                 "unit": claim.normalized_unit, "fact_ids": list(claim.evidence_ids)})
     return row
+
+
+def _claim_prefix_bound(prefix: str, field: str, scope: str | None) -> bool:
+    """A value match cannot certify unexplained words before its label."""
+    prefix = prefix.strip(" \t-*•`_:：")
+    if not prefix or re.fullmatch(r"(?:该|本)?产品", prefix):
+        return True
+    direction = {"input": "input", "output": "output", "输入": "input", "输出": "output"}.get(prefix.casefold())
+    return bool(SCOPE_POLICIES.get(field) == "electrical" and direction
+                and direction in (scope or "").split("|"))
 
 
 def check_draft(text: str, facts: list[dict[str, Any]]) -> dict[str, Any]:
@@ -135,16 +202,10 @@ def check_draft(text: str, facts: list[dict[str, Any]]) -> dict[str, Any]:
             offset = max(offset, clause_start + len(clause))
             if not clause.strip():
                 continue
-            product_id, product_ambiguous = _product_for_clause(clause, facts)
-            parameter_text, product_token = strip_product_prefix(clause)
+            parameter_text, product_token = _claim_product_prefix(clause, facts)
+            product_id, product_ambiguous = _product_for_clause(clause, facts, product_token)
             if product_token:
-                # Strip only a product token supported by identity references.
-                # An unfamiliar token still gets explicit identity feedback.
-                owners = {f.get("product_id") for f in facts if f.get("field") in {"sku", "model"}
-                          and normalize_text(str(f.get("value", ""))) == normalize_text(product_token)}
-                if len(owners) == 1:
-                    product_id, product_ambiguous = next(iter(owners)), False
-                    clause = parameter_text
+                clause = parameter_text
             explicit = explicit_parameter(clause)
             if explicit and explicit[0].name.startswith("custom_"):
                 spec, _raw = explicit
@@ -177,8 +238,10 @@ def check_draft(text: str, facts: list[dict[str, Any]]) -> dict[str, Any]:
                             findings.append({"kind": "unverified", "line": line_number,
                                              "field": field, "message": "参数单位或表达无法可靠核对。"})
                         continue
-                    raw = measurement.group()
-                    span = measurement.span()
+                    # The whole labeled value is the claim. Taking only a
+                    # regex measurement loses 'not', bounds and conditions.
+                    raw = tail.strip(" ,，;；*`")
+                    span = (match.end(), end)
                 normalized = normalize_value(field, raw)
                 if field == "capacity" and normalized.unit == "mAh" and references.get("capacity_charge"):
                     field = "capacity_charge"
@@ -199,27 +262,11 @@ def check_draft(text: str, facts: list[dict[str, Any]]) -> dict[str, Any]:
                     elif len(directions) > 1:
                         scope = "ambiguous"
                 consumed.append(span)
-                candidates = references.get(field, [])
-                if product_id:
-                    candidates = [f for f in candidates if f.get("product_id") in {None, product_id}]
-                scoped = [f for f in candidates if _scope_matches(scope, f.get("scope"))]
-                exact = [f for f in scoped if values_equal(normalized.value, f.get("value"))
-                         and (normalized.unit or "") == (f.get("unit") or "")]
-                if product_ambiguous:
-                    claim_status, kind = "needs_review", "product_ambiguous"
-                    reason = "资料包包含多个商品，但声明没有可验证的商品身份。"
-                    expected = candidates
-                elif exact:
-                    claim_status, kind = "supported", ""
-                    reason = "与同商品、同字段、同口径的已确认事实一致。"
-                    expected = exact
-                else:
-                    kind = "scope_ambiguous" if candidates and not scoped else "conflict" if scoped else "unsupported"
-                    claim_status = "needs_review" if kind == "scope_ambiguous" else kind
-                    reason = {"conflict": "与授权的已确认参数不一致。",
-                              "unsupported": "该字段没有授权的已确认依据。",
-                              "scope_ambiguous": "输入/输出或参数口径不明确，需要人工核对。"}[kind]
-                    expected = scoped or candidates
+                claim_status, kind, reason, expected = _evaluate_claim(
+                    field, normalized.value, normalized.unit, scope, product_id, product_ambiguous, references)
+                if claim_status == "supported" and not _claim_prefix_bound(clause[:aliases[0].start()], field, scope):
+                    claim_status, kind, reason, expected = ("needs_review", "unverified",
+                        "字段前还有未核对的限定或条件，不能仅凭数值一致判定通过。", [])
                 evidence_ids = [str(f.get("fact_id")) for f in expected if f.get("fact_id")]
                 used.update(evidence_ids)
                 claim = ClaimCandidate(
@@ -243,28 +290,32 @@ def check_draft(text: str, facts: list[dict[str, Any]]) -> dict[str, Any]:
                 for ip in STANDALONE_IP.finditer(clause):
                     raw = re.sub(r"\s+", "", ip.group()).upper()
                     normalized = normalize_value("ip_rating", raw)
-                    candidates = references.get("ip_rating", [])
-                    if product_id:
-                        candidates = [f for f in candidates if f.get("product_id") in {None, product_id}]
-                    exact = [f for f in candidates if values_equal(normalized.value, f.get("value"))]
-                    status = "supported" if exact and not product_ambiguous else "needs_review" if product_ambiguous else "unsupported"
-                    reason = "与已确认防护等级一致。" if status == "supported" else "防护等级没有同商品的已确认依据。"
-                    evidence_ids = [str(f.get("fact_id")) for f in exact if f.get("fact_id")]
+                    scope = infer_semantic_scope("ip_rating", clause) or DEFAULT_SCOPES.get("ip_rating")
+                    status, kind, reason, expected = _evaluate_claim(
+                        "ip_rating", normalized.value, normalized.unit, scope, product_id, product_ambiguous, references)
+                    if status == "supported" and (not _claim_prefix_bound(clause[:ip.start()], "ip_rating", scope)
+                            or clause[ip.end():].strip(" \t,，;；*`")):
+                        status, kind, reason, expected = ("needs_review", "unverified",
+                            "防护等级前后还有未核对的限定或条件，请明确完整写法。", [])
+                    evidence_ids = [str(f.get("fact_id")) for f in expected if f.get("fact_id")]
                     used.update(evidence_ids)
                     claim = ClaimCandidate(
                         claim_id=_claim_id(line=line_number, clause=clause, field="ip_rating",
-                                           value=normalized.value, unit=None, scope=None, product_id=product_id),
+                                           value=normalized.value, unit=normalized.unit, scope=scope, product_id=product_id),
                         raw_text=clause.strip(), line=line_number, field="ip_rating", field_label=LABELS["ip_rating"],
-                        normalized_value=normalized.value, product_id=product_id, status=status,
+                        normalized_value=normalized.value, normalized_unit=normalized.unit, scope=scope,
+                        product_id=product_id, status=status,
                         evidence_ids=evidence_ids, reason=reason,
                         provenance={"extraction_method": "deterministic_standalone_ip"},
                     )
                     claims.append(_claim_row(claim, raw))
                     consumed.append(ip.span())
-                    if status != "supported":
-                        findings.append({"kind": "unsupported" if not product_ambiguous else "product_ambiguous",
+                    if kind:
+                        findings.append({"kind": kind,
                                          "line": line_number, "field": "ip_rating", "observed": raw,
-                                         "message": reason, "expected": []})
+                                         "message": reason, "expected": [
+                                             {k: f.get(k) for k in ("fact_id", "product_id", "value", "unit", "scope")}
+                                             for f in expected]})
 
             for assertion in INFERENTIAL_ASSERTION.finditer(clause):
                 if any(start <= assertion.start() and assertion.end() <= end for start, end in consumed):

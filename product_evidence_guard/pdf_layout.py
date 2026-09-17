@@ -273,7 +273,10 @@ def read_layout_page(page, number: int) -> tuple[list[dict], list[dict]]:
         return [], [{"code": "page_text_limit", "locator": {"page": number},
                      "message": "本页文字结构超过安全上限，其余页面继续读取；请拆分或简化本页。"}]
     clean = page.dedupe_chars()
-    words = clean.extract_words(x_tolerance=2, y_tolerance=3, extra_attrs=["size"])
+    # Word gaps shrink with the font. An absolute 2 pt tolerance swallowed
+    # real spaces in 8 pt specifications, turning Input Current into an
+    # unrelated custom field and Model Name into an unbound table header.
+    words = clean.extract_words(x_tolerance=1, x_tolerance_ratio=.12, y_tolerance=3, extra_attrs=["size"])
     records: list[dict] = []
     issues: list[dict] = []
     consumed: list[tuple] = []
@@ -288,7 +291,7 @@ def read_layout_page(page, number: int) -> tuple[list[dict], list[dict]]:
             "explicit_horizontal_lines": horizontal, "explicit_vertical_lines": vertical,
             "join_tolerance": 4}) if len(horizontal) >= 2 and len(vertical) >= 2 else []
     for index, table in enumerate(tables):
-        raw = table.extract(x_tolerance=2, y_tolerance=3)
+        raw = table.extract(x_tolerance=1, x_tolerance_ratio=.12, y_tolerance=3)
         # Reject diagrams with no meaningful parameter labels.
         if len(raw) < 2 or not any(field_for_label(split_label_unit(str(row[0] or ""))[0]) for row in raw if row):
             continue
@@ -385,10 +388,9 @@ def read_layout_page(page, number: int) -> tuple[list[dict], list[dict]]:
             text = f"{_cell_text(cell.header)}: {_cell_text(cell.value)}"
             records.append({"text": text,
                             "locator": _locator(page, number, cell.location, table=index, row=cell.row_number),
-                            "provenance": {"table_id": table_id, "atomic_parameter": True, "parent_labels": list(dict.fromkeys(parents)),
+                            "provenance": {**cell.provenance, "table_id": table_id, "atomic_parameter": True, "parent_labels": list(dict.fromkeys(parents)),
                                 ("condition_bbox" if cell.whole_parameter_row else "value_bbox"): cell.location,
-                                "structured_row": {"row_id": cell.row_id, "identity": cell.identity,
-                                                   "field": cell.field}}})
+                                }})
         missing = [rn for rn, cells in expanded if rn >= 0 and rn not in bound_rows and
                    any(re.search(r"\d", str(value or "")) for _, value in cells[1:]) and
                    header_field(cells[0][1]) not in {"model", "sku", "variant"}]

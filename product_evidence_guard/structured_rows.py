@@ -23,6 +23,14 @@ class StructuredCell:
     identity: dict[str, str]
     parent_labels: tuple[str, ...] = ()
     whole_parameter_row: bool = False
+    parameter_value: str | None = None
+
+    @property
+    def provenance(self) -> dict[str, Any]:
+        row = {"row_id": self.row_id, "identity": dict(self.identity), "field": self.field}
+        if self.parameter_value is not None:
+            row["parameter_value"] = self.parameter_value
+        return {"structured_row": row, "parent_labels": list(self.parent_labels)}
 
 
 _VARIANT_HEADERS = {
@@ -270,11 +278,16 @@ def bind_table(rows: Sequence[tuple[int, Sequence[tuple[Any, Any]]]], *,
 
 
 def _heading(value):
-    return re.sub(r"\s+", " ", str(value or "")).strip().casefold().rstrip(".")
+    return _cell_value(value).casefold().rstrip(".")
 
 
-_PARAMETER_HEADERS = {"parameter", "parameters", "characteristic", "characteristics", "item", "参数", "特性", "项目"}
-_VALUE_HEADERS = {"value", "values", "min", "typ", "max", "minimum", "typical", "maximum", "数值", "值", "最小", "典型", "最大"}
+def _cell_value(value):
+    return re.sub(r"\s+", " ", str(value) if value is not None else "").strip()
+
+
+_PARAMETER_HEADERS = {"parameter", "parameters", "characteristic", "characteristics", "item", "feature", "functionality", "参数", "特性", "项目"}
+_UNQUALIFIED_VALUE_HEADERS = {"value", "values", "specification", "specifications", "support", "数值", "值"}
+_VALUE_HEADERS = _UNQUALIFIED_VALUE_HEADERS | {"min", "typ", "max", "minimum", "typical", "maximum", "最小", "典型", "最大"}
 
 
 def parameter_header_columns(values):
@@ -309,7 +322,6 @@ def bind_parameter_matrix(rows, *, table_id):
     Only actual merged geometry may repeat labels or units across subrows.
     No field names or product models are needed to recognize this structure.
     """
-    qualifiers = {"condition", "conditions", "test condition", "test conditions", "classification", "comments", "测试条件", "条件", "分类"}
     units = {"unit", "units", "单位"}
     header = None
     for position, (_, cells) in enumerate(rows[:6]):
@@ -321,35 +333,57 @@ def bind_parameter_matrix(rows, *, table_id):
     if header is None:
         return None
     position, names, label_cols, value_cols = header
+    identity_cols = {i: header_field(name) for i, name in enumerate(names)
+                     if header_field(name) in {"sku", "model", "variant"}}
+    structural_cols = set(label_cols) | set(value_cols) | set(identity_cols) | {
+        i for i, name in enumerate(names) if name in units}
     result = []
     for rn, cells in rows[position + 1:]:
         if len(cells) != len(names):
             continue
         # Several measurements stacked in one physical cell need an inner
         # row binder. Flattening them loses which condition owns each value.
-        if any(sum(bool(re.search(r"\d", line)) for line in str(cells[i][1] or "").splitlines()) > 1
+        if any(sum(bool(re.search(r"\d", line)) for line in str(cells[i][1]).splitlines()) > 1
                for i in value_cols):
             continue
-        label_parts = list(dict.fromkeys(re.sub(r"\s+", " ", str(cells[i][1] or "")).strip() for i in label_cols))
+        label_parts = list(dict.fromkeys(_cell_value(cells[i][1]) for i in label_cols))
         label = " ".join(p for p in label_parts if p)
         spec = field_for_label(split_label_unit(label)[0])
         if not spec or _heading(label) in _PARAMETER_HEADERS:
             continue
-        unit = " ".join(dict.fromkeys(re.sub(r"\s+", "", str(cells[i][1] or "")) for i, name in enumerate(names) if name in units)).strip()
-        conditions = [re.sub(r"\s+", " ", str(cells[i][1] or "")).strip() for i, name in enumerate(names) if name in qualifiers]
-        conditions = [s for s in conditions if s and s not in {"-", "—"}]
+        unit = " ".join(dict.fromkeys(re.sub(r"\s+", "", _cell_value(cells[i][1])) for i, name in enumerate(names) if name in units)).strip()
+        identity_values: dict[str, set[str]] = {}
+        for i, field in identity_cols.items():
+            token = _cell_value(cells[i][1])
+            if token and token not in {"-", "—"}:
+                identity_values.setdefault(field, set()).add(token)
+        identity = identity_from_values(identity_values)
+        if any(field not in identity_values for field in identity_cols.values()):
+            identity["_ambiguous_identity"] = "true"
+        conditions = []
+        for i, name in enumerate(names):
+            if i in structural_cols:
+                continue
+            context = _cell_value(cells[i][1])
+            if context and context not in {"-", "—"}:
+                # Unknown headers are context too. Retain their dimension,
+                # so e.g. Region=Standard and Mode=Standard cannot collapse.
+                generic = bool(re.search(r"(?:\bconditions?|条件)$", name))
+                conditions.append(context if generic else f"{name or 'column ' + str(i + 1)}: {context}")
         values = []
         locations = []
         for i in value_cols:
-            value = re.sub(r"\s+", " ", str(cells[i][1] or "")).strip()
+            value = _cell_value(cells[i][1])
             if not value or value in {"-", "—"}:
                 continue
-            prefix = names[i] + ": " if len(value_cols) > 1 or names[i] not in {"value", "values", "值", "数值"} else ""
+            # Generic column roles are not part of the measurement. Keep
+            # actual qualifiers (min/typ/max) and distinct multi-column roles.
+            prefix = names[i] + ": " if len(value_cols) > 1 or names[i] not in _UNQUALIFIED_VALUE_HEADERS else ""
             values.append(prefix + value + (" " + unit if unit and unit not in {"-", "—"} else ""))
             locations.append(cells[i][0])
         if not values:
             continue
-        value = "; ".join(values)
+        parameter_value = value = "; ".join(values)
         if conditions:
             value += " (" + "; ".join(conditions) + ")"
         if len(value) > 512:
@@ -359,5 +393,7 @@ def bind_parameter_matrix(rows, *, table_id):
         boxes = [loc for loc, _ in cells if isinstance(loc, (list, tuple)) and len(loc) == 4]
         location = (min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes), max(b[3] for b in boxes)) if boxes else locations[0]
         row_id = hashlib.sha256(json.dumps([table_id, rn], ensure_ascii=False).encode()).hexdigest()[:20]
-        result.append(StructuredCell(rn, location, label, spec.name, value, row_id, {}, tuple(conditions), True))
+        result.append(StructuredCell(rn, location, label, spec.name, value, row_id, identity,
+                                     tuple(conditions), True,
+                                     parameter_value if spec.value_type != "text" else None))
     return result
